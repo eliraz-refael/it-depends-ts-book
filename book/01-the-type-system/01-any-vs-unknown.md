@@ -10,9 +10,15 @@ She pauses, the way she always does before the sentence that ends the confusion.
 
 "`any` is not a type. It is the absence of typing — a voluntary exit from the type system. When you write `any`, you are not describing your data. You are telling the compiler: *'I don't know, and I don't want to know.'*"
 
-**Theo Compiler** leans forward with a clarification:
+Ada walks to the whiteboard and draws two arrows. One pointing down from `any` to every other type. One pointing up from every other type to `any`. Both directions. No restrictions.
 
-"Ada's right, but let me make it precise. `any` has a property that no real type has — it's both assignable *to* every type and assignable *from* every type. Watch:"
+Then she draws `unknown` — arrows pointing up from every type *to* it, but nothing pointing down. A one-way door.
+
+"That," she says, tapping the whiteboard, "is the difference. And it's the only difference that matters."
+
+**Theo Compiler** leans forward to make it precise:
+
+"Let me put Ada's whiteboard into code. `any` has a property that no real type has — it's both assignable *to* every type and assignable *from* every type. Watch:"
 
 ```typescript
 let value: any = "hello";
@@ -103,7 +109,7 @@ function formatResponse(data: any) {
 
 **Marcus**: "That's not fair—"
 
-**Helena**: "It's on a sticky note on your desk, Marcus. *'We can fix it in the next sprint.'* You know what I found when I audited the codebase? That `any` parameter had been there for eight sprints. Eight. With a TODO comment dated from the week you joined the team."
+**Helena** leans forward, and there's nothing polite about it now: "It's on a sticky note on your desk, Marcus. *'We can fix it in the next sprint.'* You know what I found when I audited the codebase? That `any` parameter had been there for eight sprints. Eight. With a TODO comment dated from the week you joined the team. Your `any` is my on-call page. Literally. I got paged at 2 AM because of that `Invalid Date`."
 
 Marcus doesn't have a comeback for that one. Not because he agrees — but because the TODO is still there.
 
@@ -251,6 +257,8 @@ She turns the screen so everyone can see the chart. No one argues with Elena's c
 **Sarah**: "No. The data says *untracked* `any` is a liability. Tracked `any` with a reduction plan is the most successful migration strategy we have. There's a difference between a controlled burn and a wildfire."
 
 Helena opens her mouth, then closes it. Sarah has a point, and Helena knows it.
+
+**Sarah** adds, quieter now: "I've seen `any` save a migration deadline. I've also seen it cause a six-figure production outage three months later — because nobody went back to finish the job. The `any` isn't the problem. The *forgetting* is the problem."
 
 ---
 
@@ -455,9 +463,9 @@ app.post("/users", (req, res) => {
 });
 ```
 
-**Helena**: "Wrap the dependency. Create a typed facade. This isn't hard."
+**Helena**: "Wrap the dependency. Create a typed facade. This isn't hard. And frankly, if a library ships `any` in its public API in 2025, that's a library that doesn't respect its consumers."
 
-**Marcus**: "You want me to wrap Express? That's hundreds of endpoints. The cure is worse than the disease."
+**Marcus**: "You want me to wrap Express? *Express.* That's hundreds of endpoints. The cure is worse than the disease."
 
 **Diana Class** speaks up — her first strong moment in the debate:
 
@@ -819,6 +827,8 @@ declare function chargeUser(method: any, amount: number): Promise<void>;
 Zero `any` in the application logic. One documented, tracked `any` at the untyped boundary. Every value narrowed before use.
 
 The difference isn't just safety — it's *searchability*. When the payment SDK eventually publishes types (or when you write a wrapper), you can find every `any` in the codebase with a single search, read the comment to understand the context, and replace it with confidence. Try doing that when `any` is scattered through fifty files with no documentation.
+
+Where does each voice land? Helena wins the default: `unknown` over `any`, always. Sarah wins the migration path: tracked `any` with a reduction plan beats no migration at all. Marcus wins the acknowledgment that zero isn't the goal — *intentional* is. And Ravi wins the framing: every `any` is a 'here be dragons,' not a permanent feature of the map.
 
 ## Additional Takes
 
