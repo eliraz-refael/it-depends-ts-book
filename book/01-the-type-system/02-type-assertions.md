@@ -161,7 +161,7 @@ dog.bark(); // Runtime: dog.bark is not a function
 
 He pauses.
 
-"If the library types are wrong, there are options. Declare a module augmentation. Write a thin wrapper with the correct type. Use a type guard that validates the actual runtime shape. All of these are more work than `as unknown as X`. All of them are safer. The TypeScript compiler codebase has zero double assertions — when the types are wrong, we fix the types."
+"If the library types are wrong, there are options. Declare a module augmentation. Write a thin wrapper with the correct type. Use a type guard that validates the actual runtime shape. All of these are more work than `as unknown as X`. All of them are safer. You'll find almost no double assertions in the TypeScript compiler codebase — when the types are wrong, we fix the types."
 
 ---
 
@@ -172,6 +172,17 @@ He pauses.
 "Let me show you something every developer has written. A test that needs a `User` object, but only cares about the `name` field:"
 
 ```typescript
+interface UserPreferences {
+  theme: "light" | "dark";
+  notifications: boolean;
+  locale: string;
+}
+
+interface Team {
+  id: string;
+  name: string;
+}
+
 interface User {
   id: string;
   name: string;
@@ -182,11 +193,17 @@ interface User {
   preferences: UserPreferences;
   team: Team;
 }
+```
 
-// What I want to write:
+"What I want to write:"
+
+```typescript
 const mockUser = { id: "1", name: "Test User" } as User;
+```
 
-// What Helena wants me to write:
+"What Helena wants me to write:"
+
+```typescript
 const mockUser: User = {
   id: "1",
   name: "Test User",
@@ -227,11 +244,15 @@ const mockUser = createMockUser({ name: "Test User" });
 
 "Write the factory once. Use it everywhere. When the `User` interface changes — and it will — you update one function, not two hundred test files."
 
+**Marcus** isn't fully convinced:
+
+"Factories hide which fields the test actually depends on. With the assertion, I can *see* that this test only cares about `id` and `name`. With the factory, I'm reading twelve default values to figure out which ones matter and which are noise."
+
 **Dr. Elena Voss** opens her laptop. *"What does the data say?"*
 
 "Test files account for 62% of all type assertions in the codebases I've studied. Teams that use factory functions instead of assertions in tests report 40% fewer test maintenance issues when interfaces change — because the factory breaks in one place, not in every test file."
 
-**Marcus**: "That's a mature test infrastructure. For a team writing their first tests, the assertion is the stepping stone."
+**Marcus**: "Fine. But that's a mature test infrastructure. For a team writing their first tests, the assertion is the stepping stone."
 
 **Helena**: "Then step. Don't camp."
 
@@ -268,8 +289,11 @@ const palette = {
   accent: "purple", // Typo!
 } satisfies Record<string, Color>;
 // Error: Type '"purple"' is not assignable to type 'Color'.
+```
 
-// With as, this would silently pass:
+"Now watch what happens with `as`:"
+
+```typescript
 const palette = {
   primary: "red",
   secondary: "green",
@@ -327,7 +351,27 @@ const name = user!.name;
 // Only safe if you can PROVE user isn't null.
 ```
 
-**Theo Compiler**, briefly: "Both Jordan and Helena are correct. The `!` is an assertion — full stop. Treat it like one. If you can prove the value exists through control flow, do that instead. If you genuinely can't and the `!` is the only option, it should pass the same checklist as any other assertion: why is it here, and what happens when it's wrong."
+**Marcus** jumps in:
+
+"Here's one Helena can't wiggle out of. You check a `Map` with `.has()`, then access it. The compiler doesn't narrow through `.has()` — it's a known limitation:"
+
+```typescript
+const cache = new Map<string, User>();
+
+if (cache.has(userId)) {
+  const user = cache.get(userId);
+  //    ^? const user: User | undefined
+  // The compiler can't connect .has() to .get()
+  // Option 1: redundant undefined check
+  // Option 2: user!
+}
+```
+
+"You've *proven* the value exists one line above. The compiler just can't see it. What do you want me to do — restructure the code around a tooling limitation?"
+
+**Helena**, reluctantly: "Use `get` and check the result directly. But... yes. That's one of the cases where `!` is defensible. I still want a comment."
+
+**Theo Compiler** closes the thread: "Both Jordan and Helena are correct. The `!` is an assertion — full stop. Treat it like one. If you can prove the value exists through control flow, do that instead. If you genuinely can't — and the `Map.has()` case is a real example — the `!` should pass the same checklist as any other assertion: why is it here, and what happens when it's wrong."
 
 ## The Turn
 
@@ -368,7 +412,7 @@ He draws a simple diagram: a line from "the lie" on one end to "the crash" on th
 | Library types are wrong | Fix the types / PR upstream | `as` with documented justification |
 | Double assertion (`as unknown as X`) | Redesign the approach | Almost never |
 
-**The assertion checklist** — for any `as` that survives code review:
+**The assertion checklist** — for any assertion (`as`, `!`) that survives code review:
 
 1. **Why** can't the compiler infer this? (Document the answer.)
 2. **What happens** at runtime if this assertion is wrong?
@@ -377,10 +421,10 @@ He draws a simple diagram: a line from "the lie" on one end to "the crash" on th
 
 ## Additional Takes
 
-**Helena Strictland**: "Every `as` in a code review gets the same question from me: 'What evidence do you have?' If the answer is 'I just know,' the PR stays open."
+**Helena Strictland**: "Every assertion in a code review — `as`, `!`, all of it — gets the same question from me: 'What evidence do you have?' If the answer is 'I just know,' the PR stays open."
 
 **Marcus Shipley**: "I'll use `satisfies` for new code. I'm not rewriting two hundred existing assertions for a theoretical improvement." — **Chen Wei**, without looking up: "You will when one of them pages you at 3 AM."
 
 **Alex Turing**: "`satisfies` is TypeScript's apology for `as`. They just can't deprecate `as` without breaking the internet."
 
-**Jordan Doubt**: "We spent this whole chapter on `as`, but nobody mentioned that `<Type>value` is the same assertion in angle-bracket syntax. How many of you forgot that existed?"
+**Jordan Doubt**: "So the assertion checklist boils down to: 'When this is wrong, how will I know?' Has anyone considered that if you can answer that question, you probably don't need the assertion?"
