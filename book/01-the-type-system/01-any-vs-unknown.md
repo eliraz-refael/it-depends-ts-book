@@ -132,9 +132,11 @@ function processInput(value: unknown) {
   }
   throw new Error("Unsupported type");
 }
+```
 
+```typescript
 // With any
-function processInput(value: any) {
+function processInputUnsafe(value: any) {
   if (typeof value === "string") {
     return value.toUpperCase();
   }
@@ -152,12 +154,14 @@ function processInput(value: any) {
 "The difference is *explicitness*. With `unknown`, you're forced to prove what you have before you use it. Forget the type guard — watch what happens when you skip it:"
 
 ```typescript
-function processInput(value: unknown) {
+function processInputSafe(value: unknown) {
   return value.toUpperCase();
   //     ^^^^^ 'value' is of type 'unknown'
 }
+```
 
-function processInput(value: any) {
+```typescript
+function processInputUnsafe(value: any) {
   return value.toUpperCase();
   // No error. Compiles fine. Explodes at runtime if value isn't a string.
 }
@@ -176,12 +180,14 @@ function parseConfig(raw: any): any {
 
 const config = parseConfig(input);
 config.database.host.toUpperCase(); // No error. No safety. Good luck.
+```
 
-function parseConfig(raw: string): unknown {
+```typescript
+function parseConfigSafe(raw: string): unknown {
   return JSON.parse(raw);
 }
 
-const config = parseConfig(input);
+const config = parseConfigSafe(input);
 config.database.host.toUpperCase();
 // ^^^ 'config' is of type 'unknown'
 // You MUST narrow before you can use it.
@@ -428,7 +434,7 @@ function processOrder(order, options) {
   const tax = order.total * options.taxRate;
 
   // Bug 2: options.taxRate is actually a string like "0.08".
-  // String * string = NaN. No type error.
+  // undefined * "0.08" = NaN. No type error.
   return tax;
 }
 ```
