@@ -80,6 +80,12 @@ analytics.track("button_click", {
 
 "Shipped in ten minutes. Works perfectly. The alternative was three hours writing type definitions for an SDK we might replace next quarter. I made a business decision."
 
+**Theo Compiler** speaks before Helena can. The room notices — Theo rarely weighs in this early.
+
+"For a third-party SDK with no types that you might replace next quarter, `declare const analytics: any` is exactly what the compiler team would expect you to do. The sin isn't the `any` — it's forgetting to come back."
+
+Marcus looks genuinely surprised to have an expert in his corner. It won't last.
+
 **Helena Strictland** is already shaking her head:
 
 "Let me tell you about *my* Tuesday. I spent four hours debugging a production error that traced back to exactly this kind of 'business decision.' Someone — I'm not naming names, *Marcus* — added `any` to a utility function six months ago. One parameter, one `any`. Here's what happened:"
@@ -254,9 +260,13 @@ export function fetchUserProfile(userId: string): Promise<any> {
 
 **Dr. Elena Voss** opens her laptop. *"What does the data say?"*
 
-"Across twelve enterprise migrations I've studied: teams that use `any` as a migration tool *with tracking* reduce their `any` count by 80% within six months. Teams that try to fully type everything from day one? They abandon the migration within three months. The completion rate drops to 12%."
+"Across the enterprise migrations I've studied, the pattern is consistent: teams that use tracked `any` with reduction plans consistently hit low single-digit `any` rates within six months. Teams that try to fully type everything from day one? Most abandon the migration within a quarter."
 
-She turns the screen so everyone can see the chart. No one argues with Elena's charts.
+She turns the screen so everyone can see the chart.
+
+**Jordan**: "What's your sample size, Elena? And how do you control for the fact that teams with tracked `any` probably have better engineering practices across the board?"
+
+**Elena**: "Twelve codebases across four industries. And you're right — correlation isn't causation. But the pattern holds even when I control for team size and codebase age."
 
 **Helena**: "So the data says `any` is a liability even during migration."
 
@@ -383,69 +393,6 @@ startServer(port, host);         // port and host ARE checked against function s
 **Jordan**: "Finally, something everyone can agree on."
 
 **Helena**: "Don't get used to it."
-
----
-
-### "The noImplicitAny debate"
-
-**Helena**: "Can we talk about `noImplicitAny`? It should be mandatory. End of discussion. Implicit `any` is always a bug:"
-
-```typescript
-// Without noImplicitAny
-function greet(name) {
-//              ^^^^ implicitly 'any'
-  return `Hello, ${name.toUpperCase()}`;
-}
-
-greet(42); // No error. Runtime crash.
-
-// With noImplicitAny
-function greet(name) {
-//              ^^^^ Error: Parameter 'name' implicitly has an 'any' type
-  return `Hello, ${name.toUpperCase()}`;
-}
-```
-
-**Marcus**: "For new projects, sure. But for existing projects, enabling it produces ten thousand errors overnight. You just gave every developer on the team a reason to hate TypeScript."
-
-**Sarah Chen** sees the middle ground:
-
-"You enable it incrementally. Start with new files only — add a comment directive or configure it per-directory if your build system supports it. Or use `// @ts-expect-error` as a tracking mechanism — it's self-documenting debt."
-
-**Alex Turing** points out the bigger picture:
-
-"`noImplicitAny` is included in `strict: true`. So this debate is really about whether to use strict mode at all. We'll get to that in Chapter 5. But here's the thing — if you're not running `noImplicitAny`, you might as well be writing JavaScript with extra steps."
-
-**Chen Wei** intervenes, and the room quiets:
-
-"The question isn't *whether* to enable it. It's *when* and *how*. Every team should get there. Not every team should get there today."
-
-He looks at Helena and Marcus in turn.
-
-"Helena, your position is correct but your timeline is wrong. Marcus, your objection is valid but your conclusion is wrong. Enable it. Just have a plan for the ten thousand errors."
-
-```typescript
-// The hidden bugs noImplicitAny reveals:
-function processOrder(order, options) {
-  //                  ^^^^^  ^^^^^^^ both implicitly any
-
-  // Bug 1: order.total was renamed to order.amount three months ago.
-  // No type error. The value is silently undefined.
-  const tax = order.total * options.taxRate;
-
-  // Bug 2: options.taxRate is actually a string like "0.08".
-  // undefined * "0.08" = NaN. No type error.
-  return tax;
-}
-```
-
-"Those are real bugs hiding behind implicit `any`. I've seen both in production. This works. *What happens when it doesn't?*"
-
-**Marcus** stares at the code example. The `NaN` bug is the kind of thing that wouldn't show up in manual testing — the function returns a number, just the wrong number. It would sail through QA and detonate in production when someone's tax calculation comes back as `NaN`.
-
-"Okay," he says. "I'll give you `noImplicitAny`. But we're enabling it with a migration plan, not a big bang."
-
-**Chen Wei**: "That's all I'm asking."
 
 ---
 
@@ -627,9 +574,13 @@ function on(event: string, handler: (...args: any[]) => void): void {
 
 He pauses.
 
-"The answer depends on who's calling the function. But notice — none of the three solutions needed `any`. Zero."
+"The answer depends on who's calling the function. But notice — none of the three solutions needed `any` at the call site. The callers are fully typed."
 
-**Marcus** looks at all three code blocks on the screen. For the first time in the debate, he doesn't have a counterargument. Not because the solutions are simple — they're actually more code than his `any` version. But because each one is clearly better, and he can see it.
+**Jordan** leans in: "But have you considered that Kai's generic version has a type assertion in the *implementation*, and Helena's overload has `any` in the fallback signature? You moved the `any` — you didn't eliminate it."
+
+**Nate**: "Fair. The implementations still have rough edges. But the *public API* is type-safe, and that's where the forty call sites live. The assertion is in one place, not forty. That's the same centralization principle Sarah argued for with API boundaries."
+
+**Marcus** looks at all three code blocks on the screen. He doesn't have a counterargument for the call-site safety. But Jordan's point lands too — "zero `any`" was an overstatement, and everyone in the room heard it.
 
 "I'll use the generic pattern for the event system," he says quietly.
 
@@ -679,7 +630,7 @@ It might be the first time they've agreed on anything.
 
 **Dr. Elena Voss** has been waiting for this. *"What does the data say?"*
 
-"I analyzed thirty-two production codebases last year. Teams with less than 1% `any` usage had 38% fewer runtime type errors, spent 27% less time debugging, and — this surprised me — reported higher developer satisfaction. Teams above 5% `any` had the inverse pattern across all three metrics."
+"I analyzed thirty-two production codebases last year. Teams with near-zero `any` usage had significantly fewer runtime type errors and spent noticeably less time debugging — and, to my surprise, reported higher developer satisfaction. Teams above 5% `any` had the inverse pattern across all three dimensions."
 
 **Sarah Chen**: "Zero `any` is achievable for greenfield. For migrated codebases, under 1% is the realistic target. *I've seen this fail at scale* — but I've also seen it succeed. My last migration landed at 0.3% — eleven remaining `any`s across two million lines. Every single one was documented."
 
@@ -755,7 +706,7 @@ This is the principle the entire chapter has been building toward. Not "never us
 1. **Default to `unknown`** for values of uncertain type
 2. **Use type narrowing** — type guards, `instanceof`, discriminated unions — to work with `unknown` values safely
 3. **When `any` is necessary** (migration, untyped dependencies, compiler limitations), document *why* and create a tracking ticket
-4. **Enable `noImplicitAny`** — implicit `any` is always a bug
+4. **Enable `noImplicitAny`** — implicit `any` is always a bug (more on this in Chapter 5: Strict Mode)
 5. **Track `any` usage** as tech debt with measurable reduction targets
 6. **Wrap untyped boundaries** — create typed facades at system edges where `any` leaks in from dependencies
 

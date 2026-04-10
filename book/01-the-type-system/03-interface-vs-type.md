@@ -317,6 +317,10 @@ She looks at it. Four classes. A constructor in each. An `as User` assertion hid
 
 This is Diana adapting, not retreating. She draws the line clearly: `type` for data, `interface` for behavior contracts.
 
+**Kai**, after a pause: "I should be honest about something. Last month I spent forty minutes debugging a `never` that came from a type intersection conflict. Diana's `extends` would have caught it at the declaration. Composition has costs I don't always admit."
+
+Diana looks at Kai. It might be the first time he's conceded anything to her in the entire book.
+
 ---
 
 ### "Performance — does the compiler care?"
@@ -327,7 +331,7 @@ This is Diana adapting, not retreating. She draws the line clearly: `type` for d
 
 **Alex Turing** provides the source:
 
-"This is from the TypeScript wiki. The recommendation is specific: when you're creating an object type that extends another object type, `interface extends` is faster than `type` with `&`."
+"This is from the TypeScript wiki. The recommendation is narrowly scoped: when you're creating an object type that extends another object type, `interface extends` can be faster than `type` with `&` — especially in large codebases with deeply nested intersections."
 
 ```typescript
 // The TS team recommends this for extending object types:

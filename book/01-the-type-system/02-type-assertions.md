@@ -97,7 +97,9 @@ const ApiUser = z.object({
 });
 
 const response = await fetch("/api/user/123");
-const raw = await response.json();
+const raw: unknown = await response.json();
+// Note: response.json() returns any in the DOM lib types —
+// annotating as unknown is itself a discipline choice.
 const user = ApiUser.parse(raw);
 // Throws with a clear error if the shape is wrong.
 // At the boundary. Where you can handle it.
@@ -250,7 +252,7 @@ const mockUser = createMockUser({ name: "Test User" });
 
 **Dr. Elena Voss** opens her laptop. *"What does the data say?"*
 
-"Test files account for 62% of all type assertions in the codebases I've studied. Teams that use factory functions instead of assertions in tests report 40% fewer test maintenance issues when interfaces change — because the factory breaks in one place, not in every test file."
+"In every codebase I've studied, test files account for the clear majority of type assertions. Teams that switch to factory functions consistently report fewer test maintenance headaches when interfaces change — because the factory breaks in one place, not across every test file."
 
 **Marcus**: "Fine. But that's a mature test infrastructure. For a team writing their first tests, the assertion is the stepping stone."
 
@@ -394,6 +396,12 @@ He turns to the room.
 He draws a simple diagram: a line from "the lie" on one end to "the crash" on the other, with a question mark in the middle.
 
 "Every assertion in your codebase is a bet. You are betting that the world outside your program matches your model of it. Some bets are reasonable — backed by contracts, schemas, tests. Some bets are reckless — backed by hope. The question isn't 'should I use assertions?' The question is: *what is the blast radius when this bet loses?*"
+
+The room is quiet. Marcus is looking at his laptop — not arguing, just scrolling through a file. He doesn't say what he's looking at, but everyone can guess.
+
+**Helena** breaks the silence, and for once she's not attacking anyone: "The uncomfortable part is that strict types don't fix this. If the assertion at the boundary is wrong, everything downstream is *more* dangerous — because the compiler tells you it's safe. You trust it. You build on it. And the distance between the lie and the crash gets longer, not shorter."
+
+It's the first time Helena has admitted that her own approach has a failure mode. Chen Wei nods.
 
 ## The Verdict
 

@@ -212,6 +212,32 @@ When presenting the "losing" side of a debate, still give it a fair hearing. The
 
 ---
 
+## Reliable Structure, Unreliable Outcomes
+
+The book's format is a strength — but format fatigue is a real risk. The solution is not to abandon the structure. It's to make the *outcomes* unpredictable while keeping the *skeleton* reliable.
+
+### What stays predictable
+- The chapter skeleton: Principle → Debate → Turn → Verdict (or "The Debate Continues"). Readers always know where they are.
+- Character roles: experts set principles and intervene; professionals drive the debate.
+- Code-first arguments: every position is backed by a code example.
+
+### What must be unpredictable
+1. **The verdict.** The reader should not be able to guess who "wins" from the Principle. At least one subsection per chapter should go to the side the reader doesn't expect.
+2. **Characters must move.** In every chapter, at least one character should concede a point they wouldn't normally concede, be surprised, or change their mind mid-debate. Characters who only ever defend their archetype become puppets.
+3. **The Turn.** Vary how it's delivered across chapters:
+   - Expert monologue that reframes (the default — use sparingly after Act I)
+   - Turn with character reactions — the insight lands on the characters, not just the reader
+   - Turn that comes early and changes the debate's direction for the second half
+   - Turn delivered by a professional, not an expert
+   - Cold open (production incident or code review) that IS the Turn
+4. **Chapter length.** Not every topic needs 6 debate subsections. Some chapters should be 2,000 words, not 3,500. A shorter, sharper chapter between two long ones changes the pacing.
+5. **Resolution.** At least one chapter per act should end with **"The Debate Continues"** — genuinely unresolved, with conditions under which each position wins.
+
+### Elena Voss's data
+Elena shares patterns and trends from her analyses — directional insights, not fake-precise statistics. She says "the clear majority" not "62%." She says "significantly fewer" not "38% fewer." Jordan may challenge her methodology occasionally (sample size, confounders), which makes the device self-aware. One such pushback per act is enough — doing it every chapter would undermine her.
+
+---
+
 ## Common Mistakes to Avoid
 
 1. **All characters agreeing too quickly.** The debate should feel real — not a setup for a predetermined conclusion.
