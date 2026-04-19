@@ -35,12 +35,12 @@ Check every character appearance against their definition in `PLAN.md`:
 - Does each character stay in voice throughout?
 - Are catchphrases used naturally (not forced, not absent)?
 - Does any character say something that contradicts their archetype?
-  - Helena defending `any`? **FAIL.**
-  - Marcus advocating for slowing down to add types? **FAIL.**
-  - Kai endorsing a class hierarchy? **FAIL.**
-  - Diana praising a pipeline pattern? **Suspicious** (she might grudgingly acknowledge it, but she wouldn't champion it)
+  - Noam defending `any`? **FAIL.**
+  - Oded advocating for slowing down to add types? **FAIL.**
+  - Dafna endorsing a class hierarchy? **FAIL.**
+  - Guy praising a pipeline pattern? **Suspicious** (he might grudgingly acknowledge it, but he wouldn't champion it)
 - Are the right characters activated for this topic? (Reference the activation table in the writing guide)
-- Do character interactions feel natural? (Helena vs Marcus tension, Kai vs Diana foiling, Jordan annoying everyone)
+- Do character interactions feel natural? (Noam vs Oded tension, Dafna vs Guy foiling, Chen annoying everyone)
 
 **Red flags:**
 - Two characters making the same argument
@@ -58,7 +58,7 @@ Check every character appearance against their definition in `PLAN.md`:
   - Verify that mentioned TypeScript features exist and work as described
   - Ensure version-specific features are noted as such
 - Are there any hallucinated APIs, methods, types, or compiler behaviors?
-- Are performance claims or statistics presented as data (from Dr. Elena Voss) plausible and clearly marked as illustrative?
+- Are performance claims or statistics presented as data (from Gil Benchmark) plausible and clearly marked as illustrative?
 - Do "bad" examples actually demonstrate the problem they claim to show?
 - Do "good" examples actually solve the problem?
 
@@ -90,7 +90,7 @@ This is a **fun book to read**, not a reference manual. Check:
 Check that the content aligns with the book's stated stance and voice:
 
 - Is the FP-leaning stance maintained without being preachy?
-- Does Diana (OOP advocate) get fair treatment? Her arguments should be strong even when the verdict goes against her.
+- Does Guy (OOP advocate) get fair treatment? His arguments should be strong even when the verdict goes against him.
 - If there's a verdict, is it opinionated enough? Wishy-washy verdicts waste the reader's time.
 - If there's no verdict ("The Debate Continues"), is the open-endedness justified?
 - Does the chapter earn its "it depends" if it uses one?

@@ -83,24 +83,24 @@ it-depends-ts-book/
 
 | Name                    | Archetype          | Personality                                                                                            | Catchphrase                                  |
 |-------------------------|--------------------|--------------------------------------------------------------------------------------------------------|----------------------------------------------|
-| **Prof. Ada Typeworth** | Language theorist  | Formal logic, calm, drops perfect metaphors. Almost annoyingly patient.                                | *"Let us return to first principles."*       |
-| **Theo Compiler**       | Compiler internist | Dry humor, knows what the compiler *actually* does. Casually invalidates arguments with edge cases.    | *"The compiler disagrees."*                  |
-| **Chen Wei**            | Systems architect  | 20 years production. Doesn't care about theory unless it survives prod. Delivers synthesis.            | *"Show me the stack trace."*                 |
-| **Ravi Lambda**         | FP / Design master | Wise elder from Lisp/Clojure. Speaks in parables and analogies. Warm but uncompromising on simplicity. | *"Complexity is a choice, not a necessity."* |
+| **Prof. Eli Typeworth** | Language theorist  | Formal logic, calm, drops perfect metaphors. Almost annoyingly patient.                                | *"Let us return to first principles."*       |
+| **Daniel Compiler**       | Compiler internist | Dry humor, knows what the compiler *actually* does. Casually invalidates arguments with edge cases.    | *"The compiler disagrees."*                  |
+| **Gilad Stacktrace**            | Systems architect  | 20 years production. Doesn't care about theory unless it survives prod. Delivers synthesis.            | *"Show me the stack trace."*                 |
+| **Liron Closure**         | FP / Design master | Wise elder from Lisp/Clojure. Speaks in parables and analogies. Warm but uncompromising on simplicity. | *"Complexity is a choice, not a necessity."* |
 
 ### The Professionals (drive the debate)
 
 | Name                  | Archetype              | Personality                                                                                            | Catchphrase                           |
 |-----------------------|------------------------|--------------------------------------------------------------------------------------------------------|---------------------------------------|
-| **Helena Strictland** | Type safety absolutist | Personal vendetta against `any` and `as`. Gets visibly upset at unsafe code.                           | *"Over my dead type definition."*     |
-| **Marcus Shipley**    | Velocity advocate      | Ships fast, refactors never. Knows the tradeoffs, picks speed anyway.                                  | *"We can fix it in the next sprint."* |
-| **Dr. Elena Voss**    | Data-driven analyst    | Won't accept claims without benchmarks. Carries dashboards everywhere.                                 | *"What does the data say?"*           |
-| **Sarah Chen**        | Migration veteran      | Converted millions of lines JS→TS. Has seen everything fail at scale.                                  | *"I've seen this fail at scale."*     |
-| **Alex Turing**       | Cutting-edge advocate  | Uses features before they're stable. Half their code needs `@ts-ignore`.                               | *"There's an RFC for that."*          |
-| **Jordan Doubt**      | Socratic skeptic       | Doesn't propose solutions, just pokes holes. Infuriating but indispensable.                            | *"But have you considered..."*        |
-| **Kai Functor**       | FP hard-die            | Everything is a pipeline. Side effects are a personal offense. Would write the entire app in `pipe()`. | *"That's just a map."*                |
-| **Diana Class**       | OOP advocate           | Believes in encapsulation, inheritance hierarchies, and design patterns. SOLID is gospel.              | *"Where's the interface?"*            |
-| **Nate Bridge**       | Balanced pragmatist    | Appreciates both FP and OOP. Picks the right tool per context. The mediator.                           | *"Both have a point here."*           |
+| **Noam Kiperman** | Type safety absolutist | Personal vendetta against `any` and `as`. Gets visibly upset at unsafe code.                           | *"Over my dead type definition."*     |
+| **Oded Shipley**    | Velocity advocate      | Ships fast, refactors never. Knows the tradeoffs, picks speed anyway.                                  | *"We can fix it in the next sprint."* |
+| **Gil Benchmark**    | Data-driven analyst    | Won't accept claims without benchmarks. Carries dashboards everywhere.                                 | *"What does the data say?"*           |
+| **Eden Legacy**        | Migration veteran      | Converted millions of lines JS→TS. Has seen everything fail at scale.                                  | *"I've seen this fail at scale."*     |
+| **Linoy Nightly**       | Cutting-edge advocate  | Uses features before they're stable. Half her code needs `@ts-ignore`.                               | *"There's an RFC for that."*          |
+| **Chen Override**      | Socratic skeptic       | Doesn't propose solutions, just pokes holes. Infuriating but indispensable.                            | *"But have you considered..."*        |
+| **Dafna Functor**       | FP hard-die            | Everything is a pipeline. Side effects are a personal offense. Would write the entire app in `pipe()`. | *"That's just a map."*                |
+| **Guy Singleton**       | OOP advocate           | Believes in encapsulation, inheritance hierarchies, and design patterns. SOLID is gospel.              | *"Where's the interface?"*            |
+| **Dima Bridge**       | Balanced pragmatist    | Appreciates both FP and OOP. Picks the right tool per context. The mediator.                           | *"Both have a point here."*           |
 
 ---
 

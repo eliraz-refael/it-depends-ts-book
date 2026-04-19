@@ -8,11 +8,11 @@ This book doesn't pretend there's one right way to write TypeScript. Instead, it
 
 Here's what that looks like:
 
-> **Marcus**: "Shipped in ten minutes. Works perfectly. I made a business decision."
+> **Oded**: "Shipped in ten minutes. Works perfectly. I made a business decision."
 >
-> **Helena**: "Your business decision is my on-call page. Literally. I got paged at 2 AM because of that `Invalid Date`."
+> **Noam**: "Your business decision is my on-call page. Literally. I got paged at 2 AM because of that `Invalid Date`."
 >
-> **Chen Wei**, quietly: "The question isn't whether to use it. It's what happens when it's wrong."
+> **Gilad**, quietly: "The question isn't whether to use it. It's what happens when it's wrong."
 
 That's a real exchange from Chapter 1. The code that sparked it, the argument that followed, and the verdict the room eventually reached — that's every chapter of this book.
 

@@ -2,13 +2,13 @@
 
 ## The Principle
 
-In the last chapter, **Nate Bridge** called type assertions "a localized lie — a correctness problem rather than a scope problem." This chapter examines what happens when the localized lie meets the real world.
+In the last chapter, **Dima Bridge** called type assertions "a localized lie — a correctness problem rather than a scope problem." This chapter examines what happens when the localized lie meets the real world.
 
-**Prof. Ada Typeworth** sets the frame:
+**Prof. Eli Typeworth** sets the frame:
 
 "A type assertion is not a conversion. It is not a cast. It is not a check. In languages like Java or C#, a cast performs a runtime operation — it verifies the type, and throws if the verification fails. A TypeScript assertion does *none of that*."
 
-She writes two lines on the whiteboard. *"Let us return to first principles."*
+He writes two lines on the whiteboard. *"Let us return to first principles."*
 
 "An assertion is an instruction to the compiler: 'I know more than you do.' The question this chapter must answer is simple: *do you?*"
 
@@ -22,7 +22,7 @@ const len2 = (input2 as string).length; // Also compiles. No runtime check. Unde
 
 "Both lines compile. Both lines produce JavaScript with zero type checking at runtime. The first happens to work. The second silently produces `undefined` — and the compiler will never tell you, because you told *it* to be quiet."
 
-She steps back from the whiteboard.
+He steps back from the whiteboard.
 
 "Annotations protect you from yourself. Assertions require you to protect yourself."
 
@@ -30,7 +30,7 @@ She steps back from the whiteboard.
 
 ### "`as const` vs `as Type` — the naming collision"
 
-**Alex Turing** starts with something that bothers them:
+**Linoy Nightly** starts with something that bothers her:
 
 "Before we argue about whether `as` is dangerous, can we acknowledge that TypeScript uses the same keyword for two completely opposite operations?"
 
@@ -53,19 +53,19 @@ const config2 = { env: "production" } as Config;
 
 "`as const` makes the type *more* precise. `as Type` makes the type *less* trustworthy. Same keyword. Opposite effects."
 
-**Helena Strictland** seizes on this immediately:
+**Noam Kiperman** seizes on this immediately:
 
 "This is a language design problem, and it's a real one. Developers learn that `as const` is safe — because it is — and then assume `as SomeType` is equally benign. I see it in code reviews constantly. *'But I used `as` and it worked fine before!'* Yes, because last time you used `as const`. This time you're lying."
 
-**Jordan Doubt** leans in: "But have you considered that this entire problem has a solution? `satisfies` exists. Maybe the real question isn't whether `as Type` is dangerous — it's why anyone still reaches for it when there's a safe alternative."
+**Chen Override** leans in: "But have you considered that this entire problem has a solution? `satisfies` exists. Maybe the real question isn't whether `as Type` is dangerous — it's why anyone still reaches for it when there's a safe alternative."
 
-**Alex**: "Because `satisfies` was added in TypeScript 4.9. Millions of lines of code predate it. And not every use case is covered — but we'll get to that."
+**Linoy**: "Because `satisfies` was added in TypeScript 4.9. Millions of lines of code predate it. And not every use case is covered — but we'll get to that."
 
 ---
 
 ### "Assertions at system boundaries"
 
-**Marcus Shipley** has been waiting for this one:
+**Oded Shipley** has been waiting for this one:
 
 "Let me present the case where assertions aren't just defensible — they're necessary. You call an API. You get JSON back. The compiler knows *nothing* about the shape. You have to tell it something. What's the alternative?"
 
@@ -83,7 +83,7 @@ const user = (await response.json()) as ApiUser;
 
 "I'm not making this up. I'm asserting a contract. The API documentation says this is a `User`. I'm telling the compiler what the docs tell me."
 
-**Helena** isn't having it:
+**Noam** isn't having it:
 
 "You're trusting documentation. Documentation written by humans who may or may not have updated it since the last API change. Here's what I trust:"
 
@@ -107,9 +107,9 @@ const user = ApiUser.parse(raw);
 
 "Runtime validation doesn't trust anyone. Not the API, not the documentation, not the developer who wrote the assertion six months ago and has since left the company."
 
-**Sarah Chen** steps in:
+**Eden Legacy** steps in:
 
-"Helena's right about what's *ideal*. But *I've seen this fail at scale*. In a codebase with 400 API calls, you don't add Zod to every one on day one. The practical path is: centralize your assertions in a typed API client, document the expected shapes, and migrate to runtime validation on critical paths first — auth, payments, user data. The admin dashboard's logging endpoint? That assertion can wait."
+"Noam's right about what's *ideal*. But *I've seen this fail at scale*. In a codebase with 400 API calls, you don't add Zod to every one on day one. The practical path is: centralize your assertions in a typed API client, document the expected shapes, and migrate to runtime validation on critical paths first — auth, payments, user data. The admin dashboard's logging endpoint? That assertion can wait."
 
 ```typescript
 // Centralized: one file, one assertion per endpoint
@@ -123,13 +123,13 @@ class ApiClient {
 }
 ```
 
-**Helena** concedes the point — barely: "I'll accept boundary assertions if they're centralized in one place and tracked for replacement. What I will not accept is `as ApiUser` scattered across forty components."
+**Noam** concedes the point — barely: "I'll accept boundary assertions if they're centralized in one place and tracked for replacement. What I will not accept is `as ApiUser` scattered across forty components."
 
 ---
 
 ### "The double assertion — `as unknown as Type`"
 
-**Jordan** brings up the pattern everyone recognizes and nobody is proud of:
+**Chen** brings up the pattern everyone recognizes and nobody is proud of:
 
 "Okay, what about this? When a direct assertion fails — TypeScript says the types don't sufficiently overlap — I've seen developers do this:"
 
@@ -151,13 +151,13 @@ dog.bark(); // Runtime: dog.bark is not a function
 
 "You route through `unknown` — the type that means 'I don't know what this is' — and then immediately assert 'I know exactly what this is.' It's type laundering."
 
-**Helena**: "This is putting a fake mustache on a bug and walking it past the type checker. If TypeScript tells you two types don't overlap, *listen*."
+**Noam**: "This is putting a fake mustache on a bug and walking it past the type checker. If TypeScript tells you two types don't overlap, *listen*."
 
-**Marcus** pushes back:
+**Oded** pushes back:
 
 "Sometimes the types are genuinely wrong. Third-party library declares a return type that's too narrow. You know the actual runtime value has additional properties. The library maintainer hasn't merged your PR yet. What do you do for the next three months?"
 
-**Theo Compiler** intervenes. *"The compiler disagrees"* — and in this case, the compiler is trying to help:
+**Daniel Compiler** intervenes. *"The compiler disagrees"* — and in this case, the compiler is trying to help:
 
 "When TypeScript rejects a direct assertion, it's telling you something specific: these two types have no structural overlap. The double assertion explicitly routes through 'I have no idea what this is' to arrive at 'I know exactly what this is.' Those two statements cannot both be true."
 
@@ -169,7 +169,7 @@ He pauses.
 
 ### "Assertions in test code"
 
-**Marcus** shifts to his most sympathetic case:
+**Oded** shifts to his most sympathetic case:
 
 "Let me show you something every developer has written. A test that needs a `User` object, but only cares about the `name` field:"
 
@@ -203,7 +203,7 @@ interface User {
 const mockUser = { id: "1", name: "Test User" } as User;
 ```
 
-"What Helena wants me to write:"
+"What Noam wants me to write:"
 
 ```typescript
 const mockUser: User = {
@@ -221,7 +221,7 @@ const mockUser: User = {
 
 "Nobody reads those extra nine fields. They're noise. The assertion is saying 'I only care about these two fields for this test.' That's honest."
 
-**Helena** is uncomfortable — but she has an answer:
+**Noam** is uncomfortable — but he has an answer:
 
 "You're right that the noise is a problem. You're wrong that assertions are the solution. Factory functions are:"
 
@@ -246,23 +246,23 @@ const mockUser = createMockUser({ name: "Test User" });
 
 "Write the factory once. Use it everywhere. When the `User` interface changes — and it will — you update one function, not two hundred test files."
 
-**Marcus** isn't fully convinced:
+**Oded** isn't fully convinced:
 
 "Factories hide which fields the test actually depends on. With the assertion, I can *see* that this test only cares about `id` and `name`. With the factory, I'm reading twelve default values to figure out which ones matter and which are noise."
 
-**Dr. Elena Voss** opens her laptop. *"What does the data say?"*
+**Gil Benchmark** opens his laptop. *"What does the data say?"*
 
 "In every codebase I've studied, test files account for the clear majority of type assertions. Teams that switch to factory functions consistently report fewer test maintenance headaches when interfaces change — because the factory breaks in one place, not across every test file."
 
-**Marcus**: "Fine. But that's a mature test infrastructure. For a team writing their first tests, the assertion is the stepping stone."
+**Oded**: "Fine. But that's a mature test infrastructure. For a team writing their first tests, the assertion is the stepping stone."
 
-**Helena**: "Then step. Don't camp."
+**Noam**: "Then step. Don't camp."
 
 ---
 
 ### "`satisfies` — the assertion you actually wanted"
 
-**Alex Turing** has been waiting for this:
+**Linoy Nightly** has been waiting for this:
 
 "There's a tool that most developers don't know about — or don't reach for because `as` is muscle memory. `satisfies` was added in TypeScript 4.9, and it does what developers *think* `as` does. *There's an RFC for that* — and it shipped."
 
@@ -304,19 +304,19 @@ const palette = {
 // No error. The lie is accepted. "purple" slips through.
 ```
 
-**Helena** is visibly delighted: "`satisfies` is what `as` should have been. It checks without lying. It validates without overriding."
+**Noam** is visibly delighted: "`satisfies` is what `as` should have been. It checks without lying. It validates without overriding."
 
-**Nate Bridge** provides the synthesis. *"Both have a point here"* — but this time, the scales tip clearly:
+**Dima Bridge** provides the synthesis. *"Both have a point here"* — but this time, the scales tip clearly:
 
 "`as` says 'trust me.' `satisfies` says 'check me.' For the vast majority of cases where developers reach for `as`, what they actually want is `satisfies`. The rule of thumb: if you want validation, use `satisfies`. If you want override, use `as` — and document why."
 
-**Alex** adds the caveat: "`satisfies` doesn't cover everything. You can't use it to assert at a boundary — it only works on expressions where the compiler can see the value. API responses, JSON parsing, dynamic data — you still need either `as` or a runtime validator for those. So `as` has a role. Just a much smaller one than most codebases give it."
+**Linoy** adds the caveat: "`satisfies` doesn't cover everything. You can't use it to assert at a boundary — it only works on expressions where the compiler can see the value. API responses, JSON parsing, dynamic data — you still need either `as` or a runtime validator for those. So `as` has a role. Just a much smaller one than most codebases give it."
 
 ---
 
 ### "The non-null assertion (`!`) — the assertion people forget is an assertion"
 
-**Jordan Doubt** raises the last topic:
+**Chen Override** raises the last topic:
 
 "We've spent this whole chapter on `as`. But there's an assertion hiding in plain sight that developers use ten times more casually — because it's a single character:"
 
@@ -331,9 +331,9 @@ const name2 = (user as NonNullable<typeof user>).name;
 
 "The `!` is just `as NonNullable` in disguise. It tells the compiler 'this isn't null, trust me' — with exactly as much evidence as a bare `as`. But because it's one character instead of a keyword, developers treat it like punctuation rather than an assertion."
 
-**Helena**: "The exclamation mark is the most dangerous character in TypeScript. It's an assertion disguised as punctuation. I ban it in code reviews with exactly one exception: immediately after assignment in test `beforeEach` blocks."
+**Noam**: "The exclamation mark is the most dangerous character in TypeScript. It's an assertion disguised as punctuation. I ban it in code reviews with exactly one exception: immediately after assignment in test `beforeEach` blocks."
 
-**Jordan** pushes back: "But have you considered that optional chaining changes the return type? `user?.name` gives you `string | undefined`, not `string`. Sometimes you genuinely *know* the value exists — after a `.filter()` that guarantees it, after a null check three lines up that the compiler can't trace."
+**Chen** pushes back: "But have you considered that optional chaining changes the return type? `user?.name` gives you `string | undefined`, not `string`. Sometimes you genuinely *know* the value exists — after a `.filter()` that guarantees it, after a null check three lines up that the compiler can't trace."
 
 ```typescript
 // Optional chaining: safe but changes the type
@@ -353,9 +353,9 @@ const name = user!.name;
 // Only safe if you can PROVE user isn't null.
 ```
 
-**Marcus** jumps in:
+**Oded** jumps in:
 
-"Here's one Helena can't wiggle out of. You check a `Map` with `.has()`, then access it. The compiler doesn't narrow through `.has()` — it's a known limitation:"
+"Here's one Noam can't wiggle out of. You check a `Map` with `.has()`, then access it. The compiler doesn't narrow through `.has()` — it's a known limitation:"
 
 ```typescript
 const cache = new Map<string, User>();
@@ -371,13 +371,13 @@ if (cache.has(userId)) {
 
 "You've *proven* the value exists one line above. The compiler just can't see it. What do you want me to do — restructure the code around a tooling limitation?"
 
-**Helena**, reluctantly: "Use `get` and check the result directly. But... yes. That's one of the cases where `!` is defensible. I still want a comment."
+**Noam**, reluctantly: "Use `get` and check the result directly. But... yes. That's one of the cases where `!` is defensible. I still want a comment."
 
-**Theo Compiler** closes the thread: "Both Jordan and Helena are correct. The `!` is an assertion — full stop. Treat it like one. If you can prove the value exists through control flow, do that instead. If you genuinely can't — and the `Map.has()` case is a real example — the `!` should pass the same checklist as any other assertion: why is it here, and what happens when it's wrong."
+**Daniel Compiler** closes the thread: "Both Chen and Noam are correct. The `!` is an assertion — full stop. Treat it like one. If you can prove the value exists through control flow, do that instead. If you genuinely can't — and the `Map.has()` case is a real example — the `!` should pass the same checklist as any other assertion: why is it here, and what happens when it's wrong."
 
 ## The Turn
 
-The room has gone quiet. The debates have covered the landscape — when to assert, when not to, what tools exist as alternatives. Then **Chen Wei** speaks.
+The room has gone quiet. The debates have covered the landscape — when to assert, when not to, what tools exist as alternatives. Then **Gilad Stacktrace** speaks.
 
 *"Show me the stack trace."*
 
@@ -397,11 +397,11 @@ He draws a simple diagram: a line from "the lie" on one end to "the crash" on th
 
 "Every assertion in your codebase is a bet. You are betting that the world outside your program matches your model of it. Some bets are reasonable — backed by contracts, schemas, tests. Some bets are reckless — backed by hope. The question isn't 'should I use assertions?' The question is: *what is the blast radius when this bet loses?*"
 
-The room is quiet. Marcus is looking at his laptop — not arguing, just scrolling through a file. He doesn't say what he's looking at, but everyone can guess.
+The room is quiet. Oded is looking at his laptop — not arguing, just scrolling through a file. He doesn't say what he's looking at, but everyone can guess.
 
-**Helena** breaks the silence, and for once she's not attacking anyone: "The uncomfortable part is that strict types don't fix this. If the assertion at the boundary is wrong, everything downstream is *more* dangerous — because the compiler tells you it's safe. You trust it. You build on it. And the distance between the lie and the crash gets longer, not shorter."
+**Noam** breaks the silence, and for once he's not attacking anyone: "The uncomfortable part is that strict types don't fix this. If the assertion at the boundary is wrong, everything downstream is *more* dangerous — because the compiler tells you it's safe. You trust it. You build on it. And the distance between the lie and the crash gets longer, not shorter."
 
-It's the first time Helena has admitted that her own approach has a failure mode. Chen Wei nods.
+It's the first time Noam has admitted that his own approach has a failure mode. Gilad Stacktrace nods.
 
 ## The Verdict
 
@@ -429,10 +429,10 @@ It's the first time Helena has admitted that her own approach has a failure mode
 
 ## Additional Takes
 
-**Helena Strictland**: "Every assertion in a code review — `as`, `!`, all of it — gets the same question from me: 'What evidence do you have?' If the answer is 'I just know,' the PR stays open."
+**Noam Kiperman**: "Every assertion in a code review — `as`, `!`, all of it — gets the same question from me: 'What evidence do you have?' If the answer is 'I just know,' the PR stays open."
 
-**Marcus Shipley**: "I'll use `satisfies` for new code. I'm not rewriting two hundred existing assertions for a theoretical improvement." — **Chen Wei**, without looking up: "You will when one of them pages you at 3 AM."
+**Oded Shipley**: "I'll use `satisfies` for new code. I'm not rewriting two hundred existing assertions for a theoretical improvement." — **Gilad Stacktrace**, without looking up: "You will when one of them pages you at 3 AM."
 
-**Alex Turing**: "`satisfies` is TypeScript's apology for `as`. They just can't deprecate `as` without breaking the internet."
+**Linoy Nightly**: "`satisfies` is TypeScript's apology for `as`. They just can't deprecate `as` without breaking the internet."
 
-**Jordan Doubt**: "So the assertion checklist boils down to: 'When this is wrong, how will I know?' Has anyone considered that if you can answer that question, you probably don't need the assertion?"
+**Chen Override**: "So the assertion checklist boils down to: 'When this is wrong, how will I know?' Has anyone considered that if you can answer that question, you probably don't need the assertion?"

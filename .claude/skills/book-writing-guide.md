@@ -28,13 +28,13 @@ This book is **fun first, educational second**. It should read like eavesdroppin
 
 ### The Two Tiers
 
-**Experts** (Prof. Ada Typeworth, Theo Compiler, Chen Wei, Ravi Lambda):
+**Experts** (Prof. Eli Typeworth, Daniel Compiler, Gilad Stacktrace, Liron Closure):
 - Set the principle at the start of each chapter
 - Intervene **sparingly** — only when the debate goes off track or needs reframing
 - Their interventions carry weight because they're rare
 - They don't argue with each other (they may politely disagree, but never debate)
 
-**Professionals** (Helena, Marcus, Dr. Elena Voss, Sarah, Alex, Jordan, Kai, Diana, Nate):
+**Professionals** (Noam, Oded, Gil Benchmark, Eden, Linoy, Chen, Dafna, Guy, Dima):
 - Drive the bulk of every debate
 - Argue with each other freely — interruptions, comebacks, grudging admissions
 - Each has a **consistent personality** that readers learn to predict
@@ -43,25 +43,25 @@ This book is **fun first, educational second**. It should read like eavesdroppin
 
 Every character has a defined personality and catchphrase in `PLAN.md`. Rules:
 
-1. **Never break character.** Helena never says "types don't matter sometimes." Marcus never says "let's slow down and think about this more." Kai never endorses a class hierarchy.
+1. **Never break character.** Noam never says "types don't matter sometimes." Oded never says "let's slow down and think about this more." Dafna never endorses a class hierarchy.
 2. **Use catchphrases naturally** — not forced into every appearance, but often enough that readers associate them with the character.
 3. **Characters can evolve within a debate** — they can be convinced, surprised, or grudgingly admit a point. But their core stance doesn't change.
 4. **Not every character appears in every chapter.** Pick the 4-6 characters most naturally activated by the topic. Some chapters might feature only 3.
-5. **Character interactions matter.** Helena and Marcus are natural antagonists. Kai and Diana are foils. Jordan annoys everyone. Nate mediates. Use these dynamics.
+5. **Character interactions matter.** Noam and Oded are natural antagonists. Dafna and Guy are foils. Chen annoys everyone. Dima mediates. Use these dynamics.
 
 ### Character Quick Reference
 
 | Character | Will argue FOR | Will argue AGAINST | Activated by topics about |
 |-----------|---------------|-------------------|--------------------------|
-| Helena Strictland | Strict types, safety | `any`, loose typing, shortcuts | Type safety, strictness, assertions |
-| Marcus Shipley | Velocity, pragmatism | Over-engineering, ceremony | Migration, config, tooling |
-| Dr. Elena Voss | Data, evidence, metrics | Unsubstantiated claims | Performance, patterns, comparisons |
-| Sarah Chen | Migration patterns, gradual adoption | Big-bang rewrites | Legacy code, adoption strategies |
-| Alex Turing | Latest features, cutting edge | Old patterns, legacy approaches | New TS features, modern patterns |
-| Jordan Doubt | Nothing (asks hard questions) | Lazy thinking, unexamined assumptions | Everything — especially "obvious" answers |
-| Kai Functor | FP, pipelines, immutability | Side effects, mutation, classes | FP patterns, state management, design |
-| Diana Class | OOP, SOLID, encapsulation | "Everything is a function" | Architecture, design patterns, interfaces |
-| Nate Bridge | Context-appropriate solutions | Dogma from either side | FP vs OOP debates, balanced discussions |
+| Noam Kiperman | Strict types, safety | `any`, loose typing, shortcuts | Type safety, strictness, assertions |
+| Oded Shipley | Velocity, pragmatism | Over-engineering, ceremony | Migration, config, tooling |
+| Gil Benchmark | Data, evidence, metrics | Unsubstantiated claims | Performance, patterns, comparisons |
+| Eden Legacy | Migration patterns, gradual adoption | Big-bang rewrites | Legacy code, adoption strategies |
+| Linoy Nightly | Latest features, cutting edge | Old patterns, legacy approaches | New TS features, modern patterns |
+| Chen Override | Nothing (asks hard questions) | Lazy thinking, unexamined assumptions | Everything — especially "obvious" answers |
+| Dafna Functor | FP, pipelines, immutability | Side effects, mutation, classes | FP patterns, state management, design |
+| Guy Singleton | OOP, SOLID, encapsulation | "Everything is a function" | Architecture, design patterns, interfaces |
+| Dima Bridge | Context-appropriate solutions | Dogma from either side | FP vs OOP debates, balanced discussions |
 
 ---
 
@@ -164,7 +164,7 @@ if (isUserProfile(data)) {
 Format character statements as:
 
 ```markdown
-**Helena Strictland** immediately objects:
+**Noam Kiperman** immediately objects:
 
 "That's a type safety violation waiting to happen. Look at what happens when the API changes:"
 ```
@@ -172,7 +172,7 @@ Format character statements as:
 Or for shorter interjections:
 
 ```markdown
-**Jordan Doubt** raises an eyebrow: "But have you considered what happens when that assumption is wrong?"
+**Chen Override** raises an eyebrow: "But have you considered what happens when that assumption is wrong?"
 ```
 
 ### Markdown Conventions
@@ -208,7 +208,7 @@ The book has opinions. Here's where we stand:
 | Runtime validation | **Favor at boundaries** | Trust types internally, validate at edges |
 | Type assertions | **Skeptical** | Must be documented and justified |
 
-When presenting the "losing" side of a debate, still give it a fair hearing. The FP-leaning stance should feel like wisdom, not dogma. Diana and Marcus should make genuinely good points even when the verdict goes against them.
+When presenting the "losing" side of a debate, still give it a fair hearing. The FP-leaning stance should feel like wisdom, not dogma. Guy and Oded should make genuinely good points even when the verdict goes against them.
 
 ---
 
@@ -233,8 +233,8 @@ The book's format is a strength — but format fatigue is a real risk. The solut
 4. **Chapter length.** Not every topic needs 6 debate subsections. Some chapters should be 2,000 words, not 3,500. A shorter, sharper chapter between two long ones changes the pacing.
 5. **Resolution.** At least one chapter per act should end with **"The Debate Continues"** — genuinely unresolved, with conditions under which each position wins.
 
-### Elena Voss's data
-Elena shares patterns and trends from her analyses — directional insights, not fake-precise statistics. She says "the clear majority" not "62%." She says "significantly fewer" not "38% fewer." Jordan may challenge her methodology occasionally (sample size, confounders), which makes the device self-aware. One such pushback per act is enough — doing it every chapter would undermine her.
+### Gil Benchmark's data
+Gil shares patterns and trends from his analyses — directional insights, not fake-precise statistics. He says "the clear majority" not "62%." He says "significantly fewer" not "38% fewer." Chen may challenge his methodology occasionally (sample size, confounders), which makes the device self-aware. One such pushback per act is enough — doing it every chapter would undermine him.
 
 ---
 
@@ -246,4 +246,4 @@ Elena shares patterns and trends from her analyses — directional insights, not
 4. **Academic tone creeping in.** Rewrite any paragraph that sounds like a textbook.
 5. **Inconsistent character voices.** Re-read the character table before writing. If you can swap two characters' dialogue and it still works, the voices aren't distinct enough.
 6. **Ignoring the professionals in favor of experts.** Experts set up and intervene. Professionals are the stars.
-7. **Making the FP stance feel preachy.** Kai should be passionate, not self-righteous. Diana should be respected, not a punching bag.
+7. **Making the FP stance feel preachy.** Dafna should be passionate, not self-righteous. Guy should be respected, not a punching bag.
