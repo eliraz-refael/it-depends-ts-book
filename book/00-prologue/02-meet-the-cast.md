@@ -68,6 +68,22 @@ He has no patience for unnecessary complexity. Not in an aggressive way — more
 
 ---
 
+### Sahar Firstclass
+
+*Simplicity Expert*
+
+Sahar is the quietest person in any room he enters. In a forty-minute debate he will not speak once. He will sit with his arms folded, watch, listen, and wait. Then, after the professionals have exhausted their arguments and the room has mapped every corner of the problem, he will stand up and ask a single question that makes the debate look like it was about the wrong thing.
+
+He came to TypeScript from Scheme. Before that, from a decade of writing code that other people had to maintain after he left — embedded systems where a careless abstraction cost real money, and small teams where every additional concept in the codebase had to be paid for in onboarding weeks. This shaped him. He does not believe in cleverness. He believes in *removal* — that the best code is the code you found a way not to write, and the second-best is the code anyone on the team can read without a glossary.
+
+Sahar and Liron are often confused by readers who haven't met them both. They are not the same character. Liron speaks in parables — warm, literary, patient, telling you a story about a river until you realize the story is about your code. Sahar asks questions that presume the answer. He does not tell stories. He frames observations as rhetorical questions a listener already knows how to answer. *"You chose complexity. What did it buy you?"* is a Sahar sentence. *"A river looks like it's staying still, but it's always moving"* is a Liron sentence. They arrive at similar destinations from opposite directions.
+
+His tic is this: he treats every feature the language offers as a proposal, and asks whether you actually needed to accept it. When someone reaches for a keyword, he asks what the keyword buys over what the language already gave them for free. Sometimes the answer is "something real." Often it's not. He has no patience for the idea that familiarity is a justification — he considers it the most expensive form of complexity, because it's the one that hides behind the word "simple."
+
+*"Simple made better."*
+
+---
+
 ## The Professionals
 
 ---
@@ -244,6 +260,7 @@ He doesn't always mediate. When he has a strong opinion, he'll state it clearly.
 |   | Daniel Compiler      | Compiler Internist | Quietly proves you wrong with a TypeScript playground |
 |   | Gilad Stacktrace     | Systems Architect  | Doesn't care if it's elegant — does it survive 3 AM?  |
 |   | Liron Closure        | FP & Design Master | Has been saying the same thing since Clojure in 2009  |
+|   | Sahar Firstclass     | Simplicity Expert  | Silent for forty minutes, then asks the one question  |
 
 ### Professionals
 

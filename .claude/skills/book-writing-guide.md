@@ -28,7 +28,7 @@ This book is **fun first, educational second**. It should read like eavesdroppin
 
 ### The Two Tiers
 
-**Experts** (Prof. Eli Typeworth, Daniel Compiler, Gilad Stacktrace, Liron Closure):
+**Experts** (Prof. Eli Typeworth, Daniel Compiler, Gilad Stacktrace, Liron Closure, Sahar Firstclass):
 - Set the principle at the start of each chapter
 - Intervene **sparingly** — only when the debate goes off track or needs reframing
 - Their interventions carry weight because they're rare
@@ -62,6 +62,7 @@ Every character has a defined personality and catchphrase in `PLAN.md`. Rules:
 | Dafna Functor | FP, pipelines, immutability | Side effects, mutation, classes | FP patterns, state management, design |
 | Guy Singleton | OOP, SOLID, encapsulation | "Everything is a function" | Architecture, design patterns, interfaces |
 | Dima Bridge | Context-appropriate solutions | Dogma from either side | FP vs OOP debates, balanced discussions |
+| Sahar Firstclass (Expert) | Removing features, plain JS primitives | Ceremony, familiarity disguised as simplicity | Language features that duplicate what the base language already provides |
 
 ---
 

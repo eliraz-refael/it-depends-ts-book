@@ -87,6 +87,7 @@ it-depends-ts-book/
 | **Daniel Compiler**       | Compiler internist | Dry humor, knows what the compiler *actually* does. Casually invalidates arguments with edge cases.    | *"The compiler disagrees."*                  |
 | **Gilad Stacktrace**            | Systems architect  | 20 years production. Doesn't care about theory unless it survives prod. Delivers synthesis.            | *"Show me the stack trace."*                 |
 | **Liron Closure**         | FP / Design master | Wise elder from Lisp/Clojure. Speaks in parables and analogies. Warm but uncompromising on simplicity. | *"Complexity is a choice, not a necessity."* |
+| **Sahar Firstclass**    | Simplicity expert  | Silent for most of a debate. Reframes it with one rhetorical question. Asks what each feature buys you that the language didn't already give. | *"Simple made better."*                      |
 
 ### The Professionals (drive the debate)
 
