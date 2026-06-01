@@ -43,7 +43,7 @@ it-depends-ts-book/
 │   │   ├── 02-type-assertions.md
 │   │   ├── 03-interface-vs-type.md
 │   │   ├── 04-enums-vs-unions.md
-│   │   ├── 05-strict-mode.md
+│   │   ├── 05-narrowing-strategies.md
 │   │   └── 06-generics-basics.md
 │   ├── 02-advanced-typescript/
 │   │   ├── 01-conditional-types.md
@@ -102,6 +102,7 @@ it-depends-ts-book/
 | **Dafna Functor**       | FP hard-die            | Everything is a pipeline. Side effects are a personal offense. Would write the entire app in `pipe()`. | *"That's just a map."*                |
 | **Guy Singleton**       | OOP advocate           | Believes in encapsulation, inheritance hierarchies, and design patterns. SOLID is gospel.              | *"Where's the interface?"*            |
 | **Dima Bridge**       | Balanced pragmatist    | Appreciates both FP and OOP. Picks the right tool per context. The mediator.                           | *"Both have a point here."*           |
+| **Idan Greenfield**   | Parse-Don't-Validate advocate | Treats input shape as a problem in itself. Believes types must be produced, not checked. Lives at the boundary. | *"Prove it by producing it."*         |
 
 ---
 

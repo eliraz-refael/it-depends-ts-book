@@ -63,6 +63,7 @@ Every character has a defined personality and catchphrase in `PLAN.md`. Rules:
 | Guy Singleton | OOP, SOLID, encapsulation | "Everything is a function" | Architecture, design patterns, interfaces |
 | Dima Bridge | Context-appropriate solutions | Dogma from either side | FP vs OOP debates, balanced discussions |
 | Sahar Firstclass (Expert) | Removing features, plain JS primitives | Ceremony, familiarity disguised as simplicity | Language features that duplicate what the base language already provides |
+| Idan Greenfield | Parsing at boundaries, produced-not-checked types, schema libraries | Boolean predicates, ad-hoc inline guards, exception-driven validation | Narrowing, validation, boundary data, shape transformation, parse-vs-validate |
 
 ---
 

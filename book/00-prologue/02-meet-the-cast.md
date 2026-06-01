@@ -250,6 +250,24 @@ He doesn't always mediate. When he has a strong opinion, he'll state it clearly.
 
 ---
 
+### Idan Greenfield
+
+*Parse-Don't-Validate Advocate*
+
+Idan came to TypeScript through schemas. Her formative years were spent building services that consumed APIs nobody owned and storing data on disks nobody had documented — the kind of work where the bug is never *what the code does*, it's always *what arrived through the door*. She read Alexis King's "Parse, Don't Validate" early and never quite got over it. Her copy of the essay has marginalia, which is unusual, because it's a blog post.
+
+Her core belief is unfashionable in its simplicity: a type doesn't exist on a value until you produce it. Predicates are guesses. Assertion functions are guesses with stack traces. The only honest narrowing is one that hands you back a value of the type you wanted, or hands you back a structured reason it couldn't. Anything else, in her view, is the compiler trusting an unverified note from the developer.
+
+She's distinct from Dafna, despite the surface FP overlap. Dafna lives inside the pipeline — purity, immutability, declarative composition over the whole program. Idan lives at the door. Once data is parsed and shaped, she defers to Dafna entirely; she has no opinions about your `reduce`. But she will spend a remarkable amount of energy on the thirty lines where bytes from the network become a typed value, because that's where every production bug she has ever seen actually lived.
+
+Her debates with Guy are the loudest. Guy uses assertion functions for precondition checks in class methods. Idan thinks every such check should live in the constructor — make the class impossible to construct in a bad state, and the assertion is no longer needed anywhere downstream. Guy calls this "FP purism dressed in OOP clothes." Idan calls it "putting the invariant in the type system instead of scattering it across the codebase." They have not resolved this. They're not going to.
+
+She's not a moralist. She doesn't lecture. She has, over time, become the engineer who has seen the same shape of production bug enough times that she stopped explaining it and started building around it.
+
+*"Prove it by producing it."*
+
+---
+
 ## The Cast at a Glance
 
 ### Experts
@@ -275,6 +293,7 @@ He doesn't always mediate. When he has a strong opinion, he'll state it clearly.
 |   | Dafna Functor     | FP Purist              | Sees a `for` loop, mourns a `reduce`                        |
 |   | Guy Singleton     | OOP Advocate           | Considers his whiteboard class diagram a form of art        |
 |   | Dima Bridge       | Balanced Pragmatist    | The human "it depends"                                      |
+|   | Idan Greenfield   | Parse-Don't-Validate   | A type doesn't exist until you produce it                   |
 
 ---
 
