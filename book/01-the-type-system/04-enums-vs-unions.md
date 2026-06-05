@@ -44,7 +44,7 @@ var Status;
 
 Eli smiles the way he does when a student asks exactly the right question.
 
-"A union describes what a value can be. An enum describes what a value can be *and* creates the value at runtime. The question the rest of the chapter will debate is whether you need the second part."
+"A union describes what a value can be. An enum describes what a value can be *and* creates the value at runtime. The question we have to answer is whether you need the second part."
 
 ## The Debate
 
@@ -119,7 +119,7 @@ Oded shrugs, not fully won over. Guy hasn't conceded anything — but he also ha
 
 **Noam** keeps going, because this is where he actually lives.
 
-"The erasure principle from Chapter 1: types describe, they don't generate. Every other construct in Act I respects that. `interface`? Erased. `type`? Erased. Type assertions? Erased. The moment you write `enum`, the compiler stops describing and starts generating. You're shipping code you didn't write."
+"Erasure is the principle we keep coming back to: types describe, they don't generate. Every other type-system construct we've talked about respects that. `interface`? Erased. `type`? Erased. Type assertions? Erased. The moment you write `enum`, the compiler stops describing and starts generating. You're shipping code you didn't write."
 
 **Linoy Nightly** opens her laptop with the particular energy she gets when a construct is about to be torn apart.
 
@@ -559,7 +559,7 @@ The rule in one sentence: if you don't need a runtime object, you don't need an 
 
 **Noam Kiperman**: "If your type emits JavaScript, it is not a type. It is a feature wearing a type's clothing. *Over my dead type definition.*"
 
-**Noam Kiperman**, again: "One thing the debate didn't touch: none of this exempts you from validating at the boundary. A union type protects the code you wrote. It doesn't protect you from the API, the user, or disk. Act III's runtime validation chapter is where we cover this properly — but note that `z.enum(["active","inactive","banned"])` composes with a string literal union in one line, while `z.nativeEnum(Status)` exists because TS enums don't fit most validator schemas cleanly. One more reason the union wins at the edge."
+**Noam Kiperman**, again: "One thing the debate didn't touch: none of this exempts you from validating at the boundary. A union type protects the code you wrote. It doesn't protect you from the API, the user, or disk. Real validation is a longer conversation — but note that `z.enum(["active","inactive","banned"])` composes with a string literal union in one line, while `z.nativeEnum(Status)` exists because TS enums don't fit most validator schemas cleanly. One more reason the union wins at the edge."
 
 **Guy Singleton**: "In Java, enums are the foundation of half our design patterns. They have methods, they have fields, they're first-class classes with restricted instantiation. TypeScript enums are... a different thing wearing the same name. If you came from Java expecting the Java feature, that's the cost you're paying — and it's fair to know you're paying it."
 

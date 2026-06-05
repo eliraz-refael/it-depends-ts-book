@@ -92,7 +92,7 @@ function isResponse(x: object): x is { error: string } {
   // True for any object that has `error` anywhere on its prototype chain —
   // including a class instance whose class defines a method called `error`.
   // Also doesn't check that x.error is a string — double-unsafe by design,
-  // since this is exactly the kind of predicate the chapter is warning about.
+  // exactly the kind of unchecked promise we're warning about.
 }
 ```
 
@@ -331,7 +331,7 @@ function describeRequest<T>(state: RequestState<T>): string {
 }
 ```
 
-"Inside `case "success"`, `state.data` is `T`. Inside `case "error"`, `state.error` is `Error`. No type guard. No predicate. No assertion. The discriminant *is* the narrowing. And if I add `{ kind: "retrying"; attempt: number }` to the union, every `switch` that doesn't handle it stops compiling — the chapter on enums showed this with a `never` exhaustiveness check, and the same pattern works here."
+"Inside `case "success"`, `state.data` is `T`. Inside `case "error"`, `state.error` is `Error`. No type guard. No predicate. No assertion. The discriminant *is* the narrowing. And if I add `{ kind: "retrying"; attempt: number }` to the union, every `switch` that doesn't handle it stops compiling — the same `never` exhaustiveness trick we used on enums works here too."
 
 **Daniel**, briefly: "The annotated return type `: string` is what enforces it. Without the annotation, TS would infer `string | undefined` and the missing case would slide through. Belt-and-suspenders: an explicit `default: assertNever(state)` in the verdict."
 

@@ -10,7 +10,7 @@ In the last chapter, **Dima Bridge** called type assertions "a localized lie —
 
 He writes two lines on the whiteboard. *"Let us return to first principles."*
 
-"An assertion is an instruction to the compiler: 'I know more than you do.' The question this chapter must answer is simple: *do you?*"
+"An assertion is an instruction to the compiler: 'I know more than you do.' The question is simple: *do you?*"
 
 ```typescript
 const input: unknown = "hello";

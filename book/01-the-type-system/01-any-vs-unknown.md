@@ -596,7 +596,7 @@ The room has been intense for a while. **Liron Closure** has been listening, say
 
 "Let me tell you about maps."
 
-A few people exchange glances. Liron's parables are either illuminating or twenty minutes long. Usually both.
+A few people exchange glances. Liron's parables are illuminating. They are also twenty minutes long. These facts are related.
 
 "In ancient cartography, when mapmakers reached the edge of the explored world, they didn't leave the space blank. They wrote: *'Here be dragons.'* They didn't pretend the territory didn't exist. They acknowledged they hadn't explored it yet."
 
