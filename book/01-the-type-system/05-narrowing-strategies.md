@@ -4,9 +4,7 @@
 
 The previous four chapters were about how TypeScript *describes* values: what the type can be, how to compose shapes, where the escape hatches live. This chapter is about a different verb. What does it mean, inside a function, to *prove* that a value has the type the compiler thinks it does?
 
-**Daniel Compiler** is the right person to set this one up, because narrowing isn't really a TypeScript feature. It's a compiler behavior with a name.
-
-He opens his laptop.
+**Daniel Compiler** opens his laptop.
 
 ```typescript
 function handle(x: string | number) {
@@ -22,7 +20,7 @@ function handle(x: string | number) {
 
 "Look at the type of `x` inside each branch. The compiler tracks two different types in two different code paths — same variable, same scope, different facts known. That's narrowing. It's called *control flow analysis*. The compiler reads your code as a graph of paths and asks, 'on this path, what have we proven about this value?'"
 
-*"The compiler disagrees"* — and now Daniel demonstrates with a case that catches developers off guard:
+**Daniel** adds two null checks.
 
 ```typescript
 function process(input: string | null | undefined) {
@@ -39,21 +37,21 @@ function process(input: string | null | undefined) {
 
 He looks up.
 
-"Narrowing is not the debate. You always narrow — every `if`, every `switch`, every truthy check is narrowing whether you meant it or not. The debate is *how you prove it*. And every proof costs something when it fails."
+"You have already been using narrowing when you write checks like these. The compiler follows the conditions along each path."
 
-**Chen Override** has been waiting. *"But have you considered..."* — the question that frames the chapter:
+**Chen Override**: "Does it check the body of a type guard too? If I say a function proves something?"
 
-"...that a proof is only as honest as the person writing it?"
+**Daniel**: "It checks the body as code. But if you write a type predicate in the return annotation, it trusts that predicate. You can write one that always returns `true`."
 
-Daniel nods. That's exactly the door this chapter walks through.
+**Noam Kiperman**: "You can also test it."
 
 ## The Debate
 
 ### "The `typeof` family — what lies and what doesn't"
 
-**Linoy Nightly** takes the floor first because somebody has to lay out the primitives and Linoy is incapable of resisting a list.
+**Linoy Nightly**:
 
-"Built-in narrowing operators. Four of them, plus a fifth that thinks it's an operator. `typeof` for primitives. `instanceof` for class instances. `Array.isArray` for arrays. The `in` operator for property checks. And the truthy/equality checks — `=== null`, `!= null`, `if (x)` — that I'll call honorable mentions. *There's an RFC for that* — actually no, this set has been stable since TypeScript 1.x."
+"Start with the checks you already write: `typeof`, `instanceof`, `Array.isArray`, `in`. Equality and truthiness checks narrow too. There are a few runtime details you have to remember."
 
 ```typescript
 function describe(value: unknown): string {
@@ -70,7 +68,7 @@ function describe(value: unknown): string {
 
 **Chen Override** unfolds his arms.
 
-"Linoy. Walk me through every footgun in those five lines."
+"What do those checks leave unproven?"
 
 Linoy sighs, but she enjoys this.
 
@@ -78,7 +76,7 @@ Linoy sighs, but she enjoys this.
 
 **Chen**: "And `in`?"
 
-**Linoy** pauses, because Chen's setup is too good not to deliver:
+**Linoy** takes her time with this one:
 
 "The `in` operator does not check whether an object has the property as its own. It walks the prototype chain. Inherited properties — class methods, anything `Object.prototype` provides — return true. `"toString" in {}` is `true`."
 
@@ -96,23 +94,23 @@ function isResponse(x: object): x is { error: string } {
 }
 ```
 
-"If the object came from `JSON.parse`, fine — JSON parse returns plain objects with no inherited methods worth worrying about. If the object came from a class instance, every method on the class shows up as `in` true. You wrote a guard for `error`. You also accidentally accepted any object with a method called `error`."
+"A class method called `error` passes that check. So does an `error` property containing a number. The check only tells you the property exists, possibly on a prototype. It has not established `string`."
 
-**Chen** isn't done. "One more landmine: `\"x\" in null` throws `TypeError`. The throw happens when the right-hand side is null or undefined — the object being searched, not the property name. Narrow the object to non-null before `in` or you've traded a type bug for a runtime crash."
+**Chen**: "And `"x" in null` throws. So does using any primitive on the right of `in`. Check that you have an object first."
 
-**Linoy**: "Add it to the list. And the cheapest narrowing of all, `if (x)`, is the one that lies most often — it excludes `0`, `''`, `false`, `0n`, and `NaN` along with `null` and `undefined`. Half the time you wanted only the latter."
+**Linoy**: "And `if (x)` also rejects `0`, the empty string, `false`, `0n`, and `NaN`. If you only meant to reject nullish values, that check is too broad."
 
 **Chen**, satisfied: "Nothing to add."
 
-**Linoy** holds her ground: "All of these are known quantities. The hovers are correct. The lies are at runtime. If you know the language, you write around them."
+**Linoy**: "The checks work. You have to ask them the question you actually mean."
 
-**Daniel**, quietly: "If you don't, the compiler still believes you. That's the gap."
+**Daniel**: "`typeof NaN` is `number` in JavaScript too. Narrowing to `number` does not promise a finite number. That takes another check."
 
 ---
 
 ### "Type predicates — safe if you don't lie"
 
-**Noam Kiperman** has been waiting for this one.
+**Noam** opens his guard function.
 
 "User-defined type guards. The construct that lets you write a function that *is* the narrowing logic, in one place, named, testable."
 
@@ -123,9 +121,9 @@ function isUser(value: unknown): value is User {
   return (
     typeof value === "object" &&
     value !== null &&
-    "id" in value && typeof (value as User).id === "string" &&
-    "email" in value && typeof (value as User).email === "string" &&
-    "displayName" in value && typeof (value as User).displayName === "string"
+    "id" in value && typeof value.id === "string" &&
+    "email" in value && typeof value.email === "string" &&
+    "displayName" in value && typeof value.displayName === "string"
   );
 }
 
@@ -137,9 +135,9 @@ function greet(input: unknown) {
 }
 ```
 
-"This is structured. It's reusable — every place I need to check 'is this a User?' calls the same function. It's testable — I can write a unit test for `isUser` with a hundred edge cases. The contract is in one place. *Over my dead type definition* — this is what 'safe narrowing' looks like in a real codebase."
+"Now I can test the check in one place. If three handlers need a `User`, they can all call this. I don't want three copies of those field checks."
 
-**Dafna Functor** has been quiet. She's waiting for this exact moment.
+**Dafna Functor** points at the return annotation.
 
 "Noam. Show me the signature again."
 
@@ -147,7 +145,7 @@ function greet(input: unknown) {
 
 **Dafna**: "And what does TypeScript check, in that signature, to make sure the predicate is honest?"
 
-**Noam** — knowing where this is going — answers anyway: "Nothing."
+**Noam**: "It trusts the annotation. We just said that."
 
 ```typescript
 // Looks safe. Is a lie.
@@ -155,36 +153,28 @@ function isUser(value: unknown): value is User {
   return true;
 }
 
-// The compiler will now believe ANY value is a User, forever:
+// The declared predicate tells the compiler to narrow to User:
 const x: unknown = 42;
 if (isUser(x)) {
-  x.email; // TypeScript: "string". Runtime: TypeError, x is 42.
+  x.email.toLowerCase(); // x.email is undefined; the method access throws.
 }
 ```
 
-**Dafna**: "A type predicate is an assertion you make to the compiler about the relationship between a runtime check and a type. The compiler does not verify the assertion. It cannot. It has no way to read the body of your predicate and confirm it actually narrows the way you said. You write `value is User` and TypeScript writes it down and stops asking questions."
+**Dafna**: "Then adding `value is User` has given me another claim to review. The compiler accepts this body too."
 
-"Every type predicate in your codebase is an unchecked promise. Some of them are good. Some of them have bugs. The compiler can't tell you which is which."
+**Daniel**: "An explicit predicate is trusted. TypeScript can infer predicates from some function bodies, but that is a different case. Writing the annotation yourself does not make the checker prove it."
 
-**Noam** — and this is the move — concedes the footgun without abandoning the construct:
-
-"Yes. The contract is unchecked. So write the predicate carefully, put it in one place, and *write the test*. An unchecked promise in a tested function is still better than fifty inline checks scattered across the codebase, none of them tested, all of them inconsistent. The structure is the win. The structure has to be earned by discipline."
+**Noam**: "That's why I want the tests. I'm still putting the check in one place."
 
 **Idan Greenfield**, half to herself: "You're all arguing about how to prove it. Nobody's asked when the value got the type in the first place."
 
 A pause. Noam looks over.
 
-**Daniel** adds a footnote. *"The compiler disagrees"* — with something nobody said but several people probably believe:
-
-"TypeScript narrows the value, not the type parameter. Inside `function f<T>(x: T)` after `typeof x === 'string'`, `x` is `T & string` — string methods compile. But `T` itself is not refined. So if you need the narrowed type to flow back out — say, returning it — the predicate must *return* the narrowed type, not refine the parameter. The compiler won't second-guess the caller's choice of `T`. Comes up the moment you write a generic helper with any runtime check."
-
-**Dafna**: "Or by giving up on the structure entirely. Which is the next subsection."
-
 ---
 
 ### "Assertion functions — throw or return?"
 
-**Guy Singleton** stretches and sits up. This is his.
+**Guy Singleton** opens another function.
 
 "Assertion functions. `asserts x is T`. Imperative narrowing — the function throws if the value is wrong, and the compiler treats the *successful return* as proof of the type."
 
@@ -193,14 +183,14 @@ function assertIsUser(value: unknown): asserts value is User {
   if (
     typeof value !== "object" ||
     value === null ||
-    !("id" in value) ||
-    !("email" in value) ||
-    !("displayName" in value)
+    !("id" in value) || typeof value.id !== "string" ||
+    !("email" in value) || typeof value.email !== "string" ||
+    !("displayName" in value) || typeof value.displayName !== "string"
   ) {
-    throw new TypeError("Expected User");
+    throw new TypeError("Expected User with string id, email, and displayName");
   }
-  // Note: checks property presence but not value types. Same family of
-  // unchecked promise as `isUser` — the compiler trusts this body whole.
+  // The body checks the fields, but TypeScript does not verify
+  // that those checks justify the assertion annotation.
 }
 
 function greetOrFail(input: unknown) {
@@ -212,33 +202,29 @@ function greetOrFail(input: unknown) {
 
 "This is how I write invariants. If `input` isn't a User, the program can't continue. The throw says so. The caller doesn't need a wrapping `if` — the assertion shapes the type going forward, and the failure case is a thrown exception, not a control flow branch I have to handle."
 
-**Dafna** refuses, which is in character.
+**Dafna**: "Where does the caller see that it can fail? The signature returns `void`."
 
-"Throws break composition. My function was `(A) => B`. Now it's `(A) => B | <throws>`, and the throw is invisible in the type. I can't `map` it. I can't `pipe` it. I can't combine `assertIsUser` with `assertIsAddress` and get a single result. I have to wrap each call in try/catch, which is exactly the code I was trying to avoid."
+**Guy**: "It's an assertion. If it returns, the value is usable. If it throws, our request handler catches it."
 
-```typescript
-// What I want: pipe(input, assertUser, formatGreeting)
-// What I get:
-let greeting: string;
-try {
-  assertIsUser(input);
-  greeting = formatGreeting(input);
-} catch (e) {
-  greeting = "fallback";
-}
-```
+"And if I'm processing a list of inputs? I want to keep the good ones and report the rejected ones. A throw stops the traversal unless I catch it for each input."
 
-"The assertion function is a control flow grenade dressed as a type tool. The type narrows, sure. The function also exits the entire call stack on failure. Those are very different operations and they shouldn't share a syntax that hides one inside the other."
+**Guy**: "For that list, you would. In this handler, one invalid user rejects the request. I want it to stop."
 
-**Noam** — and this is unexpected — takes the middle.
+**Noam**: "Assertion functions belong with invariants. `assertNever`, a required value that's unexpectedly missing. External input is allowed to be wrong. We should handle that as a result."
 
-"There's a place for assertion functions. `assertNever` for exhaustiveness checks. Real invariants — 'this should be impossible if my code is correct.' Programmer errors. Programmer errors *should* throw, because the program is in a state the developer didn't anticipate, and continuing is worse than stopping. Use `asserts` there. It's the right tool."
+**Guy**: "You used `ApiUser.parse(raw)` in your API example. That throws. You said the error was clear and happened where we could handle it."
 
-"What it isn't right for is *validation*. If `input` is from an API, the failure case is not a programmer error. It's expected. You're not asserting an invariant — you're checking external data, and external data is wrong all the time. Throwing in that case is using exceptions as control flow. That's where Dafna is right."
+Noam scrolls back to the example.
 
-**Guy** doesn't concede. He narrows:
+"Yes. It does."
 
-"Fine. Assertion functions for invariants — yes. For boundary validation — granted, throwing isn't right. But the line is invariants vs validation, not assertions vs predicates. The construct is fine; the use case I gave was wrong."
+**Guy**: "Was that wrong?"
+
+"The check was doing its job. I should have shown the handler too. I want to see who catches it. If there isn't a handler, use the result."
+
+**Dafna**: "I'd use the result either way. I want the failure in the signature when I move that call."
+
+**Guy**: "And I don't want every function between the parser and the handler to repeat the same failure branch."
 
 ---
 
@@ -254,11 +240,11 @@ Guy looks at her. "From the API."
 
 "From whatever the client posted. Or a database column. I don't know — it's `unknown` for a reason."
 
-"Right. So the value never *had* a type. There was no `User` floating in your function waiting to be confirmed. There was a string of bytes, and at some point you decided to call it a `User`. The boolean doesn't *check* a type. The assertion function doesn't *check* a type. They both *claim* one. The compiler believes them. That's the part I want to talk about."
+"Then show me where it becomes a `User` I can use. Your annotation says the input passed. I want the function to return the fields it checked."
 
-She sits back.
+**Guy**: "They're already on the object."
 
-"You're all arguing about the shape of the *return*. I'm arguing about the shape of the *value* before any of you got there. The type doesn't exist yet. You're not narrowing — you're producing."
+**Idan**: "Yes. Watch what the compiler checks when I construct the return value."
 
 ```typescript
 type ParseResult<T> =
@@ -288,31 +274,56 @@ function parseUser(input: unknown): ParseResult<User> {
 
 *"Prove it by producing it."*
 
-"A boolean predicate throws information away. You learn the value passed; you've lost the *reason* it passed and the structured value that came out the other side. A throw throws information away too — you've lost the reason in a stack trace, which is fine in development and useless in production logs. A parser carries both. The narrowed value on success. The structured failure on failure. You can serialize it, log it, return it as an HTTP response, branch on it. The result is data."
+"Delete the `email` field from that return object. The function no longer compiles. Leave it out of an explicitly annotated predicate's checks, and the predicate can still compile. That's why I build the value."
 
-**Guy** pushes back: "You've just rewritten `assertIsUser` with five times the boilerplate. Ten lines instead of three."
+**Noam** tries the deletion, then restores the field.
 
-**Idan**: "Your way is shorter until it fails. When it fails, the operator on call gets a stack trace with `Expected User` and no idea which field. I get `{ ok: false, reason: "id missing or not a string" }` and the log line writes itself. The ten lines paid for themselves the first time someone is paged."
+**Idan**: "And a failure tells the caller which check failed. Your assertion gives me one message for the whole object."
 
-**Guy** doesn't fold. "Or you put the parsing in the constructor. `new User(input)` either succeeds or throws. That's parse-don't-validate with class syntax — you're reinventing checked exceptions in a result type and pretending you invented something."
+**Guy**: "I can put the field name on an error. I can put the rejected value on it too."
 
-**Idan**: "A constructor that throws is an assertion function with extra ceremony. Same trade Dafna rejected — the throw is still an invisible exit in the type, and when it fires at 4 AM you get the same stack trace with no field name. Unless someone wrote a careful message. Whose discipline is that — mine, or every junior who copies the pattern next month?"
+"Yes."
 
-**Noam** is nodding, slowly. He's done this before, on his own, without having a name for it.
+"Then stop comparing yours to a generic message. I'll use your parser."
 
-"This is what I've been reaching for without articulating. Parse-or-fail composes. If I have `parseUser` and `parseAddress`, I can build `parseUserWithAddress` that returns a single `ParseResult` — no try/catch, no nesting, no exception bubbling. I cannot do that with assertion functions. Every `assertX` call is a potential exit point that I have to handle separately."
+```typescript
+class UserParseError extends Error {
+  constructor(readonly reason: string, readonly input: unknown) {
+    super(reason);
+    this.name = "UserParseError";
+  }
+}
 
-**Guy** thinks. He doesn't fold; he narrows: "For data crossing the boundary — yes. I'll grant that. For internal invariants where the class controls its own input — the constructor stays."
+function parseUserOrThrow(input: unknown): User {
+  const result = parseUser(input);
+  if (!result.ok) {
+    throw new UserParseError(result.reason, result.input);
+  }
+  return result.value;
+}
+```
 
-**Idan**: "Keep them. We're not arguing about invariants. We're arguing about input."
+**Guy**: "Same checks, same fields, same reason if it fails. The request handler catches `UserParseError`."
+
+**Idan** reads the function.
+
+"And a caller outside that handler?"
+
+"Has to follow the same convention."
+
+"I want them to see the failure in the return type."
+
+**Guy**: "I want one place that handles it. I'm not changing every call just to repeat that decision."
+
+**Noam**: "At least we're reviewing the same checks now."
 
 ---
 
-### "Discriminated unions eliminate most narrowing"
+### "Discriminated unions make the check ordinary"
 
 **Dafna Functor** picks up the thread.
 
-"Once data has a discriminant, narrowing is free. You don't write a guard. You don't call a predicate. You don't invoke a parser. You `switch`, and the compiler does the rest."
+"Once you have a typed discriminated union, you can narrow with an ordinary `switch`. No separate guard function for each case."
 
 ```typescript
 type RequestState<T> =
@@ -333,11 +344,9 @@ function describeRequest<T>(state: RequestState<T>): string {
 
 "Inside `case "success"`, `state.data` is `T`. Inside `case "error"`, `state.error` is `Error`. No type guard. No predicate. No assertion. The discriminant *is* the narrowing. And if I add `{ kind: "retrying"; attempt: number }` to the union, every `switch` that doesn't handle it stops compiling — the same `never` exhaustiveness trick we used on enums works here too."
 
-**Daniel**, briefly: "The annotated return type `: string` is what enforces it. Without the annotation, TS would infer `string | undefined` and the missing case would slide through. Belt-and-suspenders: an explicit `default: assertNever(state)` in the verdict."
+**Daniel**: "With strict null checking, the annotated return type `: string` catches a missing return here. Without the annotation, the inferred result can become `string | undefined`. An explicit `assertNever` check is another way to enforce exhaustiveness."
 
-**Idan** picks up the thread, but only her end of it:
-
-"Discriminants are what a parser hands you. Inside, Dafna's right — you `switch` and you're done. I have no opinions about the inside; that's her territory. But outside, the data doesn't *have* a `kind` field yet. Someone has to put it there. That's at the boundary. That's the parser's job, and it's the only one I'm interested in."
+**Idan**: "If the value came from outside, first check that the tag and payload agree. This parser accepts in-memory values; its error case expects an actual `Error` object, not a JSON representation of one."
 
 ```typescript
 // At the boundary — produce the discriminated shape:
@@ -360,9 +369,9 @@ function parseEvent(input: unknown): ParseResult<RequestState<unknown>> {
 }
 ```
 
-**Guy** holds a real line: "But the incoming data doesn't have a discriminant. Someone has to put it there."
+**Guy**: "And if the external format uses a different tag?"
 
-**Dafna**: "Yes. That's the parsing step. That's the work. After that, you're done narrowing for the lifetime of the value."
+**Idan**: "Translate it in the parser. The rest of the code can keep using `RequestState`."
 
 ---
 
@@ -372,17 +381,11 @@ function parseEvent(input: unknown): ParseResult<RequestState<unknown>> {
 
 "So `parseUser` is fine for one type. What about forty? I'm not writing forty parsers and maintaining forty test suites. *We can fix it in the next sprint* — or we can use a schema library and ship today."
 
-**Gil Benchmark** opens his laptop.
+**Linoy**: "We already depend on Zod. Start there. Valibot and ArkType are other options if we're evaluating libraries, but that's another PR."
 
-*"What does the data say?"*
+**Gil Benchmark**: "Keep the cases you would have tested against the handwritten parser. Missing fields, wrong element types, `null`, `undefined`. Run them against the schema. Importing a validator doesn't tell us whether we wrote the right schema."
 
-"I've watched hand-written guards consistently miss edge cases at meaningfully higher rates than schema validators. The misses cluster in a small set: null versus undefined, missing-property versus property-set-to-undefined, arrays of the wrong shape, optional fields written as required. Boring categories. The validators get them right because they're built around exactly those distinctions. The hand-written code has them right on a Tuesday and wrong on a Friday."
-
-**Linoy** sketches the field in directional terms — version-specific numbers age fast:
-
-"Three dominate. `zod` is the lingua franca, the one most ecosystem code already speaks. `valibot` is function-first and aggressively tree-shakeable. `arktype` reads closest to TypeScript syntax itself. All three iterate hard on bundle and runtime cost — if your library decision is older than the last major release, the assumptions behind it have probably moved."
-
-**Gil Benchmark**, with caveats: "Order of magnitude — these shift every release. `zod` lands in the tens of KB gzipped at full surface, lower with newer tree-shakeable builds. `valibot` single-digit KB when tree-shaken. `arktype` near `valibot` for runtime cost. The comparison isn't library vs library. It's any-of-them versus the forty hand-written parsers and test suites Oded didn't want to write."
+**Linoy**: "Here's the same user shape. I've also required an email address rather than just a string."
 
 ```typescript
 import { z } from "zod";
@@ -402,110 +405,83 @@ function parseUser(input: unknown): ParseResult<User> {
 }
 ```
 
-**Chen Override**, as usual, finds the load-bearing question:
+**Chen**: "Are you keeping the handwritten `User` type too?"
 
-*"But have you considered what happens when the schema drifts from the type?"*
+**Linoy**: "No. This version replaces it with `z.infer<typeof UserSchema>`."
 
-"The pattern people reach for: write the type, then write a schema that matches the type. Now you have the same shape declared twice. They will disagree. It might take a week, it might take a quarter, but at some point a developer adds a field to the type and forgets the schema. The compiler is happy. The runtime is silently rejecting valid input."
+**Chen**: "And when someone adds a field?"
 
-**Idan**: "The fix is the inversion. `type User = z.infer<typeof UserSchema>`. Derive the type from the schema, not the other way. The schema is the source of truth — it has to be, because it's the only one that runs at runtime. The TypeScript type follows from it."
+**Idan**: "They add it to the schema. The type follows. Otherwise we have two definitions to keep in step."
 
-She closes the section:
+**Guy**: "Zod offers `.parse` as well. Same schema, throws on failure."
 
-"The validator libraries are parsers. They produce a value of type T, or they tell you why they couldn't. *Prove it by producing it* — that has been the right answer the whole time. We just sometimes write the parser ourselves, and sometimes import it."
+**Linoy**: "Yes. `.safeParse` gives Idan the result, `.parse` gives you the exception. We can use the same schema."
 
 ## The Turn
 
-The whiteboard has all four shapes on it now. Boolean predicates. Assertion functions. Parsers. Discriminants. Each with its trade-off, each with its place.
+**Gilad Stacktrace** points at `parseUser`, then at Guy's wrapper.
 
-**Gilad Stacktrace** has been quiet through the whole thing. He's been quiet on purpose. He stands now, walks to the whiteboard, and circles one column header.
-
-*"Show me the stack trace."*
-
-"Every narrowing we've discussed is a proof. The question I want you to answer is what each proof leaves behind when it fails. Not which is cleanest. Not which is most functional. Not which is shortest. Which one *survives* its own failure."
-
-He walks the four:
-
-- **Boolean predicate returns false.** You know it failed. You don't know why. The caller has to re-examine the input themselves to figure out what was wrong. The log line says `validation failed`. Useful zero of the times it was logged.
-- **Assertion function throws.** You get a message if the author wrote one. A stack trace pointing to the throw site. You know roughly where. You probably don't know which field. The log line is bigger than the predicate's, but it's still telling you what didn't happen, not what did.
-- **Parser returns structured failure.** You know where, you know why, and you know what the input *was*. `{ ok: false, reason: "id missing or not a string", input: { ... } }`. The log line writes itself. The fix writes itself.
-- **Discriminated switch hits a case the type didn't allow.** This shouldn't compile. If it did, your union changed and your switch didn't. The exhaustiveness check throws a `never`-typed error. Programmer error, caught at compile time if you wrote it right.
-
-He turns to face the room.
-
-"That's the real axis. Not 'which narrowing is cleanest.' Which one gives the operator the most information at the worst possible time. The book leans toward parsers — not because parsers are elegant, although they are. Because parsers *leave evidence*. The boolean leaves nothing. The throw leaves a stack trace pointing at a check, not at a failure. The parser leaves you the shape that broke, in a form you can serialize, log, and grep tomorrow morning. That's the proof that survives 3 AM."
-
-He looks at Idan. She's still newish to this room — the others know each other, she's been here once.
-
-"What you said earlier. The code that runs on our servers is not the interesting code. The code that runs in the logs when something is broken — that's the interesting code. Boolean predicates produce no logs. Assertion functions produce short logs. Parsers produce the logs that let you ship a fix before the retro."
-
-**Idan**, picking up the thread without taking the stage:
-
-"The parser had to build the value. That's what survives the failure."
-
-A beat.
-
-"That's the argument."
-
-Noam writes something down. Guy is quiet.
-
-## The Verdict
-
-> Parse at the boundary. Discriminate inside. Assertion functions for real invariants only. Schema libraries when the boundary is big.
-
-| Situation | Recommended | Why |
-|-----------|-------------|-----|
-| Data from outside (API, localStorage, URL, JSON, user input) | Parse into a concrete type — schema library or hand-written `parseX` | The data didn't have a type. You produce one. Failure carries information. |
-| Inside a discriminated union | `switch` on the discriminant | Zero-cost narrowing. Exhaustive. Free. |
-| Class instance check | `instanceof` (single-realm code only) | Built-in, reliable when prototype chain is intact |
-| Primitive value | `typeof` (know the footguns: `null`, `NaN`, `function`) | Built-in, correct for primitives |
-| True invariant ("this can't happen if my code is correct") | Assertion function — `assertNever`, `assertDefined`, etc. | Programmer errors should throw. Honest about being a programmer error. |
-| Internal object shape from a trusted source | Type predicate (user-defined guard) | Structured and testable, but write the test — the predicate body is unchecked |
-| Inside a pipeline / functional composition | Parser returning `Result<T, E>` or `T \| null` | Composes. Throws don't. |
-| Using `in` to narrow | Only if you control the object shape | `in` checks the prototype chain — `"toString" in {}` is `true` |
-| Schema and TS type co-evolve | Derive the type from the schema (`z.infer<typeof Schema>`) | One source of truth; they can't drift |
-
-**In practice — the two anchors:**
+"Give them the same bad input."
 
 ```typescript
-// typeof for primitives — the language already gives you the proof.
-function formatPrimitive(input: string | number): string {
-  return typeof input === "string" ? input.toUpperCase() : input.toFixed(2);
+const badUser = { id: 42, email: "ada@example.com", displayName: "Ada" };
+
+const result = parseUser(badUser);
+if (!result.ok) console.log(result.reason);
+// id missing or not a string
+
+try {
+  parseUserOrThrow(badUser);
+} catch (error) {
+  if (!(error instanceof UserParseError)) throw error;
+  console.log(error.reason);
+  // id missing or not a string
 }
 ```
 
-```typescript
-// parser for boundary data — produce the type, carry the failure.
-type Parsed<T> =
-  | { ok: true; value: T }
-  | { ok: false; reason: string; input: unknown };
+**Gilad**: "Same failure. Same details. What happens next?"
 
-type Profile = { id: string; email: string };
+**Guy**: "The handler rejects the request."
 
-function parseProfile(input: unknown): Parsed<Profile> {
-  if (typeof input !== "object" || input === null) {
-    return { ok: false, reason: "not an object", input };
-  }
-  if (!("id" in input) || typeof input.id !== "string") {
-    return { ok: false, reason: "id missing or not a string", input };
-  }
-  if (!("email" in input) || typeof input.email !== "string") {
-    return { ok: false, reason: "email missing or not a string", input };
-  }
-  return { ok: true, value: { id: input.id, email: input.email } };
-}
-```
+**Idan**: "The caller chooses. Reject, retry, collect the failure with the other rejected rows."
 
-Type predicates and assertion functions appeared at length in the debate above, with their caveats in context — the table is the lookup for which shape goes where.
+**Guy**: "Which is useful for Dafna's batch. I don't have a batch. I have a request we can't fulfill."
 
-The rule in one sentence: at the boundary, parse; inside, discriminate; for invariants, assert; for primitives, use `typeof`. If you reach for a predicate, write the test — the compiler isn't watching the body. Act III's chapter on runtime validation is where the schema-library question gets its full hearing; for now, know that whichever shape you choose, the proof is only as honest as its author.
+**Chen**: "Can the caller ignore your result, Idan?"
+
+"They can ignore the call. They can't take its `value` as a `User` without dealing with the union. That's the check I want when this function gets used somewhere new."
+
+Guy leaves his wrapper on the screen.
+
+## The Debate Continues
+
+The room has agreed to parse external input and keep the runtime checks in one place. It has not agreed on how every parser should report failure.
+
+Idan and Dafna prefer a result for expected rejection. The return type exposes the failure case, and a batch can retain failures alongside successes. Guy prefers throwing when an established handler owns rejection for the whole operation. Both versions above produce a checked `User`; both carry the same failure details.
+
+The unresolved choice is how much each caller should know about failure handling. That matters when code moves between a request handler, a batch, and a reusable library. A convention that works in one setting may need an adapter in another.
+
+| Situation | Starting point | Condition |
+|-----------|----------------|-----------|
+| External data with expected rejection | Parser returning a result | Prefer this when callers choose different recovery paths or need to collect failures |
+| An operation with one established failure handler | A throwing parser can fit | Show where errors are caught and which errors the handler recognizes |
+| A true internal invariant | Assertion function | The explicit assertion annotation still needs review and tests |
+| A primitive value | `typeof`, equality, or a more specific runtime check | A JavaScript type such as `number` does not promise validity for your domain |
+| A class instance | `instanceof` | Be aware of constructor identity across realms |
+| A typed discriminated union | `switch` on the tag | Enforce exhaustiveness with an explicit return type or `assertNever` |
+| A reusable shape check | Type predicate | Test explicit predicates; their annotations are trusted |
+| A boundary with many shapes | Schema library, with types derived from schemas | Test the schemas against the inputs your application accepts and rejects |
+
+**Oded**: "We can use the schema without settling this for every service?"
+
+**Guy**: "Yes."
+
+**Idan**: "Show me the handler before you pick `.parse`."
 
 ## Additional Takes
 
-**Idan Greenfield**: *"Prove it by producing it."* — "A predicate that returns `true` without building the value has told you nothing. It guessed on your behalf. The next person to read your code will trust the guess. So will the compiler."
+**Noam Kiperman**: "Keep the predicate tests when the type changes. Adding a required field to `User` doesn't force an explicitly annotated `isUser` to check it."
 
-**Noam Kiperman**: "A boolean predicate is an implicit promise. An assertion function is an imperative one. A parser is an explicit one. The more explicit the promise, the less likely you are to break it by accident. *Over my dead type definition.*"
+**Daniel Compiler**: "[TypeScript 5.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html) can infer predicates for some functions without return annotations. That inference comes from the body. It does not verify a predicate you explicitly wrote."
 
-**Chen Override**: *"But have you considered..."* — "...that `instanceof` has been quietly failing across iframes, web workers, and VM contexts for a decade? If your code runs in anything other than a single main thread, your `instanceof` is a time bomb. `Array.isArray` was specifically designed to avoid this. It's the only one of the built-ins that did."
-
-**Eden Legacy**: *"I've seen this fail at scale."* — "A codebase with three hundred type predicates. Not one of them tested. Every one of them trusted by the compiler. I spent half a quarter writing tests *for the guards*. It felt like auditing a notary who had never been audited. Half the predicates were wrong. The compiler had been believing them for years."
+**Eden Legacy**: "I would migrate the checks first. Get one parser behind the existing callers, including the ones that expect exceptions. Then change how failure travels where the callers need it. Those are separate changes; I'd like to review them separately."

@@ -111,7 +111,7 @@ function updateUser(id: string, status: UserStatus) { ... }
 
 "`UserStatus` is the domain name. The values are what they are. The type tells you what *role* the string plays. The enum tells you that plus... it also happens to be a runtime object. That's the part we're about to interrogate."
 
-Oded shrugs, not fully won over. Guy hasn't conceded anything — but he also hasn't produced a counter that isn't about familiarity.
+Oded leaves the enum version open beside the union.
 
 ---
 
@@ -123,7 +123,7 @@ Oded shrugs, not fully won over. Guy hasn't conceded anything — but he also ha
 
 **Linoy Nightly** opens her laptop with the particular energy she gets when a construct is about to be torn apart.
 
-"And the usual defense — *'use `const enum`, it inlines at the call site, no runtime object'* — is dead. Not deprecated. Dead. Unless you're shipping pure `tsc`. Which, let me guess — you're not. Watch."
+"There is a version intended to inline at call sites: `const enum`. That can work in a build you control. Publishing one for other people to consume has a specific problem."
 
 ```typescript
 // A const enum. The whole point is that references inline,
@@ -134,7 +134,7 @@ export const enum Status {
 }
 ```
 
-"Now turn on `isolatedModules`. Which is the flag that requires each file to be compilable in isolation — no cross-file type information — because tools like Vite, esbuild, SWC, and Babel compile one file at a time. It's on in most modern TypeScript setups. Next.js turns it on. Vite turns it on. Create-React-App turned it on. The problem: `const enum`'s whole point — inlining its members across every call site so the enum itself never reaches the bundle — is a *cross-file* optimization. A single-file transpiler can't do it by construction. Downstream tools handle it unevenly. Exact behavior varies by tool, version, and flag — there's no reliable cross-toolchain story for the thing the feature was built for."
+"Turn on `isolatedModules`, which checks for constructs that require information unavailable to a single-file transpilation. Inlining an imported ambient `const enum` requires knowing its members from declarations in another file."
 
 "And the moment any code in your project imports a `const enum` from a `.d.ts` file — which is what happens when a compiled npm package ships one in its types — you get a hard error:"
 
@@ -142,17 +142,15 @@ export const enum Status {
 error TS2748: Cannot access ambient const enums when 'isolatedModules' is enabled.
 ```
 
-"*There's an RFC for that* — there are multiple proposals to fix the underlying design. None have shipped. The feature is too unreliable cross-toolchain to depend on unless you own the whole build."
+"So if we publish the ambient enum, we have put a constraint on the consumer's build. I want a plain object at that boundary."
 
-**Gil Benchmark** looks up from his laptop.
+The ambient `const enum` restriction is documented in the [handbook's const-enum pitfalls](https://www.typescriptlang.org/docs/handbook/enums.html#const-enum-pitfalls).
 
-*"What does the data say?"*
+**Gil Benchmark**: "Before we talk about bundle cost, which build are we measuring?"
 
-"I've been tracking enum declarations in large open-source TypeScript projects. The rate of new enum declarations in new code is falling. Members of the TypeScript team have said publicly they wouldn't add enums if they were designing the language today — they've called them a 'historical feature.' Several prominent style guides discourage or disallow them. The direction is clear even if the exact numbers aren't."
+**Linoy**: "I haven't measured this application's bundle. I'm showing why I wouldn't promise a consumer that a published `const enum` will inline in their build."
 
-**Chen Override**, as he does once per act: "But have you considered the methodology? 'OSS projects' is a survivorship-biased sample. You're measuring projects that tend to use modern tooling. A ten-year-old enterprise Angular codebase isn't in your dataset, and it's covered in enums."
-
-**Gil**: "Fair. The point isn't that nobody uses enums. The point is that the direction of travel for *new* TypeScript code is away from them. The feature is calcifying."
+**Gil**: "Then keep that distinction. Emitted JavaScript is something we can inspect. How much reaches the final bundle depends on the toolchain and how the value is used."
 
 ---
 
@@ -427,29 +425,44 @@ console.log(Object.values(Direction));
 
 ### "When a dependency exports an enum"
 
-**Oded Shipley** closes the debate section with the last honest defense:
+**Oded Shipley** opens a dependency's declarations.
 
-"In the real world, you don't always get to pick. If Prisma's generated client exports an enum for your database's enum column, or a GraphQL codegen spits out enums for your schema, you inherit the shape. You can't convert it to a union at the boundary without writing a mapping layer."
+"What if the library already chose? Its API takes a string enum. I still have to call it."
 
-**Noam**: "Wrap the boundary. Same principle as Chapter 1's typed facades. If your internal code is enum-free, you write one adapter at the edge. If it's not, the enum leaks through every layer that touches it. The ergonomics of the wrap are worse than owning your own types from the start."
+**Daniel**: "Check which direction the value is going. The enum can flow into a matching literal union without a mapping:"
+
+```typescript
+// The dependency's type:
+enum SdkStatus {
+  Active = "active",
+  Inactive = "inactive",
+  Banned = "banned",
+}
+
+type Status = "active" | "inactive" | "banned";
+
+const fromSdk: SdkStatus = SdkStatus.Active;
+const localStatus: Status = fromSdk; // No conversion needed.
+
+function sendToSdk(status: SdkStatus) {
+  console.log(status);
+}
+
+sendToSdk("active"); // Error: "active" is not assignable to SdkStatus.
+sendToSdk(SdkStatus.Active); // Works.
+```
+
+**Oded**: "Mine is the call going back in. The raw string doesn't work."
+
+**Noam**: "Then use its enum members there. If we want callers inside the application to pass our union, we can put that translation in an adapter."
+
+**Oded**: "And if they're already using the dependency's type, I'm going to need a reason to add one."
 
 ## The Turn
 
-The whiteboard has two columns. Enum wins: familiarity, reverse mapping, discoverable iteration. Union wins: erasure, no `const enum` footgun, flexibility, no runtime gotcha. Each side has scored real points. The debate is mapped but not resolved.
+**Sahar Firstclass** points at the `as const` object.
 
-A chair scrapes at the back of the room.
-
-He hasn't spoken once. Not through the familiarity argument. Not through the erasure argument. Not through reverse mapping, not through `as const`, not through the `Object.values` gotcha. He sat with his arms folded, listening, for the entire debate.
-
-He stands now. **Sahar Firstclass**, simplicity expert, the voice from the back of the room.
-
-"You've spent forty minutes debating which feature to use."
-
-He pauses. The silence lasts a beat longer than it should.
-
-"I'm asking which feature you can remove."
-
-The room goes still. Noam looks up. Guy puts down his marker. Dafna has a very small smile.
+"Which part of this needs to be an enum?"
 
 "A string literal union doesn't exist at runtime. You've been treating that as the case against it — 'you can't iterate, you can't reverse-map, you can't import it as a value.' I want to suggest you read it as the case *for* it. The type describes what the string can be. The string itself is already a JavaScript value. You didn't need a language feature. You needed a string."
 
@@ -473,19 +486,13 @@ He turns to Guy, not aggressively.
 
 **Guy** doesn't fold this time. "Maybe. But if the team can read enum-code at 3 AM and can't parse an `as const` derivation under stress, 'recognizable' *is* simpler — for them, on that night. You're assuming the choice is about the language. Sometimes it's about the room."
 
-Sahar nods slowly. "That's a real answer. The first one in this conversation that didn't reduce to habit."
+**Sahar**: "For that team, on that night, I'd leave it. What would you choose for the next service?"
 
-He doesn't refute it. He just lets it stand.
+**Guy**: "Depends who's maintaining it. Learning the language matters. So does having someone available to review the first few changes."
 
-**Noam** is nodding, slowly. This is his erasure principle, said differently. "Types should describe, not generate." Sahar said the same thing without using the word *erasure*.
+**Oded**: "Four hundred enums across twelve services. I'm not putting a rewrite on the roadmap."
 
-**Oded** is quiet. Not because he's lost — because he's calculating the migration cost on his current codebase. Four hundred enum declarations across twelve services. The cost isn't zero. It isn't even small.
-
-Sahar reads the room and lands it:
-
-*"Simple made better."*
-
-"You chose complexity. What did it buy you?"
+**Sahar**: "Then don't. Start where the choice is still open."
 
 ## The Verdict
 
@@ -559,7 +566,7 @@ The rule in one sentence: if you don't need a runtime object, you don't need an 
 
 **Noam Kiperman**: "If your type emits JavaScript, it is not a type. It is a feature wearing a type's clothing. *Over my dead type definition.*"
 
-**Noam Kiperman**, again: "One thing the debate didn't touch: none of this exempts you from validating at the boundary. A union type protects the code you wrote. It doesn't protect you from the API, the user, or disk. Real validation is a longer conversation — but note that `z.enum(["active","inactive","banned"])` composes with a string literal union in one line, while `z.nativeEnum(Status)` exists because TS enums don't fit most validator schemas cleanly. One more reason the union wins at the edge."
+**Noam Kiperman**, again: "None of this exempts us from validating external input. In Zod 4, `z.enum(["active", "inactive", "banned"])` checks the literal values, and `z.enum(SdkStatus)` accepts the TypeScript enum directly. Either gives us a runtime check; choosing a type declaration doesn't." See [Zod's enum documentation](https://zod.dev/api#enums).
 
 **Guy Singleton**: "In Java, enums are the foundation of half our design patterns. They have methods, they have fields, they're first-class classes with restricted instantiation. TypeScript enums are... a different thing wearing the same name. If you came from Java expecting the Java feature, that's the cost you're paying — and it's fair to know you're paying it."
 

@@ -30,23 +30,26 @@ Score each category as **PASS**, **NEEDS WORK**, or **FAIL**. Provide specific l
 
 ### 1. Character Consistency
 
-Check every character appearance against their definition in `PLAN.md`:
+Check the characters against their motives in `PLAN.md`, their biographies, and the tendencies in `character-voices.md`.
 
-- Does each character stay in voice throughout?
-- Are catchphrases used naturally (not forced, not absent)?
-- Does any character say something that contradicts their archetype?
-  - Noam defending `any`? **FAIL.**
-  - Oded advocating for slowing down to add types? **FAIL.**
-  - Dafna endorsing a class hierarchy? **FAIL.**
-  - Guy praising a pipeline pattern? **Suspicious** (he might grudgingly acknowledge it, but he wouldn't champion it)
-- Are the right characters activated for this topic? (Reference the activation table in the writing guide)
-- Do character interactions feel natural? (Noam vs Oded tension, Dafna vs Guy foiling, Chen annoying everyone)
+- What decision is disputed, and what does each participant stand to lose?
+- Does each side offer the strongest reasonable implementation for the same problem?
+- Does an objection change the scope of a claim, expose an assumption, or leave a consequential disagreement?
+- If a character changes position, does the exchange explain why? If they hold their ground, does their reasoning remain visible?
+- Can a professional challenge an expert, including by bringing back an earlier example?
+- Does the speaker notice things this person would care about, or merely read the next prepared explanation?
+- Are catchphrases and physical details doing useful work rather than satisfying a quota?
 
 **Red flags:**
-- Two characters making the same argument
-- A character being uncharacteristically passive
-- Catchphrase used in a way that feels forced or out of context
-- Character appearing without contributing meaningfully
+- An obvious repair omitted from the losing implementation
+- A narrator declaring a winner, explaining that someone is "in character," or announcing a concession
+- Everyone ending their turn with a maxim, or sharing the same antithetical rhythm
+- Concessions that summarize the other side's whole position
+- Arbitrary confusion, stammers, mistakes, or gestures inserted to simulate spontaneity
+- A deadline that never affects the scene
+- Chapter numbers spoken in dialogue
+
+Do not require an antagonist pair, a mistake, a concession, or a fixed number of polished lines. Judge whether the exchange earns its conclusion.
 
 ### 2. Factual Accuracy (CRITICAL)
 
@@ -58,9 +61,10 @@ Check every character appearance against their definition in `PLAN.md`:
   - Verify that mentioned TypeScript features exist and work as described
   - Ensure version-specific features are noted as such
 - Are there any hallucinated APIs, methods, types, or compiler behaviors?
-- Are performance claims or statistics presented as data (from Gil Benchmark) plausible and clearly marked as illustrative?
+- Are empirical claims sourced, reproducibly demonstrated, or explicitly hypothetical? Hedged or plausible-sounding invented studies are still a finding.
 - Do "bad" examples actually demonstrate the problem they claim to show?
-- Do "good" examples actually solve the problem?
+- Do "good" examples actually solve the same problem? Check output shapes, failure details, and requirements on both sides.
+- Does an attributed real-world precedent have a source that supports the actual claim?
 
 **How to verify code:**
 - Read the code carefully for syntax errors, type errors, and logical errors
@@ -91,10 +95,10 @@ Check that the content aligns with the book's stated stance and voice:
 
 - Is the FP-leaning stance maintained without being preachy?
 - Does Guy (OOP advocate) get fair treatment? His arguments should be strong even when the verdict goes against him.
-- If there's a verdict, is it opinionated enough? Wishy-washy verdicts waste the reader's time.
+- If there is a verdict, does it identify a useful decision and its conditions without claiming more than the examples establish?
 - If there's no verdict ("The Debate Continues"), is the open-endedness justified?
 - Does the chapter earn its "it depends" if it uses one?
-- Is the two-tier structure respected? (Experts set up and intervene; Professionals drive debate)
+- Do professionals drive the debate? Experts may disagree with one another and need not have the final word.
 
 ### 5. Code Quality
 
@@ -102,7 +106,7 @@ Check all code examples:
 
 - Are examples realistic? (Real-world scenarios, not `foo`/`bar`)
 - Do they use realistic variable names and domain scenarios?
-- Are both the "wrong" and "right" approaches shown?
+- Are the alternatives shown fairly? A deliberately broken example is useful for a mechanism, but cannot stand in for the strongest competing design.
 - Is the code properly formatted with TypeScript language tags?
 - Are comments minimal and only where intent isn't obvious?
 - Do examples build on each other within the chapter where possible?
@@ -114,7 +118,8 @@ Check the overall reading experience:
 - Is the chapter the right length? (Target: 2,000-4,000 words)
 - Does the debate flow naturally or feel forced?
 - Are transitions between speakers smooth?
-- Is there a clear arc? (principle → challenge → escalation → turn → resolution)
+- Can the reader follow how the cases change the initial claim? Does the ending preserve any material disagreement?
+- Does the chapter repeat a lesson through a Turn, maxim, verdict, and multiple closing remarks?
 - Are there abrupt topic shifts or non-sequiturs?
 - Would a reader want to keep reading, or would they put it down?
 

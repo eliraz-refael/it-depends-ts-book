@@ -12,9 +12,9 @@
 
 The whiteboard in Eli's office has been erased and rewritten so many times that the ghost of a lambda calculus proof is permanently etched into the surface. He doesn't mind. He says it reminds him that every type system is built on the shoulders of ideas older than computers themselves.
 
-When Eli speaks in a meeting, the room changes. Not because he raises his voice — he never does. It's because he has this unsettling ability to reduce a thirty-minute argument to a single sentence. Last quarter, two teams spent an entire sprint arguing about whether to use discriminated unions or class hierarchies for their event system. Eli walked into the room, listened for four minutes, and said: *"You're debating syntax when you should be debating semantics. What invariant are you trying to maintain?"* The room went quiet. Then they solved it in twenty minutes.
+Eli wants to know which claim everyone is arguing about. In a review of an event system, he asked the team to set aside the class diagram and write down what had to remain true when an event arrived twice. They discovered they disagreed about that too. Guy stayed at the board with him; Oded went to find the retry code.
 
-He's almost annoyingly patient. He'll let a debate run long past the point where everyone else can see the answer, because he believes people need to arrive at understanding themselves. This drives Oded crazy.
+His smaller examples make a problem easier to reason about, but he can remove a requirement along with the distracting detail. Eden keeps asking him to put the old client back into the example. Eli usually wants another minute to finish the argument first. His patience is easier to appreciate when you aren't waiting to merge.
 
 *"Let us return to first principles."*
 
@@ -26,11 +26,11 @@ He's almost annoyingly patient. He'll let a debate run long past the point where
 
 Daniel has read the TypeScript compiler source code the way some people read novels — for pleasure, on weekends. He once found a bug in the type checker during a code review because the behavior "felt wrong" to him. He was right.
 
-In debates, Daniel is the person who waits for someone to make a confident assertion about what TypeScript does, then quietly opens a playground and types for thirty seconds. The result is always a snippet that proves the assertion wrong in some edge case nobody considered. He delivers this without malice — it's more like a doctor showing you an X-ray. *"The compiler disagrees,"* he'll say, turning his laptop around so everyone can see.
+Daniel tends to open a playground while someone is still explaining the problem. He wants a small example, the compiler version, and the diagnostic. When the result contradicts a claim, he'll turn his laptop around: *"The compiler disagrees."* When it doesn't, he keeps the example open and asks what else was in the original file.
 
 His humor is dry enough to start fires. When Oded once argued that a particular `as` assertion was "perfectly safe in practice," Daniel responded: "The Titanic was perfectly safe in practice. Until the iceberg."
 
-He doesn't have strong opinions about how people should write code. He has strong opinions about people being wrong about how TypeScript works.
+Reducing a problem is also where he can lose it. A missing project flag or declaration file can make his tidy reproduction answer a different question. Eden has learned to bring the repository configuration along with the snippet. And a compiling example rarely satisfies Noam until they've called the function.
 
 *"The compiler disagrees."*
 
@@ -44,7 +44,7 @@ Gilad Stacktrace has been building production systems since before TypeScript ex
 
 He doesn't speak in abstractions. When someone proposes a pattern, Gilad asks one question: *"Show me the stack trace."* Not metaphorically — he literally wants to see what happens at 3 AM when this pattern hits an edge case and the on-call engineer is staring at logs. If you can't trace from the error to the root cause in under a minute, Gilad considers the pattern a failure, no matter how elegant it is.
 
-He's the one who delivers the synthesis in debates. After Noam and Oded have been going back and forth for twenty minutes, Gilad will say something like: "You're both right, and you're both building the wrong thing." Then he'll sketch a solution on the whiteboard that takes the best of both arguments and throws away the parts that only matter in theory.
+Gilad often recognizes an old incident in a new proposal. This is useful until he starts bringing the old system's precautions along with it. He once wanted retry handling and a recovery queue for an import tool that could simply be rerun. Oded asked who would maintain the queue. They kept the error report and dropped the queue; Gilad still wanted to know who would read the report.
 
 His code reviews are legendary. Sparse, precise, and occasionally devastating. His most common comment: "This works. What happens when it doesn't?"
 
@@ -60,9 +60,9 @@ Liron started programming in Lisp in the early nineties, moved to Clojure when i
 
 He speaks in parables. When the team was debating whether to use mutable state in a performance-critical module, Liron told a story about a river. "A river looks like it's staying still, but it's always moving. Your mutable object looks like it's staying the same, but every function that touches it might change it. The river is honest about what it is. Your object is not." Noam immediately printed the quote and pinned it above his desk.
 
-Liron sees patterns where others see code. He'll listen to an argument about error handling and say, "This is the same problem as null propagation, which is the same problem as async sequencing. They're all just monads wearing different hats." This either illuminates or infuriates, depending on who's listening.
+Liron likes finding a familiar pattern inside an unfamiliar problem. In a conversation about error handling, he'll reach for something the team already knows about null propagation or asynchronous work. Dafna follows him quickly. Guy usually asks what happens to the connection they still have to close. That is where Liron has to leave the analogy and work through the code.
 
-He has no patience for unnecessary complexity. Not in an aggressive way — more in the way a gardener prunes a tree. *"Complexity is a choice, not a necessity,"* he says, and somehow it doesn't sound like a platitude when he says it.
+He is less patient with an abstraction that nobody can explain than with a page of repetitive code. *"Complexity is a choice, not a necessity,"* he says. Linoy has asked him whether the abstraction was hard to explain or whether he had interrupted the explanation. They still disagree about that helper.
 
 *"Complexity is a choice, not a necessity."*
 
@@ -72,13 +72,13 @@ He has no patience for unnecessary complexity. Not in an aggressive way — more
 
 *Simplicity Expert*
 
-Sahar is the quietest person in any room he enters. In a forty-minute debate he will not speak once. He will sit with his arms folded, watch, listen, and wait. Then, after the professionals have exhausted their arguments and the room has mapped every corner of the problem, he will stand up and ask a single question that makes the debate look like it was about the wrong thing.
+Sahar often says little while the others compare implementations. He is looking at the caller, trying to work out whether the proposed abstraction needs to exist. When he finds a use for it, he wants that use in the example. When he can't, he asks what would happen if they removed it.
 
 He came to TypeScript from Scheme. Before that, from a decade of writing code that other people had to maintain after he left — embedded systems where a careless abstraction cost real money, and small teams where every additional concept in the codebase had to be paid for in onboarding weeks. This shaped him. He does not believe in cleverness. He believes in *removal* — that the best code is the code you found a way not to write, and the second-best is the code anyone on the team can read without a glossary.
 
-Sahar and Liron are often confused by readers who haven't met them both. They are not the same character. Liron speaks in parables — warm, literary, patient, telling you a story about a river until you realize the story is about your code. Sahar asks questions that presume the answer. He does not tell stories. He frames observations as rhetorical questions a listener already knows how to answer. *"You chose complexity. What did it buy you?"* is a Sahar sentence. *"A river looks like it's staying still, but it's always moving"* is a Liron sentence. They arrive at similar destinations from opposite directions.
+He and Liron often end up on the same side of a review, though they can irritate each other getting there. Liron wants the team to recognize a pattern they can reuse. Sahar wants to see whether this caller needs it at all. Liron has accused him of solving the example and leaving the library author to deal with everything else.
 
-His tic is this: he treats every feature the language offers as a proposal, and asks whether you actually needed to accept it. When someone reaches for a keyword, he asks what the keyword buys over what the language already gave them for free. Sometimes the answer is "something real." Often it's not. He has no patience for the idea that familiarity is a justification — he considers it the most expensive form of complexity, because it's the one that hides behind the word "simple."
+Sahar can underestimate how much work a familiar convention saves the people using it. Guy keeps bringing him reviews and incident logs from the team that would have to adopt his replacement. Sahar still asks whether the feature earns its place, but the cost of removing it belongs in the answer.
 
 *"Simple made better."*
 
@@ -120,8 +120,6 @@ Oded isn't stupid — he graduated top of his class and can write sophisticated 
 
 His debates with Noam are the stuff of company legend. They once argued about optional chaining versus explicit null checks for forty-five minutes in a design review. The project they were reviewing launched three months late. Oded still brings this up.
 
-*"We can fix it in the next sprint."* (They never do.)
-
 *"We can fix it in the next sprint."*
 
 ---
@@ -134,7 +132,7 @@ Gil doesn't have opinions. Gil has datasets.
 
 When a debate starts, Gil opens his laptop. While everyone else argues from experience and intuition, he's querying production error logs, measuring bundle sizes, counting type assertion usage across the codebase, and pulling up adoption metrics from industry surveys.
 
-His interventions always start the same way: *"What does the data say?"* — followed by a chart or a number that either validates or demolishes the argument in progress. He once ended a week-long debate about whether to use `enum` or union types by presenting error rates across fifteen teams and six months of production data. The data was so clear that even the losing side couldn't argue.
+In one review, he asks how many errors a change prevented. In another, he asks whether the two teams counted the same kind of error. He has ended meetings by discovering that the available data could not answer the question everyone was arguing about. Oded considers that an expensive way to reach lunch. Gil considers it useful.
 
 Gil is suspicious of anecdotes, allergic to "in my experience," and physically uncomfortable when someone says "everyone knows that." He considers unsubstantiated claims a form of technical debt.
 
@@ -208,7 +206,7 @@ Dafna's code is beautiful. Genuinely beautiful. Her pipelines read like prose �
 
 Dafna and Guy are natural foils. Where Guy sees a well-structured class with clear responsibilities, Dafna sees unnecessary ceremony. Where Dafna sees a clean pipeline, Guy sees "where is the encapsulation?" Their arguments are the book's recurring main event.
 
-But Dafna isn't just a purist for the sake of purity. She genuinely believes that FP patterns catch entire categories of bugs that OOP patterns leave open. She has the production data to back it up — courtesy of Gil Benchmark, who once analyzed Dafna's team's bug reports and found that mutation-related bugs dropped to near zero after Dafna refactored the codebase.
+Dafna keeps examples of bugs caused by shared mutable state. She can show which function changed an object and which caller expected the old value. Guy usually asks how the object acquired so many owners. They can spend a meeting agreeing about the bug and disagreeing about what would have prevented it.
 
 *"That's just a map."*
 
@@ -256,11 +254,11 @@ He doesn't always mediate. When he has a strong opinion, he'll state it clearly.
 
 Idan came to TypeScript through schemas. Her formative years were spent building services that consumed APIs nobody owned and storing data on disks nobody had documented — the kind of work where the bug is never *what the code does*, it's always *what arrived through the door*. She read Alexis King's "Parse, Don't Validate" early and never quite got over it. Her copy of the essay has marginalia, which is unusual, because it's a blog post.
 
-Her core belief is unfashionable in its simplicity: a type doesn't exist on a value until you produce it. Predicates are guesses. Assertion functions are guesses with stack traces. The only honest narrowing is one that hands you back a value of the type you wanted, or hands you back a structured reason it couldn't. Anything else, in her view, is the compiler trusting an unverified note from the developer.
+She prefers a parser that builds the value it promises. If a developer adds a required field to the type, she wants the return object to fail compilation until that field is produced. An explicitly annotated predicate can omit the new check and keep compiling. She has reviewed that mistake too often to be reassured by a function named `isUser`.
 
 She's distinct from Dafna, despite the surface FP overlap. Dafna lives inside the pipeline — purity, immutability, declarative composition over the whole program. Idan lives at the door. Once data is parsed and shaped, she defers to Dafna entirely; she has no opinions about your `reduce`. But she will spend a remarkable amount of energy on the thirty lines where bytes from the network become a typed value, because that's where every production bug she has ever seen actually lived.
 
-Her debates with Guy are the loudest. Guy uses assertion functions for precondition checks in class methods. Idan thinks every such check should live in the constructor — make the class impossible to construct in a bad state, and the assertion is no longer needed anywhere downstream. Guy calls this "FP purism dressed in OOP clothes." Idan calls it "putting the invariant in the type system instead of scattering it across the codebase." They have not resolved this. They're not going to.
+Her debates with Guy often concern where failure goes. Guy wants a request handler to catch a validation error once and end the operation. Idan wants the return type to tell each caller that the input may be rejected. They can agree on the parser and its checks and still argue about the function that calls it. Guy has existing handlers to maintain. Idan keeps finding callers outside them.
 
 She's not a moralist. She doesn't lecture. She has, over time, become the engineer who has seen the same shape of production bug enough times that she stopped explaining it and started building around it.
 
@@ -274,11 +272,11 @@ She's not a moralist. She doesn't lecture. She has, over time, become the engine
 
 |   | Name                | Role               | In One Line                                           |
 |---|---------------------|--------------------|-------------------------------------------------------|
-|   | Prof. Eli Typeworth  | Language Theorist  | Reduces thirty-minute arguments to a single sentence  |
-|   | Daniel Compiler      | Compiler Internist | Quietly proves you wrong with a TypeScript playground |
+|   | Prof. Eli Typeworth  | Language Theorist  | Wants the claim stated precisely enough to test       |
+|   | Daniel Compiler      | Compiler Internist | Opens the playground; asks which compiler you used    |
 |   | Gilad Stacktrace     | Systems Architect  | Doesn't care if it's elegant — does it survive 3 AM?  |
 |   | Liron Closure        | FP & Design Master | Has been saying the same thing since Clojure in 2009  |
-|   | Sahar Firstclass     | Simplicity Expert  | Silent for forty minutes, then asks the one question  |
+|   | Sahar Firstclass     | Simplicity Expert  | Checks the caller before adding the abstraction      |
 
 ### Professionals
 
@@ -293,7 +291,7 @@ She's not a moralist. She doesn't lecture. She has, over time, become the engine
 |   | Dafna Functor     | FP Purist              | Sees a `for` loop, mourns a `reduce`                        |
 |   | Guy Singleton     | OOP Advocate           | Considers his whiteboard class diagram a form of art        |
 |   | Dima Bridge       | Balanced Pragmatist    | The human "it depends"                                      |
-|   | Idan Greenfield   | Parse-Don't-Validate   | A type doesn't exist until you produce it                   |
+|   | Idan Greenfield   | Parse-Don't-Validate   | Wants to see the value the parser actually produced       |
 
 ---
 

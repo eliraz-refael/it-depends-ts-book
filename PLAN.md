@@ -8,18 +8,22 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 ---
 
-## Current Phase: Scaffolding + Prologue
+## Current Phase: Act II — Advanced TypeScript
 
 ### Tasks
 
-- [x] Create master plan as MD in project root
-- [x] Create `.claude/skills/book-writing-guide.md` — single comprehensive agent skill
-- [x] Create `.claude/skills/book-review.md` — review skill for validating content
-- [x] Scaffold all directories
-- [x] Write `README.md`
-- [x] Write `DISCLAIMER.md`
-- [x] Write `book/00-prologue/01-how-to-read.md`
-- [x] Write `book/00-prologue/02-meet-the-cast.md`
+- [x] Ch7: `01-conditional-types.md` — revised after voice review; complete overload comparison, local normalization decision, dissent preserved
+- [x] Voice revision: Ch1–7 and prologue; Ch5 ends with "The Debate Continues"
+- [x] Writing guidance: disputed decisions, fair alternatives, flexible voice tendencies
+- [x] Pre-commit corrections: assignability, assertions, Express augmentation, enum interoperability, serialization; expert biographies revised
+- [ ] Ch8: `02-mapped-types.md`
+- [ ] Ch9: `03-template-literal-types.md`
+- [ ] Ch10: `04-infer-keyword.md`
+- [ ] Ch11: `05-advanced-generics.md`
+- [ ] Ch12: `06-variance.md`
+- [ ] Ch13: `07-declaration-merging.md` — NOTE: Ch3 already settled core declaration merging; reframe this chapter as *module augmentation & ambient types* (`.d.ts`, `declare global`, patching third-party types) to avoid re-litigating
+- [ ] Act II debt: at least one "The Debate Continues" chapter (candidates: advanced-generics, variance)
+- [ ] Act II: use sourced or reproducible evidence; do not schedule Gil/Chen methodology exchanges by quota
 
 ---
 
@@ -33,7 +37,8 @@ it-depends-ts-book/
 ├── .claude/
 │   └── skills/
 │       ├── book-writing-guide.md   # Skill for agents: how to write chapters
-│       └── book-review.md         # Skill for agents: how to review content
+│       ├── book-review.md         # Skill for agents: how to review content
+│       └── character-voices.md    # Writer-facing speech tendencies
 ├── book/
 │   ├── 00-prologue/
 │   │   ├── 01-how-to-read.md
@@ -83,18 +88,18 @@ it-depends-ts-book/
 
 | Name                    | Archetype          | Personality                                                                                            | Catchphrase                                  |
 |-------------------------|--------------------|--------------------------------------------------------------------------------------------------------|----------------------------------------------|
-| **Prof. Eli Typeworth** | Language theorist  | Formal logic, calm, drops perfect metaphors. Almost annoyingly patient.                                | *"Let us return to first principles."*       |
-| **Daniel Compiler**       | Compiler internist | Dry humor, knows what the compiler *actually* does. Casually invalidates arguments with edge cases.    | *"The compiler disagrees."*                  |
-| **Gilad Stacktrace**            | Systems architect  | 20 years production. Doesn't care about theory unless it survives prod. Delivers synthesis.            | *"Show me the stack trace."*                 |
-| **Liron Closure**         | FP / Design master | Wise elder from Lisp/Clojure. Speaks in parables and analogies. Warm but uncompromising on simplicity. | *"Complexity is a choice, not a necessity."* |
-| **Sahar Firstclass**    | Simplicity expert  | Silent for most of a debate. Reframes it with one rhetorical question. Asks what each feature buys you that the language didn't already give. | *"Simple made better."*                      |
+| **Prof. Eli Typeworth** | Language theorist  | Patient, precise; looks for the claim beneath an example. Can simplify away a requirement others need restored. | *"Let us return to first principles."*       |
+| **Daniel Compiler**       | Compiler internist | Dry humor; tests compiler behavior. Small reproductions can omit project context, and acceptance doesn't settle runtime behavior. | *"The compiler disagrees."*                  |
+| **Gilad Stacktrace**            | Systems architect  | Long production experience; asks who diagnoses and recovers from failure. Can import precautions from an old system that the new one doesn't need. | *"Show me the stack trace."*                 |
+| **Liron Closure**         | FP / Design master | Warm Lisp/Clojure veteran; uses familiar patterns and analogies. Has to work through the code when an analogy leaves a practical question unanswered. | *"Complexity is a choice, not a necessity."* |
+| **Sahar Firstclass**    | Simplicity expert  | Looks at callers and asks what could be removed. Can underestimate library requirements and the value of a team's conventions. | *"Simple made better."*                      |
 
 ### The Professionals (drive the debate)
 
 | Name                  | Archetype              | Personality                                                                                            | Catchphrase                           |
 |-----------------------|------------------------|--------------------------------------------------------------------------------------------------------|---------------------------------------|
 | **Noam Kiperman** | Type safety absolutist | Personal vendetta against `any` and `as`. Gets visibly upset at unsafe code.                           | *"Over my dead type definition."*     |
-| **Oded Shipley**    | Velocity advocate      | Ships fast, refactors never. Knows the tradeoffs, picks speed anyway.                                  | *"We can fix it in the next sprint."* |
+| **Oded Shipley**    | Velocity advocate      | Ships fast; asks what justifies the work now. Knows the tradeoffs and challenges speculative fixes.                                  | *"We can fix it in the next sprint."* |
 | **Gil Benchmark**    | Data-driven analyst    | Won't accept claims without benchmarks. Carries dashboards everywhere.                                 | *"What does the data say?"*           |
 | **Eden Legacy**        | Migration veteran      | Converted millions of lines JS→TS. Has seen everything fail at scale.                                  | *"I've seen this fail at scale."*     |
 | **Linoy Nightly**       | Cutting-edge advocate  | Uses features before they're stable. Half her code needs `@ts-ignore`.                               | *"There's an RFC for that."*          |
@@ -121,7 +126,7 @@ Each chapter follows this skeleton (with flexibility):
 [Code examples illustrating each position]
 
 ## The Turn (optional)
-[An expert intervenes with a key insight that reframes the debate]
+[A new case, question, or observation changes the inquiry]
 
 ## The Verdict
 [Clear ruling OR honest "it depends" with conditions]
@@ -139,9 +144,9 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 
 | Phase                       | Status          | Notes                 |
 |-----------------------------|-----------------|-----------------------|
-| Scaffolding + Prologue      | **IN PROGRESS** | Current phase         |
-| Act I: The Type System      | Planned         | 6 chapters            |
-| Act II: Advanced TypeScript | Planned         | 7 chapters            |
+| Scaffolding + Prologue      | Done            |                       |
+| Act I: The Type System      | Done            | 6 chapters; voice revisions in working tree |
+| Act II: Advanced TypeScript | **IN PROGRESS** | Ch7 revised (1 of 7) |
 | Act III: Patterns & Design  | Planned         | 10 chapters           |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |

@@ -32,9 +32,9 @@ This book is **fun first, educational second**. It should read like eavesdroppin
 - Set the principle at the start of each chapter
 - Intervene **sparingly** — only when the debate goes off track or needs reframing
 - Their interventions carry weight because they're rare
-- They don't argue with each other (they may politely disagree, but never debate)
+- Can question and correct one another. Expertise establishes mechanisms; practical judgments remain open to challenge.
 
-**Professionals** (Noam, Oded, Gil Benchmark, Eden, Linoy, Chen, Dafna, Guy, Dima):
+**Professionals** (Noam, Oded, Gil Benchmark, Eden, Linoy, Chen, Dafna, Guy, Dima, Idan):
 - Drive the bulk of every debate
 - Argue with each other freely — interruptions, comebacks, grudging admissions
 - Each has a **consistent personality** that readers learn to predict
@@ -43,9 +43,9 @@ This book is **fun first, educational second**. It should read like eavesdroppin
 
 Every character has a defined personality and catchphrase in `PLAN.md`. Rules:
 
-1. **Never break character.** Noam never says "types don't matter sometimes." Oded never says "let's slow down and think about this more." Dafna never endorses a class hierarchy.
+1. **Preserve motives, not predetermined answers.** Noam cares who will discover an unchecked assumption; Oded cares whether the work is justified. Either can accept an unfamiliar solution when the circumstances warrant it.
 2. **Use catchphrases naturally** — not forced into every appearance, but often enough that readers associate them with the character.
-3. **Characters can evolve within a debate** — they can be convinced, surprised, or grudgingly admit a point. But their core stance doesn't change.
+3. **Let evidence change a position.** A character may revise earlier advice, including advice from another chapter. Show what changed their judgment.
 4. **Not every character appears in every chapter.** Pick the 4-6 characters most naturally activated by the topic. Some chapters might feature only 3.
 5. **Character interactions matter.** Noam and Oded are natural antagonists. Dafna and Guy are foils. Chen annoys everyone. Dima mediates. Use these dynamics.
 
@@ -64,6 +64,49 @@ Every character has a defined personality and catchphrase in `PLAN.md`. Rules:
 | Dima Bridge | Context-appropriate solutions | Dogma from either side | FP vs OOP debates, balanced discussions |
 | Sahar Firstclass (Expert) | Removing features, plain JS primitives | Ceremony, familiarity disguised as simplicity | Language features that duplicate what the base language already provides |
 | Idan Greenfield | Parsing at boundaries, produced-not-checked types, schema libraries | Boolean predicates, ad-hoc inline guards, exception-driven validation | Narrowing, validation, boundary data, shape transformation, parse-vs-validate |
+
+---
+
+## Dialogue and argument
+
+Read the biographies in `book/00-prologue/02-meet-the-cast.md` and the writer-facing tendencies in `character-voices.md`. The biographies establish people and history; the voice notes help distinguish their attention and speech. Neither is a script for what they must say next.
+
+### Start with a disputed decision
+
+Before drafting, identify the decision these people need to make: merge a helper, move a check, expose an API, accept a migration compromise. Record what each position protects and what it costs the other people. A permanent antagonist pair is optional. Linoy and Eden can disagree about three overloads without becoming ideological enemies.
+
+Give each side its strongest reasonable implementation. Do not make an experienced engineer overlook an obvious fix to preserve the planned conclusion. Test the alternatives against the same inputs and requirements. If both work, the argument must address their actual tradeoffs.
+
+### Let objections alter the ruling
+
+The book's Talmudic aspiration lives in the examination of claims. A counterexample can restrict a rule; a distinction can preserve part of a rejected position; a later case can reopen an earlier ruling. Keep track of which assumptions each conclusion needs.
+
+A practical decision need not resolve the general question. Chapter 7 can normalize the particular input while leaving overloads versus conditional types contested. Chapter 5 can settle on one parser without settling whether every caller should receive a result or an exception.
+
+Plan what must be understood, not which slogan must survive. Do not require a mistake, confession, or surprise winner in every chapter. A well-supported disagreement can remain a disagreement.
+
+### Ordinary speech has room here
+
+Avoid a sequence of polished closing lines, especially across different speakers. Some characters enjoy metaphors; others usually reach for code, a question, or an incident. Treat these as tendencies, not permissions assigned to a fixed number of people. There is no epigram quota and no ban on a particular character being funny or declarative.
+
+Let questions be answered plainly. A confused character can help the reader, but do not make someone repeatedly forget material they already used. Show the specific point they do not understand. Interruptions and unfinished sentences should follow the exchange, not decorate it.
+
+A concession can be a corrected line, a brief acknowledgment, or a revised demand. It need not summarize the winner's argument. Equally, silence is not automatically better: choose what the person would do next.
+
+### Keep the narrator out of the judgment
+
+- Do not announce who is winning, whether a concession is genuine, or that an action is "in character."
+- Avoid explaining a gesture after showing it. A character opens a file because the file matters to the conversation.
+- Watch repeated antitheses such as "That's not X. That's Y." A useful distinction does not always need that rhythm.
+- Keep chapter and subsection numbers out of dialogue. Characters recall an example or a previous claim.
+- Use history to test consistency. Guy recalling Noam's throwing parser is more useful than a congratulatory callback.
+- Give deadlines and props consequences. If a meeting is eleven minutes away, someone must eventually deal with it. Do not add clocks to simulate a scene.
+
+### Teach the mechanism before comparing policies
+
+Give a new construct a small, clear example. Introduce alternatives as the actual problem demands them. An alternative can survive the next exchange. Avoid a relay where each speaker delivers the next paragraph of documentation and nobody responds to what was said.
+
+Use a Turn only when it changes the inquiry. It can be an altered input, another caller, or a question answered from the file. It need not be a speech, and it does not require an expert's endorsement afterward. Avoid restating the same lesson in the Turn, a boxed maxim, a verdict, and every Additional Take.
 
 ---
 
@@ -90,8 +133,8 @@ Every character has a defined personality and catchphrase in `PLAN.md`. Rules:
 
 ## The Turn
 
-[Optional. An Expert intervenes with an insight that reframes everything.]
-[This should feel like a "oh, we were asking the wrong question" moment.]
+[Optional. A new case, question, or observation changes the inquiry.]
+[Use whichever character has reason to make it; keep it brief when the code already teaches the point.]
 
 ## The Verdict
 
@@ -134,7 +177,7 @@ Always show the approach being debated AND the alternative:
 
 ```typescript
 // The approach being challenged
-const data = response.json() as UserProfile;
+const data = (await response.json()) as UserProfile;
 
 // The alternative being proposed
 const data: unknown = await response.json();
@@ -224,8 +267,8 @@ The book's format is a strength — but format fatigue is a real risk. The solut
 - Code-first arguments: every position is backed by a code example.
 
 ### What must be unpredictable
-1. **The verdict.** The reader should not be able to guess who "wins" from the Principle. At least one subsection per chapter should go to the side the reader doesn't expect.
-2. **Characters must move.** In every chapter, at least one character should concede a point they wouldn't normally concede, be surprised, or change their mind mid-debate. Characters who only ever defend their archetype become puppets.
+1. **The verdict.** Let the examined cases determine its scope. A local decision can preserve a dissent about the general rule.
+2. **Characters respond to evidence.** They may change their minds, narrow a claim, request another example, or remain unconvinced for a reason. Do not manufacture a concession to satisfy a chapter pattern.
 3. **The Turn.** Vary how it's delivered across chapters:
    - Expert monologue that reframes (the default — use sparingly after Act I)
    - Turn with character reactions — the insight lands on the characters, not just the reader
@@ -235,8 +278,11 @@ The book's format is a strength — but format fatigue is a real risk. The solut
 4. **Chapter length.** Not every topic needs 6 debate subsections. Some chapters should be 2,000 words, not 3,500. A shorter, sharper chapter between two long ones changes the pacing.
 5. **Resolution.** At least one chapter per act should end with **"The Debate Continues"** — genuinely unresolved, with conditions under which each position wins.
 
-### Gil Benchmark's data
-Gil shares patterns and trends from his analyses — directional insights, not fake-precise statistics. He says "the clear majority" not "62%." He says "significantly fewer" not "38% fewer." Chen may challenge his methodology occasionally (sample size, confounders), which makes the device self-aware. One such pushback per act is enough — doing it every chapter would undermine him.
+### Evidence, including Gil's data
+
+A fictional incident can give a character a reason to care. A claimed study about real engineering outcomes needs an identifiable source, or an explicit hypothetical framing. "Directionally" and "the clear majority" do not fix an invented statistic. Do not attribute imaginary practices or examples to the TypeScript team.
+
+Gil can run a reproducible check, question the denominator, separate two measurements, or say that he does not know. Use him when he contributes to the decision; do not require a chart or a ceremonial challenge to his methodology. Cite real empirical claims near the claim and preserve the source's actual scope.
 
 ---
 
@@ -246,6 +292,16 @@ Gil shares patterns and trends from his analyses — directional insights, not f
 2. **Characters making strawman arguments.** Even the "wrong" position should be presented at its strongest.
 3. **Forgetting to show code.** If a character makes a claim, back it up with code. "Show, don't tell" applies.
 4. **Academic tone creeping in.** Rewrite any paragraph that sounds like a textbook.
-5. **Inconsistent character voices.** Re-read the character table before writing. If you can swap two characters' dialogue and it still works, the voices aren't distinct enough.
-6. **Ignoring the professionals in favor of experts.** Experts set up and intervene. Professionals are the stars.
+5. **Inconsistent character voices.** Re-read the character table and the tendencies in `character-voices.md` before writing. If you can swap two characters' dialogue and it still works, the voices aren't distinct enough.
+6. **Ignoring the professionals in favor of experts.** Experts set up and intervene. Professionals are the stars. Watch expert airtime specifically: if an expert owns the longest section as a multi-block lecture, hand a beat to a professional.
 7. **Making the FP stance feel preachy.** Dafna should be passionate, not self-righteous. Guy should be respected, not a punching bag.
+8. **Universal eloquence.** If every exchange ends with a finished maxim, leave more room for plain answers and specific objections. Do not repair this by inserting arbitrary mistakes or stammers.
+9. **Rhetoric substituting for a decision.** For an abstract topic, find the actual change under review and the people who will live with it. Extra gestures and deadlines cannot supply the missing disagreement.
+
+---
+
+## A Note for Reviewers
+
+A plain line is not a defect. First ask whether the alternative has been given its strongest code, whether an objection changed anything, and whether the ruling follows from the cases. Then check the voices. Tightening every sentence into a maxim can make the whole chapter less convincing.
+
+Compare neighboring chapters for repeated outcomes as well as repeated wording. If every disagreement ends in a balanced speech and a table, removing a few metaphors will not resolve the repetition. See `book-review.md` for the review checklist.

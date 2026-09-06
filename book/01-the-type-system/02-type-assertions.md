@@ -163,7 +163,7 @@ dog.bark(); // Runtime: dog.bark is not a function
 
 He pauses.
 
-"If the library types are wrong, there are options. Declare a module augmentation. Write a thin wrapper with the correct type. Use a type guard that validates the actual runtime shape. All of these are more work than `as unknown as X`. All of them are safer. You'll find almost no double assertions in the TypeScript compiler codebase — when the types are wrong, we fix the types."
+"If the library types are wrong, fix the declaration where possible, or validate the actual runtime shape in a wrapper. A wrapper that merely hides the same assertion has not established anything new. Module augmentation can add declarations; it cannot repair every incompatible property type."
 
 ---
 
@@ -250,13 +250,15 @@ const mockUser = createMockUser({ name: "Test User" });
 
 "Factories hide which fields the test actually depends on. With the assertion, I can *see* that this test only cares about `id` and `name`. With the factory, I'm reading twelve default values to figure out which ones matter and which are noise."
 
-**Gil Benchmark** opens his laptop. *"What does the data say?"*
+**Noam**: "Then have the function ask for the fields it actually needs. If it only uses `name`, why does its parameter require a whole `User`?"
 
-"In every codebase I've studied, test files account for the clear majority of type assertions. Teams that switch to factory functions consistently report fewer test maintenance headaches when interfaces change — because the factory breaks in one place, not across every test file."
+**Oded**: "If we own that function, sure. This test calls a library. Its type wants the whole object."
 
-**Oded**: "Fine. But that's a mature test infrastructure. For a team writing their first tests, the assertion is the stepping stone."
+**Noam**: "Then I still want a complete fixture. The library may start reading another field."
 
-**Noam**: "Then step. Don't camp."
+**Oded**: "And the defaults may let that new dependency pass without anyone noticing. That's what I'm trying to make visible."
+
+Noam leaves the factory on the screen. Oded leaves a comment beside the test naming the fields it is supposed to exercise.
 
 ---
 
@@ -293,24 +295,20 @@ const palette = {
 // Error: Type '"purple"' is not assignable to type 'Color'.
 ```
 
-"Now watch what happens with `as`:"
+**Daniel**: "That palette would be rejected with `as` too. The object and `Record<string, Color>` don't overlap sufficiently. An assertion still has a compatibility check. But this one passes:"
 
 ```typescript
-const palette = {
-  primary: "red",
-  secondary: "green",
-  accent: "purple",
-} as Record<string, Color>;
-// No error. The lie is accepted. "purple" slips through.
+const invalidColor = "purple" as Color;
+// Compiles. The static type is Color; the value is still "purple".
 ```
 
-**Noam** is visibly delighted: "`satisfies` is what `as` should have been. It checks without lying. It validates without overriding."
+**Noam**: "So an accepted assertion still doesn't prove this is one of our colors."
 
-**Dima Bridge** provides the synthesis. *"Both have a point here"* — but this time, the scales tip clearly:
+**Linoy**: "Right. `"purple" satisfies Color` fails. For this configuration, I want the compiler to check membership and keep the specific values."
 
-"`as` says 'trust me.' `satisfies` says 'check me.' For the vast majority of cases where developers reach for `as`, what they actually want is `satisfies`. The rule of thumb: if you want validation, use `satisfies`. If you want override, use `as` — and document why."
+**Dima Bridge**: "Then use `satisfies` here. If you need an assertion elsewhere, explain what you know that the compiler doesn't."
 
-**Linoy** adds the caveat: "`satisfies` doesn't cover everything. You can't use it to assert at a boundary — it only works on expressions where the compiler can see the value. API responses, JSON parsing, dynamic data — you still need either `as` or a runtime validator for those. So `as` has a role. Just a much smaller one than most codebases give it."
+**Linoy**: "And this is a static check. Putting `satisfies` after `JSON.parse` doesn't inspect the data it returns. For that, we still need runtime validation."
 
 ---
 
@@ -391,7 +389,7 @@ He walks to the whiteboard and draws a timeline.
 
 He turns to the room.
 
-"That's the real cost of an assertion. Not the lie itself — the *distance* between the lie and the explosion. An assertion error always surfaces at runtime, always far from the source, and always at the worst possible time."
+"An unchecked assumption can fail far from where it entered the program. The stack trace may tell you which field was used without telling you why the compiler believed it existed."
 
 He draws a simple diagram: a line from "the lie" on one end to "the crash" on the other, with a question mark in the middle.
 
@@ -400,8 +398,6 @@ He draws a simple diagram: a line from "the lie" on one end to "the crash" on th
 The room is quiet. Oded is looking at his laptop — not arguing, just scrolling through a file. He doesn't say what he's looking at, but everyone can guess.
 
 **Noam** breaks the silence, and for once he's not attacking anyone: "The uncomfortable part is that strict types don't fix this. If the assertion at the boundary is wrong, everything downstream is *more* dangerous — because the compiler tells you it's safe. You trust it. You build on it. And the distance between the lie and the crash gets longer, not shorter."
-
-It's the first time Noam has admitted that his own approach has a failure mode. Gilad Stacktrace nods.
 
 ## The Verdict
 
@@ -415,7 +411,7 @@ It's the first time Noam has admitted that his own approach has a failure mode. 
 | API response / JSON parse | Runtime validation (Zod, etc.) | As stepping stone only, centralized |
 | Narrowing a literal | `as const` | Yes (always safe) |
 | Checking shape without widening | `satisfies` | Not needed — use `satisfies` |
-| Test mocks / partial objects | Factory function | As stepping stone only |
+| Test mocks / partial objects | Complete factory fixture; narrow the tested function's parameter when you own it | A partial assertion can expose field dependencies, but does not satisfy the full contract |
 | Non-null after proven init | Control flow narrowing | Only when narrowing is impossible |
 | Library types are wrong | Fix the types / PR upstream | `as` with documented justification |
 | Double assertion (`as unknown as X`) | Redesign the approach | Almost never |
