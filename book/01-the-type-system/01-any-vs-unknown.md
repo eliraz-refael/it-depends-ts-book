@@ -4,29 +4,32 @@
 
 **Prof. Eli Typeworth** begins:
 
-"Before we debate anything else, we need to talk about the escape hatch. Every type system has one. In TypeScript, it's called `any`, and it is the most misunderstood keyword in the language."
+"Before we debate anything else, we need to talk about an escape hatch. In TypeScript, `any` lets us bypass checks the rest of this book will rely on."
 
-He pauses, the way he always does before the sentence that ends the confusion. *"Let us return to first principles."*
+He writes `any` on the whiteboard. *"Let us return to first principles."*
 
-"`any` is not a type. It is the absence of typing — a voluntary exit from the type system. When you write `any`, you are not describing your data. You are telling the compiler: *'I don't know, and I don't want to know.'*"
+"`any` is a special type that disables many of the usual checks on a value. When you write it, you are asking the compiler to accept operations without the information it would normally require."
 
-Eli walks to the whiteboard and draws two arrows. One pointing down from `any` to every other type. One pointing up from every other type to `any`. Both directions. No restrictions.
+Eli draws arrows from every type to `any`, and from `any` back to most of them. He leaves out the arrow from `any` to `never`.
 
-Then he draws `unknown` — arrows pointing up from every type *to* it, but nothing pointing down. A one-way door.
+Then he draws `unknown`. Every type has an arrow to it. Its outgoing arrows reach only `unknown` itself and `any`.
 
-"That," he says, tapping the whiteboard, "is the difference. And it's the only difference that matters."
+"Start with assignment. What can we pass to a function that expects a number?"
 
 **Daniel Compiler** leans forward to make it precise:
 
-"Let me put Eli's whiteboard into code. `any` has a property that no real type has — it's both assignable *to* every type and assignable *from* every type. Watch:"
+"A value of type `any` can go straight in. Almost any other target type accepts it too. `never` is the exception. In the other direction, every type is assignable to `any`. Watch:"
 
 ```typescript
 let value: any = "hello";
 
-// any is assignable TO every type — no error
+// These target types all accept any:
 const num: number = value;
 const bool: boolean = value;
 const obj: { name: string } = value;
+
+const impossible: never = value;
+// Error: Type 'any' is not assignable to type 'never'.
 
 // any is assignable FROM every type — no error
 value = 42;
@@ -44,7 +47,10 @@ value = 42;
 value = { anything: "goes" };
 value = null;
 
-// unknown is NOT assignable TO other types — error!
+// unknown can pass to any, which gives up the checks:
+const unchecked: any = value;
+
+// It cannot pass directly to number:
 const num: number = value;
 //    ^^^ Type 'unknown' is not assignable to type 'number'
 
@@ -54,7 +60,7 @@ if (typeof value === "number") {
 }
 ```
 
-"That asymmetry is the entire point. `unknown` says 'I don't know *yet*.' `any` says 'I don't want the compiler to check.' They're different statements about different things."
+"The function expecting a number accepts `any` without further evidence. With `unknown`, we have to narrow first — or explicitly leave the checks behind by passing through `any`."
 
 The room is quiet. Then Oded clears his throat.
 
@@ -82,7 +88,7 @@ analytics.track("button_click", {
 
 **Daniel Compiler** speaks before Noam can. The room notices — Daniel rarely weighs in this early.
 
-"For a third-party SDK with no types that you might replace next quarter, `declare const analytics: any` is exactly what the compiler team would expect you to do. The sin isn't the `any` — it's forgetting to come back."
+"I would accept that declaration to get an untyped SDK working. I would also ask which calls you need to keep using. You may only need to describe a small part of its API."
 
 Oded looks genuinely surprised to have an expert in his corner. It won't last.
 
@@ -101,7 +107,7 @@ function formatResponse(data: any) {
 }
 
 // Six months later, 47 call sites use formatResponse.
-// Every single one has an untyped return value.
+// id and name are any in every return; createdAt is still typed Date.
 // The API changes: created_at becomes createdAt.
 // No compiler error anywhere.
 // Runtime: Invalid Date propagates through the entire feature.
@@ -258,23 +264,19 @@ export function fetchUserProfile(userId: string): Promise<any> {
 }
 ```
 
-**Gil Benchmark** opens his laptop. *"What does the data say?"*
+**Gil Benchmark**: "What are you counting in the reduction target? Explicit `any`s? Inferred ones? Dependency declarations?"
 
-"Across the enterprise migrations I've studied, the pattern is consistent: teams that use tracked `any` with reduction plans consistently hit low single-digit `any` rates within six months. Teams that try to fully type everything from day one? Most abandon the migration within a quarter."
+**Eden**: "Start with the ones we add to application code during the migration. The ticket identifies the boundary we're going to type."
 
-He turns the screen so everyone can see the chart.
+**Gil**: "Then track that population consistently. A falling percentage can mean you added more code around the same untyped boundary."
 
-**Chen**: "What's your sample size, Gil? And how do you control for the fact that teams with tracked `any` probably have better engineering practices across the board?"
+**Noam**: "I want the boundary fixed."
 
-**Gil**: "Twelve codebases across four industries. And you're right — correlation isn't causation. But the pattern holds even when I control for team size and codebase age."
+**Eden**: "So do I. I also want the migration to get past that boundary this week. We can see what's unfinished if we keep the ticket."
 
-**Noam**: "So the data says `any` is a liability even during migration."
+**Oded**: "Who gets the ticket?"
 
-**Eden**: "No. The data says *untracked* `any` is a liability. Tracked `any` with a reduction plan is the most successful migration strategy we have. There's a difference between a controlled burn and a wildfire."
-
-Noam opens his mouth, then closes it. Eden has a point, and Noam knows it.
-
-**Eden** adds, quieter now: "I've seen `any` save a migration deadline. I've also seen it cause a six-figure production outage three months later — because nobody went back to finish the job. The `any` isn't the problem. The *forgetting* is the problem."
+**Eden**: "The team that owns the call. Including yours."
 
 ---
 
@@ -318,28 +320,22 @@ type A = Unwrap<Promise<string>>;
 type B = Unwrap<any>;
 //   ^? type B = any
 // Not string. Not never. Just... any.
-// The conditional type gives up and returns any.
+// The conditional produces both branches; the any branch absorbs the other result.
 ```
 
-"When `any` enters a generic pipeline, every type-level computation downstream collapses. It's not that `any` skips a check — it corrupts the inference engine."
+"Here one branch contributes `any`, so the resulting union is `any`. The compiler is following its rules. Those rules can preserve the uncertainty all the way to the caller."
 
-**Noam** turns to Oded:
-
-"See? `any` doesn't just skip checks — it *actively misleads* the type system. It's not neutral. It's destructive."
+**Noam** turns to Oded: "Your generic function can look properly typed while its callers still get `any`. That's why I check what went into it."
 
 **Oded** is, for once, genuinely surprised:
 
 "Okay. I didn't know that. But how often does this actually happen in practice?"
 
-**Gil Benchmark** already has the answer:
+**Linoy**: "Look at `firstElement`. One array of `any` is enough. You don't have to author a conditional type to pass `any` through a generic. You only have to call one."
 
-"In a study of forty TypeScript codebases, 23% of generic functions had at least one call site passing `any`. Of those, 67% had downstream type errors that the compiler could not detect. So — often."
+**Oded** looks back at the array declaration.
 
-**Oded** sits back in his chair. This is the first debate where he looks genuinely unsettled rather than strategically defensive.
-
-"Fine. I'll concede generics. But that's an edge case. Most developers aren't writing conditional types."
-
-**Linoy Nightly** shakes her head: "They're not writing them — but they're *using* them. Every time you call a library function with a generic signature, you're participating in generic inference. *There's an RFC for that*, by the way — improving how `any` propagates through generics. It's been open for three years."
+"All right. I'd been looking for the brackets on our functions."
 
 ---
 
@@ -384,7 +380,7 @@ const host = config.server.host; // string (maybe wrong, but contained)
 startServer(port, host);         // port and host ARE checked against function signature
 ```
 
-"If the assertion is wrong, the error surfaces when `port` or `host` hits a function expecting a specific type. With `any`, the error might never surface at compile time — period."
+"The asserted `port` is checked as a number at later calls. If it is really a string at runtime, that static check still passes. The assertion contains the declared type; it does not establish the truth of it."
 
 **Noam**: "So the answer is: `any` is worse?"
 
@@ -598,13 +594,11 @@ The room has been intense for a while. **Liron Closure** has been listening, say
 
 A few people exchange glances. Liron's parables are illuminating. They are also twenty minutes long. These facts are related.
 
-"In ancient cartography, when mapmakers reached the edge of the explored world, they didn't leave the space blank. They wrote: *'Here be dragons.'* They didn't pretend the territory didn't exist. They acknowledged they hadn't explored it yet."
+"Imagine a map with a region marked *'Here be dragons.'* The warning tells you where the mapmaker stopped. You can travel farther, but you know where you are leaving the mapped ground."
 
 He lets that sit.
 
 "`any` should be your 'here be dragons.' Not a permanent feature of your map, but a marker of what you haven't yet understood. The problem isn't `any` itself — it's when `any` becomes invisible. When it stops being a conscious choice and becomes the default."
-
-This reframes the entire debate. The issue isn't `any` vs `unknown`. It's whether `any` means "I don't know yet" or "I don't want to know."
 
 **Noam** softens — not much, but noticeably:
 
@@ -613,8 +607,6 @@ This reframes the entire debate. The issue isn't `any` vs `unknown`. It's whethe
 **Oded** nods:
 
 "That's actually practical. An `any` with a TODO is a plan. An `any` without one is debt."
-
-It might be the first time they've agreed on anything.
 
 *"Complexity is a choice, not a necessity,"* Liron adds quietly. "And `any` without intention is the choice to accept complexity you haven't measured."
 
@@ -628,11 +620,7 @@ It might be the first time they've agreed on anything.
 
 **Oded**: "Your team is eight people building an internal tool. Try zero `any` with forty developers and three acquired codebases."
 
-**Gil Benchmark** has been waiting for this. *"What does the data say?"*
-
-"I analyzed thirty-two production codebases last year. Teams with near-zero `any` usage had significantly fewer runtime type errors and spent noticeably less time debugging — and, to my surprise, reported higher developer satisfaction. Teams above 5% `any` had the inverse pattern across all three dimensions."
-
-**Eden Legacy**: "Zero `any` is achievable for greenfield. For migrated codebases, under 1% is the realistic target. *I've seen this fail at scale* — but I've also seen it succeed. My last migration landed at 0.3% — eleven remaining `any`s across two million lines. Every single one was documented."
+**Eden Legacy**: "I had eleven left at the end of my last migration. I could tell you why each was there. Getting from that to zero would have been a different project."
 
 **Chen** raises a hand:
 
@@ -644,70 +632,43 @@ The room considers this. It's a better question than it sounds. Every team draws
 
 **Oded**: "Even Noam has a threshold. Mark the date."
 
-**Gilad Stacktrace** closes the debate:
-
-"The goal isn't zero. The goal is *intentional*. Every `any` should be a choice, not an accident. If you can defend every `any` in your codebase — if you can explain why it's there and when it will be removed — your codebase is healthy. Regardless of the count."
-
-He looks around the room.
-
-"Stop counting. Start accounting."
-
 ## The Turn
 
-The debate has settled into consensus — or at least, exhaustion. Noam and Oded have stopped interrupting each other. Eden is closing his laptop. Even Chen seems satisfied.
+**Daniel Compiler** scrolls back to Noam's event-handler overloads.
 
-Then **Daniel Compiler** clears his throat.
+"Your implementation takes `any`. What ticket would you put on that?"
 
-"Before we wrap up, I want to show you something that might surprise you."
+**Noam**: "The public overloads restrict the handlers."
 
-He opens his laptop and navigates to a very specific repository.
+"Yes. What lets you remove the `any` underneath them?"
 
-"The TypeScript compiler itself — the program that enforces *your* types, that throws errors when *you* write `any`, that Noam relies on to block Oded's PRs — uses `any` in its own source code."
+Noam reads the signatures again.
 
-The room reacts exactly the way you'd expect. Noam's eyes narrow. Oded's face lights up like it's Christmas morning.
+"A different implementation that preserves the event-to-payload association. I haven't shown one."
 
-"Don't celebrate yet, Oded. Here's the part that matters: every instance is documented. The compiler team doesn't *avoid* `any` — they *account* for it. Every `any` in the TypeScript codebase has a comment explaining why it's necessary and what invariant the developer is maintaining manually in place of the type checker."
+**Oded**: "So 'tracked for removal' can mean you don't know how to remove it."
 
-He shows an example:
+**Noam**: "In this example, yes. I'd still want the association tested. The implementation must only call a handler with its event's payload."
 
-```typescript
-// From TypeScript's own compiler codebase (simplified):
-// any is used here because the node type is narrowed through
-// a switch statement that handles all possible SyntaxKind values.
-// The type system cannot represent "I've exhaustively checked this"
-// in this context without prohibitive type-level complexity.
-function visitNode(node: any, visitor: Visitor): Node {
-  switch (node.kind) {
-    case SyntaxKind.Identifier:
-      return visitIdentifier(node);
-    case SyntaxKind.StringLiteral:
-      return visitStringLiteral(node);
-    // ... exhaustive handling
-  }
-}
-```
+**Daniel**: "Then document that invariant. A comment promising removal doesn't check it."
 
-"The people who *built* the type system use `any` when the alternative would be worse. But they never use it accidentally. Every `any` is a conscious, documented decision."
+**Eden**: "A migration placeholder gets an owner and a next step. A helper we intend to keep gets a reason and tests. We shouldn't give both the same unfinished ticket."
 
-**Oded** tries: "So you're saying the TypeScript team agrees with me—"
+**Oded**: "And the SDK I might replace next quarter?"
 
-**Daniel**: "I'm saying the TypeScript team agrees with Noam's *standard* and your *reality*. They use `any`, but they treat it the way Noam treats it — as something that requires justification, documentation, and scrutiny. Not as something you reach for because the deadline is Thursday."
-
-**Noam**, to his credit, nods: "If the TypeScript team can account for their `any` usage, so can we."
-
-This is the principle the entire chapter has been building toward. Not "never use `any`" — but "never use `any` *accidentally*."
+**Noam**: "Still a ticket. You know how to type the calls you use."
 
 ## The Verdict
 
-> `any` is a tool of last resort. When used, it must be intentional, documented, and tracked for removal.
+> Default to `unknown` for uncertain values. Justify an `any` by describing the unchecked assumption and how it is maintained. Track temporary gaps for replacement; review deliberate implementation compromises when their code changes.
 
 **The Accepted Standard:**
 
 1. **Default to `unknown`** for values of uncertain type
 2. **Use type narrowing** — type guards, `instanceof`, discriminated unions — to work with `unknown` values safely
-3. **When `any` is necessary** (migration, untyped dependencies, compiler limitations), document *why* and create a tracking ticket
-4. **Enable `noImplicitAny`** — implicit `any` is always a bug (more on this in Chapter 5: Strict Mode)
-5. **Track `any` usage** as tech debt with measurable reduction targets
+3. **For temporary `any`** in a migration or untyped integration, document the next step and its owner. For a deliberate implementation compromise, document the invariant and test it
+4. **Enable `noImplicitAny`** to catch places where TypeScript would otherwise infer `any` without enough evidence
+5. **Track unfinished boundaries**, not just an `any` percentage; use a consistent counting scope when measuring progress
 6. **Wrap untyped boundaries** — create typed facades at system edges where `any` leaks in from dependencies
 
 Here's what it looks like in practice — a module before and after:
@@ -744,6 +705,8 @@ interface PurchaseData {
   order: Order;
 }
 
+type PaymentMethod = { token: string };
+
 interface User {
   id: string;
   email: string;
@@ -755,9 +718,26 @@ interface Order {
 }
 
 function isPurchaseData(data: unknown): data is PurchaseData {
+  if (
+    typeof data !== "object" || data === null ||
+    !("user" in data) || !("order" in data)
+  ) return false;
+
+  const { user, order } = data;
   return (
-    typeof data === "object" && data !== null &&
-    "user" in data && "order" in data
+    typeof user === "object" && user !== null &&
+    "id" in user && typeof user.id === "string" &&
+    "email" in user && typeof user.email === "string" &&
+    "paymentMethod" in user &&
+    typeof user.paymentMethod === "object" && user.paymentMethod !== null &&
+    "token" in user.paymentMethod && typeof user.paymentMethod.token === "string" &&
+    typeof order === "object" && order !== null &&
+    "items" in order && Array.isArray(order.items) &&
+    order.items.every((item: unknown) =>
+      typeof item === "object" && item !== null &&
+      "price" in item && typeof item.price === "number" &&
+      "quantity" in item && typeof item.quantity === "number"
+    )
   );
 }
 
@@ -785,8 +765,6 @@ Zero `any` in the application logic. One documented, tracked `any` at the untype
 
 The difference isn't just safety — it's *searchability*. When the payment SDK eventually publishes types (or when you write a wrapper), you can find every `any` in the codebase with a single search, read the comment to understand the context, and replace it with confidence. Try doing that when `any` is scattered through fifty files with no documentation.
 
-Where does each voice land? Noam wins the default: `unknown` over `any`, always. Eden wins the migration path: tracked `any` with a reduction plan beats no migration at all. Oded wins the acknowledgment that zero isn't the goal — *intentional* is. And Liron wins the framing: every `any` is a 'here be dragons,' not a permanent feature of the map.
-
 ## Additional Takes
 
 **Noam Kiperman**: "If your linter doesn't flag `any`, your linter is misconfigured."
@@ -794,8 +772,6 @@ Where does each voice land? Noam wins the default: `unknown` over `any`, always.
 **Oded Shipley**: "I'll accept all of this except the wrapper pattern. Nobody has time for that."
 
 **Gilad Stacktrace**: "Then budget the debugging time instead."
-
-**Liron Closure**: "The question was never about a keyword. It was about intellectual honesty with your own code."
 
 **Chen Override**: "So we've spent an entire chapter agreeing that `any` is bad. Groundbreaking."
 

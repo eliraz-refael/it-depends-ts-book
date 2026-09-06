@@ -8,13 +8,13 @@ This book doesn't pretend there's one right way to write TypeScript. Instead, it
 
 Here's what that looks like:
 
-> **Oded**: "Shipped in ten minutes. Works perfectly. I made a business decision."
+> **Oded**: "Fine. For critical paths — auth, payments — I'll wrap. For the admin dashboard's logging middleware? I'm using `req.body` directly and you can't stop me."
 >
-> **Noam**: "Your business decision is my on-call page. Literally. I got paged at 2 AM because of that `Invalid Date`."
+> **Noam**: "I can block your PR."
 >
-> **Gilad**, quietly: "The question isn't whether to use it. It's what happens when it's wrong."
+> **Oded**: "You already block all my PRs."
 
-That's a real exchange from Chapter 1. The code that sparked it, the argument that followed, and the verdict the room eventually reached — that's every chapter of this book.
+That's an exchange from Chapter 1. The code that sparked it, the argument that followed, and the verdict the room eventually reached — that's every chapter of this book.
 
 ---
 
@@ -26,7 +26,7 @@ Every chapter follows a debate structure:
 
 **The Debate** — Then the practitioners tear it apart. They challenge it with real-world experience, edge cases, production war stories, and strong opinions. They argue with each other. They show code. They get heated.
 
-**The Turn** — Sometimes, an expert steps back in with an insight that reframes the entire discussion. The kind of moment where everyone goes quiet because the question itself was wrong.
+**The Turn** — Sometimes another caller, a changed input, or a question sends the discussion in a different direction. A rule that seemed settled may need an exception.
 
 **The Verdict** — Some chapters land on a clear answer. A practical ruling with code you can adopt tomorrow. Others end honestly: *it depends* — and we tell you on what.
 
@@ -38,7 +38,7 @@ Not every debate has a winner. That's not a cop-out. Some questions in software 
 
 This book features two tiers of characters:
 
-**The Experts** are the authorities. They set the principles, and they intervene when debates go off the rails. They speak rarely, but when they do, the room listens. Think of them as the senior architects who've seen enough to know what matters and what doesn't.
+**The Experts** bring theory, compiler knowledge, and experience. They usually set the opening principle and intervene when those specialties help. Their advice can be challenged too; knowing what the compiler does does not settle what a team should choose.
 
 **The Professionals** are the practitioners who drive every debate. They represent the voices you hear in real engineering teams — the type safety absolutist, the "just ship it" advocate, the data person who won't accept a claim without benchmarks, the FP purist, the OOP defender, and the one person who just asks hard questions until everyone wants to throw something at them.
 

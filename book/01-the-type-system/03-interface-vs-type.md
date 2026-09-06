@@ -120,9 +120,7 @@ const emp: Employee = {
 
 **Noam Kiperman** supports Guy: "The `extends` error message is a diagnosis. The intersection error message is a riddle. In a code review, I can explain the first one in ten seconds. The second one requires a whiteboard and five minutes on how `string & number` collapses to `never`."
 
-**Dafna Functor** counters:
-
-"You're showing me a hierarchy. A chain of dependencies. `Employee extends Base` means Employee is *coupled* to Base. Change Base, and every descendant must be re-evaluated. Intersection is composition — you combine independent pieces without a dependency chain:"
+**Dafna Functor** writes three smaller shapes.
 
 ```typescript
 type Identifiable = { id: string };
@@ -130,28 +128,27 @@ type Timestamped = { createdAt: Date; updatedAt: Date };
 type Named = { name: string; email: string };
 
 type User = Identifiable & Timestamped & Named;
-// Each piece is independent. Compose what you need. No hierarchy.
 ```
 
-"The error messages are worse. I'll grant you that. But the *model* is better. You're assembling from parts, not inheriting from ancestors."
+"I want to assemble these independently. Something can have timestamps without being one of our entities."
 
-**Guy** fires back with a multi-level hierarchy:
+**Guy** writes underneath:
 
 ```typescript
-interface Entity { id: string; }
-interface Timestamped extends Entity { createdAt: Date; updatedAt: Date; }
-interface User extends Timestamped { name: string; email: string; }
-interface Admin extends User { permissions: string[]; }
-// Clear chain. Each level adds meaning. IDE shows the full hierarchy.
+interface UserContract extends Identifiable, Timestamped, Named {}
 ```
 
-"Four levels. Every developer can read this top to bottom and understand the relationships. Your intersection version is a flat bag of properties with no visible structure."
+"So can mine. Extending interfaces doesn't require a chain four levels deep."
 
-**Dafna**: "Your hierarchy version is a rigid tree that breaks the moment you need something that's `Timestamped` but not an `Entity`."
+Dafna checks the resulting properties.
 
-**Guy**: "Then you refactor the hierarchy."
+**Guy**: "And if two parts disagree about `id`, this declaration fails. The intersection can give you `id: never` and wait until somebody tries to use it."
 
-**Dafna**: "Or you don't build one in the first place."
+**Dafna**: "Yes. The independent parts weren't a reason to choose `&`. I still use intersections when I'm combining types in a generic expression. I don't want a new interface declaration for every intermediate result."
+
+**Guy**: "For this named object, I want the conflict reported here."
+
+**Noam**: "I would too. We know where the conflicting parts were combined."
 
 ---
 
@@ -159,18 +156,28 @@ interface Admin extends User { permissions: string[]; }
 
 **Linoy Nightly** shifts the terrain:
 
-"Declaration merging is the reason every Express middleware can add `req.user` without forking the framework. This is a real, shipped capability that only `interface` provides. *There's an RFC for that* — actually, it shipped years ago, and it powers half the TypeScript ecosystem:"
+"Express exposes an interface we can extend to describe fields our middleware adds. We can type `req.user` without forking the framework:"
 
 ```typescript
-// Extending Express's Request — only possible with interface
-declare module "express" {
-  interface Request {
-    user?: AuthenticatedUser;
-    requestId: string;
+import express from "express";
+
+type AuthenticatedUser = { id: string };
+declare function authenticateFromToken(
+  token: string | undefined,
+): AuthenticatedUser | undefined;
+
+// The import makes this file a module; the augmentation targets global Express.
+declare global {
+  namespace Express {
+    interface Request {
+      user?: AuthenticatedUser;
+      requestId?: string;
+    }
   }
 }
 
-// Now every route handler has req.user typed
+const app = express();
+
 app.use((req, res, next) => {
   req.user = authenticateFromToken(req.headers.authorization);
   req.requestId = crypto.randomUUID();
@@ -178,12 +185,20 @@ app.use((req, res, next) => {
 });
 ```
 
-"Try doing that with a `type`. You can't. The type is closed."
+"Express's core request type extends this global interface, so inferred handler parameters get the fields too. Augmenting only the `Request` exported by `"express"` doesn't reach those parameters."
+
+This extension point is declared in the [Express core type definitions](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/express-serve-static-core/index.d.ts).
+
+**Guy**: "The fields are optional because a request can reach a handler before this middleware runs. Declaring them doesn't install the middleware."
+
+**Linoy**: "Yes. But the shared type can describe them. You couldn't reopen a type alias this way."
 
 **Chen Override** leans forward: "But have you considered that the same mechanism that lets you augment Express also lets you corrupt your own types?"
 
 ```typescript
-// file: models/user.ts (global scope)
+// file: models/user.ts
+export {};
+
 declare global {
   interface User {
     id: string;
@@ -191,7 +206,9 @@ declare global {
   }
 }
 
-// file: api/responses.ts (global scope, different file)
+// file: api/responses.ts (separate module, same explicit global scope)
+export {};
+
 declare global {
   interface User {
     email: string;
@@ -208,7 +225,7 @@ declare global {
 
 **Daniel Compiler** settles it:
 
-"Declaration merging is designed for module augmentation — extending third-party types you don't control. For application code, where you *do* control the types, accidental merging is a bug. The TypeScript team's own guidance: use `interface` for APIs that consumers need to augment. Use `type` for application-level types where accidental merging would be a defect."
+"Declarations merge when they refer to the same interface in the same scope. Two `User` interfaces in separate modules do not merge just because their names match. Your example deliberately puts both in the global scope. For an extension point that may be useful; for two unrelated models it is a mistake."
 
 **Noam**: "If you're writing a library, `interface` gives consumers the ability to extend your types. If you're writing an application, that same ability is a vector for silent type corruption. *Over my dead type definition.*"
 
@@ -301,8 +318,8 @@ class LoadingState implements RequestState<never> {
 }
 
 class SuccessState<T> implements RequestState<T> {
-  constructor(private data: T) {}
-  render() { return `Hello, ${(this.data as User).name}`; }
+  constructor(private data: T, private renderData: (data: T) => string) {}
+  render() { return this.renderData(this.data); }
 }
 
 class ErrorState implements RequestState<never> {
@@ -311,15 +328,29 @@ class ErrorState implements RequestState<never> {
 }
 ```
 
-He looks at it. Four classes. A constructor in each. An `as User` assertion hiding in `SuccessState`. No compiler-enforced exhaustiveness — if someone adds a `RetryingState`, nothing forces existing code to handle it.
+**Guy** adds a caller:
 
-**Guy**, to his credit: "For data modeling — yes. Discriminated unions are cleaner. I'll use `type` for state and `interface` for contracts. *Where's the interface?* — it's at the boundary, where you define what a service must provide. Not where you describe what data looks like."
+```typescript
+const state = new SuccessState(
+  { name: "Ada" },
+  (user) => `Hello, ${user.name}`,
+);
+state.render(); // "Hello, Ada"
+```
 
-This is Guy adapting, not retreating. He draws the line clearly: `type` for data, `interface` for behavior contracts.
+"No assertion. The renderer knows what data it gets."
 
-**Dafna**, after a pause: "I should be honest about something. Last month I spent forty minutes debugging a `never` that came from a type intersection conflict. Guy's `extends` would have caught it at the declaration. Composition has costs I don't always admit."
+**Dafna**: "Now write a second operation over every state. We need to serialize it, or tell the UI which controls to enable."
 
-Guy looks at Dafna. It might be the first time she's conceded anything to him in the entire book.
+**Guy**: "I'd add the operation to the contract."
+
+"And implement it in every class. I can put another exhaustive `switch` beside the first one."
+
+**Guy**: "Yes. And when I add a new kind of state, I add a class that implements the contract. Your switches all need a new case."
+
+**Dafna**: "I want to see those places. A new state can affect each operation differently."
+
+**Guy**: "For this UI, I'd use your union. But adding a class without editing existing callers is sometimes the point."
 
 ---
 
@@ -389,7 +420,7 @@ type User = { id: string; name: string; };
 
 ## The Turn
 
-The debate has mapped the territory — where each keyword wins, where each falls short. Then **Liron Closure** speaks, and as usual, the energy shifts.
+**Liron Closure** looks at the object definitions still on the board.
 
 *"Complexity is a choice, not a necessity."*
 
@@ -401,7 +432,11 @@ He pauses the way he always does before a parable.
 
 "A description tells an observer what they're looking at. It captures shape — this wall is here, this door is there, this window faces east. An observer reads a description and understands a thing that *already is*."
 
-"An `interface` is a blueprint. It says: anything that claims to be this must provide these capabilities. A `type` is a description. It says: this is the shape of the data I'm looking at."
+"I often use an `interface` as that blueprint and a `type` as that description."
+
+**Daniel**: "Either keyword can describe an object with methods, or one with only data. That distinction is a convention. It is not enforced by the compiler."
+
+**Liron**: "Yes. A convention for the reader. It still needs exceptions for the things we have just seen."
 
 He looks around the room.
 
@@ -411,17 +446,17 @@ He turns to Guy.
 
 "Guy, your hierarchies are blueprints. They belong where things are being built — services, repositories, class contracts. Dafna, your compositions are descriptions. They belong where data is being shaped — state, events, API responses."
 
-"You've been fighting over the same territory. You don't live in the same kingdom."
+"That is how I would organize this codebase. Guy has also shown why a composed object may deserve an interface even when it contains no behavior."
 
 ## The Verdict
 
-> `type` for describing data. `interface` for defining contracts. When unsure, `type` is the safer default.
+> Our default is `type` for data and `interface` for behavioral contracts or deliberate extension points. That is a convention. Use `interface extends` for composed objects when declaration-time conflict checking is useful; use `type` for unions and other type expressions.
 
 **The Accepted Standard — a decision framework:**
 
 | Use case | Recommended | Why |
 |----------|-------------|-----|
-| Object shape (plain data) | `type` | Consistent with unions/intersections, no accidental merging |
+| Object shape (plain data) | `type` by our convention | Closed declaration; `interface` is also reasonable, especially when composing object types |
 | Union / discriminated union | `type` | Only option |
 | Mapped / conditional / utility types | `type` | Only option |
 | Function signature | `type` | More natural: `type Handler = (e: Event) => void` |
@@ -467,7 +502,7 @@ interface AppConfig {
 }
 ```
 
-The rule is simple: if you're describing what data *looks like*, use `type`. If you're defining what something *must do*, use `interface`. Most TypeScript code describes data — which is why `type` is the safer default. But `interface` isn't going anywhere, and the codebases that use both well are better for it.
+The table is a starting convention for this book. Both keywords describe object shapes. Choosing between them also depends on whether declarations should merge and where composition conflicts should be reported. Guy's composed interface remains a reasonable choice for data too.
 
 ## Additional Takes
 
