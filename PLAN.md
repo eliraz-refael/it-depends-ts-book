@@ -17,7 +17,7 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 - [x] Writing guidance: disputed decisions, fair alternatives, flexible voice tendencies
 - [x] Pre-commit corrections: assignability, assertions, Express augmentation, enum interoperability, serialization; expert biographies revised
 - [x] Ch8: `02-mapped-types.md` — revised for voice and pacing; explicit partial-update behavior, repaired derivation and contract test, form/error mappings, and key-remapping handoff; examples checked
-- [ ] Ch9: `03-template-literal-types.md`
+- [x] Ch9: `03-template-literal-types.md` — drafted and reviewed; naming alternatives, tracing tradeoffs, and compiler/runtime/search checks complete
 - [ ] Ch10: `04-infer-keyword.md`
 - [ ] Ch11: `05-advanced-generics.md`
 - [ ] Ch12: `06-variance.md`
@@ -146,7 +146,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 |-----------------------------|-----------------|-----------------------|
 | Scaffolding + Prologue      | Done            |                       |
 | Act I: The Type System      | Done            | 6 chapters; voice revisions merged |
-| Act II: Advanced TypeScript | **IN PROGRESS** | Ch7–8 revised and checked (2 of 7) |
+| Act II: Advanced TypeScript | **IN PROGRESS** | Ch7–9 drafted/revised and checked (3 of 7) |
 | Act III: Patterns & Design  | Planned         | 10 chapters           |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
