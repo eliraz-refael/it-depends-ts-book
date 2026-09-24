@@ -20,12 +20,12 @@ Successful run on **2026-09-24**, TypeScript **7.0.2**, Node **22.23.2**:
 | Chapters 1–6 | 110 | 116 | 8 |
 | Chapters 7–8 | 50 | 52 | 8 |
 | Chapter 9 | 20 | 33 | 5 |
-| Chapter 10 | 19 | 29 | 8 |
-| Total | **199** | **230** | **29** |
+| Chapter 10 | 20 | 32 | 9 |
+| Total | **200** | **233** | **30** |
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
 
-Codex's implementation checks and Claude's final review are settled. Claude independently reran the full suite in the workspace and in a fresh copy installed from the lockfile; both runs passed with the totals above. No consequential migration findings remain open.
+The original TS7 migration review is settled. Claude independently reran that suite in the workspace and a fresh install; both runs passed with 199 fences, 230 compiler cases, and 29 runtime groups. The table above includes the subsequent Chapter 10 reader-onboarding repair, which adds a caller checked before the SDK upgrade, after the breaking upgrade, and after the overload repair. Its runtime checks cover success, a synchronous throw, and a rejected promise. Claude also independently reran this expanded suite and confirmed the totals above. See [the chapter review](../CH10-REVIEW.md) for the separate comprehension review.
 
 The suites extract all TypeScript fences in the ten completed chapters. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 
@@ -35,6 +35,7 @@ Specific adaptations and limits:
 - Chapter 4's explicitly abbreviated `{ ... }` function body becomes `{}` in its fixture. The ambient-enum example gets a generated `.d.ts` and import to reproduce the diagnostic quoted outside a TypeScript fence. These edits are printed in the suite's report.
 - Express checks use the real type packages, including the difference between augmenting global `Express.Request` and the interface exported by `express`. Express's server runtime is not exercised. Zod examples use the real package and check their inferred types.
 - Chapter 9 uses a recording event-bus adapter for runtime assertions. Chapter 10 uses the documented fictional SDK test double. Neither stands in for verification of an external production service.
+- Chapter 10's v4 fixture removes the two members explicitly marked as v5 additions, leaving the original single-signature method. Original and replacement `courier` declarations are checked separately.
 - The suites do not benchmark compiler performance or establish the fictional characters' empirical claims. Chapter 3 attributes its performance recommendation to the TypeScript wiki and makes no measured TS7 speed claim.
 
 ## Compiler settings

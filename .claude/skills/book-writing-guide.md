@@ -106,6 +106,8 @@ A concession can be a corrected line, a brief acknowledgment, or a revised deman
 
 Give a new construct a small, clear example. Introduce alternatives as the actual problem demands them. An alternative can survive the next exchange. Avoid a relay where each speaker delivers the next paragraph of documentation and nobody responds to what was said.
 
+Before an example relies on a project-specific helper, establish where it comes from, why it exists, and what its caller receives. Show ordinary behavior before asking the reader to diagnose a failure. A name such as `safe` does not explain an error-handling contract. The implementation may appear later when someone needs to inspect it, but its purpose and promised behavior must already be on the page. Make the claim under debate clear enough that a reader can restate it before the counterexample arrives.
+
 Use a Turn only when it changes the inquiry. It can be an altered input, another caller, or a question answered from the file. It need not be a speech, and it does not require an expert's endorsement afterward. Avoid restating the same lesson in the Turn, a boxed maxim, a verdict, and every Additional Take.
 
 ---

@@ -1,6 +1,6 @@
 # Chapter 10 — The Call You Didn't Make
 
-Status: complete; Codex self-review and Claude's final review settled, 2026-09-24.
+Status: reader-onboarding repair jointly reviewed and settled, 2026-09-24.
 
 ## Decision
 
@@ -26,8 +26,11 @@ solution gets to win against an unrepaired version of the other.
 
 ## Argument and mechanism
 
-1. The SDK's new retrieve overload breaks wrapped one-argument calls. Direct calls
-   still work. Revisit Unwrap and explain inferred parameter tuples and results.
+1. Establish Idan's `safe` helper, its Result contract, and the page caller that
+   worked on v4. State the claim that wrapper signatures should derive from the
+   SDK. Then show the new retrieve overload breaking wrapped one-argument calls
+   while direct calls still work. Revisit Unwrap and explain inferred parameter
+   tuples and results in response to that failure.
 2. Parameters and ReturnType read the last overload. Explicit local overloads
    repair the facade. The implementation signature is not an extra public one.
 3. V5 also adds a synchronous isTrackingCode helper. The old type passes it through,
@@ -55,7 +58,7 @@ solution gets to win against an unrepaired version of the other.
 - Durable compiler and runtime checks in checks/chapter10.cjs, reading manuscript
   fences. Verify both complete alternatives and the actual invalid-input guard.
 - Self-review and Claude's whole-manuscript review must settle before completion.
-- Publication authorized: include Chapter 10 and the TypeScript 7 migration in one PR after both reviews settle.
+- Publication authorized: open a follow-up PR for the reader-onboarding repair after review.
 
 ## Draft findings
 
@@ -76,5 +79,10 @@ solution gets to win against an unrepaired version of the other.
   The mixed courier SDK gets the facade-preserving adapter.
 - Noam challenges the double assertion; the exact positive/negated condition
   diagnostic difference is explicit. Required-method scope and optional-method
-  limitations are stated. Final validation: 19 fences, 29 compiler cases,
+  limitations are stated. Original final validation: 19 fences, 29 compiler cases,
   8 runtime groups. Full findings and dispositions: CH10-REVIEW.md.
+- Reader feedback reopened the opening after merge: `safe` had no established
+  purpose or caller contract before its failure. The revised opening explains
+  behavior before failure and mechanism afterward. Current validation covers
+  20 fences, 32 compiler cases, and 9 runtime groups; fresh-reader reviews and
+  Claude's consultation are recorded in CH10-REVIEW.md.

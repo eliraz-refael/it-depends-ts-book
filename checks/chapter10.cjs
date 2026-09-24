@@ -14,9 +14,27 @@ function block(prefix) {
   used.add(matches[0]);
   return matches[0] + "\n";
 }
-const sdk = block("interface Shipment {");
-const oldTypes = block("type Result<T> =");
-const newTypes = oldTypes.slice(0, oldTypes.indexOf("type Safe<C>")) + block("// Replacement for Safe.");
+const sdkWithExport = block("interface Shipment {");
+const exportStart = sdkWithExport.indexOf("const courier = safe(raw);");
+assert(exportStart > 0, "The original integration export must appear in the SDK fence");
+const sdk = sdkWithExport.slice(0, exportStart);
+const originalExport = sdkWithExport.slice(exportStart);
+// The opening caller ran before either of the explicitly marked v5 additions.
+let sdkV4 = sdk;
+for (const addition of [
+  `  // Added in v5.\n  retrieve(\n    code: string,\n    options: { events: true },\n  ): Promise<ShipmentWithEvents>;\n`,
+  `  // Added in v5.\n  isTrackingCode(text: string): boolean;\n`,
+]) {
+  assert(sdkV4.includes(addition), "Update the v4 fixture when the marked v5 additions change");
+  sdkV4 = sdkV4.replace(addition, "");
+}
+const opening = block("type Result<T> =");
+const callerStart = opening.indexOf("async function parcelStatus(");
+assert(callerStart > 0, "The opening must include the tracking-page caller");
+const resultType = opening.slice(0, callerStart);
+const caller = opening.slice(callerStart);
+const oldTypes = resultType + block("type Safe<C> =");
+const newTypes = resultType + block("// Replacement for Safe.");
 const unwrap = block("type Unwrap<T>");
 const proxy = block("function safe<C");
 const overloads = block("type SafeCourier =");
@@ -43,9 +61,15 @@ function example(name, code, expected = []) {
   cases.push({name, filename, expected});
 }
 function fact(name, code, base = newBase) { example(name, base + equal + code); }
-example("original-fences", oldBase + unwrap + block('raw.retrieve("TRK-42")') +
+example("opening-caller-on-v4", sdkV4 + oldTypes + proxy + originalExport + caller + equal + `
+type OriginalCall = Expect<Equal<typeof courier.retrieve, (code: string) => Promise<Result<Shipment>>>>;
+`);
+example("opening-caller-and-comparison-break-on-v5", sdkWithExport + oldTypes + proxy + caller +
+  block('raw.retrieve("TRK-42")'), [2554, 2554]);
+example("opening-caller-after-overload-repair", oldBase + caller);
+example("original-fences", oldBase + unwrap +
   block("type RetrieveArguments") + block('courier.retrieve("TRK-42")') + oldGuard +
-  block('raw.isTrackingCode("bad")'), [2554]);
+  block('raw.isTrackingCode("bad")'));
 example("repaired-wrapper-still-accepts-negated-call", newBase + oldGuard);
 example("repaired-wrapper-flags-positive-call", newBase + `
 function check(text: string) {
@@ -201,11 +225,43 @@ function runtimeModule(name, types, guard, extra, exports) {
 }
 (async () => {
   let runtimeGroups = 0;
-  const original = runtimeModule("original-runtime", oldTypes, oldGuard, "", "acceptTrackingCode");
+  const original = runtimeModule("original-runtime", oldTypes, oldGuard, caller, "acceptTrackingCode, parcelStatus");
   assert.equal(original.raw.isTrackingCode("bad"), false);
   assert.equal(original.acceptTrackingCode("bad"), "accepted");
   assert(original.courier.isTrackingCode("bad") instanceof Promise);
   assert.deepEqual(await original.courier.isTrackingCode("bad"), {ok: true, value: false});
+  runtimeGroups++;
+
+  const v4Fixture = `
+const sdkFailure = {message: "courier unavailable"};
+const raw: Courier = {
+  region: "test",
+  retrieve(code) {
+    if (code === "throw") throw sdkFailure;
+    if (code === "reject") return Promise.reject(sdkFailure);
+    return Promise.resolve({code, status: this.region + ":in transit"});
+  },
+};
+`;
+  const v4File = path.join(scratch, "opening-v4-runtime.ts");
+  fs.writeFileSync(v4File, sdkV4.replace("declare const raw: Courier;", v4Fixture) +
+    oldTypes + proxy + originalExport + caller + "\nexport {raw, courier, parcelStatus, sdkFailure};\n");
+  const v4Out = path.join(scratch, "out-opening-v4");
+  const v4Compilation = compile([v4File], {outDir: v4Out}, scratch);
+  assert.equal(v4Compilation.diagnostics.length, 0, describe(v4Compilation.diagnostics));
+  const v4 = require(path.join(v4Out, "opening-v4-runtime.js"));
+  for (const client of [v4, original]) {
+    assert.equal(await client.parcelStatus("TRK-42"), "test:in transit");
+    assert.deepEqual(await client.courier.retrieve("TRK-42"), {
+      ok: true, value: {code: "TRK-42", status: "test:in transit"},
+    });
+    assert.throws(() => client.raw.retrieve("throw"), error => error === client.sdkFailure);
+    await assert.rejects(client.raw.retrieve("reject"), error => error === client.sdkFailure);
+    for (const code of ["throw", "reject"]) {
+      assert.deepEqual(await client.courier.retrieve(code), {ok: false, error: client.sdkFailure});
+      assert.equal(await client.parcelStatus(code), "Tracking is unavailable. Try again shortly.");
+    }
+  }
   runtimeGroups++;
 
   const repaired = runtimeModule("repaired-runtime", newTypes, newGuard, "", "acceptTrackingCode");

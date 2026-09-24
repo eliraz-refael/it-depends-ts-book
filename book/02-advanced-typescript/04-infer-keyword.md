@@ -6,9 +6,33 @@
 
 **Idan Greenfield**: "It doesn't. The options are for the event history."
 
-**Eden**: "Tell that to these three lines."
+**Eden**: "Tell that to the tracking page."
 
-Eden has the SDK's v5 declarations open beside the failing build. This release adds an overload to `retrieve`. The integration already has a dozen operations behind Idan's wrapper, used by forty callers. These are the members involved in the upgrade:
+The page is one of forty callers that reach the courier SDK through the team's integration module. The module keeps the raw client private. It exports `courier`, built by Idan's `safe` helper, which wraps every method on the client so that each call resolves to a `Result` instead of throwing or rejecting.
+
+Eden opens the module's result type and the tracking-page code that worked with version four:
+
+```typescript
+type Result<T> =
+  | { ok: true; value: T }
+  | { ok: false; error: unknown };
+
+async function parcelStatus(code: string): Promise<string> {
+  const found = await courier.retrieve(code);
+  if (!found.ok) return "Tracking is unavailable. Try again shortly.";
+  return found.value.status;
+}
+```
+
+**Idan**: "I didn't want every caller writing its own `try/catch`."
+
+**Eden**: "And the types for a dozen wrapped methods?"
+
+**Idan**: "The SDK already declares their arguments and return types. I want our wrapper to derive its signatures from those declarations. Change a request in the SDK, and our types should follow."
+
+**Eden**: "They followed it this morning. The page stopped compiling."
+
+He opens the v5 declarations. This upgrade adds an overload for retrieving a shipment's event history, and a local tracking-code check:
 
 ```typescript
 interface Shipment {
@@ -23,28 +47,29 @@ interface ShipmentWithEvents extends Shipment {
 interface Courier {
   readonly region: string;
   retrieve(code: string): Promise<Shipment>;
+  // Added in v5.
   retrieve(
     code: string,
     options: { events: true },
   ): Promise<ShipmentWithEvents>;
+  // Added in v5.
   isTrackingCode(text: string): boolean;
 }
 
 declare const raw: Courier;
+const courier = safe(raw);
 ```
 
-The raw SDK client stays private to the integration module. Its public counterpart returns a result instead of throwing. Eden puts a direct call next to the wrapped one in a scratch file.
+Eden puts a direct SDK call next to the page's call in a scratch file.
 
 ```typescript
 raw.retrieve("TRK-42"); // Accepted.
-
-const wrapped = safe(raw);
-wrapped.retrieve("TRK-42"); // Error: Expected 2 arguments.
+courier.retrieve("TRK-42"); // Error: Expected 2 arguments.
 ```
 
 **Idan**: "Same function underneath."
 
-**Daniel Compiler**: "Different type on top. Open `Safe`."
+**Daniel Compiler**: "Different type on top. `safe` declares its return type as `Safe<C>`. Here `C` is `Courier`. Open that alias."
 
 **Eden**: "That's where I stopped. I can follow the mapped keys. There are two `infer`s in the next line."
 
@@ -69,13 +94,9 @@ The [`infer` keyword](https://www.typescriptlang.org/docs/handbook/2/conditional
 
 ### "Which call did it look at?"
 
-Idan opens the wrapper's types.
+Idan opens the type that describes the wrapped client.
 
 ```typescript
-type Result<T> =
-  | { ok: true; value: T }
-  | { ok: false; error: unknown };
-
 type Safe<C> = {
   [K in keyof C]: C[K] extends (...args: infer A) => Promise<infer R>
     ? (...args: A) => Promise<Result<R>>
@@ -85,9 +106,9 @@ type Safe<C> = {
 
 **Idan**: "For every property, check whether it's a function returning a promise. `A` is its parameter tuple. `R` is the value inside that promise. Rebuild the function with the same parameters, returning a promise of our result. Leave the other properties alone."
 
-**Eden**: "So before this upgrade, `retrieve` gave it `[code: string]` and `Shipment`."
+**Eden**: "So before this upgrade, `retrieve` gave it `[code: string]` and `Shipment`. The wrapped method was `(code: string) => Promise<Result<Shipment>>`. That's what the page was calling."
 
-**Idan**: "I wrote it for our generated tracking client first. Every operation there returns a promise. The courier used to fit too. I didn't want each caller deciding whether to catch SDK errors."
+**Idan**: "I wrote it for our generated tracking client first. Every operation there returns a promise. The courier used to fit too."
 
 **Daniel**: "Now inspect these."
 
@@ -115,7 +136,7 @@ Eden scrolls back to the two SDK declarations.
 
 **Idan**: "We can preserve the cases ourselves. They only added one overload."
 
-She gives the integration its own public type.
+She gives the integration its own public type and replaces its earlier `courier` declaration.
 
 ```typescript
 type SafeCourier = Omit<Safe<Courier>, "retrieve"> & {
