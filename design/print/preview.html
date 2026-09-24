@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>It Depends / Print design study</title>
+  <style>
+    @font-face { font-family: Plex; src: url('fonts/IBMPlexSans-Regular.ttf'); font-weight: 400; }
+    @font-face { font-family: Oxanium; src: url('fonts/Oxanium-Medium.ttf'); font-weight: 500; }
+    @font-face { font-family: JetBrains; src: url('fonts/JetBrainsMono-Regular.ttf'); }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #171b20; color: #f3f3eb; font: 17px/1.6 Plex, sans-serif; }
+    main { max-width: 1440px; padding: 64px 48px 80px; margin: auto; }
+    .eyebrow { color: #d9f58b; font: 12px/1.5 JetBrains, monospace; letter-spacing: 2px; }
+    header { border-bottom: 1px solid #4a4f52; padding-bottom: 36px; margin-bottom: 38px; }
+    h1 { font: 500 clamp(40px, 5vw, 76px)/1.1 Oxanium, sans-serif; letter-spacing: -2px; margin: 20px 0; }
+    header p { color: #bcc4c9; max-width: 700px; margin-bottom: 0; }
+    .compare { display: grid; grid-template-columns: 6fr 7fr; gap: 44px; align-items: start; }
+    h2 { font: 500 30px/1.2 Oxanium, sans-serif; margin: 0 0 12px; }
+    .description { color: #bcc4c9; margin: 0 0 20px; min-height: 54px; }
+    a { color: inherit; }
+    .button { display: inline-block; border: 1px solid #d9f58b; color: #d9f58b; padding: 9px 17px; text-decoration: none; font-size: 14px; margin-bottom: 26px; }
+    .button:hover { background: #d9f58b; color: #171b20; }
+    figure { margin: 0 0 28px; }
+    img { width: 100%; height: auto; display: block; box-shadow: 0 8px 24px #0004; }
+    figcaption { font: 11px/1.5 JetBrains, monospace; color: #9ba4a9; margin-top: 12px; }
+    footer { border-top: 1px solid #4a4f52; margin-top: 32px; padding-top: 22px; font-size: 14px; color: #bcc4c9; }
+    @media (max-width: 700px) { main { padding: 32px 22px; } .compare { grid-template-columns: 1fr; } .description { min-height: 0; } }
+  </style>
+</head>
+<body><main>
+  <header>
+    <div class="eyebrow">IT DEPENDS / PRINT STUDY 01</div>
+    <h1>A little science fiction.<br>A lot of room to think.</h1>
+    <p>Angular titles, precise code, and quiet dialogue pages. The complete Chapter 10, in two print sizes. The book interior is monochrome; the accent color belongs only to this preview.</p>
+  </header>
+  <div class="compare">
+    <section>
+      <h2>6 × 9 inches</h2>
+      <p class="description">A compact book with a closer reading feel. More code lines need to wrap.</p>
+      <a class="button" href="output/chapter-10-6x9.pdf">Open the complete PDF ↗</a>
+      <figure><a href="output/6x9-page-01.png"><img src="output/6x9-page-01.png" alt="6 by 9 inch chapter opener"></a><figcaption>01 / CHAPTER OPENER</figcaption></figure>
+      <figure><a href="output/6x9-page-02.png"><img src="output/6x9-page-02.png" alt="6 by 9 inch first reading page"></a><figcaption>02 / DIALOGUE + CODE</figcaption></figure>
+      <figure><a href="output/6x9-page-05.png"><img src="output/6x9-page-05.png" alt="6 by 9 inch debate page"></a><figcaption>05 / THE DEBATE</figcaption></figure>
+    </section>
+    <section>
+      <h2>7 × 10 inches</h2>
+      <p class="description">A roomier technical book. Slightly larger text and more width for the examples.</p>
+      <a class="button" href="output/chapter-10-7x10.pdf">Open the complete PDF ↗</a>
+      <figure><a href="output/7x10-page-01.png"><img src="output/7x10-page-01.png" alt="7 by 10 inch chapter opener"></a><figcaption>01 / CHAPTER OPENER</figcaption></figure>
+      <figure><a href="output/7x10-page-02.png"><img src="output/7x10-page-02.png" alt="7 by 10 inch first reading page"></a><figcaption>02 / DIALOGUE + CODE</figcaption></figure>
+      <figure><a href="output/7x10-page-04.png"><img src="output/7x10-page-04.png" alt="7 by 10 inch debate page"></a><figcaption>04 / THE DEBATE</figcaption></figure>
+    </section>
+  </div>
+  <footer>Typography: Oxanium · IBM Plex Sans · JetBrains Mono. Full chapter text comes directly from the manuscript. These are design samples; final pagination, binding margins, and the cover follow later.</footer>
+</main></body>
+</html>

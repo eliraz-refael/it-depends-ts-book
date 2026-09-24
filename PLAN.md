@@ -2,7 +2,7 @@
 
 ## Context
 
-This is a new open-source TypeScript book written in Markdown, structured as debate-style discussions between fictional expert characters. Each chapter presents a TypeScript principle, challenges it from multiple perspectives, and arrives at a practical ruling (or an honest "it depends"). The book will be available as open-source MD files and as a paid printed edition. A build pipeline (PDF/website) will come later.
+This is a new open-source TypeScript book written in Markdown, structured as debate-style discussions between fictional expert characters. Each chapter presents a TypeScript principle, challenges it from multiple perspectives, and arrives at a practical ruling (or an honest "it depends"). The book will be available as open-source MD files and as a paid printed edition. A chapter-level print design study is available; the full-book PDF and website pipelines remain to be built.
 
 **This plan is a master tracking document.** We work phase by phase — only the current phase is actively being written. Everything else tracks what's coming.
 
@@ -154,7 +154,11 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Act III: Patterns & Design  | Planned         | 10 chapters           |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
-| Build Pipeline (PDF/Web)    | Future          | After content is done |
+| Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |
+
+Print design sources and decisions: [design/print/README.md](design/print/README.md).
+The cover concept is still open; final cover dimensions depend on the complete
+book's page count and paper choice.
 
 ---
 
