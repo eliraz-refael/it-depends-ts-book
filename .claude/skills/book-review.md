@@ -8,7 +8,7 @@ description: >
 
 # Book Review Skill — "It Depends: TypeScript Principles, Debated"
 
-When invoked, this skill reviews a chapter or section of the book against the project's quality standards. Before reviewing, **read `PLAN.md`** for character definitions and **`.claude/skills/book-writing-guide.md`** for writing standards.
+When invoked, this skill reviews a chapter or section of the book against the project's quality standards. For the full review, **read `PLAN.md`** for character definitions and **`.claude/skills/book-writing-guide.md`** for writing standards. The separate first-read pass below deliberately excludes author planning and previous reviews.
 
 ---
 
@@ -23,6 +23,18 @@ Read the chapter file to be reviewed in full. Also read:
 ### Step 2: Evaluate Each Category
 
 Score each category as **PASS**, **NEEDS WORK**, or **FAIL**. Provide specific line-level feedback for anything that isn't PASS.
+
+### Separate First-Read Pass
+
+Before approval, have a fresh reviewer who did not participate in planning read the manuscript in order. Give that reviewer only the chapter and its stated prerequisites, without the author discussion, plans, prior verdicts, or an explanation of the intended lesson. This pass can run alongside technical verification.
+
+At each substantive example, ask what a reader knows at that point:
+
+- What are the functions and types, and which belong to this application?
+- Why does this code exist, and what behavior should its caller expect?
+- What claim is being tested, and why would the result matter?
+
+Record the earliest place an answer needs information revealed later. A later explanation does not repair the initial gap. Report the principle as understood and cite the passages that establish it. If the premise or helper contract is missing, mark Readability & Flow as NEEDS WORK even when all compiler and runtime checks pass. Recheck that passage after revision; do not count a successful build as evidence of reader comprehension.
 
 ---
 

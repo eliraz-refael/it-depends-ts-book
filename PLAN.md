@@ -21,6 +21,7 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 - [x] Ch8: `02-mapped-types.md` — revised for voice and pacing; explicit partial-update behavior, repaired derivation and contract test, form/error mappings, and key-remapping handoff; examples checked
 - [x] Ch9: `03-template-literal-types.md` — drafted and reviewed; naming alternatives, tracing tradeoffs, and compiler/runtime/search checks complete
 - [x] Ch10: `04-infer-keyword.md` — drafted and jointly reviewed; infer patterns, overload extraction, runtime mismatch, and competing wrapper/adapter repairs checked
+- [x] Ch10 reader-onboarding repair: helper and caller established before the upgrade failure; fresh-reader checks and joint review settled; validation updated
 - [x] TypeScript 7 migration: pinned 7.0.2, CLI-based validators, all 199 TypeScript fences covered; compiler defaults, diagnostics, dependencies, and current guidance updated
 - [ ] Ch11: `05-advanced-generics.md`
 - [ ] Ch12: `06-variance.md`
