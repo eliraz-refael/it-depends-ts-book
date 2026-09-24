@@ -392,7 +392,7 @@ import { z } from "zod";
 
 const UserSchema = z.object({
   id: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   displayName: z.string(),
 });
 
@@ -482,6 +482,6 @@ The unresolved choice is how much each caller should know about failure handling
 
 **Noam Kiperman**: "Keep the predicate tests when the type changes. Adding a required field to `User` doesn't force an explicitly annotated `isUser` to check it."
 
-**Daniel Compiler**: "[TypeScript 5.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html) can infer predicates for some functions without return annotations. That inference comes from the body. It does not verify a predicate you explicitly wrote."
+**Daniel Compiler**: "Since [TypeScript 5.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html), the compiler can infer predicates for some functions without return annotations. That inference comes from the body. It does not verify a predicate you explicitly wrote."
 
 **Eden Legacy**: "I would migrate the checks first. Get one parser behind the existing callers, including the ones that expect exceptions. Then change how failure travels where the callers need it. Those are separate changes; I'd like to review them separately."

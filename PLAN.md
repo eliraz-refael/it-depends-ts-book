@@ -10,6 +10,8 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 ## Current Phase: Act II — Advanced TypeScript
 
+**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all ten completed chapters. Recheck the stable release and rerun the full suite before publication.
+
 ### Tasks
 
 - [x] Ch7: `01-conditional-types.md` — revised after voice review; complete overload comparison, local normalization decision, dissent preserved
@@ -18,7 +20,8 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 - [x] Pre-commit corrections: assignability, assertions, Express augmentation, enum interoperability, serialization; expert biographies revised
 - [x] Ch8: `02-mapped-types.md` — revised for voice and pacing; explicit partial-update behavior, repaired derivation and contract test, form/error mappings, and key-remapping handoff; examples checked
 - [x] Ch9: `03-template-literal-types.md` — drafted and reviewed; naming alternatives, tracing tradeoffs, and compiler/runtime/search checks complete
-- [ ] Ch10: `04-infer-keyword.md`
+- [x] Ch10: `04-infer-keyword.md` — drafted and jointly reviewed; infer patterns, overload extraction, runtime mismatch, and competing wrapper/adapter repairs checked
+- [x] TypeScript 7 migration: pinned 7.0.2, CLI-based validators, all 199 TypeScript fences covered; compiler defaults, diagnostics, dependencies, and current guidance updated
 - [ ] Ch11: `05-advanced-generics.md`
 - [ ] Ch12: `06-variance.md`
 - [ ] Ch13: `07-declaration-merging.md` — NOTE: Ch3 already settled core declaration merging; reframe this chapter as *module augmentation & ambient types* (`.d.ts`, `declare global`, patching third-party types) to avoid re-litigating
@@ -146,7 +149,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 |-----------------------------|-----------------|-----------------------|
 | Scaffolding + Prologue      | Done            |                       |
 | Act I: The Type System      | Done            | 6 chapters; voice revisions merged |
-| Act II: Advanced TypeScript | **IN PROGRESS** | Ch7–9 drafted/revised and checked (3 of 7) |
+| Act II: Advanced TypeScript | **IN PROGRESS** | Ch7–10 drafted/revised and checked (4 of 7) |
 | Act III: Patterns & Design  | Planned         | 10 chapters           |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |

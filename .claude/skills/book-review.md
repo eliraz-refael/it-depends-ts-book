@@ -55,7 +55,7 @@ Do not require an antagonist pair, a mistake, a concession, or a fixed number of
 
 **All TypeScript claims and code must be correct.** This is the highest-priority check.
 
-- Does every code example compile as valid TypeScript?
+- Does every code example compile with its stated context, or produce the intentional errors described?
 - Are all claims about TypeScript behavior accurate?
   - Check compiler behavior claims against actual TS behavior
   - Verify that mentioned TypeScript features exist and work as described
@@ -67,6 +67,8 @@ Do not require an antagonist pair, a mistake, a concession, or a fixed number of
 - Does an attributed real-world precedent have a source that supports the actual claim?
 
 **How to verify code:**
+- Use the locked TypeScript 7 baseline: `npm ci` followed by `npm run check`. Record the actual compiler version and coverage in the review. The current pin is 7.0.2; historical review results remain evidence for the version originally tested.
+- Extend the manuscript-derived checks for new or changed examples. Check intended diagnostics, inferred types, and relevant runtime behavior; compiling a stub is insufficient evidence for a claim about a third-party library.
 - Read the code carefully for syntax errors, type errors, and logical errors
 - If uncertain about a specific TypeScript behavior, flag it explicitly in the review rather than guessing
 - Pay special attention to: generic constraints, conditional types, utility type usage, and `as` behavior

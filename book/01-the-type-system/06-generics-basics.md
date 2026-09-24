@@ -192,7 +192,7 @@ const size = get(settings, "fontSize"); // number
 
 get(settings, "fontsize");
 // Error: Argument of type '"fontsize"' is not assignable to
-//        parameter of type '"fontSize" | "theme" | "telemetry"'
+//        parameter of type '"fontSize" | "telemetry" | "theme"'
 ```
 
 "`keyof T` gives you the object's keys. `T[K]` gives you the type at the chosen key. The compiler infers both from the arguments: `fontSize` gives `number`, `theme` gives `string`. And `fontsize` is rejected because it isn't a key. You don't write either type argument at the call site. That's the part I like."

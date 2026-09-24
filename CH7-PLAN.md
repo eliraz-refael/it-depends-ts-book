@@ -55,6 +55,6 @@ The [conditional-types handbook](https://www.typescriptlang.org/docs/handbook/2/
 
 ## Validation
 
-Run the revised snippets under TypeScript 5.9.3 with `--strict`, using earlier definitions as context and separating alternative implementations. Check expected diagnostics as well as successful examples. Exercise string, array, empty-array, and normalization cases at runtime, plus the deliberately broken branch. The editorial pass also checks that the verdict no longer excludes Eden's working alternative.
+Run `node checks/chapters7-8.cjs` with the repository's pinned TypeScript 7 compiler after `npm ci`. The checks use earlier definitions as context and separate alternative implementations. Check expected diagnostics as well as successful examples. Exercise string, array, empty-array, and normalization cases at runtime, plus the deliberately broken branch. The editorial pass also checks that the verdict no longer excludes Eden's working alternative.
 
 **Result (2026-09-06):** the revised chapter examples were included in the 65 successful strict snippet/type checks and 10 runtime scenario groups recorded in `VOICE-REVIEW.md`. Final chapter length: 3,672 words, including code.

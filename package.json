@@ -1,0 +1,13 @@
+{
+  "name": "it-depends-ts-book",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "check": "node checks/run.cjs"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6",
+    "typescript": "7.0.2",
+    "zod": "4.6.2"
+  }
+}

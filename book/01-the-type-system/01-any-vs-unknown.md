@@ -412,7 +412,7 @@ app.post("/users", (req, res) => {
 });
 ```
 
-**Noam**: "Wrap the dependency. Create a typed facade. This isn't hard. And frankly, if a library ships `any` in its public API in 2025, that's a library that doesn't respect its consumers."
+**Noam**: "Wrap the dependency. Create a typed facade. This isn't hard. And frankly, if a library still ships `any` in its public API, that's a library that doesn't respect its consumers."
 
 **Oded**: "You want me to wrap Express? *Express.* That's hundreds of endpoints. The cure is worse than the disease."
 
@@ -667,7 +667,7 @@ Noam reads the signatures again.
 1. **Default to `unknown`** for values of uncertain type
 2. **Use type narrowing** — type guards, `instanceof`, discriminated unions — to work with `unknown` values safely
 3. **For temporary `any`** in a migration or untyped integration, document the next step and its owner. For a deliberate implementation compromise, document the invariant and test it
-4. **Enable `noImplicitAny`** to catch places where TypeScript would otherwise infer `any` without enough evidence
+4. **Keep `noImplicitAny` enabled** — it is part of TypeScript 7's default strict mode and catches places where TypeScript would otherwise infer `any` without enough evidence. If a legacy project disables it, plan its restoration
 5. **Track unfinished boundaries**, not just an `any` percentage; use a consistent counting scope when measuring progress
 6. **Wrap untyped boundaries** — create typed facades at system edges where `any` leaks in from dependencies
 

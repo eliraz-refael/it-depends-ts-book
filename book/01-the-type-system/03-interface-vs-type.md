@@ -170,7 +170,7 @@ declare function authenticateFromToken(
 declare global {
   namespace Express {
     interface Request {
-      user?: AuthenticatedUser;
+      user?: AuthenticatedUser | undefined;
       requestId?: string;
     }
   }
@@ -358,11 +358,11 @@ state.render(); // "Hello, Ada"
 
 **Gil Benchmark** opens his laptop. *"What does the data say?"*
 
-"The TypeScript team's own performance guidance recommends `interface extends` over type intersection for object types. Interfaces create a single flat type that the compiler caches by name. Intersections require the compiler to evaluate the merged properties at each use site."
+"The TypeScript team's performance wiki recommends `interface extends` over intersections when composing object types. It describes caching relationships between interfaces, and checking each constituent when comparing against an intersection."
 
 **Linoy Nightly** provides the source:
 
-"This is from the TypeScript wiki. The recommendation is narrowly scoped: when you're creating an object type that extends another object type, `interface extends` can be faster than `type` with `&` — especially in large codebases with deeply nested intersections."
+"Here's the [guidance](https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections). It predates the native compiler. I'd try it if a trace pointed here, but I haven't timed these two on TypeScript 7."
 
 ```typescript
 // The TS team recommends this for extending object types:
@@ -378,10 +378,10 @@ type Props = BaseProps & {
   title: string;
   onClick: () => void;
 };
-// The intersection is re-evaluated at each use site.
+// The same object shape, expressed as an intersection.
 ```
 
-**Chen Override** pressure-tests: "But have you considered that this matters only at scale? For a fifty-file project, the difference is unmeasurable. And the recommendation applies specifically to deeply nested object type intersections — not to `type` in general. Unions, mapped types, conditionals — there's no `interface` alternative, so there's no performance comparison to make."
+**Chen Override**: "Then how much would this save in our project? The recommendation is about composing object types. Unions, mapped types, conditionals — there's no equivalent `interface` spelling to swap in."
 
 **Oded Shipley** interjects: "If your compile time is slow, profile it first. Don't prematurely optimize your *type syntax*. *We can fix it in the next sprint.* — Actually, this time, I'm right."
 

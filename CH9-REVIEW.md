@@ -31,13 +31,14 @@ The chapter's decision follows a visible difference between its callers: ordinar
 
 ## Verification
 
-The durable validator is `checks/chapter9.cjs`. It requires Node, `rg`, and TypeScript; pass the installed TypeScript package directory if it is not available through ordinary Node resolution:
+The durable validator is `checks/chapter9.cjs`. It requires Node and `rg`, and uses the repository's pinned TypeScript package:
 
 ```sh
-node checks/chapter9.cjs /path/to/node_modules/typescript
+npm ci
+node checks/chapter9.cjs
 ```
 
-Latest successful run used **TypeScript 5.9.3**, `strict`, and `exactOptionalPropertyTypes`:
+The original review run used **TypeScript 5.9.3**, `strict`, and `exactOptionalPropertyTypes`:
 
 - **20 TypeScript fences covered**, with dependencies supplied and competing implementations separated.
 - **33 compiler cases:** two complete feature versions plus isolated snippets and additional type/diagnostic checks. Expected errors are checked rather than suppressed.
@@ -48,6 +49,8 @@ Latest successful run used **TypeScript 5.9.3**, `strict`, and `exactOptionalPro
 Claude independently rebuilt the feature files and reproduced both searches. His separate checks also confirmed generic index assignment, listener errors, the discriminated union, `as const` narrowing, `Capitalize`, the repaired audit union, and the publisher's union-correlation limit. The independent Codex reviewer separately reproduced the source searches.
 
 The runtime adapter records and dispatches events for testing the illustrated producers and subscriber. It does not validate an unseen production event-bus implementation. The chapter makes no claim that a source search identifies which runtime occurrence produced a particular log.
+
+**TS7 revalidation, 2026-09-24:** The CLI-based validator passes on **7.0.2** with the same 20 fences, 33 compiler cases, five runtime groups, and two source searches. The missing-property `satisfies` case now reports TS2741 instead of TS1360; the example is still rejected. See [the migration record](checks/README.md).
 
 ## Verdict
 
