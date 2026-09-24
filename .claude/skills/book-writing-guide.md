@@ -169,7 +169,9 @@ Some topics genuinely don't have a resolution. For these:
 
 ### Must Be Real
 
-Every code example must be **valid, compilable TypeScript**. No pseudo-code, no `...` in place of real logic (except when explicitly showing a pattern skeleton).
+Examples target **TypeScript 7**, currently pinned to **7.0.2** in `package.json` and `package-lock.json`. Run `npm ci` and `npm run check`; see `checks/README.md` for options and coverage. Add manuscript-derived checks for new chapters, including expected failures and runtime claims. Use the compiler CLI; TypeScript 7 does not provide the old JavaScript compiler API.
+
+Examples must compile with their stated context, or produce the intentional errors the chapter describes. Separate competing implementations when checking them. No pseudo-code, no `...` in place of real logic (except when explicitly showing a pattern skeleton). Keep historical feature-introduction dates accurate; they do not set the book's current compiler baseline.
 
 ### Show Both Sides
 
@@ -248,7 +250,7 @@ The book has opinions. Here's where we stand:
 | Function purity | **Strongly favor** | Side effects should be explicit and contained |
 | Declarative over imperative | **Favor** | Show both, but lean toward declarative |
 | FP vs OOP | **Lean FP** | Both valid, but FP patterns often simpler for TS |
-| Strict mode | **Strongly favor** | No-brainer for new projects, worth migrating to |
+| Strict mode | **Strongly favor** | Keep TypeScript 7's default; restore it in legacy projects that disable it |
 | `any` | **Against** | Almost never justified, `unknown` exists for a reason |
 | Runtime validation | **Favor at boundaries** | Trust types internally, validate at edges |
 | Type assertions | **Skeptical** | Must be documented and justified |

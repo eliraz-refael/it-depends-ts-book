@@ -1,13 +1,11 @@
-// Run with Node, ripgrep, and TypeScript 5.9.3:
-// node checks/chapter9.cjs /path/to/node_modules/typescript
-// With TypeScript installed locally, the argument is optional.
+// npm ci && node checks/chapter9.cjs (also requires ripgrep)
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const cp = require("node:child_process");
 const assert = require("node:assert/strict");
 
-const ts = require(process.argv[2] || "typescript");
+const {compile, describe, version} = require("./compiler.cjs");
 const root = path.resolve(__dirname, "..");
 const chapter = fs.readFileSync(
   path.join(root, "book/02-advanced-typescript/03-template-literal-types.md"),
@@ -16,14 +14,6 @@ const chapter = fs.readFileSync(
 const blocks = [...chapter.matchAll(/```typescript\n([\s\S]*?)\n```/g)]
   .map((match) => match[1]);
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "ts-book-ch9-"));
-const options = {
-  strict: true,
-  exactOptionalPropertyTypes: true,
-  target: ts.ScriptTarget.ES2022,
-  module: ts.ModuleKind.CommonJS,
-  types: [],
-  skipLibCheck: true,
-};
 
 function block(prefix) {
   const found = blocks.filter((code) => code.startsWith(prefix));
@@ -36,14 +26,6 @@ function write(relative, content) {
   fs.mkdirSync(path.dirname(filename), { recursive: true });
   fs.writeFileSync(filename, content);
   return filename;
-}
-
-function diagnostics(program) {
-  return ts.getPreEmitDiagnostics(program);
-}
-
-function describe(found) {
-  return found.map((d) => `${d.code}: ${ts.flattenDiagnosticMessageText(d.messageText, "\n")}`).join("\n");
 }
 
 const sourceBlocks = blocks.filter((code) => code.startsWith("// src/"));
@@ -106,7 +88,7 @@ example("wrong-generic-payload", 'function wrong<K extends SettingKey>(key: K, v
 
 const registry = block("const eventNames");
 example("registry-literal-preservation", registry + equal + 'type Check = Expect<Equal<typeof eventNames.fontSize, "fontSizeChanged">>;');
-example("registry-missing-key", registry.replace('  autoSave: "autoSaveChanged",\n', ""), [1360, 2339]);
+example("registry-missing-key", registry.replace('  autoSave: "autoSaveChanged",\n', ""), [2741, 2339]);
 example("registry-wrong-pair", registry.replace('fontSize: "fontSizeChanged"', 'fontSize: "autoSaveChanged"'), [2322, 2345]);
 
 const audit = block("type Entity");
@@ -124,13 +106,12 @@ type Check = Expect<Equal<ChangeEvents<Mixed>, { titleChanged: string }>>;
 example("added-setting", mapping + equal + 'type Extended = Settings & { lineHeight: number }; type Check = Expect<Equal<ChangeEvents<Extended>["lineHeightChanged"], number>>;');
 example("capitalized-names", block("type HandlerName") + equal + 'type Check = Expect<Equal<HandlerName, "onThemeChanged" | "onFontSizeChanged" | "onAutoSaveChanged">>;');
 
-const program = ts.createProgram([...originalFiles, ...changedFiles, ...examples.map((c) => c.filename)], { ...options, noEmit: true });
-const allDiagnostics = diagnostics(program);
+const {diagnostics: allDiagnostics} = compile([...originalFiles, ...changedFiles, ...examples.map((c) => c.filename)], {noEmit: true}, scratch);
 for (const test of examples) {
-  const found = allDiagnostics.filter((d) => d.file?.fileName === test.filename);
+  const found = allDiagnostics.filter((d) => d.fileName === test.filename);
   assert.deepEqual(found.map((d) => d.code).sort(), test.expected.slice().sort(), test.name + "\n" + describe(found));
 }
-const unexpected = allDiagnostics.filter((d) => !examples.some((test) => test.filename === d.file?.fileName));
+const unexpected = allDiagnostics.filter((d) => !examples.some((test) => test.filename === d.fileName));
 assert.equal(unexpected.length, 0, describe(unexpected));
 
 function search(directory) {
@@ -160,9 +141,8 @@ exports.publish = (name, value) => {
 let runtimeGroups = 0;
 function exercise(files, outName) {
   const out = path.join(scratch, outName);
-  const runtimeProgram = ts.createProgram(files, { ...options, outDir: out });
-  assert.equal(diagnostics(runtimeProgram).length, 0);
-  assert.equal(runtimeProgram.emit().emitSkipped, false);
+  const {diagnostics: found} = compile(files, {outDir: out, rootDir: path.dirname(files[0])}, scratch);
+  assert.equal(found.length, 0, describe(found));
   fs.writeFileSync(path.join(out, "events.js"), adapter);
   const bus = require(path.join(out, "events.js"));
   const { settings } = require(path.join(out, "settings.js"));
@@ -207,7 +187,13 @@ exercise(originalFiles, "out-original");
 exercise(changedFiles, "out-revised");
 
 const vm = require("node:vm");
-const registryProgram = ts.transpileModule(registry + '\nrestoreWithNames({theme: "dark", fontSize: 18, autoSave: false});', { compilerOptions: options }).outputText;
+const registryTypes = sources["src/settings.ts"].split("export const settings")[0].replaceAll("export ", "");
+const registryPublish = sources["src/events.d.ts"].slice(sources["src/events.d.ts"].indexOf("export declare function publish")).replace("export ", "");
+const registryFile = write("registry-runtime.ts", registryTypes + "\ndeclare const settings: Settings;\n" + registryPublish + registry + '\nrestoreWithNames({theme: "dark", fontSize: 18, autoSave: false});');
+const registryOut = path.join(scratch, "out-registry");
+const registryResult = compile([registryFile], {outDir: registryOut, moduleDetection: "legacy"}, scratch);
+assert.equal(registryResult.diagnostics.length, 0, describe(registryResult.diagnostics));
+const registryProgram = fs.readFileSync(path.join(registryOut, "registry-runtime.js"), "utf8");
 const state = { theme: "light", fontSize: 14, autoSave: true };
 const emitted = [];
 const snapshots = [];
@@ -229,7 +215,7 @@ for (const snapshot of snapshots) assert.deepEqual(snapshot, registrySaved);
 runtimeGroups++;
 
 console.log(JSON.stringify({
-  typescript: ts.version,
+  typescript: version,
   chapterFences: blocks.length,
   compilerCases: examples.length + 2,
   runtimeScenarioGroups: runtimeGroups,

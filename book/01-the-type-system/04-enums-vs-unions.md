@@ -88,7 +88,7 @@ updateUser("u_42", Status.Active);
 updateUser("u_42", "active");
 //                 ^^^^^^^^ TS will catch a typo here.
 updateUser("u_42", "activ");
-// Error: Argument of type '"activ"' is not assignable to parameter of type '"active" | "inactive" | "banned"'.
+// Error: Argument of type '"activ"' is not assignable to parameter of type '"active" | "banned" | "inactive"'.
 
 // With the enum
 updateUser("u_42", Status.Active);
