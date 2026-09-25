@@ -50,7 +50,7 @@ Claude independently rebuilt the feature files and reproduced both searches. His
 
 The runtime adapter records and dispatches events for testing the illustrated producers and subscriber. It does not validate an unseen production event-bus implementation. The chapter makes no claim that a source search identifies which runtime occurrence produced a particular log.
 
-**TS7 revalidation, 2026-09-24:** The CLI-based validator passes on **7.0.2** with the same 20 fences, 33 compiler cases, five runtime groups, and two source searches. The missing-property `satisfies` case now reports TS2741 instead of TS1360; the example is still rejected. See [the migration record](checks/README.md).
+**TS7 revalidation, 2026-09-24:** The CLI-based validator passes on **7.0.2** with the same 20 fences, 33 compiler cases, five runtime groups, and two source searches. The missing-property `satisfies` case now reports TS2741 instead of TS1360; the example is still rejected. See [the migration record](../../checks/README.md).
 
 ## Verdict
 

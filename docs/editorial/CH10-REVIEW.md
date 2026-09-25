@@ -98,7 +98,7 @@ and 8 runtime groups. The reader-onboarding revision passes on **7.0.2** with th
 expanded coverage above. The manuscript now
 names 7.0.2 for the checked condition diagnostic. The compiler run records its
 actual version; these checks do not claim future diagnostics cannot change.
-See [the migration record](checks/README.md).
+See [the migration record](../../checks/README.md).
 
 ## Reader-onboarding revision — 2026-09-24
 
