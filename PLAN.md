@@ -10,7 +10,7 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 ## Current Phase: Act II — Advanced TypeScript
 
-**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all ten completed chapters. Recheck the stable release and rerun the full suite before publication.
+**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all eleven completed chapters. Recheck the stable release and rerun the full suite before publication.
 
 ### Tasks
 
@@ -23,10 +23,10 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 - [x] Ch10: `04-infer-keyword.md` — drafted and jointly reviewed; infer patterns, overload extraction, runtime mismatch, and competing wrapper/adapter repairs checked
 - [x] Ch10 reader-onboarding repair: helper and caller established before the upgrade failure; fresh-reader checks and joint review settled; validation updated
 - [x] TypeScript 7 migration: pinned 7.0.2, CLI-based validators, all 199 TypeScript fences covered; compiler defaults, diagnostics, dependencies, and current guidance updated
-- [ ] Ch11: `05-advanced-generics.md`
+- [x] Ch11: `05-advanced-generics.md` — drafted and jointly reviewed; state preservation, constrained transitions, competing function APIs, and widening counterexample checked; fresh first-read review settled
 - [ ] Ch12: `06-variance.md`
 - [ ] Ch13: `07-declaration-merging.md` — NOTE: Ch3 already settled core declaration merging; reframe this chapter as *module augmentation & ambient types* (`.d.ts`, `declare global`, patching third-party types) to avoid re-litigating
-- [ ] Act II debt: at least one "The Debate Continues" chapter (candidates: advanced-generics, variance)
+- [x] Act II debt: at least one "The Debate Continues" chapter — Ch11 leaves the SDK construction API open, with demonstrated conditions for each choice
 - [ ] Act II: use sourced or reproducible evidence; do not schedule Gil/Chen methodology exchanges by quota
 
 ---
@@ -150,7 +150,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 |-----------------------------|-----------------|-----------------------|
 | Scaffolding + Prologue      | Done            |                       |
 | Act I: The Type System      | Done            | 6 chapters; voice revisions merged |
-| Act II: Advanced TypeScript | **IN PROGRESS** | Ch7–10 drafted/revised and checked (4 of 7) |
+| Act II: Advanced TypeScript | **IN PROGRESS** | Ch7–11 drafted/revised and checked (5 of 7) |
 | Act III: Patterns & Design  | Planned         | 10 chapters           |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
