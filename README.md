@@ -33,6 +33,8 @@ The source lives in `book/` as Markdown files, organized by act:
 
 This book is open source. If you find errors, have suggestions, or want to propose a debate topic, open an issue or PR.
 
+Chapter plans and review records live in [docs/editorial/](docs/editorial/).
+
 ## Checking the Examples
 
 The book targets **TypeScript 7**. The reproducible baseline is **7.0.2**, pinned in `package.json` and `package-lock.json` alongside the examples' library dependencies.

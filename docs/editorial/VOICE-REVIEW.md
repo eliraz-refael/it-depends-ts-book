@@ -65,7 +65,7 @@ These are better models for revision than a quota of jokes, pauses, or imperfect
 
 ## 1. Chapter 7 needs an objection that survives
 
-In [Chapter 7](book/02-advanced-typescript/01-conditional-types.md), “Show me the caller” correctly demonstrates that the **two displayed overloads** reject `string | string[]`. But Eden can add a public union overload before the implementation:
+In [Chapter 7](../../book/02-advanced-typescript/01-conditional-types.md), “Show me the caller” correctly demonstrates that the **two displayed overloads** reject `string | string[]`. But Eden can add a public union overload before the implementation:
 
 ```typescript
 function slugify(title: string): string;
@@ -144,7 +144,7 @@ That could produce a local decision to normalize front matter while preserving L
 
 ## 2. Let the Turn be shorter and leave something unsettled
 
-In [Chapter 7's Turn](book/02-advanced-typescript/01-conditional-types.md), starting around line 516, Dafna explains distribution again, identifies it as map/filter, announces that the room asked the wrong question, delivers a review principle, boxes a rule, answers Oded, adds a caveat, and receives Eli's endorsement. Then the verdict and Daniel repeat the rule.
+In [Chapter 7's Turn](../../book/02-advanced-typescript/01-conditional-types.md), starting around line 516, Dafna explains distribution again, identifies it as map/filter, announces that the room asked the wrong question, delivers a review principle, boxes a rule, answers Oded, adds a caveat, and receives Eli's endorsement. Then the verdict and Daniel repeat the rule.
 
 The observation about filtering is enough to earn her appearance. I would cut the ensuing speech substantially. For example:
 
@@ -172,7 +172,7 @@ I would also remove the unfulfilled eleven-minute deadline from the opening unle
 
 ## 3. Chapter 5 gives Guy too weak a defense
 
-[Chapter 5](book/01-the-type-system/05-narrowing-strategies.md), especially “Parse, don't validate” and the Turn, repeatedly credits parsers with informative errors while treating exceptions as necessarily vague stack traces. But an exception can carry field names and structured details. An assertion function can call a parser. Whether failure is returned or thrown does not alone determine the quality of its diagnostics.
+[Chapter 5](../../book/01-the-type-system/05-narrowing-strategies.md), especially “Parse, don't validate” and the Turn, repeatedly credits parsers with informative errors while treating exceptions as necessarily vague stack traces. But an exception can carry field names and structured details. An assertion function can call a parser. Whether failure is returned or thrown does not alone determine the quality of its diagnostics.
 
 The chapter already provides a useful basis for preferring results: an expected failure appears in the return type, and callers can handle it as data. Let Idan defend that against Guy's strongest version.
 
@@ -236,7 +236,7 @@ Chapter 1's assertion that every `any` in the TypeScript compiler is documented 
 
 ## 6. Adjust the writing rules that keep producing this result
 
-The current [writing guide](.claude/skills/book-writing-guide.md) identifies several real problems, especially universal eloquence and narration that declares a winner. Keep those observations. I would revise these prescriptions:
+The current [writing guide](../../.claude/skills/book-writing-guide.md) identifies several real problems, especially universal eloquence and narration that declares a winner. Keep those observations. I would revise these prescriptions:
 
 - **“They don't argue with each other.”** Experts should be able to dispute scope, challenge an analogy, and correct one another. Expertise can establish what the compiler does without settling what a team should choose.
 - **The mandatory antagonist pair.** Prefer a concrete disputed decision. Linoy and Eden already have grounds to disagree about a public signature. They do not need a permanent ideological feud for that disagreement to matter.
@@ -244,7 +244,7 @@ The current [writing guide](.claude/skills/book-writing-guide.md) identifies sev
 - **A required mistake and concession every chapter.** Look for consequential objections, including ones that remain unanswered. Otherwise the draft may manufacture a small error solely to tick off a correction.
 - **“Land one transferable rule” in the Chapter 7 plan.** Permit a narrower ruling or two defensible judgments when that is what the examples establish. Do not force the evidence to preserve the planned slogan.
 
-The reader-facing [“How They Talk” introduction](book/00-prologue/02-meet-the-cast.md) should move into the writing guide. It begins by explaining how fifteen characters might sound machine-written and which four are permitted polished lines. That asks the reader to inspect the construction before meeting the people. The individual “How he/she talks” notes are also more useful to the writer than the reader. Keep the biographies and let the scenes demonstrate the voices.
+The reader-facing [“How They Talk” introduction](../../book/00-prologue/02-meet-the-cast.md) should move into the writing guide. It begins by explaining how fifteen characters might sound machine-written and which four are permitted polished lines. That asks the reader to inspect the construction before meeting the people. The individual “How he/she talks” notes are also more useful to the writer than the reader. Keep the biographies and let the scenes demonstrate the voices.
 
 ## Chapter priorities
 
