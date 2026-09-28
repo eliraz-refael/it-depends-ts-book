@@ -8,9 +8,11 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 ---
 
-## Current Phase: Act II — Advanced TypeScript
+## Current Phase: Act II — Advanced TypeScript (complete)
 
-**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all twelve completed chapters. Recheck the stable release and rerun the full suite before publication.
+**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all thirteen completed chapters. Recheck the stable release and rerun the full suite before publication.
+
+Act II is complete. Next is Chapter 14, **error handling**, opening Act III. Its discovery has not started.
 
 ### Tasks
 
@@ -25,9 +27,9 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 - [x] TypeScript 7 migration: pinned 7.0.2, CLI-based validators, all 199 TypeScript fences covered; compiler defaults, diagnostics, dependencies, and current guidance updated
 - [x] Ch11: `05-advanced-generics.md` — drafted and jointly reviewed; state preservation, constrained transitions, competing function APIs, and widening counterexample checked; fresh first-read review settled
 - [x] Ch12: `06-variance.md` — drafted and jointly reviewed; reader/writer variance, method exceptions, annotation limits, retention alternatives, and builder callback checked; fresh first-reader reviews settled
-- [ ] Ch13: `07-declaration-merging.md` — NOTE: Ch3 already settled core declaration merging; reframe this chapter as *module augmentation & ambient types* (`.d.ts`, `declare global`, patching third-party types) to avoid re-litigating
+- [x] Ch13: `07-declaration-merging.md` — module augmentation and ambient types; drafted and jointly reviewed; separate entry points, type-only imports, runtime installation, optional capability checks, and declaration scope validated; fresh first-reader recheck settled
 - [x] Act II debt: at least one "The Debate Continues" chapter — Ch11 leaves the SDK construction API open, with demonstrated conditions for each choice
-- [ ] Act II: use sourced or reproducible evidence; do not schedule Gil/Chen methodology exchanges by quota
+- [x] Act II: compiler/runtime claims covered by reproducible checks and primary sources; methodology exchanges follow the cases
 
 ---
 
@@ -150,7 +152,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 |-----------------------------|-----------------|-----------------------|
 | Scaffolding + Prologue      | Done            |                       |
 | Act I: The Type System      | Done            | 6 chapters; voice revisions merged |
-| Act II: Advanced TypeScript | **IN PROGRESS** | Ch7–12 drafted/revised and checked (6 of 7) |
+| Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
 | Act III: Patterns & Design  | Planned         | 10 chapters           |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
