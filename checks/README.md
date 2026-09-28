@@ -13,7 +13,7 @@ npm run check
 
 ## Coverage
 
-Successful run on **2026-09-24**, TypeScript **7.0.2**, Node **22.23.2**:
+Successful run on **2026-09-25**, TypeScript **7.0.2**, Node **22.23.2**:
 
 | Suite | TypeScript fences | Compiler cases | Runtime scenario groups |
 | --- | ---: | ---: | ---: |
@@ -22,13 +22,16 @@ Successful run on **2026-09-24**, TypeScript **7.0.2**, Node **22.23.2**:
 | Chapter 9 | 20 | 33 | 5 |
 | Chapter 10 | 20 | 32 | 9 |
 | Chapter 11 | 20 | 34 | 11 |
-| Total | **220** | **267** | **41** |
+| Chapter 12 | 18 | 31 | 14 |
+| Total | **238** | **298** | **55** |
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
 
 The original TS7 migration review is settled. Claude independently reran that suite in the workspace and a fresh install; both runs passed with 199 fences, 230 compiler cases, and 29 runtime groups. The subsequent Chapter 10 reader-onboarding repair added a caller checked before the SDK upgrade, after the breaking upgrade, and after the overload repair. Its runtime checks cover success, a synchronous throw, and a rejected promise. Claude also independently reran that expanded suite: 200 fences, 233 compiler cases, and 30 runtime groups. See [the Chapter 10 review](../docs/editorial/CH10-REVIEW.md) for its separate comprehension review. Chapter 11 adds the builder and function checks described below; its review is recorded separately in [CH11-REVIEW.md](../docs/editorial/CH11-REVIEW.md).
 
-The suites extract all TypeScript fences in Chapters 1–11. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
+Chapter 12's variance checks and separate first-read review are recorded in [CH12-REVIEW.md](../docs/editorial/CH12-REVIEW.md).
+
+The suites extract all TypeScript fences in Chapters 1–12. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 
 Specific adaptations and limits:
 
@@ -38,6 +41,7 @@ Specific adaptations and limits:
 - Chapter 9 uses a recording event-bus adapter for runtime assertions. Chapter 10 uses the documented fictional SDK test double. Neither stands in for verification of an external production service.
 - Chapter 10's v4 fixture removes the two members explicitly marked as v5 additions, leaving the original single-signature method. Original and replacement `courier` declarations are checked separately.
 - Chapter 11 checks the original builder and its replacement `source` method separately. The method excerpt is substituted into the manuscript's class body. Fixtures verify state preservation and loss through helpers, receiver constraints, both construction orders, the stronger source-setting helper constraint, and the accepted widening that bypasses the static set-once rule. Intentional errors are checked by diagnostic line and code; printed diagnostic codes and excerpts are matched against the compiler's output. Three additional cases verify the source-transition rule with `exactOptionalPropertyTypes` disabled; the printed excerpts use the main profile because diagnostic display differs. Runtime checks compare the builder, complete-options function, and fixed-source function; they also exercise fresh copies, repeated setters, invalid JavaScript arguments, and the guard that still rejects a widened builder's repeated source selection.
+- Chapter 12 checks the original method-shaped cache, the annotated version, and the function-property version separately. Fixtures exercise direct calls, inferred forwarding, explicit adapter annotations, spread copies, both directions of reader/writer and full-cache assignment, and an already-widened legacy reference. Two cases also show that a method-shaped writer view admits the bug even with a property-shaped cache, while a property-shaped view rejects the original method cache. Runtime checks execute the accepted faulty paths and all printed results, then verify that archiving updates the download while retaining CSV metadata and a later CSV updates both. The builder callback uses Chapter 11's actual class and replacement source method with the printed variance annotation. Two profile cases disable `strictFunctionTypes` to pin the repair's dependency on that flag. These checks do not run a real archiver, generate files, or test a deployed UI.
 - The suites do not benchmark compiler performance or establish the fictional characters' empirical claims. Chapter 3 attributes its performance recommendation to the TypeScript wiki and makes no measured TS7 speed claim.
 
 ## Compiler settings
