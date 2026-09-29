@@ -13,7 +13,7 @@ npm run check
 
 ## Coverage
 
-Successful run on **2026-09-28**, TypeScript **7.0.2**, Node **22.23.3**:
+Successful run on **2026-09-29**, TypeScript **7.0.2**, Node **22.23.3**:
 
 | Suite | TypeScript fences | Compiler cases | Runtime scenario groups |
 | --- | ---: | ---: | ---: |
@@ -24,7 +24,8 @@ Successful run on **2026-09-28**, TypeScript **7.0.2**, Node **22.23.3**:
 | Chapter 11 | 20 | 34 | 11 |
 | Chapter 12 | 18 | 31 | 14 |
 | Chapter 13 | 16 | 24 | 16 |
-| Total | **254** | **322** | **71** |
+| Chapter 14 | 15 | 19 | 18 |
+| Total | **269** | **341** | **89** |
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
 
@@ -34,7 +35,9 @@ Chapter 12's variance checks and separate first-read review are recorded in [CH1
 
 Chapter 13 closes Act II with module augmentation and ambient declarations; its review is recorded in [CH13-REVIEW.md](../docs/editorial/CH13-REVIEW.md).
 
-The suites extract all TypeScript fences in Chapters 1–13. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
+Chapter 14 opens Act III with error handling across a transaction boundary; its review is recorded in [CH14-REVIEW.md](../docs/editorial/CH14-REVIEW.md).
+
+The suites extract all TypeScript fences in Chapters 1–14. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 
 Specific adaptations and limits:
 
@@ -46,6 +49,7 @@ Specific adaptations and limits:
 - Chapter 11 checks the original builder and its replacement `source` method separately. The method excerpt is substituted into the manuscript's class body. Fixtures verify state preservation and loss through helpers, receiver constraints, both construction orders, the stronger source-setting helper constraint, and the accepted widening that bypasses the static set-once rule. Intentional errors are checked by diagnostic line and code; printed diagnostic codes and excerpts are matched against the compiler's output. Three additional cases verify the source-transition rule with `exactOptionalPropertyTypes` disabled; the printed excerpts use the main profile because diagnostic display differs. Runtime checks compare the builder, complete-options function, and fixed-source function; they also exercise fresh copies, repeated setters, invalid JavaScript arguments, and the guard that still rejects a widened builder's repeated source selection.
 - Chapter 12 checks the original method-shaped cache, the annotated version, and the function-property version separately. Fixtures exercise direct calls, inferred forwarding, explicit adapter annotations, spread copies, both directions of reader/writer and full-cache assignment, and an already-widened legacy reference. Two cases also show that a method-shaped writer view admits the bug even with a property-shaped cache, while a property-shaped view rejects the original method cache. Runtime checks execute the accepted faulty paths and all printed results, then verify that archiving updates the download while retaining CSV metadata and a later CSV updates both. The builder callback uses Chapter 11's actual class and replacement source method with the printed variance annotation. Two profile cases disable `strictFunctionTypes` to pin the repair's dependency on that flag. These checks do not run a real archiver, generate files, or test a deployed UI.
 - Chapter 13 uses separate multi-file compiler programs and fresh Node processes. The fictional `label-kit` package has the manuscript's declarations and a small JavaScript implementation of its constructor, text rendering, and prototype plugin. Checks reproduce the shared-program failure, the working runtime integration module, the erased type-only dependency, optional-member guards, and test contamination when both entry points run in one process. They also exercise ambient-module shadowing and its two repairs, a local versus global `Window`, a checked local subtype for repeated chaining, and conflicting declarations from a simulated dependency upgrade. Unlike the shared default, these cases use `skipLibCheck: false`; two comparison cases enable it. The upgrade fixture loads the dependency's declarations through the plugin import, before the application's `.ts` augmentation. Printed diagnostic text and all annotated output values are checked. The host-global runtime check supplies two small `window` objects in a VM; it does not run a browser, printer, or real third-party package. The DOM library is supplied by the compiler's default libraries for the configured target.
+- Chapter 14 runs the manuscript's complete serial in-memory store model; it does not exercise a real database or provide concurrent transaction isolation. Original, inside-conversion, outside-conversion and result-adapter versions compile separately. Printed top-level-await examples are placed in an async function for Node16 CommonJS execution. All seven printed values are checked. Tests compare both the response and committed state for success, occupied and unknown seats, both seat orders, and unexpected thrown values. The adapter is checked for payload typing inside its restoration branch, an `undefined` error payload, signal identity, a host that wraps rejection, and an injected replacement host failure. The last case tests propagation, not a real rollback failure. Two additional variants reproduce the missing-await catch bypass and the raw transaction accepting result-returning steps. Prose alternatives get explicit fixtures: preflight adds a readable draft API and checks duplicate requests before writing; an owned result-aware host changes the commit condition to inspect `ok`. Neither alternative assumes concurrency guarantees. Exhaustiveness is checked with an added refusal kind in both the exception and Result versions. The catch diagnostic is matched verbatim. The queue Take stipulates a hypothetical host policy; no queue implementation, retries or external effects are simulated.
 - The suites do not benchmark compiler performance or establish the fictional characters' empirical claims. Chapter 3 attributes its performance recommendation to the TypeScript wiki and makes no measured TS7 speed claim.
 
 ## Compiler settings

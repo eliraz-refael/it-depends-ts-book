@@ -8,13 +8,19 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 ---
 
-## Current Phase: Act II — Advanced TypeScript (complete)
+## Current Phase: Act III — Patterns & Design
 
-**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all thirteen completed chapters. Recheck the stable release and rerun the full suite before publication.
+**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all fourteen completed chapters. Recheck the stable release and rerun the full suite before publication.
 
-Act II is complete. Next is Chapter 14, **error handling**, opening Act III. Its discovery has not started.
+Act II is complete. Chapter 14 opens Act III with **error handling** and is drafted, jointly reviewed and checked. Next is Chapter 15, **branded types**; its discovery has not started.
 
-### Tasks
+### Act III tasks
+
+- [x] Ch14: `01-error-handling.md` — exceptions and explicit results across a transaction boundary; fair alternatives, independent first-reader rechecks, joint review and compiler/runtime validation complete
+- [ ] Ch15: `02-branded-types.md` — discovery not started
+- [ ] Act III debt: at least one honest "The Debate Continues" chapter, with demonstrated conditions
+
+### Completed Act II work
 
 - [x] Ch7: `01-conditional-types.md` — revised after voice review; complete overload comparison, local normalization decision, dissent preserved
 - [x] Voice revision: Ch1–7 and prologue; Ch5 ends with "The Debate Continues"
@@ -153,7 +159,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Scaffolding + Prologue      | Done            |                       |
 | Act I: The Type System      | Done            | 6 chapters; voice revisions merged |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
-| Act III: Patterns & Design  | Planned         | 10 chapters           |
+| Act III: Patterns & Design  | **IN PROGRESS** | Ch14 drafted, reviewed and checked (1 of 10) |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |
