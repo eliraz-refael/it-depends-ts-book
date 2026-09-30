@@ -13,7 +13,7 @@ npm run check
 
 ## Coverage
 
-Successful run on **2026-09-29**, TypeScript **7.0.2**, Node **22.23.3**:
+Successful run on **2026-09-30**, TypeScript **7.0.2**, Node **22.23.3**:
 
 | Suite | TypeScript fences | Compiler cases | Runtime scenario groups |
 | --- | ---: | ---: | ---: |
@@ -25,7 +25,8 @@ Successful run on **2026-09-29**, TypeScript **7.0.2**, Node **22.23.3**:
 | Chapter 12 | 18 | 31 | 14 |
 | Chapter 13 | 16 | 24 | 16 |
 | Chapter 14 | 15 | 19 | 18 |
-| Total | **269** | **341** | **89** |
+| Chapter 15 | 13 | 30 | 16 |
+| Total | **282** | **371** | **105** |
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
 
@@ -37,7 +38,9 @@ Chapter 13 closes Act II with module augmentation and ambient declarations; its 
 
 Chapter 14 opens Act III with error handling across a transaction boundary; its review is recorded in [CH14-REVIEW.md](../docs/editorial/CH14-REVIEW.md).
 
-The suites extract all TypeScript fences in Chapters 1–14. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
+Chapter 15 examines scalar role brands and checked object brands; review progress is recorded in [CH15-REVIEW.md](../docs/editorial/CH15-REVIEW.md).
+
+The suites extract all TypeScript fences in Chapters 1–15. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 
 Specific adaptations and limits:
 
@@ -50,6 +53,7 @@ Specific adaptations and limits:
 - Chapter 12 checks the original method-shaped cache, the annotated version, and the function-property version separately. Fixtures exercise direct calls, inferred forwarding, explicit adapter annotations, spread copies, both directions of reader/writer and full-cache assignment, and an already-widened legacy reference. Two cases also show that a method-shaped writer view admits the bug even with a property-shaped cache, while a property-shaped view rejects the original method cache. Runtime checks execute the accepted faulty paths and all printed results, then verify that archiving updates the download while retaining CSV metadata and a later CSV updates both. The builder callback uses Chapter 11's actual class and replacement source method with the printed variance annotation. Two profile cases disable `strictFunctionTypes` to pin the repair's dependency on that flag. These checks do not run a real archiver, generate files, or test a deployed UI.
 - Chapter 13 uses separate multi-file compiler programs and fresh Node processes. The fictional `label-kit` package has the manuscript's declarations and a small JavaScript implementation of its constructor, text rendering, and prototype plugin. Checks reproduce the shared-program failure, the working runtime integration module, the erased type-only dependency, optional-member guards, and test contamination when both entry points run in one process. They also exercise ambient-module shadowing and its two repairs, a local versus global `Window`, a checked local subtype for repeated chaining, and conflicting declarations from a simulated dependency upgrade. Unlike the shared default, these cases use `skipLibCheck: false`; two comparison cases enable it. The upgrade fixture loads the dependency's declarations through the plugin import, before the application's `.ts` augmentation. Printed diagnostic text and all annotated output values are checked. The host-global runtime check supplies two small `window` objects in a VM; it does not run a browser, printer, or real third-party package. The DOM library is supplied by the compiler's default libraries for the configured target.
 - Chapter 14 runs the manuscript's complete serial in-memory store model; it does not exercise a real database or provide concurrent transaction isolation. Original, inside-conversion, outside-conversion and result-adapter versions compile separately. Printed top-level-await examples are placed in an async function for Node16 CommonJS execution. All seven printed values are checked. Tests compare both the response and committed state for success, occupied and unknown seats, both seat orders, and unexpected thrown values. The adapter is checked for payload typing inside its restoration branch, an `undefined` error payload, signal identity, a host that wraps rejection, and an injected replacement host failure. The last case tests propagation, not a real rollback failure. Two additional variants reproduce the missing-await catch bypass and the raw transaction accepting result-returning steps. Prose alternatives get explicit fixtures: preflight adds a readable draft API and checks duplicate requests before writing; an owned result-aware host changes the commit condition to inspect `ok`. Neither alternative assumes concurrency guarantees. Exhaustiveness is checked with an added refusal kind in both the exception and Result versions. The catch diagnostic is matched verbatim. The queue Take stipulates a hypothetical host policy; no queue implementation, retries or external effects are simulated.
+- Chapter 15 extracts all 13 fences and separates repeated timeline definitions. Runtime variants omit only intentional-error lines. Checks distinguish page-number and page-count brands, arithmetic and widening, required versus optional markers, stale proofs retained by spread, and a cross-module copy whose brand symbol is unexported. The class repair rejects copied data statically and prevents mutable-alias writes at runtime under strict emitted JavaScript; a no-freeze variant demonstrates the remaining corruption. A stronger read-method class variant also rejects the old mutator and spread at compile time while producing the same renderer request. The checked-object and class variants both convert into the original renderer request; the suite substitutes the class parameter into the unchanged conversion body. Tests exercise printed outputs, both action responses during and after an endpoint edit, constructor limits, and the safe-integer guard before addition (a post-addition check can miss rounding). The page-number lists are executable models, not a document renderer or UI; document existence, actual files, form parsing and huge list allocation are outside their scope.
 - The suites do not benchmark compiler performance or establish the fictional characters' empirical claims. Chapter 3 attributes its performance recommendation to the TypeScript wiki and makes no measured TS7 speed claim.
 
 ## Compiler settings
