@@ -174,6 +174,38 @@ The synthetic host-failure message now says “Injected host failure.”
 The targeted suite still passes with 15/19/18. Claude approved every revised passage and independently reran the final full
 suite: exit 0, with unchanged chapter and book totals.
 
+## Opening revision — 2026-09-30
+
+The user's first-hand reading found a gap the original reviews missed: the
+opening described the team and its code without stating a recognizable general
+principle. Earlier readers restated the lesson after reading the whole chapter;
+that did not establish that the opening itself stated it.
+
+Codex and Claude revised the opening around the two decisions made by returning
+a failure value: what to report and normal function completion. The first line
+now asks whether the code awaiting that function still needs rejection to stop
+or undo work. Dafna's answer about the current transaction identifies the
+assumption the later test examines. The setup moves into the Debate, introduced
+by Guy's objection about the existing booking contract. The obsolete ticket
+analogy callback is removed. Every TypeScript fence remains byte-identical to
+the original chapter commit.
+
+Claude's targeted opening review is **SETTLED**. A fresh Claude reader received
+only the Principle, stopping before the Debate, and restated the general rule
+without relying on the booking story. After final wording precision and two
+small trims, a new fresh reader checked the exact final snapshot with the same
+limited context. It again restated the rule generally, judged the async claims
+accurate, and identified both the transaction's role and the outer-conversion
+repair before reading the example. Claude confirmed the final check passed.
+Suggestions to explain the repair inside the Principle were declined: the
+following debate demonstrates and tests it. The statement begins with returning
+failure values generally, then specifies the async behavior used by this case.
+
+The final targeted `node checks/chapter14.cjs` run passes unchanged coverage:
+**15 fences, 19 compiler cases, 18 runtime groups**. The full suite and source
+code remain as validated above. This revision updates the existing Chapter 14
+PR rather than creating another chapter or changing its technical examples.
+
 ## Verdict
 
 **APPROVED / SETTLED.** Claude, self-review and the targeted independent reader

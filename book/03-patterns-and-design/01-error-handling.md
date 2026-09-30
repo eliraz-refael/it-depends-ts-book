@@ -2,13 +2,23 @@
 
 ## The Principle
 
-**Dafna Functor**: "A seat being taken isn't a broken program. Someone else got there first."
+**Liron Closure**: "When you catch a failure and return an error value, you make two decisions: what to report, and that the function can finish normally. In an async function, returning an ordinary value fulfills its promise. Whoever awaits it no longer gets a rejection to act on. Before returning, check whether they still need that rejection to stop or undo the work."
 
-**Guy Singleton**: "It still means we don't book the party."
+The booking page reserves seats for a whole party: every requested seat or none of them. Dafna's patch turns an occupied seat from a rejected operation into a returned refusal that the page can display. Guy has opened the current implementation beside her diff.
 
-The booking page reserves seats for a whole party: every requested seat or none of them. Dafna's patch makes the service return expected refusals as data. Guy has opened the current implementation beside her diff.
+**Dafna Functor**: "The page can tell them which seat is taken. I'd return that refusal."
 
-**Liron Closure**: "You can hand back a ticket with either a seat number or 'sold out' on it. Both are answers the caller knows how to use. A result type puts those answers in the signature."
+**Guy Singleton**: "And the seats we already held?"
+
+**Dafna**: "The transaction releases them. That's what the current version does."
+
+## The Debate
+
+### The booking they already have
+
+Guy starts with `bookParty`, the service function the page calls.
+
+**Guy**: "The page already reports the refusals, and the transaction rolls back. Why change `bookParty`'s contract?"
 
 The application uses a store library whose `hold` operation reserves one seat in a transaction. For an unknown or occupied seat, `hold` rejects with the library's `SeatRefused`, carrying its `Failure` union. Other failures, such as a broken connection, can also reject the operation. `Booking` is the application's record of the seats it reserved.
 
@@ -80,11 +90,7 @@ console.log(store.isHeld("A1")); // true
 console.log(store.isHeld("A2")); // true
 ```
 
-**Guy**: "The handler already reports the refusals, and the transaction rolls back. Why change `bookParty`'s contract?"
-
 **Dafna**: "The caller has to know about `SeatRefused`, but `Promise<Booking>` doesn't mention it. I'd like the ordinary refusal in the return type. Then the page has to choose a branch before it uses the booking."
-
-## The Debate
 
 ### Put the refusal in the signature
 
@@ -206,8 +212,6 @@ function testStore(entries: readonly (readonly [string, boolean])[]) {
 **Guy**: "The store doesn't inspect `ok`."
 
 **Dafna**: "The page handles that object correctly. I need the transaction to roll back before the page ever gets it."
-
-**Liron**: "Our ticket passes through the store first. It commits because we handed one back, without reading what it says."
 
 ### Move the catch
 

@@ -91,3 +91,13 @@ its first consequential use and what principle the example establishes.
 - [x] Manuscript-derived compiler/runtime checks pass: 15 fences / 19 compiler cases / 18 runtime groups.
 - [x] Claude formal review settled: all revised passages approved; independent full suite passes.
 - [x] Full-suite check and tracking complete: 269 fences / 341 compiler cases / 89 runtime groups; two compiler-default cases and two searches also pass.
+
+## Opening follow-up — 2026-09-30
+
+Reader feedback showed that the original Principle supplied a scenario but did
+not clearly state the general claim under examination. The revised opening
+states the reporting/normal-completion decisions first, then tests them through
+the booking. Setup moves under the Debate. Claude's targeted review and a fresh
+Principle-only comprehension check are settled. All TypeScript fences are
+unchanged; targeted validation still passes at 15/19/18. See the review record
+for the reader's exact scope and the final wording refinements.
