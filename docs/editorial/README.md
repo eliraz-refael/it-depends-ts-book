@@ -12,6 +12,7 @@ The [master plan](../../PLAN.md) remains at the repository root.
 | 11 — Advanced generics | [Plan](CH11-PLAN.md) | [Review](CH11-REVIEW.md) |
 | 12 — Variance | [Plan](CH12-PLAN.md) | [Review](CH12-REVIEW.md) |
 | 13 — Module augmentation and ambient types | [Plan](CH13-PLAN.md) | [Review](CH13-REVIEW.md) |
+| 14 — Error handling | [Plan](CH14-PLAN.md) | [Review](CH14-REVIEW.md) |
 
 The [voice review](VOICE-REVIEW.md) covers the prologue and early chapters.
 
