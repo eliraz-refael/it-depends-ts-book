@@ -2,11 +2,9 @@
 
 ## The Principle
 
-The previous two chapters dealt with escape hatches — `any`, `unknown`, and type assertions. Those were debates about *safety*. This chapter is a debate about *identity*: the two constructs TypeScript gives you to describe the shape of your data, and what your choice between them reveals about how you think.
+The team wants a convention for choosing between `interface` and `type`. Guy and Dafna have brought different defaults. Eli puts the same user on the board twice.
 
-**Prof. Eli Typeworth** begins with a deception:
-
-"Let me show you two definitions. Tell me which is the interface and which is the type alias."
+**Prof. Eli Typeworth**: "Both of these describe the same user. What would make you choose one?"
 
 ```typescript
 interface UserA {
@@ -22,9 +20,7 @@ type UserB = {
 };
 ```
 
-He turns to the room. *"Let us return to first principles."*
-
-"For this use case — a simple object shape — the compiler treats them identically. You can assign one to the other without error:"
+**Eli**: "For this simple object shape, you can assign one to the other without error:"
 
 ```typescript
 const user1: UserA = { id: "1", name: "Eli", email: "eli@types.edu" };
@@ -34,9 +30,9 @@ const user3: UserA = user2; // No error.
 const user4: UserB = user1; // No error.
 ```
 
-"This is where the confusion begins. They look the same. They behave the same. But an `interface` describes a contract that can be *extended*. A `type` describes a shape that can be *composed*. These are different philosophies wearing similar syntax."
+**Eli**: "Choose by what the declaration needs to do beyond describing the shape. Does other code need to reopen it? Where should a conflict between its parts be reported? Does it need to name something other than an object? If none of those differences matters, choose a convention for your readers."
 
-**Daniel Compiler** leans in to show the first crack. *"The compiler disagrees"* — with the premise that these are the same thing:
+**Daniel Compiler**: "Start with a second declaration of the same name."
 
 ```typescript
 // interface: open — can be declared again to merge
@@ -58,15 +54,13 @@ type Settings = {
 // };
 ```
 
-"An `interface` is a door you can reopen. A `type` is a door that locks behind you. Whether that lock is a feature or a limitation — that's the debate."
+**Daniel**: "`Config` picked up another field. Redeclaring `Settings` gives an error. If another file declares `Config` in the same scope, do you want it to be able to add to this definition?"
 
 ## The Debate
 
 ### "`extends` is not the same as `&`"
 
-**Guy Singleton** has been waiting for this chapter. *"Where's the interface?"* — everywhere, if you know where to look:
-
-"Let me show you something that most developers learn the hard way. When you build a hierarchy with `interface extends`, the compiler *checks* for conflicts at the point of declaration:"
+**Guy Singleton**: "I want conflicts reported where I put the types together. `interface extends` checks them at the declaration. Start with this:"
 
 ```typescript
 interface Base {
@@ -92,7 +86,7 @@ interface Employee extends Base {
 }
 ```
 
-"The error is immediate. It's clear. It tells you *exactly* what went wrong and *exactly* where. Now watch the same thing with type intersections:"
+**Guy**: "It points at the declaration and tells me which properties disagree. Now try the intersection:"
 
 ```typescript
 type Base = {
@@ -106,7 +100,7 @@ type Employee = Base & {
 };
 ```
 
-"No error at the declaration. TypeScript silently computes `id: string & number`, which is `never`. The error only surfaces when you try to actually use it:"
+"No error at the declaration. TypeScript computes `id: string & number`: a value would have to be both a string and a number. There is no such value, so that becomes `never`. The error only surfaces when you try to actually use it:"
 
 ```typescript
 const emp: Employee = {
@@ -118,7 +112,7 @@ const emp: Employee = {
 // Where did 'never' come from? Hope you understand intersection theory.
 ```
 
-**Noam Kiperman** supports Guy: "The `extends` error message is a diagnosis. The intersection error message is a riddle. In a code review, I can explain the first one in ten seconds. The second one requires a whiteboard and five minutes on how `string & number` collapses to `never`."
+**Noam Kiperman**: "The `extends` error message is a diagnosis. The intersection error message is a riddle. The first one names the conflict. The second points at an object literal, and somebody has to go looking for that `number`."
 
 **Dafna Functor** writes three smaller shapes.
 
@@ -154,9 +148,7 @@ Dafna checks the resulting properties.
 
 ### "Declaration merging — feature or footgun?"
 
-**Linoy Nightly** shifts the terrain:
-
-"Express exposes an interface we can extend to describe fields our middleware adds. We can type `req.user` without forking the framework:"
+**Linoy Nightly**: "I do want to add fields to Express's request. It exposes an interface for that. We can describe what our middleware adds without forking the framework:"
 
 ```typescript
 import express from "express";
@@ -193,7 +185,7 @@ This extension point is declared in the [Express core type definitions](https://
 
 **Linoy**: "Yes. But the shared type can describe them. You couldn't reopen a type alias this way."
 
-**Chen Override** leans forward: "But have you considered that the same mechanism that lets you augment Express also lets you corrupt your own types?"
+**Chen Override**: "What if two application models end up in that same scope?"
 
 ```typescript
 // file: models/user.ts
@@ -223,19 +215,15 @@ declare global {
 
 "Two developers. Two files. One silently merged type that neither of them intended."
 
-**Daniel Compiler** settles it:
+**Daniel**: "Declarations merge when they refer to the same interface in the same scope. Two `User` interfaces in separate modules do not merge just because their names match. Your example deliberately puts both in the global scope. For an extension point that may be useful; for two unrelated models it is a mistake."
 
-"Declarations merge when they refer to the same interface in the same scope. Two `User` interfaces in separate modules do not merge just because their names match. Your example deliberately puts both in the global scope. For an extension point that may be useful; for two unrelated models it is a mistake."
-
-**Noam**: "If you're writing a library, `interface` gives consumers the ability to extend your types. If you're writing an application, that same ability is a vector for silent type corruption. *Over my dead type definition.*"
+**Noam**: "I can see why a library would expose that extension point. I don't want an unrelated application model adding fields to mine. Keep those definitions closed."
 
 ---
 
 ### "The things only `type` can do"
 
-**Dafna Functor** has been patient. Now it's time:
-
-"Guy showed you what `interface` does well. Let me show you what it can't do at all:"
+**Dafna**: "Now try declaring these with `interface`. You don't need to read every line. Look at what each definition names:"
 
 ```typescript
 // Union types — interface can't do this
@@ -261,21 +249,19 @@ const defaultConfig = { port: 3000, host: "localhost", debug: false } as const;
 type Config = typeof defaultConfig;
 ```
 
-*"That's just a map."* Specifically, `type` gives you the entire algebra of types — unions, intersections, conditionals, mapped types. `interface` gives you objects. Objects are one data structure. `type` is the language for describing *all* data structures.
+**Dafna**: "These aren't all object shapes. We have choices, tuples, types computed from other types. An alias can name those too."
 
-**Guy** tries to hold the line: "You're showing advanced type-level programming. Most application code doesn't need conditional types or mapped types."
+**Guy**: "You're showing advanced type-level programming. Most application code doesn't need conditional types or mapped types."
 
-**Linoy Nightly** turns to him:
+**Linoy** turns to him:
 
-"Most application code absolutely uses union types. Every time you write `string | null`. Every time you have a status that's `'loading' | 'success' | 'error'`. Every discriminated union. That's `type`. *There's an RFC for that*, by the way — there have been multiple proposals to add union support to `interface`. They've all been rejected. Because interfaces model objects. Unions model choices. They're fundamentally different things."
+"It uses unions. `string | null`, a loading status, a result with a failure branch. You don't have to be writing a library to need those. An interface describes an object shape. A union can describe a choice between shapes."
 
 ---
 
-### "Discriminated unions — where `interface` can't compete"
+### "What changes when we add a state?"
 
-**Dafna** delivers the example that ends the expressiveness debate:
-
-"This is the pattern that changed how I think about TypeScript. Not objects with methods — data with shapes:"
+**Dafna**: "For the profile screen, these states are the whole set:"
 
 ```typescript
 type RequestState<T> =
@@ -300,9 +286,9 @@ function renderProfile(state: RequestState<User>): string {
 }
 ```
 
-"Exhaustive — because the return type is explicit, the compiler verifies every branch returns a `string`. Add a new state — say `'retrying'` — and the function won't compile until you handle it. No class hierarchy gives you this."
+**Dafna**: "The explicit return type makes the compiler check that every branch returns a `string`. Add a state like `'retrying'` and this function won't compile until we handle it. I want that error when we add a state."
 
-**Guy** tries the OOP alternative:
+**Guy**: "I'd put `render` in the contract. Each state supplies its implementation."
 
 ```typescript
 interface RequestState<T> {
@@ -344,7 +330,7 @@ state.render(); // "Hello, Ada"
 
 **Guy**: "I'd add the operation to the contract."
 
-"And implement it in every class. I can put another exhaustive `switch` beside the first one."
+**Dafna**: "And implement it in every class. I can put another exhaustive `switch` beside the first one."
 
 **Guy**: "Yes. And when I add a new kind of state, I add a class that implements the contract. Your switches all need a new case."
 
@@ -356,13 +342,11 @@ state.render(); // "Hello, Ada"
 
 ### "Performance — does the compiler care?"
 
-**Gil Benchmark** opens his laptop. *"What does the data say?"*
+**Gil Benchmark**: "There's guidance on composing object types. I haven't measured these alternatives in our project."
 
 "The TypeScript team's performance wiki recommends `interface extends` over intersections when composing object types. It describes caching relationships between interfaces, and checking each constituent when comparing against an intersection."
 
-**Linoy Nightly** provides the source:
-
-"Here's the [guidance](https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections). It predates the native compiler. I'd try it if a trace pointed here, but I haven't timed these two on TypeScript 7."
+**Linoy**: "Here's the [guidance](https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections). It predates the native compiler. I'd try it if a trace pointed here."
 
 ```typescript
 // The TS team recommends this for extending object types:
@@ -381,17 +365,15 @@ type Props = BaseProps & {
 // The same object shape, expressed as an intersection.
 ```
 
-**Chen Override**: "Then how much would this save in our project? The recommendation is about composing object types. Unions, mapped types, conditionals — there's no equivalent `interface` spelling to swap in."
+**Chen**: "So we don't know how much it would save here. And the recommendation is about composing objects. Unions, mapped types, conditionals — there's no equivalent `interface` spelling to swap in."
 
-**Oded Shipley** interjects: "If your compile time is slow, profile it first. Don't prematurely optimize your *type syntax*. *We can fix it in the next sprint.* — Actually, this time, I'm right."
+**Oded Shipley**: "If your compile time is slow, profile it first. Don't prematurely optimize your *type syntax*."
 
 ---
 
 ### "Just pick one and be consistent"
 
-**Oded** makes his play:
-
-"We've spent five subsections arguing about edge cases that affect 10% of types. Here's the uncomfortable truth:"
+**Oded**: "Can we settle the plain objects? Most of mine look like this:"
 
 ```typescript
 // For 90% of the types you write:
@@ -406,11 +388,9 @@ type User = { id: string; name: string; };
 
 "I've seen teams spend more time debating this in style guides than they save in a year of 'choosing the right one.' The overhead of the decision is more expensive than the occasional suboptimal choice."
 
-**Chen**: "But have you considered that 'just pick one' means you'll use the wrong tool for the remaining 10%? You can't 'just use interface' for a union type. You can't 'just use type' and expect declaration merging."
+**Chen**: "For an object like that, fine. The rule still needs exceptions. You can't 'just use interface' for a union type. You can't 'just use type' and expect declaration merging."
 
-**Noam** surprises everyone by partially agreeing with Oded:
-
-"Consistency matters. A codebase that randomly switches between `interface` and `type` for the same kind of thing is harder to read than one that picks wrong consistently. But the rule shouldn't be 'pick one.' It should be 'pick the right one for each *category*, then be consistent within that category.'"
+**Noam**: "Consistency matters. Switching keywords for the same kind of thing makes me wonder what changed. Pick a default for each category and use it consistently."
 
 **Oded**: "So you agree with me."
 
@@ -422,11 +402,7 @@ type User = { id: string; name: string; };
 
 **Liron Closure** looks at the object definitions still on the board.
 
-*"Complexity is a choice, not a necessity."*
-
-"You've been asking which keyword is better. That's the wrong question. Let me ask a different one: what are you modeling?"
-
-He pauses the way he always does before a parable.
+**Liron**: "What would you want the choice to tell the next reader?"
 
 "A blueprint tells a builder what to construct. It defines capabilities — load-bearing walls, doors that open, windows that let in light. A builder follows a blueprint and produces a thing that *can do* what the blueprint specifies."
 
@@ -438,21 +414,21 @@ He pauses the way he always does before a parable.
 
 **Liron**: "Yes. A convention for the reader. It still needs exceptions for the things we have just seen."
 
-He looks around the room.
-
-"Most of the code you write is not building things. It's passing data around — receiving it, transforming it, handing it off. You're observers, not builders. The question isn't which keyword is better. The question is: *are you modeling behavior, or are you modeling data?*"
+"Most of the code you write is not building things. It's passing data around — receiving it, transforming it, handing it off."
 
 He turns to Guy.
 
-"Guy, your hierarchies are blueprints. They belong where things are being built — services, repositories, class contracts. Dafna, your compositions are descriptions. They belong where data is being shaped — state, events, API responses."
+"Guy, I'd keep your service and repository contracts as interfaces. Dafna, I'd use aliases for the state, events and API responses."
 
-"That is how I would organize this codebase. Guy has also shown why a composed object may deserve an interface even when it contains no behavior."
+**Guy**: "And the `UserContract` I composed? That's data too. I still want `extends` to catch the conflict."
+
+**Liron**: "I'd keep that exception. The convention isn't worth giving up that error."
 
 ## The Verdict
 
 > Our default is `type` for data and `interface` for behavioral contracts or deliberate extension points. That is a convention. Use `interface extends` for composed objects when declaration-time conflict checking is useful; use `type` for unions and other type expressions.
 
-**The Accepted Standard — a decision framework:**
+**A starting convention:**
 
 | Use case | Recommended | Why |
 |----------|-------------|-----|
@@ -460,8 +436,8 @@ He turns to Guy.
 | Union / discriminated union | `type` | Only option |
 | Mapped / conditional / utility types | `type` | Only option |
 | Function signature | `type` | More natural: `type Handler = (e: Event) => void` |
-| Tuple types | `type` | Only option |
-| Class contract (`implements`) | `interface` | Clearer intent, better error messages |
+| Tuple types | `type` | Direct tuple syntax |
+| Class contract (`implements`) | `interface` | Marks a behavioral contract in our convention |
 | Extending object hierarchies | `interface` | Explicit lineage, catches conflicts at declaration |
 | Library public API (consumers may extend) | `interface` | Declaration merging enables augmentation |
 
@@ -502,14 +478,6 @@ interface AppConfig {
 }
 ```
 
-The table is a starting convention for this book. Both keywords describe object shapes. Choosing between them also depends on whether declarations should merge and where composition conflicts should be reported. Guy's composed interface remains a reasonable choice for data too.
-
 ## Additional Takes
 
-**Guy Singleton**: *"Where's the interface?"* — "When someone asks me whether to use `interface` or `type`, I ask them back: are you describing what something *is*, or what something *can do*? That distinction will outlive any syntax debate."
-
-**Oded Shipley**: "Four thousand words to arrive at 'use type by default, interface for contracts.' I could have told you that before lunch." — **Noam Kiperman**: "You would have told us 'just use `any`' before lunch."
-
-**Daniel Compiler**: "One thing nobody mentioned: `interface` names appear in error messages as-is. Complex type intersections expand inline, producing error messages that span thirty lines. If your types are deeply nested, `interface` saves your sanity — not your code, your ability to read the error. *The compiler disagrees* — not with your code, but with your ability to parse the output."
-
-**Chen Override**: "But have you considered that we'll be having this exact debate in five years, about some new construct that subsumes both? TypeScript is still evolving. Today's best practice is tomorrow's 'we used to do it that way.'"
+**Daniel Compiler**: "Interface names appear in error messages. A complex intersection can expand into its parts. If the choice is otherwise a tie, try a bad assignment and read what comes back."
