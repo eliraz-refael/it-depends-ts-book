@@ -1,0 +1,13 @@
+# Chapter 3: targeted reader recheck, draft 2
+
+Scope: Rechecked only the five revised passages and their immediate context in `/tmp/ts-book-ch3-pilot/book/01-the-type-system/03-interface-vs-type.md`: lines 47–63, 91–117, 224–265, and 435–457. This is a targeted follow-up, not a second full fresh read or compiler audit. Assigned frozen snapshot SHA256: `d15c5286e114b264c4928eb45e534b6f2190537c8dd4d5ad4074516ee697e16a` (provided, not independently checked). No other sources were consulted, no manuscript was edited, and no code was executed. The original first-read report is preserved.
+
+All five edits resolve their targeted concerns without introducing a consequential new reading problem.
+
+- **Same scope, line 57:** “If another file contributes to the same scope” makes cross-file merging conditional at its first mention. I no longer infer that matching names in arbitrary files automatically merge. The later explanation can now elaborate instead of correct that first impression. “Contributes to the same scope” is slightly technical, but sufficient here; a module tutorial is unnecessary.
+- **Meaning of `never`, line 103:** “A value would have to be both a string and a number. There is no such value” supplies exactly the missing bridge. I can understand why the assignment fails without prior intersection theory. The code comment at line 112 and Noam's five-minute whiteboard remark at line 115 now read as exaggerated complaints about tracing a diagnostic in practice; they do not create a comprehension gap. The exaggeration was already present and is not a reason to withhold acceptance of this fix.
+- **Advanced catalog orientation, line 228:** “Some of the syntax is for later. Look at what each definition names” gives the reader a clear instruction for approaching unfamiliar notation. It preserves the challenge in Dafna's opening while allowing me to follow the categories without decoding every operator. No additional explanation is needed for this section's purpose.
+- **Tuple recommendation, line 445:** “Direct tuple syntax” now gives a concrete reason for choosing an alias without escalating the earlier “can't do this cleanly” into an absolute claim. The table and discussion agree at the level needed for this reading.
+- **Class-contract recommendation, line 446:** “Marks a behavioral contract in our convention” accurately carries the stated team convention into the table. It removes the unsupported transfer of the composition diagnostic argument to `implements`.
+
+Verdict: Accept these five clarity fixes. The earlier observation about Liron's extended image remains available for author calibration and was deliberately outside this recheck. No additional revision is required by these five changes.
