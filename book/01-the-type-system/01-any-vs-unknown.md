@@ -2,13 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth** begins:
+**Prof. Eli Typeworth** writes `any` and `unknown` on the board.
 
-"Before we debate anything else, we need to talk about an escape hatch. In TypeScript, `any` lets us bypass checks the rest of this book will rely on."
-
-He writes `any` on the whiteboard. *"Let us return to first principles."*
-
-"`any` is a special type that disables many of the usual checks on a value. When you write it, you are asking the compiler to accept operations without the information it would normally require."
+"When you don't know a value's type, keep it `unknown` until you have checked enough to use it. An `any` lets you skip those checks. If you need that escape hatch, you owe the next caller an account of what is being left unchecked."
 
 Eli draws arrows from every type to `any`, and from `any` back to most of them. He leaves out the arrow from `any` to `never`.
 
@@ -16,9 +12,7 @@ Then he draws `unknown`. Every type has an arrow to it. Its outgoing arrows reac
 
 "Start with assignment. What can we pass to a function that expects a number?"
 
-**Daniel Compiler** leans forward to make it precise:
-
-"A value of type `any` can go straight in. Almost any other target type accepts it too. `never` is the exception. In the other direction, every type is assignable to `any`. Watch:"
+**Daniel Compiler**: "A value of type `any` can go straight in. Almost any other target type accepts it too. `never`, the type with no possible value, is the exception. In the other direction, every type is assignable to `any`. Watch:"
 
 ```typescript
 let value: any = "hello";
@@ -62,15 +56,11 @@ if (typeof value === "number") {
 
 "The function expecting a number accepts `any` without further evidence. With `unknown`, we have to narrow first — or explicitly leave the checks behind by passing through `any`."
 
-The room is quiet. Then Oded clears his throat.
-
 ## The Debate
 
 ### "any is necessary for real-world development"
 
-**Oded Shipley** starts, because of course he does:
-
-"I appreciate the theory lesson. Truly. But let me tell you about last Tuesday. I needed to integrate a third-party analytics SDK. No types. No DefinitelyTyped package. The vendor documentation was a PDF from 2021. You want me to write a complete type definition for their entire API surface before I can track a button click?"
+**Oded Shipley**: "Last Tuesday I needed to integrate a third-party analytics SDK. No types. No DefinitelyTyped package. The vendor documentation was a PDF from 2021. You want me to write a complete type definition for their entire API surface before I can track a button click?"
 
 He pulls up a screen.
 
@@ -86,15 +76,9 @@ analytics.track("button_click", {
 
 "Shipped in ten minutes. Works perfectly. The alternative was three hours writing type definitions for an SDK we might replace next quarter. I made a business decision."
 
-**Daniel Compiler** speaks before Noam can. The room notices — Daniel rarely weighs in this early.
+**Daniel**: "I would accept that declaration to get an untyped SDK working. I would also ask which calls you need to keep using. You may only need to describe a small part of its API."
 
-"I would accept that declaration to get an untyped SDK working. I would also ask which calls you need to keep using. You may only need to describe a small part of its API."
-
-Oded looks genuinely surprised to have an expert in his corner. It won't last.
-
-**Noam Kiperman** is already shaking his head:
-
-"Let me tell you about *my* Tuesday. I spent four hours debugging a production error that traced back to exactly this kind of 'business decision.' Someone — I'm not naming names, *Oded* — added `any` to a utility function six months ago. One parameter, one `any`. Here's what happened:"
+**Noam Kiperman**: "Let me tell you about *my* Tuesday. I spent four hours debugging a production error that traced back to exactly this kind of 'business decision.' Someone — I'm not naming names, *Oded* — added `any` to a utility function six months ago. One parameter, one `any`. Here's what happened:"
 
 ```typescript
 // The "just one any" in a utility function
@@ -113,7 +97,7 @@ function formatResponse(data: any) {
 // Runtime: Invalid Date propagates through the entire feature.
 ```
 
-"One `any`. Forty-seven call sites. A runtime error that the compiler *should* have caught. Your throwaway prototype became production code, Oded. It always does."
+"Forty-seven call sites. We updated the response type when the API changed, but this function didn't use it. There was nothing to tell us it was still reading the old field."
 
 **Oded**: "That's a discipline problem, not a language problem. If someone had cleaned up the types—"
 
@@ -121,17 +105,13 @@ function formatResponse(data: any) {
 
 **Oded**: "That's not fair—"
 
-**Noam** leans forward, and there's nothing polite about it now: "It's on a sticky note on your desk, Oded. *'We can fix it in the next sprint.'* You know what I found when I audited the codebase? That `any` parameter had been there for eight sprints. Eight. With a TODO comment dated from the week you joined the team. Your `any` is my on-call page. Literally. I got paged at 2 AM because of that `Invalid Date`."
-
-Oded doesn't have a comeback for that one. Not because he agrees — but because the TODO is still there.
+**Noam**: "It's on a sticky note on your desk, Oded. *'We can fix it in the next sprint.'* That parameter had been there for eight sprints. I found the TODO at 2 AM, while I was tracing that `Invalid Date`."
 
 ---
 
 ### "unknown is just any with extra steps"
 
-**Chen Override** has been quiet, arms crossed. Now he unfolds:
-
-"Can I ask an uncomfortable question? Every time someone uses `unknown`, they immediately follow it with a type guard. Like this:"
+**Chen Override**: "Suppose I do check the value. These functions have the same body:"
 
 ```typescript
 // With unknown
@@ -161,9 +141,7 @@ function processInputUnsafe(value: any) {
 
 "Identical runtime code. Identical JavaScript output. So what's the actual difference? Aren't you just adding ceremony for the same result?"
 
-**Dafna Functor** responds without hesitation:
-
-"The difference is *explicitness*. With `unknown`, you're forced to prove what you have before you use it. Forget the type guard — watch what happens when you skip it:"
+**Dafna Functor**: "Now remove the check. The `unknown` version won't let you call the method:"
 
 ```typescript
 function processInputSafe(value: unknown) {
@@ -179,11 +157,9 @@ function processInputUnsafe(value: any) {
 }
 ```
 
-"With `any`, nothing stops you from skipping the check. The compiler looks the other way. With `unknown`, the compiler is your guardrail."
+"The `any` version still compiles."
 
-**Daniel Compiler** settles it. *"The compiler disagrees"* — with both of you, actually:
-
-"Chen's observation is valid — when you *do* write the type guard, the runtime behavior is identical. But here's what `unknown` gives you that `any` never will: downstream safety."
+**Daniel**: "Chen's two functions do run the same checks. Now take a different function that returns `any`. Its callers can use the result without checking it:"
 
 ```typescript
 function parseConfig(raw: any): any {
@@ -205,23 +181,19 @@ config.database.host.toUpperCase();
 // You MUST narrow before you can use it.
 ```
 
-"`any` doesn't just skip the check where you write it — it turns off checking for everyone downstream. `unknown` contains the uncertainty. `any` spreads it."
+**Daniel**: "The `any` return lets the caller read `database.host` and call a method without a check. The `unknown` return makes that caller check what came back."
 
-**Noam** adds, quietly furious: "So to answer your question, Chen — no, `unknown` is not `any` with extra steps. `any` is `unknown` with the safety removed. *Over my dead type definition* will I treat them as equivalent."
+**Chen**: "So keeping the check in my function isn't enough if I return `any`. The next caller can skip theirs."
 
-**Chen** raises both hands in surrender: "I wasn't arguing for `any`. I was testing whether the `unknown` argument could survive scrutiny."
-
-**Dafna**: "And?"
-
-**Chen**: "It survived. I'll allow it."
+**Noam**: "That's the caller I get paged about."
 
 ---
 
 ### "any as a migration strategy"
 
-**Eden Legacy** leans in. This is his territory.
+**Eden Legacy**: "On a three-million-line migration, we tried requiring complete types for every converted module. We got stuck on modules whose dependencies weren't typed yet. We had to let some of those calls through:"
 
-"I've migrated three million lines of JavaScript to TypeScript. I know exactly what happens when you try to fully type everything on day one: you don't. The migration stalls at 15% and the team revolts. Here's what actually works:"
+In these snapshots, `Promise<UserProfile>` describes the value the promise will resolve to. The type argument in `api.get<UserProfile>` tells the API client what type to report to its caller; it does not check the response body.
 
 ```typescript
 // Week 1: Rename .js to .ts, add any where needed
@@ -247,15 +219,11 @@ export function fetchUserProfile(userId: string): Promise<UserProfile> {
 }
 ```
 
-"`any` is the stepping stone. Without it, there is no migration — there's just a three-month project that dies in planning."
+"That let us type the callers without waiting for every dependency. The intermediate version still returns `any`. I'm not calling it finished."
 
-**Noam** objects:
+**Noam**: "You're creating typed-looking code that isn't actually typed. It's worse than JavaScript because it gives false confidence. A developer sees `.ts` and assumes the compiler is checking things. It isn't."
 
-"You're creating typed-looking code that isn't actually typed. It's worse than JavaScript because it gives false confidence. A developer sees `.ts` and assumes the compiler is checking things. It isn't."
-
-**Eden** doesn't flinch:
-
-"The alternative is not migrating at all. Perfect is the enemy of migrated. But — and this is the part people skip — you track it. Every `any` gets a comment. Every sprint has a reduction target. I call it the 'any budget.'"
+**Eden**: "It checks the parts we've typed. I'd rather have those checks while we finish the rest. Every `any` we add gets a comment and a ticket. Each sprint we agree which ones to remove. I call it the 'any budget.'"
 
 ```typescript
 // TODO(migration): Type API response — tracked in JIRA-4521
@@ -264,7 +232,7 @@ export function fetchUserProfile(userId: string): Promise<any> {
 }
 ```
 
-**Gil Benchmark**: "What are you counting in the reduction target? Explicit `any`s? Inferred ones? Dependency declarations?"
+**Gil Benchmark**: "Which ones count against that budget? Explicit `any`s? Inferred ones? Dependency declarations?"
 
 **Eden**: "Start with the ones we add to application code during the migration. The ticket identifies the boundary we're going to type."
 
@@ -282,9 +250,7 @@ export function fetchUserProfile(userId: string): Promise<any> {
 
 ### "The any-in-generics trap"
 
-**Linoy Nightly** raises a hand:
-
-"Here's something most developers don't know — and I'm betting Oded doesn't either. `any` in generic type parameters doesn't just skip checking. It actively breaks type inference."
+**Linoy Nightly**: "Even a typed function can pass `any` straight through. This `T` stands for the array's element type. The return type keeps that same `T`. Look at the two calls:"
 
 ```typescript
 function firstElement<T>(arr: T[]): T {
@@ -305,11 +271,11 @@ const mystery = firstElement(anything);
 mystery.thisMethodDoesNotExist(); // No error!
 ```
 
-"The generic constraint is gone. The function's entire purpose — preserving the element type — is defeated."
+"For the second array, `T` is `any`. The function preserves exactly that, and now `mystery` accepts a call to a method that doesn't exist."
 
-**Daniel Compiler** expands on this:
+The next example previews a conditional type. Its result for `any` is the point here; the rules behind that result will get their own debate.
 
-"It gets worse with conditional types and mapped types. Watch:"
+**Daniel**: "You can also compute a type from another type. This definition extracts a promise's value type and otherwise keeps the input type. `infer U` names the value type it finds:"
 
 ```typescript
 type Unwrap<T> = T extends Promise<infer U> ? U : T;
@@ -327,23 +293,19 @@ type B = Unwrap<any>;
 
 **Noam** turns to Oded: "Your generic function can look properly typed while its callers still get `any`. That's why I check what went into it."
 
-**Oded** is, for once, genuinely surprised:
-
-"Okay. I didn't know that. But how often does this actually happen in practice?"
+**Oded**: "But how often are we writing one of those?"
 
 **Linoy**: "Look at `firstElement`. One array of `any` is enough. You don't have to author a conditional type to pass `any` through a generic. You only have to call one."
 
 **Oded** looks back at the array declaration.
 
-"All right. I'd been looking for the brackets on our functions."
+"All right. I'd been looking for angle brackets in our own code."
 
 ---
 
 ### "any vs type assertions — which is worse?"
 
-**Chen** provokes again:
-
-"While we're being honest about escape hatches — what's worse, `any` or `as SomeType`? At least `any` is transparent about not knowing. An assertion *actively lies*."
+**Chen**: "While we're being honest about escape hatches — what's worse, `any` or `as SomeType`? At least `any` is transparent about not knowing. An assertion *actively lies*."
 
 ```typescript
 // any: "I have no idea what this is"
@@ -355,13 +317,11 @@ const user = fetchData() as User;
 user.process(); // Might work, might not — but the compiler trusts the lie
 ```
 
-**Noam**: "They're both bad, but `any` is worse because it *propagates*. An assertion is a localized lie — it affects one assignment. An `any` infects every function that touches it."
+**Noam**: "An assertion gives the result a type, even if it's a lie. With `any`, reading a property can give you another `any`. I'd rather have one localized lie to find."
 
-**Dafna Functor**: "They're the same problem wearing different hats. Both are escape hatches from the type system. The question is which escape hatch has a smaller blast radius."
+**Dafna**: "The asserted value still goes to other functions. What happens to those callers?"
 
-**Dima Bridge** steps in:
-
-"`any` is a *scope* problem — it spreads through the type graph like a virus. Assertions are a *correctness* problem — they lie at a single point. Different risks need different mitigations."
+**Dima Bridge**: "Follow the properties. In the first version they stay `any`. In the second they get the types declared in `ServerConfig`:"
 
 ```typescript
 // any: scope problem — it spreads
@@ -384,7 +344,7 @@ startServer(port, host);         // port and host ARE checked against function s
 
 **Noam**: "So the answer is: `any` is worse?"
 
-**Dima**: "The answer is they're different failure modes. `any` has a larger blast radius. Assertions have a more deceptive failure. Pick your poison — or better yet, use `unknown` and avoid both."
+**Dima**: "For these calls, `any` lets an unchecked value through. The assertion lets a value through under a possibly false type. I'd use `unknown` and check the fields before passing either one to `startServer`."
 
 **Chen**: "Finally, something everyone can agree on."
 
@@ -394,9 +354,7 @@ startServer(port, host);         // port and host ARE checked against function s
 
 ### "any in third-party types — whose problem is it?"
 
-**Linoy Nightly** shifts to a thornier problem:
-
-"We keep talking about `any` like it's always something *we* write. But what about when it comes from somewhere else? Express's `req.body` is `any`. Lots of DefinitelyTyped packages are riddled with it. You can write perfect code and still have `any` leak in from dependencies."
+**Linoy**: "We haven't written all the `any`s we're using. Express gives this handler a `req.body` typed as `any`:"
 
 ```typescript
 import express from "express";
@@ -412,13 +370,11 @@ app.post("/users", (req, res) => {
 });
 ```
 
-**Noam**: "Wrap the dependency. Create a typed facade. This isn't hard. And frankly, if a library still ships `any` in its public API, that's a library that doesn't respect its consumers."
+**Noam**: "Put a typed facade in front of it. I want a check before that body reaches `createUser`."
 
 **Oded**: "You want me to wrap Express? *Express.* That's hundreds of endpoints. The cure is worse than the disease."
 
-**Guy Singleton** speaks up — his first strong moment in the debate:
-
-"This is exactly what the Adapter pattern is for. You don't wrap *Express*. You create a typed interface for *your* domain and adapt the untyped boundary to it:"
+**Guy Singleton**: "This is exactly what the Adapter pattern is for. You don't wrap *Express*. You create a typed interface for *your* domain and adapt the untyped boundary to it:"
 
 ```typescript
 // Define your contract
@@ -449,15 +405,13 @@ app.post("/users", (req, res) => {
 
 "You don't type the framework. You type the boundary between the framework and your code."
 
-**Dafna Functor**: "Or use a library that's typed properly from the start. Fastify, for instance, supports schema-based validation with full type inference. If the types are bad, the library is bad."
+**Dafna**: "For a new service I'd look for a framework that uses a schema to validate the request and infer its type. Then we wouldn't have to maintain this check and `CreateUserRequest` separately."
 
-**Chen** can't resist:
+**Chen**: "We're still maintaining this adapter and tracking changes upstream. What happens when an upgrade changes the request body we receive?"
 
-"But have you considered that wrapping a dependency creates a maintenance burden? Now you're maintaining your wrapper *and* tracking upstream changes. What happens when Express adds a field to `req.body`'s type signature in a major version?"
+**Guy**: "We check the adapter against the new input. If it can still produce our domain type, the callers can stay as they are. That's why I want the interface here."
 
-**Guy**: "Then you update one adapter instead of hundreds of endpoints. *Where's the interface?* That's the question I always ask. If you have a clear interface between your code and the dependency, upstream changes are a one-line fix. Without it, every endpoint is a potential break."
-
-**Oded** grudgingly: "Fine. For critical paths — auth, payments — I'll wrap. For the admin dashboard's logging middleware? I'm using `req.body` directly and you can't stop me."
+**Oded**: "Fine. For critical paths — auth, payments — I'll wrap. For the admin dashboard's logging middleware? I'm using `req.body` directly and you can't stop me."
 
 **Noam**: "I can block your PR."
 
@@ -467,9 +421,7 @@ app.post("/users", (req, res) => {
 
 ### "The function parameter problem"
 
-**Oded** presents his hardest case:
-
-"Fine. Let's talk about a situation where `any` seems genuinely unavoidable. Callback-heavy APIs, event handlers, middleware patterns — places where the function signature *must* accept anything because the actual type depends on context:"
+**Oded**: "What about the event system? It stores callbacks for different events in one map. The payload depends on the event name:"
 
 ```typescript
 // An event system where handlers receive different payloads
@@ -491,9 +443,7 @@ on("user:login", (payload) => {
 
 "What do you type that `payload` as? It's different for every event."
 
-Three answers come at once.
-
-**Dafna Functor** proposes generics:
+**Dafna**: "Write down which payload goes with each event name. `keyof EventMap` is the set of those names. `E` selects one; `EventMap[E]` selects its payload type:"
 
 ```typescript
 // Generics: the caller constrains the type
@@ -520,7 +470,7 @@ on("user:login", (payload) => {
 
 "Define the relationship between event names and payload types once. The generic infers the rest."
 
-**Guy Singleton** proposes interfaces:
+**Guy**: "Or pass the event name with the payload. The handler checks `type` before reading a field specific to that event:"
 
 ```typescript
 // Interfaces: define a contract for what the callback receives
@@ -548,9 +498,9 @@ onEvent((event) => {
 });
 ```
 
-"A discriminated union gives you exhaustiveness checking. Add a new event type, and the compiler tells you every handler that needs updating."
+"Each event carries its own tag. This handler only reads `timestamp` after checking that tag. A handler that needs every event can check all the alternatives."
 
-**Noam** proposes overloads:
+**Noam**: "There are three events. We can list the calls we accept:"
 
 ```typescript
 // Overloads: specific signatures for known cases
@@ -564,77 +514,49 @@ function on(event: string, handler: (...args: any[]) => void): void {
 
 "Every call site is type-safe. The overload signatures constrain what callers see — the implementation signature is hidden."
 
-**Dima Bridge** evaluates all three. *"Both have a point here"* — well, all three have a point:
+**Dima**: "Guy's handler receives the whole event and decides which kind it handles. The other two select the payload through the name passed to `on`. All three give these callers a typed payload."
 
-"Generics win for libraries — they're extensible and callers define the types. Interfaces with discriminated unions win for application code — they're explicit and exhaustive. Overloads win for APIs with a small, known set of shapes."
+**Chen**: "Dafna's assertion uses `EventMap[keyof EventMap]`, which allows any of the payload types in the map. Noam's implementation takes `any`. What keeps either one tied to the right event?"
 
-He pauses.
+**Dima**: "The signatures don't check those implementations for us. They do let us check these calls. We still have to review how the stored handlers get called."
 
-"The answer depends on who's calling the function. But notice — none of the three solutions needed `any` at the call site. The callers are fully typed."
+**Oded**: "I'll use the generic version. One list of names and payloads. But I'm leaving Chen's question on the implementation."
 
-**Chen** leans in: "But have you considered that Dafna's generic version has a type assertion in the *implementation*, and Noam's overload has `any` in the fallback signature? You moved the `any` — you didn't eliminate it."
+**Dafna**: "That's just a map."
 
-**Dima**: "Fair. The implementations still have rough edges. But the *public API* is type-safe, and that's where the forty call sites live. The assertion is in one place, not forty. That's the same centralization principle Eden argued for with API boundaries."
-
-**Oded** looks at all three code blocks on the screen. He doesn't have a counterargument for the call-site safety. But Chen's point lands too — "zero `any`" was an overstatement, and everyone in the room heard it.
-
-"I'll use the generic pattern for the event system," he says quietly.
-
-**Dafna** almost falls off her chair: *"That's just a map."* — specifically, it's a map from event names to payload types. Welcome to type-level programming, Oded."
-
-**Oded**: "Don't push it."
+**Oded**: "With homework underneath it."
 
 ---
 
 ### "any as documentation of ignorance"
 
-The room has been intense for a while. **Liron Closure** has been listening, saying nothing. Now he speaks, and the energy shifts.
-
-"Let me tell you about maps."
-
-A few people exchange glances. Liron's parables are illuminating. They are also twenty minutes long. These facts are related.
-
-"Imagine a map with a region marked *'Here be dragons.'* The warning tells you where the mapmaker stopped. You can travel farther, but you know where you are leaving the mapped ground."
-
-He lets that sit.
+**Liron Closure**: "Imagine a map with a region marked *'Here be dragons.'* The warning tells you where the mapmaker stopped. You can travel farther, but you know where you are leaving the mapped ground."
 
 "`any` should be your 'here be dragons.' Not a permanent feature of your map, but a marker of what you haven't yet understood. The problem isn't `any` itself — it's when `any` becomes invisible. When it stops being a conscious choice and becomes the default."
 
-**Noam** softens — not much, but noticeably:
+**Noam**: "If every `any` had a reason and a ticket to remove it, I could review that."
 
-"If every `any` had a comment explaining *why* and a ticket to remove it, I'd find it... acceptable. Grudgingly."
-
-**Oded** nods:
-
-"That's actually practical. An `any` with a TODO is a plan. An `any` without one is debt."
-
-*"Complexity is a choice, not a necessity,"* Liron adds quietly. "And `any` without intention is the choice to accept complexity you haven't measured."
+**Oded**: "A ticket with an owner. We've already tried the sticky note."
 
 ---
 
 ### "Can you build a real app with zero any?"
 
-**Noam** makes his closing claim:
-
-"My team runs zero `any` in production code. It's achievable. We've done it for two years."
+**Noam**: "My team runs zero `any` in production code. It's achievable. We've done it for two years."
 
 **Oded**: "Your team is eight people building an internal tool. Try zero `any` with forty developers and three acquired codebases."
 
-**Eden Legacy**: "I had eleven left at the end of my last migration. I could tell you why each was there. Getting from that to zero would have been a different project."
+**Eden**: "I had eleven left at the end of my last migration. I could tell you why each was there. Getting from that to zero would have been a different project."
 
-**Chen** raises a hand:
-
-"Define 'zero.' Does `any` in test mocks count? In build scripts? In type-test files? In generated code?"
-
-The room considers this. It's a better question than it sounds. Every team draws the line somewhere.
+**Chen**: "Define 'zero.' Does `any` in test mocks count? In build scripts? In type-test files? In generated code?"
 
 **Noam**: "Production code. That's the line. Test utilities, build scripts, type-level tests — I won't die on that hill. But anything that ships to users? Zero."
 
-**Oded**: "Even Noam has a threshold. Mark the date."
+**Oded**: "Production code. I'll remember that."
 
 ## The Turn
 
-**Daniel Compiler** scrolls back to Noam's event-handler overloads.
+**Daniel** scrolls back to Noam's event-handler overloads.
 
 "Your implementation takes `any`. What ticket would you put on that?"
 
@@ -662,7 +584,7 @@ Noam reads the signatures again.
 
 > Default to `unknown` for uncertain values. Justify an `any` by describing the unchecked assumption and how it is maintained. Track temporary gaps for replacement; review deliberate implementation compromises when their code changes.
 
-**The Accepted Standard:**
+**For this codebase:**
 
 1. **Default to `unknown`** for values of uncertain type
 2. **Use type narrowing** — type guards, `instanceof`, discriminated unions — to work with `unknown` values safely
@@ -691,6 +613,8 @@ function processOrder(user: any, order: any) {
   chargeUser(user.paymentMethod, total);
 }
 ```
+
+The next version checks the purchase fields in `isPurchaseData`. Its return annotation, `data is PurchaseData`, tells the compiler to treat the original value as `PurchaseData` when the function returns `true`. The checks in its body supply the evidence for that claim. Look at the call inside `handleWebhook`: that is where `event.data` becomes usable by `processOrder`.
 
 ```typescript
 // After: properly typed with unknown, type guards, and one documented any
@@ -761,18 +685,12 @@ function processOrder(user: User, order: Order) {
 declare function chargeUser(method: any, amount: number): Promise<void>;
 ```
 
-Zero `any` in the application logic. One documented, tracked `any` at the untyped boundary. Every value narrowed before use.
-
-The difference isn't just safety — it's *searchability*. When the payment SDK eventually publishes types (or when you write a wrapper), you can find every `any` in the codebase with a single search, read the comment to understand the context, and replace it with confidence. Try doing that when `any` is scattered through fifty files with no documentation.
+The application logic no longer uses `any`. The payment boundary still does, with a ticket naming the wrapper that needs to be written. The input check stays visible in `isPurchaseData`; declaring the SDK parameter as `any` doesn't perform that check for us.
 
 ## Additional Takes
 
-**Noam Kiperman**: "If your linter doesn't flag `any`, your linter is misconfigured."
+**Oded Shipley**: "Auth and payments first. I still haven't agreed to wrap every logging endpoint."
 
-**Oded Shipley**: "I'll accept all of this except the wrapper pattern. Nobody has time for that."
+**Noam Kiperman**: "Put the rest on the migration list. I want to know which ones we're leaving."
 
-**Gilad Stacktrace**: "Then budget the debugging time instead."
-
-**Chen Override**: "So we've spent an entire chapter agreeing that `any` is bad. Groundbreaking."
-
-**Noam Kiperman**: "We spent an entire chapter defining *exactly how* it's bad and *exactly when* it's acceptable. That's different."
+**Gil Benchmark**: "And don't call that list a count of all your `any`s. Dependencies and inferred types still need a different check."

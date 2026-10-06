@@ -16,6 +16,10 @@ The [master plan](../../PLAN.md) remains at the repository root.
 | 15 — Branded types | [Plan](CH15-PLAN.md) | [Review](CH15-REVIEW.md) |
 
 The [voice review](VOICE-REVIEW.md) covers the prologue and early chapters.
+The [Chapter 3 pilot](CH3-PILOT.md) records the author-approved calibration for
+the broader voice pass, with its independent reader and Claude reviews.
+The [Chapters 1–2 pass](CH1-2-VOICE-PASS.md) applies that calibration, with
+cross-reviews, fresh readers and preserved code examples.
 
 Compiler versions and check counts in these records describe their dated runs.
 See [the checks documentation](../../checks/README.md) for current coverage.
