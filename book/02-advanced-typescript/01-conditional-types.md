@@ -175,7 +175,7 @@ const fromTags = slugify(post.tags);  // string | string[]
 
 **Oded**: "Why list them at all? Keep the union signature."
 
-He deletes the first three lines, leaving the implementation as an ordinary function.
+Oded deletes the three overload signatures, leaving the implementation as an ordinary function.
 
 ```typescript
 const slugs = slugify(post.tags); // string | string[]
@@ -294,7 +294,7 @@ He scrolls back to Eden's version.
 
 **Oded**: "It's a slug function, Noam."
 
-**Noam**: "You said that about the helper with `as any`. I spent six hours on that deploy. Six hours."
+**Noam**: "You said that about the helper with `as any`. I blocked that deploy for six hours. Six hours."
 
 **Linoy**: "I can add type tests."
 
@@ -393,15 +393,13 @@ type Nothing = Reply<never>; // never
 type BothWays = Reply<any>; // "it was a string" | "it was not"
 ```
 
-"Here `any` produces both branches. Remember `Unwrap<any>` from the `any` argument? The false branch was `T` itself, so it contributed `any`, which absorbed the other result."
-
-"So unions distribute, `never` vanishes—"
+"Here `any` produces both branches. Remember `Unwrap<any>` from the `any` argument? The false branch was `T` itself, so it contributed `any`, which absorbed the other result. So unions distribute, `never` vanishes—"
 
 **Chen**: "Does `never` vanish?"
 
 **Linoy**: "I just showed you."
 
-"You showed me `never` through a type parameter." He nods at Daniel. "Ask it directly."
+**Chen**: "You showed me `never` through a type parameter." He nods at Daniel. "Ask it directly."
 
 **Daniel** types a direct check.
 
@@ -409,9 +407,9 @@ type BothWays = Reply<any>; // "it was a string" | "it was not"
 type Direct = never extends string ? "ran" : "no"; // "ran"
 ```
 
-"Asked directly, it evaluates. Picks a branch like anything else."
+**Daniel**: "Asked directly, it evaluates. Picks a branch like anything else."
 
-"Right. I left out the condition. `never` gives that result when we distribute over it." She underlines `T` on the board.
+**Linoy**: "Right. I left out the condition. `never` gives that result when we distribute over it." She underlines `T` on the board.
 
 ```typescript
 type ViaParam<T> = T extends string ? "ran" : "no";

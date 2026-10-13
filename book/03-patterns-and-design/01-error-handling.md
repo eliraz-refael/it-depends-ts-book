@@ -240,7 +240,7 @@ async function bookParty(
 
 **Guy**: "Now the refusal leaves the callback as a rejection. The store rolls back. Only then do we turn it into a value for the page."
 
-**Dafna**: "That `await` keeps the rejection inside the `try`, too. If we returned the transaction's promise instead, a later rejection would pass this catch."
+**Dafna**: "That `await` keeps the rejection inside the `try`, too. If we returned the transaction's promise instead, a later rejection would escape this `catch`."
 
 **Gil**: "A1 is free again. The page still gets the same refusal. And the all-free run still commits both seats."
 

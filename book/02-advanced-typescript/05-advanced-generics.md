@@ -158,7 +158,7 @@ nightly.build(); // Error: TS2684; its elaboration includes:
 
 **Oded**: "Great. Build it, then."
 
-**Eli**: "Read the helper's parameter. A bare `ExportBuilder` uses the default, `ExportBuilder<{}>`. It accepts the more configured value, but inside this function you've retained no required fields in its state type. Adding a destination to that gives you a builder with a known destination. There is no known source to carry out."
+**Eli**: "Read the helper's parameter. A bare `ExportBuilder` uses the default, `ExportBuilder<{}>`. It accepts the more configured value, but inside this function you've retained no required fields in its state type. Adding a destination to that gives you a builder with a known destination. The return type has no known source to preserve."
 
 **Oded**: "So the friendly default made a perfectly ordinary annotation too vague."
 
