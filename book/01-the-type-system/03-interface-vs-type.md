@@ -346,7 +346,7 @@ state.render(); // "Hello, Ada"
 
 "The TypeScript team's performance wiki recommends `interface extends` over intersections when composing object types. It describes caching relationships between interfaces, and checking each constituent when comparing against an intersection."
 
-**Linoy**: "Here's the [guidance](https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections). It predates the native compiler. I'd try it if a trace pointed here."
+**Linoy**: "Here's the [guidance](https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections). It predates the TypeScript 7 native compiler. I'd try it if a trace pointed here."
 
 ```typescript
 // The TS team recommends this for extending object types:

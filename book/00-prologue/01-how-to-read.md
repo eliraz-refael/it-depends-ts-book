@@ -74,7 +74,7 @@ You don't need to run the examples to follow along. If you want to, the reposito
 
 You can read this book front to back — the chapters build in complexity from basic type system concepts through advanced patterns to production concerns.
 
-Or you can jump to whatever debate your team is currently having. Each chapter is self-contained. If you're in the middle of a migration and someone just asked whether to use `interface` or `type`, go straight to that chapter. The argument is already in progress.
+Or you can jump to whatever debate your team is currently having. Each chapter opens a new argument. Some build on earlier examples and type-system concepts. If you're in the middle of a migration and someone just asked whether to use `interface` or `type`, go straight to that chapter. The argument is already in progress.
 
 Either way, pay attention to the characters. Their disagreements aren't artificial — they represent genuine tensions in how we write TypeScript. The moments where you find yourself siding with one character over another? That's you figuring out what kind of TypeScript developer you are.
 
