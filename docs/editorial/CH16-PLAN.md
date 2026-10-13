@@ -138,3 +138,58 @@ leave it to Idan or Noam. No Guy, Dafna or Linoy: Ch5 used them for this ground.
 - [ ] Claude formal review; Principle-only and fresh full readers.
 - [ ] Checks durable; full suite green.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-13)
+
+Codex's [challenge](ch16/CODEX-PLAN-CHALLENGE.md) is accepted, with the decisions below. Where this section
+conflicts with the proposal above, this section governs.
+
+1. **Principle.** Use Codex's version, in Gilad's voice: at a boundary, choose which input to reject, which
+   to preserve and which to translate. A successful parse doesn't by itself tell every caller that it is safe
+   to act on the result. Unknown keys and unknown values are two separate choices; never call the whole
+   policy "strict". Receipt versus acceptance is background (one clause plus a stand-in for durable storage),
+   not the principle. Keeping the original is justified for this replayable stream, not as a universal rule.
+   "Field by field" may be the room's first approach, which the Turn then restricts.
+2. **Order.** Before anything fails, show one ordinary delivery, what the tracking page shows, and that the
+   refund worker issues a refund on a known `returned`. State the raw-receipt contract early. Acknowledge
+   only after storing, and don't claim durability the example never established.
+3. **Strip example.** Use a known status plus `eta`. Say the schema drops `eta` from its *output*; the loss
+   came from saving only that output. Keep the ETA history short and tie it to the receipt decision.
+4. **Fair comparison.** Oded's `return false` default is the specific mistake. It has an owner and a
+   consequence, so the chapter needs no other forced wrong guess. Idan then repairs it immediately: unknown
+   means `review` (label shown, no automatic money, alert to the same owner). The refund result has three
+   values, `issue | skip | review`, never a boolean. Noam's closed design keeps the carrier's label for a
+   display projection, while only known statuses reach refunds.
+5. **What remains after both repairs.** Which type crosses the shared internal handoff, and who owns the
+   projection into each consumer's actionable input:
+   - **open handoff:** each consumer branches on unfamiliar values itself;
+   - **closed handoff:** the ingestion layer owns unfamiliar events and review.
+
+   Show one concrete cost for each, in the same service: a second consumer's wrong open default, and a closed
+   projection that withholds a harmless update until someone extends it. Then let each side repair its own.
+6. **Ending is not pre-decided.** If the hybrid is what the room chooses for this service, write a local
+   Verdict and keep any broader dissent, for example about exporting the open type from a shared package.
+   Use "The Debate Continues" only if the scenes leave the local choice genuinely split, with conditions
+   that the scenes exercised. Act III's debt does not decide this. If Ch16 ends in a Verdict, the debt
+   moves to a later Act III chapter.
+7. **Technical.**
+   - Literal tags use `true as const` / `false as const`; carry the repair into the fence.
+   - Exhaustiveness claims are qualified: TS2366 appears only with a stated return type; an inferred
+     return compiles as `string | undefined`; a `default: return false` survives enum expansion.
+   - An empty status string is malformed under the fictional wire contract (`z.string().min(1)`), one
+     clause, no validator catalogue.
+   - `.catch` is not inherently silent. The defect is substituting a known business status for an
+     unrecognized one.
+   - `| string` collapse appears as one failed proposal, with no `string & {}` detour.
+8. **Cast:** Gilad, Idan (she), Noam, Oded, Eden (he). Chen and Gil are dropped; no Daniel.
+9. **Validation additions:** Codex's list:
+   - unknown-but-valid vs malformed status;
+   - open review signaling;
+   - closed projection behavior;
+   - enum expansion with an exhaustive consumer and with a `default` consumer;
+   - raw `eta` preserved alongside a stripped parsed value.
+
+   `.probe/codex/review.cjs` seeds `checks/chapter16.cjs`.
+
+Next: Codex drafts on this branch. Claude reviews and runs an isolated Principle-only reader and a fresh
+full reader.
