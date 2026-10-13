@@ -393,9 +393,7 @@ type Nothing = Reply<never>; // never
 type BothWays = Reply<any>; // "it was a string" | "it was not"
 ```
 
-"Here `any` produces both branches. Remember `Unwrap<any>` from the `any` argument? The false branch was `T` itself, so it contributed `any`, which absorbed the other result."
-
-**Linoy**: "So unions distribute, `never` vanishes—"
+"Here `any` produces both branches. Remember `Unwrap<any>` from the `any` argument? The false branch was `T` itself, so it contributed `any`, which absorbed the other result. So unions distribute, `never` vanishes—"
 
 **Chen**: "Does `never` vanish?"
 

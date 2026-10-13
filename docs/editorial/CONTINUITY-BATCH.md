@@ -22,7 +22,7 @@ Chapter 1 sequencing changes or new examples are included.
 | --- | --- | --- | --- |
 | A1 | Chapter 1, Noam's incident | His next-sprint slogan is attributed to Oded's sticky note, whose cast biography names a different slogan. | Remove the sticky-note claim; retain the eight-sprint delay and the TODO found at 2 AM. |
 | A1 callback | Chapter 1, ticket ownership | “We've already tried the sticky note.” | “We've already tried the TODO.” This now refers to the evidence still on the page. |
-| A2 | Chapter 7, distribution/never exchange | Four speeches require inferred speakers. | Tag Linoy's “So unions distribute…”, Chen's “You showed me…”, Daniel's “Asked directly…” and Linoy's correction. |
+| A2 | Chapter 7, distribution/never exchange | Four speeches require inferred speakers. | Join Linoy's “So unions distribute…” to her continuing explanation; tag Chen's “You showed me…”, Daniel's “Asked directly…” and Linoy's correction. |
 | A3 | Chapter 12, opening assignment | “I can even put `out` on the cache.” | “There's even an annotation for that kind of assignment.” Preserve the preview without requiring unexplained syntax. |
 | A4 | Chapter 11, defaulted helper | “There is no known source to carry out.” | “The return type has no known source to preserve.” |
 | A4 | Chapter 14, awaited transaction | “a later rejection would pass this catch” | “a later rejection would escape this `catch`” |
