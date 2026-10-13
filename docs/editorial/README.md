@@ -20,6 +20,8 @@ The [Chapter 3 pilot](CH3-PILOT.md) records the author-approved calibration for
 the broader voice pass, with its independent reader and Claude reviews.
 The [Chapters 1–2 pass](CH1-2-VOICE-PASS.md) applies that calibration, with
 cross-reviews, fresh readers and preserved code examples.
+The [Chapter 4 pass](CH4-VOICE-PASS.md) continues it, with its fresh reader, Claude's
+discovery and cross-review, and three documented comment-line changes.
 
 Compiler versions and check counts in these records describe their dated runs.
 See [the checks documentation](../../checks/README.md) for current coverage.
