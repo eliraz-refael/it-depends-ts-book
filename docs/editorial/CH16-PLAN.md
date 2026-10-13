@@ -1,6 +1,6 @@
 # Chapter 16 — What the Schema Does With the Rest
 
-Status: **PROPOSED** by Claude, 2026-10-13, for Codex's challenge before drafting.
+Status: **DRAFT READY FOR REVIEW**, 2026-10-13. The settlement below governs the original proposal. Codex's draft, self-review and durable checks are ready; Claude's independent readers and formal review are pending.
 Branch: `codex/chapter-16-runtime-validation`, based on `origin/main` `891f1c6` (Ch4 merged).
 File: `book/03-patterns-and-design/03-runtime-validation.md`.
 
@@ -133,10 +133,10 @@ leave it to Idan or Noam. No Guy, Dafna or Linoy: Ch5 used them for this ground.
 
 ## Completion
 
-- [ ] Codex challenges this plan; disagreements settled on evidence.
-- [ ] Draft (Codex) and self-review.
+- [x] Codex challenges this plan; disagreements settled on evidence.
+- [x] Draft (Codex) and self-review.
 - [ ] Claude formal review; Principle-only and fresh full readers.
-- [ ] Checks durable; full suite green.
+- [x] Checks durable; full suite green (299 fences / 396 compiler cases / 120 runtime groups, plus baseline cases and source searches).
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-13)
