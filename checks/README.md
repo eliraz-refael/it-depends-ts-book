@@ -41,7 +41,7 @@ Chapter 14 opens Act III with error handling across a transaction boundary; its 
 
 Chapter 15 examines scalar role brands and checked object brands; review progress is recorded in [CH15-REVIEW.md](../docs/editorial/CH15-REVIEW.md).
 
-Chapter 16 compares unknown-key and unknown-value policies, receipt retention, and consumer projections; its draft self-review is recorded in [CH16-REVIEW.md](../docs/editorial/CH16-REVIEW.md). Initial independent readers and formal review are complete; revisions await a targeted recheck.
+Chapter 16 compares unknown-key and unknown-value policies, receipt retention, and consumer projections; its draft self-review is recorded in [CH16-REVIEW.md](../docs/editorial/CH16-REVIEW.md). Independent readers, a recheck and joint review are complete.
 
 The suites extract all TypeScript fences in Chapters 1–16. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 

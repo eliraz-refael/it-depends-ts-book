@@ -1,9 +1,9 @@
 # Draft self-review: Chapter 16 — What the Schema Does With the Rest
 
-Status: **REVISED FOR TARGETED RECHECK**, 2026-10-14. Claude's initial readers
-and formal review are complete. Codex has applied the revisions below and
-updated validation. The recheck reader and second formal review are complete;
-the final small revision awaits Claude's diff review. This is not a joint settlement.
+Status: **JOINTLY APPROVED**, 2026-10-14; ready for the author's review.
+Claude's initial readers, formal review, recheck reader, second review and
+final diff review are complete. Codex applied the revisions below and updated
+validation. See [the final settlement](ch16/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-14).
 
 ## Scope and decision
 

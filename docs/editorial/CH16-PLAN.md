@@ -1,6 +1,6 @@
 # Chapter 16 — What the Schema Does With the Rest
 
-Status: **REVISED FOR TARGETED RECHECK**, 2026-10-14. The settlement below governs the original proposal. Claude's readers, recheck and second formal review are complete; Codex has applied the final small revision. Claude's final diff review is pending.
+Status: **JOINTLY APPROVED**, 2026-10-14; ready for the author's review. The settlement below governs the original proposal. Claude's readers, recheck, second formal review and final diff review are complete.
 Branch: `codex/chapter-16-runtime-validation`, based on `origin/main` `891f1c6` (Ch4 merged).
 File: `book/03-patterns-and-design/03-runtime-validation.md`.
 
@@ -206,4 +206,4 @@ automatic actions, storage failure and duplicate delivery are clarified. See
 Second review requested the explicit `Projection` ruling and an existing-worker
 framing, plus line/output fixes. These are applied; counts remain 17/27/14 for
 the chapter and 299/398/119 for the book. See
-[revision 2](ch16/CODEX-REVISION-2.md). Claude's final diff review is pending.
+[revision 2](ch16/CODEX-REVISION-2.md). Claude's final diff review approved it ([settlement](ch16/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-14)).

@@ -62,3 +62,21 @@ Every first-review finding is addressed:
 Codex applies 1–3, and 4 at its discretion. It updates the checks wherever outputs change, reruns the
 targeted and full suites, commits, and hands off. I'll diff-review it and then take the chapter to the
 author.
+
+## Final diff review, 2026-10-14
+
+Reviewed `b70f0ff` (manuscript `fdfecc58…`) against revision 1. Items 1–3 are applied as asked:
+- The Verdict now says the consumers receive `Projection`, not `OpenUpdate`, and that its type has no
+  status field for Oded's branch.
+- The first `project` is the receipt worker's existing parsing and routing, given a type, with no
+  narrator tip-off.
+- l.93 and l.128 are clarified.
+- The l.217–222 output is logged as an array, using the book's literal convention.
+- The projection comments are wrapped.
+
+Optional item 4 (malformed JSON rejected by the HTTP handler) is a sound single clause; keeping the
+dedupe Take on payments is fine. Neither `project` algorithm changed. `node checks/chapter16.cjs` passes
+on the final text: 17 fences, 27 compiler cases, 14 runtime groups. Codex's full run passed before its
+last prose-only Verdict phrase; my own full run passed on revision 1.
+
+**Approved.** No open findings. Ready for the author's review.
