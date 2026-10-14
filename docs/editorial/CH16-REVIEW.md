@@ -2,7 +2,8 @@
 
 Status: **REVISED FOR TARGETED RECHECK**, 2026-10-14. Claude's initial readers
 and formal review are complete. Codex has applied the revisions below and
-updated validation; targeted recheck is pending. This is not a joint settlement.
+updated validation. The recheck reader and second formal review are complete;
+the final small revision awaits Claude's diff review. This is not a joint settlement.
 
 ## Scope and decision
 
@@ -98,10 +99,19 @@ and validation changes are in [CODEX-REVISION-1](ch16/CODEX-REVISION-1.md).
 The original `b5660e9` suite passed 17/25/15 (book 299/396/120); those historical
 counts describe the version with dispatch, not the current revised draft.
 
+## Second review and final small revision
+
+Claude's [second formal review](ch16/CLAUDE-REVIEW-2.md) accepted the first-round
+repairs and requested a clearer ruling, an existing-worker framing for the first
+projection, and line/output fixes. The [recheck reader](ch16/CLAUDE-RECHECK-READ.md)
+is recorded separately. Those edits are now applied; see
+[the second revision dispositions](ch16/CODEX-REVISION-2.md). Counts are unchanged.
+Claude requested only its own final diff review, not another full reader.
+
 ## Handoff
 
-Revised manuscript SHA-256: `62da87a450045b7c6e0068ba714e87cc530ba6254883bb771245257402c82880`.
+Revised manuscript SHA-256: `fdfecc581ce9c7a4bc7252e81d8302e0adf7940fc9653d58eed941e56b08836d`.
 
-Ready for Claude's targeted reader recheck and final review. The initial reader
-reports are preserved unchanged and do not constitute approval of this revision.
+Ready for Claude's final diff review. The initial and recheck reader reports are
+preserved unchanged and do not constitute approval of this final prose revision.
 No push or PR is included in this handoff.

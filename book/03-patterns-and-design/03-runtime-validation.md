@@ -49,7 +49,7 @@ console.log(refundForKnown("returned"));         // "issue"
 
 **Eden Legacy**: "Because it has a return annotation and no catch-all branch. We have switches with a `default` too. Adding a member won't stop those compiling."
 
-The endpoint has already decoded the request's JSON. It parses that value, stores the parsed update, then acknowledges receipt. The inbox's `append` stores a durable snapshot before resolving and rejects if storage fails. Its resolved value is the stored update's ID for processing and replay. The HTTP handler turns an uncaught storage failure into a 500 response.
+The HTTP handler rejects malformed JSON before calling the endpoint with the decoded value. The endpoint parses that value, stores the parsed update, then acknowledges receipt. The inbox's `append` stores a durable snapshot before resolving and rejects if storage fails. Its resolved value is the stored update's ID for processing and replay. The HTTP handler turns an uncaught storage failure into a 500 response.
 
 ```typescript
 interface Inbox {
@@ -90,7 +90,7 @@ if (!parsed.success) console.log(parsed.error.issues[0].message);
 
 **Noam**: "Keep the receipt. Acknowledge that we stored it. The receipt-processing worker can quarantine an update it doesn't understand and send it to the review queue. We don't have to pretend it passed this schema to stop the carrier retrying."
 
-He changes the endpoint. For processing, the inbox exposes the ID returned by `append` and the stored body as a `Receipt`:
+He changes the endpoint. The receipt worker reads each stored body back with the ID `append` returned:
 
 ```typescript
 type Receipt = { id: string; raw: unknown };
@@ -125,7 +125,7 @@ console.log(z.strictObject(KnownUpdate.shape).safeParse(withEta).success);
 
 **Idan**: "`z.object` strips keys the shape doesn't declare from its output. `z.looseObject` keeps them. `z.strictObject` rejects them. Same fields checked, three different answers about the rest."
 
-**Eden**: "The carrier had been sending the estimates for months. Our inbox only had the first result."
+**Eden**: "The carrier had been sending the estimates for months. Our inbox only had the shipment ID and status that `z.object` returned."
 
 **Noam**: "The parser didn't erase `withEta`. We chose to save only what it produced."
 
@@ -216,10 +216,10 @@ Eden has the carrier's change notice open. It splits `returned` into `returned_d
 ```typescript
 for (const status of ["returned_damaged", "returned_refused"]) {
   const update = OpenUpdate.parse({ shipmentId: "s1", status });
-  console.log(trackingLabel(update), refundForOpen(update));
+  console.log([trackingLabel(update), refundForOpen(update)]);
 }
-// Carrier reports: returned damaged skip
-// Carrier reports: returned refused skip
+// ["Carrier reports: returned damaged", "skip"]
+// ["Carrier reports: returned refused", "skip"]
 ```
 
 **Eden**: "The page moves. The refund worker marks the event finished. Nobody has a task to decide what these mean."
@@ -257,7 +257,7 @@ function refundForOpen(update: OpenUpdate): RefundDecision {
 
 **Noam**: "In the integration module. We already have one worker reading receipts and handing work to tracking and refunds. I don't want every new consumer inventing what an unfamiliar status means."
 
-He gives that handoff a type, using the module's existing `KnownUpdate` parser:
+He gives the receipt worker's existing parsing and routing a typed handoff:
 
 ```typescript
 type Projection =
@@ -282,7 +282,7 @@ function project(receipt: Receipt): Projection {
 }
 ```
 
-**Eden**: "We've just repaired Oded's refund branch. Now try the customs receipt against yours."
+**Eden**: "Run the customs receipt through the worker we have now."
 
 ```typescript
 console.log(project({ id: "r1", raw: incoming }));
@@ -291,7 +291,7 @@ console.log(project({ id: "r1", raw: incoming }));
 
 **Oded**: "The parcel stays in transit on the page. That's the last label we had. We can store this update now, but we still won't show it."
 
-**Noam**: "Reusing `KnownUpdate` made recognition a requirement for both outputs. Tracking only needs the wire fields. I'll separate those checks."
+**Noam**: "The worker still uses `KnownUpdate` for both outputs. Tracking only needs the wire fields. I'll separate those checks."
 
 He keeps the refund rule on known statuses and replaces `project`.
 
@@ -338,9 +338,18 @@ for (const [id, status] of [
 ]) {
   console.log(project({ id, raw: { shipmentId: "s1", status } }));
 }
-// { kind: "shipment", receiptId: "r1", shipmentId: "s1", label: "Carrier reports: held at customs", refund: "review" }
-// { kind: "shipment", receiptId: "r2", shipmentId: "s1", label: "Carrier reports: returned damaged", refund: "review" }
-// { kind: "shipment", receiptId: "r3", shipmentId: "s1", label: "returned", refund: "issue" }
+// {
+//   kind: "shipment", receiptId: "r1", shipmentId: "s1",
+//   label: "Carrier reports: held at customs", refund: "review"
+// }
+// {
+//   kind: "shipment", receiptId: "r2", shipmentId: "s1",
+//   label: "Carrier reports: returned damaged", refund: "review"
+// }
+// {
+//   kind: "shipment", receiptId: "r3", shipmentId: "s1",
+//   label: "returned", refund: "issue"
+// }
 console.log(project({ id: "r4", raw: { shipmentId: "", status: "returned" } }));
 // { kind: "review", receiptId: "r4" }
 ```
@@ -351,7 +360,7 @@ console.log(project({ id: "r4", raw: { shipmentId: "", status: "returned" } }));
 
 ## The Verdict
 
-The team keeps the projection in this service, where the integration module already owns both consumers' handoff. It will preserve the incoming JSON, acknowledge durable receipt, and produce the labels and refund decisions there. Tracking can display the carrier's unfamiliar words. Refunds get `issue`, `skip` or `review`, with unresolved meanings routed to an owner rather than silently treated as ineligible. Known application objects can still omit extra keys; the inbox retains what they leave out.
+The consumers in this service will receive `Projection`, not `OpenUpdate`. Its type has no status field, so Oded's branch for unfamiliar statuses cannot compile at that handoff. The integration module will preserve the incoming JSON, acknowledge durable receipt, and produce the labels and refund decisions. Tracking can display the carrier's unfamiliar words. Refunds get `issue`, `skip` or `review`, with unresolved meanings routed to an owner rather than silently treated as ineligible. Known application objects can still omit extra keys; the inbox retains what they leave out.
 
 **Idan**: "I'd export the open update if those consumers had separate owners. Tracking could change its policy without waiting for this module. I'd accept having to check that refund consumers use the shared helper."
 

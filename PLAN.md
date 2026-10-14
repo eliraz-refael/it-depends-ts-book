@@ -14,13 +14,13 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 Act II is complete. Chapter 14 opens Act III with **error handling** and is drafted, jointly reviewed and checked. Chapter 15, **branded types**, is drafted, jointly reviewed and checked, including isolated Principle-only and full-reader reviews.
 
-Chapter 16, **runtime validation**, is drafted and self-reviewed on the settled discovery plan; Claude's initial formal review and independent readers are complete; the revised draft awaits a targeted recheck. Its local Verdict leaves Act III's open-ending debt for a later chapter.
+Chapter 16, **runtime validation**, is drafted and self-reviewed on the settled discovery plan; Claude's initial formal review and independent readers are complete; the final small revision awaits Claude's diff review. Its local Verdict leaves Act III's open-ending debt for a later chapter.
 
 ### Act III tasks
 
 - [x] Ch14: `01-error-handling.md` — exceptions and explicit results across a transaction boundary; fair alternatives, independent first-reader rechecks, joint review and compiler/runtime validation complete
 - [x] Ch15: `02-branded-types.md` — scalar meanings, stale object checks, working class and request alternatives; joint review, independent readers and compiler/runtime validation complete
-- [ ] Ch16: `03-runtime-validation.md` — raw receipts, unfamiliar values and consumer-specific projections; revised after independent readers and formal review; compiler/runtime checks pass, targeted recheck pending
+- [ ] Ch16: `03-runtime-validation.md` — raw receipts, unfamiliar values and consumer-specific projections; revised after independent readers and formal review; compiler/runtime checks pass, Claude's final diff review pending
 - [ ] Act III debt: at least one honest "The Debate Continues" chapter, with demonstrated conditions
 
 ### Completed Act II work

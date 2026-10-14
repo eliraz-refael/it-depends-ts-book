@@ -1,6 +1,6 @@
 # Chapter 16 — What the Schema Does With the Rest
 
-Status: **REVISED FOR TARGETED RECHECK**, 2026-10-14. The settlement below governs the original proposal. Claude's initial readers and formal review are complete; Codex has revised the draft and checks. Targeted recheck is pending.
+Status: **REVISED FOR TARGETED RECHECK**, 2026-10-14. The settlement below governs the original proposal. Claude's readers, recheck and second formal review are complete; Codex has applied the final small revision. Claude's final diff review is pending.
 Branch: `codex/chapter-16-runtime-validation`, based on `origin/main` `891f1c6` (Ch4 merged).
 File: `book/03-patterns-and-design/03-runtime-validation.md`.
 
@@ -135,7 +135,7 @@ leave it to Idan or Noam. No Guy, Dafna or Linoy: Ch5 used them for this ground.
 
 - [x] Codex challenges this plan; disagreements settled on evidence.
 - [x] Draft (Codex) and self-review.
-- [ ] Claude formal review; Principle-only and fresh full readers (initial reads and review complete; revised draft awaits targeted recheck).
+- [ ] Claude formal review; Principle-only and fresh full readers (readers and second review complete; final small revision awaits diff review).
 - [x] Checks durable; full suite green (299 fences / 398 compiler cases / 119 runtime groups, plus baseline cases and source searches).
 - [ ] Ready for the author's review.
 
@@ -202,3 +202,8 @@ separate owners and accepts the review convention. The dispatch layer was
 removed in favor of printed projections. Receipt setup, rejection from
 automatic actions, storage failure and duplicate delivery are clarified. See
 [the revision dispositions](ch16/CODEX-REVISION-1.md). Targeted recheck is pending.
+
+Second review requested the explicit `Projection` ruling and an existing-worker
+framing, plus line/output fixes. These are applied; counts remain 17/27/14 for
+the chapter and 299/398/119 for the book. See
+[revision 2](ch16/CODEX-REVISION-2.md). Claude's final diff review is pending.

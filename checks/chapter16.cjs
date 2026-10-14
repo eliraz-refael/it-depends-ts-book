@@ -161,9 +161,10 @@ async function main() {
     assert.deepEqual(printed(tagged), [[{known: false, raw: "held_at_customs"}]]);
     assert.deepEqual(printed(tracking), [["Carrier reports: held at customs"]]);
     assert.deepEqual(printed(silent), [["skip"]]);
-    assert.deepEqual(printed(split), [["Carrier reports: returned damaged", "skip"], ["Carrier reports: returned refused", "skip"]]);
-    const splitStdout = cp.execFileSync(process.execPath, [path.join(split.outDir, "main.js")], {encoding: "utf8"}).trim();
-    assert.equal(splitStdout, splitReturns.split("\n").filter(line => line.startsWith("// ")).map(line => line.slice(3)).join("\n"));
+    const splitValues = splitReturns.split("\n").filter(line => line.startsWith("// ["))
+      .map(line => JSON.parse(line.slice(3)));
+    assert.deepEqual(splitValues, [["Carrier reports: returned damaged", "skip"], ["Carrier reports: returned refused", "skip"]]);
+    assert.deepEqual(printed(split), splitValues.map(value => [value]));
     assert.deepEqual(printed(projected), [
       [{kind: "shipment", receiptId: "r1", shipmentId: "s1", label: "Carrier reports: held at customs", refund: "review"}],
       [{kind: "shipment", receiptId: "r2", shipmentId: "s1", label: "Carrier reports: returned damaged", refund: "review"}],
