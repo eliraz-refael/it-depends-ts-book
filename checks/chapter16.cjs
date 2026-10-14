@@ -28,7 +28,7 @@ const schemas = block('import { z }');
 const known = block("function refundForKnown");
 const originalReceive = block("interface Inbox");
 const incoming = block("const incoming");
-const rawReceive = block("async function receive");
+const rawReceive = block("type Receipt");
 const extras = block("const withEta");
 const open = block("const WireStatus");
 const label = block("function trackingLabel");
@@ -39,18 +39,19 @@ const repairedRefund = block("function refundForOpen", 1);
 const closed = block("type Projection");
 const closedOutput = block("console.log(project(");
 const repairedClosed = block("const WireUpdate");
-const dispatch = block("interface Actions");
+const projectedOutput = block("for (const [id, status]");
 const fallback = block("const DefaultedStatus");
 assert.equal(used.size, fences.length, "Every TypeScript fence is exercised");
-const knownFn = before(known, "const delivered");
+const knownFn = before(known, "const update");
 const inboxTypes = before(originalReceive, "async function receive");
+const receiptType = before(rawReceive, "async function receive");
 const incomingValue = before(incoming, "const parsed");
 const openDefs = before(open, "console.log(");
 const labelFn = before(label, "console.log(");
 const badRefundFn = before(badRefund, "console.log(");
 const projectionType = before(closed, "function project");
 const openBase = schemas + knownFn + openDefs;
-const closedBase = schemas + knownFn + inboxTypes;
+const closedBase = schemas + knownFn + receiptType;
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "ts-book-ch16-"));
 // Both the emitted program and the compiler resolve the real locked dependency.
 fs.symlinkSync(path.join(root, "node_modules"), path.join(scratch, "node_modules"), "dir");
@@ -93,8 +94,13 @@ const original = example("original-endpoint", schemas + originalReceive + "expor
 const receipt = example("raw-endpoint", inboxTypes + rawReceive + "export {receive};\n");
 const openApi = example("repaired-open-consumers", openBase + labelFn + repairedRefund +
   "export {OpenUpdate, trackingLabel, refundForOpen};\n");
-const closedApi = example("repaired-projection-and-dispatch", closedBase + openDefs + projectionType + repairedClosed + dispatch +
-  "export {project, dispatch};\n");
+const closedApi = example("repaired-projection", closedBase + openDefs + projectionType + repairedClosed +
+  "export {project};\n");
+const projected = example("printed-repaired-projections", closedBase + openDefs + projectionType + repairedClosed + projectedOutput);
+example("handoff-has-no-unknown-status-branch", schemas + projectionType +
+  "function refundWorker(work: Extract<Projection, {kind: 'shipment'}>): RefundDecision {\n" +
+  "  if (!work.status.known) return 'skip'; // Error TS2339\n" +
+  "  return work.refund;\n}\n", [2339]);
 const inspect = example("schema-output-versus-input", schemas + openDefs +
   "export {KnownUpdate, CarrierStatus, OpenUpdate};\n");
 example("tag-requires-narrowing", schemas + openDefs +
@@ -121,7 +127,7 @@ const promoted = example("reviewed-status-gains-explicit-refund-rule", expandedS
   'export const result = refundForKnown("returned_damaged");\n');
 // Same handoff through Idan's repaired open parser, for an outcome comparison.
 // This adapter is fixture glue, not an additional manuscript implementation.
-const openProjection = example("open-repair-equivalent-handoff", openBase + labelFn + repairedRefund + inboxTypes + projectionType +
+const openProjection = example("open-repair-equivalent-handoff", openBase + labelFn + repairedRefund + receiptType + projectionType +
   "export function project(receipt: Receipt): Projection {\n" +
   "  const parsed = OpenUpdate.safeParse(receipt.raw);\n" +
   "  if (!parsed.success) return {kind: 'review', receiptId: receipt.id};\n" +
@@ -144,7 +150,7 @@ function printed(test) {
 }
 async function main() {
   await group("all-printed-results", () => {
-    assert.deepEqual(printed(working), [["delivered"], ["skip"], ["issue"]]);
+    assert.deepEqual(printed(working), [["in transit"], ["skip"], ["issue"]]);
     const message = 'Invalid option: expected one of "label_created"|"in_transit"|"delivered"|"returned"';
     assert(chapter.includes("// " + message), "The quoted Zod message remains on the page");
     assert.deepEqual(printed(rejected), [[false], [message]]);
@@ -156,6 +162,14 @@ async function main() {
     assert.deepEqual(printed(tracking), [["Carrier reports: held at customs"]]);
     assert.deepEqual(printed(silent), [["skip"]]);
     assert.deepEqual(printed(split), [["Carrier reports: returned damaged", "skip"], ["Carrier reports: returned refused", "skip"]]);
+    const splitStdout = cp.execFileSync(process.execPath, [path.join(split.outDir, "main.js")], {encoding: "utf8"}).trim();
+    assert.equal(splitStdout, splitReturns.split("\n").filter(line => line.startsWith("// ")).map(line => line.slice(3)).join("\n"));
+    assert.deepEqual(printed(projected), [
+      [{kind: "shipment", receiptId: "r1", shipmentId: "s1", label: "Carrier reports: held at customs", refund: "review"}],
+      [{kind: "shipment", receiptId: "r2", shipmentId: "s1", label: "Carrier reports: returned damaged", refund: "review"}],
+      [{kind: "shipment", receiptId: "r3", shipmentId: "s1", label: "returned", refund: "issue"}],
+      [{kind: "review", receiptId: "r4"}],
+    ]);
     assert.deepEqual(printed(initialProject), [[{kind: "review", receiptId: "r1"}]]);
     assert.deepEqual(printed(defaulted), [["in_transit"]]);
   });
@@ -223,8 +237,11 @@ async function main() {
       assert.equal(openFunctions.trackingLabel(update), "Carrier reports: " + status.replaceAll("_", " "));
       assert.equal(openFunctions.refundForOpen(update), "review");
     }
-    assert.equal(openFunctions.refundForOpen(openFunctions.OpenUpdate.parse({shipmentId: "s1", status: "returned"})), "issue");
-    assert.equal(openFunctions.refundForOpen(openFunctions.OpenUpdate.parse({shipmentId: "s1", status: "delivered"})), "skip");
+    for (const status of CarrierStatus.options) {
+      const update = openFunctions.OpenUpdate.parse({shipmentId: "s1", status});
+      assert.equal(openFunctions.refundForOpen(update), status === "returned" ? "issue" : "skip");
+      assert.equal(openFunctions.trackingLabel(update), status.replaceAll("_", " "));
+    }
   });
   const closedFunctions = load(closedApi);
   await group("both-repairs-have-equal-consumer-outcomes", () => {
@@ -236,30 +253,26 @@ async function main() {
       assert.deepEqual(openFunctions.project(receipt), closedFunctions.project(receipt));
     }
   });
-  function actionsFor(raw) {
-    const calls = [];
-    closedFunctions.dispatch(closedFunctions.project({id: "r1", raw}), {
-      label: (...args) => calls.push(["label", ...args]),
-      refund: (...args) => calls.push(["refund", ...args]),
-      review: (...args) => calls.push(["review", ...args]),
-    });
-    return calls;
-  }
-  await group("unknown-label-and-owned-review-both-dispatched", () => {
-    for (const status of ["held_at_customs", "returned_damaged", "returned_refused"]) {
-      assert.deepEqual(actionsFor({shipmentId: "s1", status}), [
-        ["label", "s1", "Carrier reports: " + status.replaceAll("_", " ")], ["review", "r1"],
-      ]);
+  await group("malformed-receipts-have-no-shipment-projection", () => {
+    for (const raw of malformed) {
+      assert.deepEqual(closedFunctions.project({id: "r1", raw}), {kind: "review", receiptId: "r1"});
     }
   });
-  await group("known-refund-and-skip-dispatched", () => {
-    assert.deepEqual(actionsFor({shipmentId: "s1", status: "returned"}), [["label", "s1", "returned"], ["refund", "s1"]]);
-    for (const status of ["label_created", "in_transit", "delivered"]) {
-      assert.deepEqual(actionsFor({shipmentId: "s1", status}), [["label", "s1", status.replaceAll("_", " ")]]);
-    }
-  });
-  await group("malformed-receipts-only-create-review", () => {
-    for (const raw of malformed) assert.deepEqual(actionsFor(raw), [["review", "r1"]]);
+  await group("retry-can-produce-two-receipts-for-the-same-refund", async () => {
+    const stored = [];
+    const inbox = {append: async raw => {
+      const id = "r" + (stored.length + 1);
+      stored.push({id, raw: structuredClone(raw)});
+      return id;
+    }};
+    const body = {shipmentId: "s1", status: "returned"};
+    // The first acknowledgement is lost; the same request reaches receive again.
+    // There is deliberately no payment or deduplication implementation here.
+    await load(receipt).receive(body, inbox);
+    assert.equal(await load(receipt).receive(body, inbox), 204);
+    assert.deepEqual(stored.map(r => r.id), ["r1", "r2"]);
+    const outputs = stored.map(closedFunctions.project);
+    assert.deepEqual(outputs.map(p => [p.shipmentId, p.refund]), [["s1", "issue"], ["s1", "issue"]]);
   });
   await group("enum-expansion-needs-a-business-answer-even-with-default", () => {
     assert.equal(load(defaultConsumer).result, "skip");

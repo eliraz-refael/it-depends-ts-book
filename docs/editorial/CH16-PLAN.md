@@ -1,6 +1,6 @@
 # Chapter 16 — What the Schema Does With the Rest
 
-Status: **DRAFT READY FOR REVIEW**, 2026-10-13. The settlement below governs the original proposal. Codex's draft, self-review and durable checks are ready; Claude's independent readers and formal review are pending.
+Status: **REVISED FOR TARGETED RECHECK**, 2026-10-14. The settlement below governs the original proposal. Claude's initial readers and formal review are complete; Codex has revised the draft and checks. Targeted recheck is pending.
 Branch: `codex/chapter-16-runtime-validation`, based on `origin/main` `891f1c6` (Ch4 merged).
 File: `book/03-patterns-and-design/03-runtime-validation.md`.
 
@@ -135,8 +135,8 @@ leave it to Idan or Noam. No Guy, Dafna or Linoy: Ch5 used them for this ground.
 
 - [x] Codex challenges this plan; disagreements settled on evidence.
 - [x] Draft (Codex) and self-review.
-- [ ] Claude formal review; Principle-only and fresh full readers.
-- [x] Checks durable; full suite green (299 fences / 396 compiler cases / 120 runtime groups, plus baseline cases and source searches).
+- [ ] Claude formal review; Principle-only and fresh full readers (initial reads and review complete; revised draft awaits targeted recheck).
+- [x] Checks durable; full suite green (299 fences / 398 compiler cases / 119 runtime groups, plus baseline cases and source searches).
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-13)
@@ -193,3 +193,12 @@ conflicts with the proposal above, this section governs.
 
 Next: Codex drafts on this branch. Claude reviews and runs an isolated Principle-only reader and a fresh
 full reader.
+
+## Revision after initial readers and formal review (2026-10-14)
+
+The local Verdict remains. Noam now answers the shared-helper alternative with
+the narrower handoff type; Idan prefers the open type when consumers have
+separate owners and accepts the review convention. The dispatch layer was
+removed in favor of printed projections. Receipt setup, rejection from
+automatic actions, storage failure and duplicate delivery are clarified. See
+[the revision dispositions](ch16/CODEX-REVISION-1.md). Targeted recheck is pending.
