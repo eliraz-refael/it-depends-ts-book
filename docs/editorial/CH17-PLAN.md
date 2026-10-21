@@ -1,6 +1,7 @@
 # Chapter 17 — Immutability (working title)
 
-Status: **SETTLED**, 2026-10-21. The settlement at the end governs the original proposal.
+Status: **PLAN SETTLED; DRAFT 1 FROZEN, INDEPENDENT REVIEW PENDING**, 2026-10-21.
+The settlement below governs the original proposal.
 Branch: `codex/chapter-17-immutability`, based on `origin/main` `4af45f5`.
 File: `book/03-patterns-and-design/04-immutability.md`.
 
@@ -179,10 +180,10 @@ Readers: an isolated Principle-only reader and a fresh full reader, with prerequ
 
 ## Completion
 
-- [ ] Codex challenges this plan; disagreements are settled on evidence.
-- [ ] Codex drafts and self-reviews.
+- [x] Codex challenges this plan; disagreements are settled on evidence.
+- [x] Codex drafts and self-reviews.
 - [ ] Claude's formal review, with Principle-only and fresh full readers.
-- [ ] Checks durable; full suite green.
+- [x] Checks durable; full suite green on the draft example corpus.
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-21)
@@ -272,3 +273,24 @@ section conflicts with the proposal above, this section governs.
 
 Next: Codex drafts on this branch and self-reviews. Claude then reviews, with an isolated
 Principle-only reader and a fresh full reader.
+
+
+## Draft 1 handoff (2026-10-21)
+
+The chapter follows the settlement and reaches a local Verdict. The snapshot and
+live-summary promises survive both implementations; the class and closure both
+have a live `total` property and stable snapshot access. Calculation remains a
+value-returning function, while one owner publishes the current quote. The ruling
+does not select class syntax over a closure, and does not claim one uniquely
+protects the invariant. Act III's open-ending requirement remains outstanding.
+
+The Turn is the frozen live view: its properties remain frozen while its getters
+read later state. Guy adds stable snapshots. The receipt retains its first value
+through a second legitimate update. The scalar snapshot deliberately excludes
+the item graph; both sides acknowledge the shared-array problem of shallow copies.
+Gil's unique-key copying count stays in Additional Takes as a qualification.
+
+The draft is shorter than the initial planning budget to avoid reteaching the
+readonly and branding material; it remains within the writing guide's chapter
+range. See [self-review](CH17-REVIEW.md) and
+[snapshot](ch17/DRAFT1-SNAPSHOT.json) for counts, evidence and review questions.

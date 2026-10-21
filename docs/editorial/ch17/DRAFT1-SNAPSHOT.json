@@ -1,0 +1,86 @@
+{
+  "status": "draft 1 frozen; independent readers and formal review pending",
+  "date": "2026-10-21",
+  "settled_plan_commit": "922fd11",
+  "path": "book/03-patterns-and-design/04-immutability.md",
+  "sha256": "aaa4e5b7e3cbf8bc3df0ed8824af90b6112cdcba287fa7c2fd448887563e232c",
+  "words": 2158,
+  "typescript_fences": 15,
+  "fences": [
+    {
+      "ordinal": 1,
+      "sha256": "a0f76ae30ee62f6dea861656ab3aadf00962b33518aa633f82e55f3224140662"
+    },
+    {
+      "ordinal": 2,
+      "sha256": "81ab87e76033bc1ffb385d934b959adb649c97b22a6b0ba3aedf3eafd4392891"
+    },
+    {
+      "ordinal": 3,
+      "sha256": "0e91c60cd252460070003b2f2f7fa51d344efa088cda36c96be94c4bb73092f4"
+    },
+    {
+      "ordinal": 4,
+      "sha256": "7437e9966e04191c6dd2eb9fa544972459fe88b0a74e49db8ad6151d8bb05977"
+    },
+    {
+      "ordinal": 5,
+      "sha256": "8853ab7c9ef00e58dbe0cddc39e02990aa9f4c559c58ff97238077cea5a22f5d"
+    },
+    {
+      "ordinal": 6,
+      "sha256": "b763e629ab776c0025dcf540f1bb6b5e88e89c518985cbc06cb75ef4048083a1"
+    },
+    {
+      "ordinal": 7,
+      "sha256": "4f95cb1bb9e4b70cab6c27b25f98696e684d2dd6835908e4ea2025d2c0a90d4a"
+    },
+    {
+      "ordinal": 8,
+      "sha256": "a94b40f7271f9a130b9793562f1154732e4eb5fe51c219c8c025e1601c2febbf"
+    },
+    {
+      "ordinal": 9,
+      "sha256": "f669b47f25a1160836f7263d26bd636b1899b28e946bacfb315588a115d66ab2"
+    },
+    {
+      "ordinal": 10,
+      "sha256": "5aa1eca7c2488cc79d4bc493d2a49976c454aea8f25491b6afcce53695bb6287"
+    },
+    {
+      "ordinal": 11,
+      "sha256": "fc32ed3f3f3cbc45d6d5eaafec1034111662eeb2022dad2dc1340ee6e666a054"
+    },
+    {
+      "ordinal": 12,
+      "sha256": "4bb9fe61b97e3c497111708ec7ba9c1e697a155d77a83240a73b4f14e75aa34a"
+    },
+    {
+      "ordinal": 13,
+      "sha256": "b66288053dfc079577092606da13895d7787f9a5b57d9520c41930d72978be19"
+    },
+    {
+      "ordinal": 14,
+      "sha256": "1763bb46e855c9f53416c709b69d845b6604b39c33873151dda45656fc81b130"
+    },
+    {
+      "ordinal": 15,
+      "sha256": "1931d7a4cc86431027ca48352169bf035f97bbaa8216df65969daa96e395594b"
+    }
+  ],
+  "validator_sha256": "d4d28f71120a681a964b3194e251b1faecc8bb2684f0d05ecf7aca1a8d3c51c9",
+  "typescript": "7.0.2",
+  "node": "v22.23.3",
+  "chapter_counts": {
+    "fences": 15,
+    "compiler_cases": 19,
+    "runtime_groups": 19
+  },
+  "book_counts": {
+    "fences": 314,
+    "compiler_cases": 417,
+    "runtime_groups": 138,
+    "default_cases": 2,
+    "searches": 2
+  }
+}
