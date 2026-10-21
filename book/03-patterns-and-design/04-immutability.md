@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Liron Closure**: "Before you change an object, ask what the people holding it expect to keep. Some want today's value. Others need the value you gave them yesterday. Those are different promises, even if both callers only read."
+**Liron Closure**: "Before you change an object, ask what each holder expects to keep. Some want the current state. Others need the value you handed them earlier. Those are different promises, even if both holders only read."
 
-"Preserve the old value for anyone who needs it. For current state, keep changes behind an owner and keep writable references inside that boundary. Having just one writer doesn't make a live view into a snapshot. That writer can still change what everyone sees."
+"A holder that needs history must receive a value that won't change. The snapshot can be made by the owner or captured at the handoff. For current state, keep changes behind an owner and keep writable references inside that boundary. Having just one writer doesn't make a live view into a snapshot. That writer can still change what everyone sees."
 
 "You can build something by mutation while nobody else can observe it. The question comes when you hand it over: what have you promised its next holder?"
 
@@ -71,7 +71,7 @@ console.log(receipt(before, cart)); // Was 80. Now 80.
 
 **Eden**: "Both mean changing the call. Putting `readonly` on this type was the change we thought we had already made."
 
-Daniel tries two writes beside it:
+Daniel tries writing through the cart's own type, then passing its array to a helper that appends a gift:
 
 ```typescript
 cart.total = 0; // Error TS2540: Cannot assign to 'total' because it is a read-only property.
@@ -87,13 +87,13 @@ appendGift(cart.items); // Error TS4104.
 
 **Daniel**: "The array types expose different operations. The readonly array has no `push`. That doesn't make the whole cart safe from replacement either. A parameter with a writable `items` property could assign a different readonly array to it."
 
-The [object-type handbook](https://www.typescriptlang.org/docs/handbook/2/objects.html#readonly-properties) documents the property-compatibility rule. Eden follows the call into the promotion package; there is no assertion to remove.
+The [object-type handbook](https://www.typescriptlang.org/docs/handbook/2/objects.html#readonly-properties) documents the property-compatibility rule.
 
 ### A price that stays put
 
 **Dafna**: "This receipt needs three numbers. Let it have three numbers we won't change."
 
-She puts the pricing rule in one constructor. Both proposed APIs will use it:
+She puts the pricing rule in a function that constructs a frozen quote:
 
 ```typescript
 function quote(subtotal: number, discount: number): Quote {
@@ -126,9 +126,15 @@ try {
 console.log(original.total); // 100
 ```
 
-**Eden**: "That catches this writer. It doesn't migrate the caller. The promotion now throws, so I have to replace its call before enabling this on that path."
+**Eden**: "That catches this writer because the package runs in strict mode. Some of our old JavaScript files would silently fail the same assignments. A missing exception won't tell me there are no writers left."
 
-**Dafna**: "Yes. `withDiscount` returns the replacement. The caller has to use it."
+**Dafna**: "The frozen price stays unchanged either way. But the old caller won't have applied a promotion. It has to use the result of `withDiscount`."
+
+**Eden**: "And the package has other callers that still expect it to mutate. I can't change its return type and leave them ignoring the result."
+
+**Dafna**: "Keep `applyPromotion` for them. Add the value-returning operation, then move checkout over."
+
+**Eden**: "Two APIs until those callers migrate. I'd have the old one call `withDiscount` and copy its numbers back, so we don't maintain the pricing rule twice."
 
 **Guy**: "And this?"
 
@@ -143,15 +149,15 @@ console.log(invented.discount, invented.total); // 20 0
 
 **Dafna**: "So don't accept a total from a caller. `withDiscount` takes the subtotal and computes it again. Your owner can do the same on entry. If we need an unforgeable value type, that's more work than freezing this one."
 
-**Guy**: "Agreed. The owner should accept a discount operation, not let callers replace fields."
+**Guy**: "The operation I want is `applyDiscount(amount)`. I won't expose a setter for the total."
 
 **Eden**: "What about the items? Our cart has a list."
 
 **Dafna**: "The receipt's price doesn't need it. Keep that out of this snapshot. If we need a historical item list too, a spread of the cart isn't enough. We'd still share the array and its rows."
 
-**Guy**: "A shallow copy from my constructor would share them too. I'd have to copy them on entry, or take values that are already kept immutable."
+**Guy**: "Putting the cart in a private field wouldn't fix that. I'd have to copy the rows on entry, or take values that are already kept immutable."
 
-**Eden**: "Good. I don't want `snapshot()` returning an old price with tomorrow's quantities."
+**Eden**: "I don't want the receipt showing an old price with tomorrow's quantities. Keep its price separate from the item list."
 
 ### Who changes the current price?
 
@@ -182,13 +188,13 @@ class CartPricing {
 }
 ```
 
-**Dafna**: "The getters read whichever quote is current when they're called. So the panel keeps the view, not a quote?"
+**Dafna**: "The panel keeps that object, and reading `total` later can give it another number. I'd be wary of passing that around as a `Quote`."
 
-**Guy**: "Exactly. It doesn't need rebinding after every discount. And the view has no setters."
+**Guy**: "For a current-price panel, that is the contract. It doesn't need rebinding after every discount. The arrow captures this owner, so the getters keep reading its current price."
 
-**Eden**: "The constructor copies the numbers too. Keeping the object I passed in won't let me change your state."
+**Eden**: "What if I keep the object I passed to the constructor?"
 
-**Guy**: "Or get a forged total into it."
+**Guy**: "It takes the numbers and makes its own checked quote. You won't have a writable alias into the private state."
 
 ## The Turn
 
@@ -209,9 +215,7 @@ console.log(Object.isFrozen(savedForReceipt)); // true
 
 **Dafna**: "Even frozen."
 
-**Guy**: "The properties didn't change. What the getters read did. That view is for the summary. The receipt needs the quote itself."
-
-**Eden**: "Both got a `Quote`, and both only read it. I need the distinction at the call."
+**Guy**: "The properties didn't change. What the getters read did. That view is for the summary. The receipt needs the stored quote."
 
 Guy adds a method to `CartPricing`:
 
@@ -223,6 +227,52 @@ snapshot(): Quote {
 
 **Guy**: "This returns the stored quote. It's frozen, it contains only numbers, and a later discount replaces it. The old quote stays as it was."
 
+**Eden**: "That fixes the receipt if I call the right method. `view()` still gives me a `Quote`, so I can make the same mistake."
+
+**Dafna**: "Stop making the live read look like a value. Give the summary a function. It has to ask for a price."
+
+```typescript
+type ReadPrice = () => Quote;
+const readPrice: ReadPrice = () => pricing.snapshot();
+
+receipt(readPrice, pricing.snapshot()); // Error TS2345.
+```
+
+**Dafna**: "Call `readPrice()` when the panel renders. Saving that result takes a snapshot. Saving the function keeps a way to read the next price."
+
+**Guy**: "Where's the interface? The panel depends on a current-price capability. I'd name the operation on it."
+
+```typescript
+interface PriceView {
+  current(): Quote;
+}
+```
+
+He replaces the getter-based `view()` method:
+
+```typescript
+view(): PriceView {
+  return { current: () => this.#current };
+}
+```
+
+```typescript
+const view = pricing.view();
+receipt(view, pricing.snapshot()); // Error TS2739.
+```
+
+**Daniel**: "`PriceView` has `current`. It doesn't have `subtotal`, `discount` or `total`. Neither live reader can be passed to this receipt."
+
+**Dafna**: "`ReadPrice` has a name too. You've put one function inside an object."
+
+**Guy**: "I want the panel to ask `prices.current()`. It tells the next reader what that dependency does."
+
+**Dafna**: "`readPrice()` tells me enough."
+
+**Eden**: "Either one makes the panel change its `.total` read to a call. That's another migration, but it catches the receipt mistake we just made."
+
+He uses Guy's interface for the next run:
+
 ```typescript
 const checkout = new CartPricing(quote(100, 0));
 const liveSummary = checkout.view();
@@ -231,20 +281,14 @@ const savedPrice = checkout.snapshot();
 checkout.applyDiscount(20);
 console.log(receipt(savedPrice, checkout.snapshot())); // Was 100. Now 80.
 checkout.applyDiscount(30);
-console.log(savedPrice.total, liveSummary.total); // 100 70
+console.log(savedPrice.total, liveSummary.current().total); // 100 70
 ```
-
-**Dafna**: "So you keep old values too."
-
-**Guy**: "For the receipt, yes. The panel keeps the view. It asks a different question."
-
-**Dafna**: "Then the new-value part isn't the disagreement. It's who replaces the current one."
 
 ### Trying a promotion before applying it
 
 **Eden** opens the promotion chooser. It previews two offers against the same starting price; selecting neither must leave checkout unchanged.
 
-**Dafna**: "This is why I want the calculation to return a value. I don't want the preview to apply a discount, read the price, and undo it."
+**Dafna**: "We need both candidate prices at once. `withDiscount` gives us two values from the same starting quote."
 
 ```typescript
 const choosing = new CartPricing(quote(100, 0));
@@ -254,18 +298,17 @@ console.log(offers.map(price => price.total)); // [90, 80]
 console.log(choosing.snapshot().total); // 100
 ```
 
-**Guy**: "Nor do I. That function can stay. Applying the chosen offer is a separate operation."
+**Guy**: "Keep that calculation. But applying the choice still goes through one owner. I won't have each handler replacing its own idea of the current price while the panel reads another."
 
-**Dafna**: "But callers could keep the current value themselves too. The summary can read a binding. It doesn't require a class."
+**Dafna**: "I wasn't proposing that. A closure can own the current binding and give the panel the reader function."
 
-She writes the other handler, with its state scoped inside a checkout factory:
+She puts the current quote in a closure:
 
 ```typescript
 function valueCheckout(initial: Quote) {
   let current = quote(initial.subtotal, initial.discount);
   return {
-    get total() { return current.total; },
-    snapshot: () => current,
+    read: (): Quote => current,
     chooseDiscount(amount: number): string {
       const before = current;
       current = withDiscount(current, amount);
@@ -275,20 +318,12 @@ function valueCheckout(initial: Quote) {
 }
 
 const values = valueCheckout(quote(100, 0));
-const valueSummary: Readonly<{ total: number }> = values;
+const readValueSummary: ReadPrice = values.read;
 console.log(values.chooseDiscount(20)); // Was 100. Now 80.
-console.log(valueSummary.total); // 80
+console.log(readValueSummary().total); // 80
 ```
 
-**Guy**: "Who else can assign `current`?"
-
-**Dafna**: "Nobody outside that function."
-
-**Guy**: "I can work with that. A caller can't replace its price behind its back."
-
-**Dafna**: "Then keep `withDiscount` available without constructing `CartPricing`. That's what the preview needs."
-
-**Eden**: "That also fits the summary's `total` property. So the class isn't what the panel needs. It needs a live read. Here's the handler with Guy's owner:"
+**Eden**: "I can wire either. Here's the receipt handler using the class we've already got on screen:"
 
 ```typescript
 function chooseDiscount(checkout: CartPricing, amount: number): string {
@@ -298,19 +333,19 @@ function chooseDiscount(checkout: CartPricing, amount: number): string {
 }
 ```
 
-**Guy**: "The promotion module gets neither a writable quote nor the view. It supplies an amount. The chooser can calculate prices, and this handler commits the choice."
+**Guy**: "The promotion supplies an amount. This handler owns the decision to apply it. The preview doesn't get to replace checkout's state."
 
-**Eden**: "That replaces the old mutating promotion call. I still have to find the receipts that saved the live view. The compiler can't find that mistake from `Quote` alone."
-
-**Dafna**: "Test both. Keep one snapshot, apply two discounts, and check that only the live view follows them."
+**Eden**: "Then the old mutating API stays for its other callers. Checkout moves to the new calculation and this handler. The panel needs a live-reader type at the same time; leaving it as `Quote` would keep the bad call compiling."
 
 ## The Verdict
 
-> Keep the price calculation as a value-returning function. Let the checkout owner publish the current price. The summary receives a live view; the receipt receives a stable snapshot. A single writer, a readonly type, and a frozen object each leave the question of history unanswered on their own.
+> Keep the price calculation as a value-returning function. Let the checkout owner publish the current price. Expose live access through a call; give the receipt stable values. A single writer, a readonly type, and a frozen object each leave the question of history unanswered on their own.
 
-The accepted boundary uses `withDiscount` for previews and inside the operation that commits a discount. Both paths use the checked constructor. Either owner implementation can keep the summary's property-reading interface. The receipt must capture a snapshot before that operation. Choosing a class over the closure is not part of this ruling.
+**Guy**: "I'd put `PriceView` in the panel's constructor. `current()` is the capability it needs, and the interface makes that dependency explicit."
 
-**Eden**: "Then I'll replace the promotion call and the receipt reads together. Adding `readonly` was a smaller diff. It just didn't do this job."
+**Dafna**: "I'd take `ReadPrice`. It's one operation. If the function type already says what I need, I don't want an object around it."
+
+**Eden**: "Both reject the receipt's bad argument. I'll replace the promotion call and the panel and receipt bindings together. Adding `readonly` was a smaller diff. It just didn't do this job."
 
 ## Additional Takes
 
@@ -334,7 +369,7 @@ console.log(JSON.stringify(copied) === JSON.stringify(built)); // true
 
 "Those are a thousand distinct keys: zero existing properties copied, then one, then two, up to 999. That counts property copies, not milliseconds. The second version builds the same object locally and hands it over when finished. Mutation inside the `reduce` callback would avoid the repeated copies too."
 
-**Dafna**: "Fine by me. No caller has an earlier index it's trying to keep. Once you publish it, keep that promise."
+**Dafna**: "Fine by me. No caller has an earlier index it's trying to keep."
 
 **Daniel Compiler**: "And if the price later carries a timestamp, don't mistake a recursive readonly type for a frozen clock."
 
@@ -351,5 +386,3 @@ console.log(stamp.at.getUTCFullYear()); // 2000
 ```
 
 "The method is still callable. Freezing the Date's properties doesn't freeze the internal date value. For a historical timestamp, a number would make the snapshot's promise easier to keep."
-
-**Eden Legacy**: "Our frozen-price test runs in strict code, where that property assignment throws. One of my old plain JavaScript files can fail the same assignment silently. If you're using freezing to locate writers during a migration, check how those files run. No exception doesn't mean no attempted write."

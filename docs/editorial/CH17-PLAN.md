@@ -1,6 +1,6 @@
 # Chapter 17 — Immutability (working title)
 
-Status: **PLAN SETTLED; DRAFT 1 FROZEN, INDEPENDENT REVIEW PENDING**, 2026-10-21.
+Status: **PLAN SETTLED; DRAFT 2 FROZEN, TARGETED RECHECK PENDING**, 2026-10-21.
 The settlement below governs the original proposal.
 Branch: `codex/chapter-17-immutability`, based on `origin/main` `4af45f5`.
 File: `book/03-patterns-and-design/04-immutability.md`.
@@ -294,3 +294,29 @@ The draft is shorter than the initial planning budget to avoid reteaching the
 readonly and branding material; it remains within the writing guide's chapter
 range. See [self-review](CH17-REVIEW.md) and
 [snapshot](ch17/DRAFT1-SNAPSHOT.json) for counts, evidence and review questions.
+
+
+## Draft 2 response (2026-10-21)
+
+The first independent Principle-only reader passed, including the single-writer
+case. Claude's formal review requested a type-level answer to the Turn, clearer
+migration costs and several continuity/voice fixes. Draft 2 applies them; the
+[first review](ch17/CLAUDE-REVIEW.md) and both reader reports are archived unchanged.
+
+Dafna offers `ReadPrice = () => Quote`; Guy replaces his getter view with
+`PriceView.current(): Quote`. Both live-reader types are rejected as receipt
+arguments. Stable stored quotes remain the receipt's values. The final owner and
+closure expose live access through calls; the historical frozen-getter bug stays
+on the page and in its own fixtures. Guy holds the single-publication-boundary
+requirement. Their remaining preference is the named method versus function type,
+stated in their own closing lines instead of a narrator's ruling.
+
+The package keeps its old in-place API for existing callers and can delegate its
+calculation to the new function. Eden's strict/sloppy assignment caveat is now
+part of that migration exchange. The preview demonstrates two non-publishing
+candidate values; it no longer implies an unshown apply-and-undo failure.
+
+The full suite passes: Chapter 17 **19/26/21**, book **318/424/140**, plus the
+existing default cases and searches. See [review response](CH17-REVIEW.md#draft-2-response-to-independent-review)
+and [snapshot](ch17/DRAFT2-SNAPSHOT.json). Claude's targeted recheck and second
+formal review are pending; draft 2 is not approved for publication.

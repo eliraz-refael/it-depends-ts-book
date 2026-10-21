@@ -1,7 +1,14 @@
-# Draft self-review: Chapter 17 — The Price You Were Given
+# Review record: Chapter 17 — The Price You Were Given
 
-Status: **DRAFT 1 FROZEN; READY FOR INDEPENDENT READERS AND FORMAL REVIEW**,
-2026-10-21. This is Codex's self-review, not independent approval.
+Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**, 2026-10-21.
+Claude's draft 1 readers and formal review requested revision. The
+[response below](#draft-2-response-to-independent-review) records the changes and
+final draft 2 validation. Draft 2 has not yet received independent approval.
+
+## Historical draft 1 self-review
+
+The following sections preserve Codex's self-review of `2d1cf88`, before Claude's
+readers. Their snapshot and validation counts belong to draft 1.
 
 ## Snapshot and scope
 
@@ -123,3 +130,99 @@ live view versus snapshot distinction is understandable at first encounter and
 whether the final API ruling follows from the displayed call sites.
 
 Local commit is authorized. No push or PR by Codex at this handoff.
+
+
+## Draft 2 response to independent review
+
+Claude's [formal review](ch17/CLAUDE-REVIEW.md),
+[Principle-only reader](ch17/CLAUDE-PRINCIPLE-READ.md) and
+[full reader](ch17/CLAUDE-FULL-READ.md) are included unchanged. The Principle
+passed, including the single-writer case. The main revision request was to answer
+the Turn's type ambiguity in the types themselves, not only through method names
+and tests.
+
+### Findings addressed
+
+1. **Type-level repair.** Dafna supplies `ReadPrice = () => Quote`. Guy names the
+   capability with `PriceView { current(): Quote }` and replaces the getter-based
+   `view()` member. Passing the first to `receipt` produces TS2345; the second
+   produces TS2739. Both are checked at the manuscript's diagnostic line.
+   The final closure also exposes a reader function. The original getter failure
+   remains a separate timeline; it is not silently repaired in its own fixture.
+2. **Ruling in the dialogue.** The narrator's design-decision paragraph is gone.
+   The Verdict retains the demonstrated boundary and adds that live access goes
+   through a call. Guy and Dafna retain their preferences for a named method and
+   a function type in their own closing lines. Neither gets exclusive credit
+   for making the compiler reject the mixed-up argument.
+3. **Guy's held point.** He requires a single owner to publish the chosen price,
+   so handlers do not maintain separate current values while the panel reads
+   another one. He accepts the closure's private binding without abandoning his
+   preferred named capability. His interface and operation vocabulary belongs
+   to the API being discussed.
+4. **Continuity and onboarding.** Remove the anticipatory “both proposed APIs,”
+   “my constructor,” `snapshot()` mention and “other handler.” Name the cart type
+   and array helper at the two-write demonstration. Remove the unexplained
+   assertion-removal aside. Eden now asks about retaining the constructor input
+   before Guy answers. Dafna proposes a closure explicitly, and the new member
+   replacement is labeled at the point it changes the earlier class.
+5. **Migration.** Eden puts the strict/sloppy assignment difference next to the
+   freeze example. The old package keeps its mutating API for other callers,
+   with a proposed compatibility wrapper delegating to the same calculation.
+   Checkout and the summary's property-reading bindings still need migration.
+   The separate strict-mode Take is removed.
+6. **Preview.** Take the review's shorter option. The scene asks for two candidate
+   values without publishing either; it no longer promises an apply/read/undo
+   failure that is not shown. The existing output test checks both candidates
+   and the unchanged current price. No subscriber or timing behavior was
+   invented to make a synchronous temporary update observable.
+7. **Voice and repetition.** Remove the requested one-word reply openers, the
+   publication slogan and the repeated instruction to run the test already
+   printed. Cut a repeated Guy/Dafna preference exchange after the closure.
+   Explain input ownership once in response to Eden's question, rather than
+   restating the total-recomputation argument. Liron remains in the Principle;
+   the professionals handle the Turn without a new parable.
+8. **Principle wording.** Use “holder” consistently. A holder needing history
+   must receive a value that stays unchanged; producing it in the owner or
+   capturing it at handoff remains a design choice.
+
+### Validation and scope
+
+`npm ci --offline` and the full `npm run check` exit 0 on TypeScript **7.0.2**,
+Node **v22.23.3**, on final draft 2:
+
+- Chapter 17: **19 fences / 26 compiler cases / 21 runtime groups**.
+- Whole book: **318 fences / 424 compiler cases / 140 runtime groups**, plus
+  2 default cases and 2 source searches.
+- `git diff --check` passes.
+
+In addition to both printed mixed-argument errors, inverse-direction cases
+reject a stored quote where a reader function or `PriceView` is required.
+Runtime checks keep the results of the actual reader function and owner/closure
+reads while later updates occur. The original frozen-getter runtime assertions
+still use the original class. The compatibility fixture checks valid in-place
+outcomes and rejection without mutation; it models Eden's proposal, not a real
+third-party package release or every possible legacy input.
+
+The call-shaped APIs distinguish a capability from its returned value. They do
+not make arbitrary implementations of `Quote` immutable by type, nor prove that
+a caller captures a value at the correct time. This implementation supplies
+stable values with the checked, frozen scalar constructor. Runtime history
+checks remain necessary even though the specific uninvoked-reader argument
+mistake is now rejected statically.
+
+The two smaller caveats retained from draft 1 still have bounded roles: Daniel's
+array-property replacement clause prevents treating the readonly array's API as
+protection for its containing property; Gil's local builder applies the opening
+rule without becoming a second Turn. No extra experts or cast members were added.
+
+### Frozen handoff
+
+SHA-256: `331e886fbed7b5b9bec95e530fc1ba76dd66e372512cbbf6d220402fd49885d7`.
+The manuscript is **2,345 words**, including code. The
+[draft 2 snapshot](ch17/DRAFT2-SNAPSHOT.json) records fence and validator hashes,
+validation counts, and hashes for the three unchanged Claude reports. No
+manuscript edit followed the full run.
+
+Claude owns the targeted fresh recheck and second formal review. The checks pass,
+but comprehension and the fairness of the revised disagreement are still for
+that review. Local commit only; no push or PR by Codex.

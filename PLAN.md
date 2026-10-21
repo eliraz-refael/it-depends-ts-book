@@ -14,14 +14,14 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 Act II is complete. Chapter 14 opens Act III with **error handling** and is drafted, jointly reviewed and checked. Chapter 15, **branded types**, is drafted, jointly reviewed and checked, including isolated Principle-only and full-reader reviews.
 
-Chapter 16, **runtime validation**, is complete and merged after independent readers, a recheck and joint review. Chapter 17, **immutability**, is drafted and self-reviewed on its settled plan; compiler/runtime checks pass, and independent readers and formal review are pending. Its draft reaches a local Verdict on stable snapshots and owner-controlled publication; Act III's open-ending debt remains outstanding.
+Chapter 16, **runtime validation**, is complete and merged after independent readers, a recheck and joint review. Chapter 17, **immutability**, has been revised after independent readers and formal review; draft 2 is frozen, the full suite passes, and a targeted recheck is pending. Its draft reaches a local Verdict on stable snapshots and owner-controlled publication; Act III's open-ending debt remains outstanding.
 
 ### Act III tasks
 
 - [x] Ch14: `01-error-handling.md` — exceptions and explicit results across a transaction boundary; fair alternatives, independent first-reader rechecks, joint review and compiler/runtime validation complete
 - [x] Ch15: `02-branded-types.md` — scalar meanings, stale object checks, working class and request alternatives; joint review, independent readers and compiler/runtime validation complete
 - [x] Ch16: `03-runtime-validation.md` — raw receipts, unfamiliar values and consumer-specific projections; independent readers, joint review and compiler/runtime validation complete; merged
-- [ ] Ch17: `04-immutability.md` — historical snapshots, live views and checked pricing updates; draft 1 frozen and self-reviewed; full suite passes; independent readers and formal review pending
+- [ ] Ch17: `04-immutability.md` — historical snapshots, live views and checked pricing updates; draft 2 frozen after independent readers and formal review; full suite passes; targeted recheck pending
 - [ ] Act III debt: at least one honest "The Debate Continues" chapter, with demonstrated conditions
 
 ### Completed Act II work
@@ -165,7 +165,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Scaffolding + Prologue      | Done            |                       |
 | Act I: The Type System      | Done            | 6 chapters; calibrated voice passes complete |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
-| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–16 complete (3 of 10); Ch17 draft frozen, independent review pending |
+| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–16 complete (3 of 10); Ch17 draft 2 frozen, targeted recheck pending |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |

@@ -1,0 +1,120 @@
+{
+  "status": "draft 2 frozen; targeted independent recheck pending",
+  "date": "2026-10-21",
+  "previous_draft_commit": "2d1cf88",
+  "path": "book/03-patterns-and-design/04-immutability.md",
+  "sha256": "331e886fbed7b5b9bec95e530fc1ba76dd66e372512cbbf6d220402fd49885d7",
+  "words": 2345,
+  "typescript_fences": 19,
+  "fences": [
+    {
+      "ordinal": 1,
+      "sha256": "a0f76ae30ee62f6dea861656ab3aadf00962b33518aa633f82e55f3224140662"
+    },
+    {
+      "ordinal": 2,
+      "sha256": "81ab87e76033bc1ffb385d934b959adb649c97b22a6b0ba3aedf3eafd4392891"
+    },
+    {
+      "ordinal": 3,
+      "sha256": "0e91c60cd252460070003b2f2f7fa51d344efa088cda36c96be94c4bb73092f4"
+    },
+    {
+      "ordinal": 4,
+      "sha256": "7437e9966e04191c6dd2eb9fa544972459fe88b0a74e49db8ad6151d8bb05977"
+    },
+    {
+      "ordinal": 5,
+      "sha256": "8853ab7c9ef00e58dbe0cddc39e02990aa9f4c559c58ff97238077cea5a22f5d"
+    },
+    {
+      "ordinal": 6,
+      "sha256": "b763e629ab776c0025dcf540f1bb6b5e88e89c518985cbc06cb75ef4048083a1"
+    },
+    {
+      "ordinal": 7,
+      "sha256": "4f95cb1bb9e4b70cab6c27b25f98696e684d2dd6835908e4ea2025d2c0a90d4a"
+    },
+    {
+      "ordinal": 8,
+      "sha256": "a94b40f7271f9a130b9793562f1154732e4eb5fe51c219c8c025e1601c2febbf"
+    },
+    {
+      "ordinal": 9,
+      "sha256": "f669b47f25a1160836f7263d26bd636b1899b28e946bacfb315588a115d66ab2"
+    },
+    {
+      "ordinal": 10,
+      "sha256": "56c39ceb6347b10cf4ca99da652218e93eea108a844e6c922067a5066a94432a"
+    },
+    {
+      "ordinal": 11,
+      "sha256": "e54c7325c4c79c5a7c041b1cf1ca121aea7f834e4dff47e796b92c48dad22f1c"
+    },
+    {
+      "ordinal": 12,
+      "sha256": "f75e0e6c329324ce8ded71489f93310f015b0f020606dac1de5e4cf9b0def01e"
+    },
+    {
+      "ordinal": 13,
+      "sha256": "9448d94e4900206837e6942e9b2e31793e9bf70c7fa518388a4c45477aaaca46"
+    },
+    {
+      "ordinal": 14,
+      "sha256": "3f1efd9d438c30e894c4818c62cb81b78f8fe90beed0e0d45caf7a0969d15c23"
+    },
+    {
+      "ordinal": 15,
+      "sha256": "fc32ed3f3f3cbc45d6d5eaafec1034111662eeb2022dad2dc1340ee6e666a054"
+    },
+    {
+      "ordinal": 16,
+      "sha256": "c673dc902ac05ee6f77e386eb626c5c37d62f1f33b52f07e08f043103572e790"
+    },
+    {
+      "ordinal": 17,
+      "sha256": "b66288053dfc079577092606da13895d7787f9a5b57d9520c41930d72978be19"
+    },
+    {
+      "ordinal": 18,
+      "sha256": "1763bb46e855c9f53416c709b69d845b6604b39c33873151dda45656fc81b130"
+    },
+    {
+      "ordinal": 19,
+      "sha256": "1931d7a4cc86431027ca48352169bf035f97bbaa8216df65969daa96e395594b"
+    }
+  ],
+  "validator_sha256": "2f99022277ffd2febb6193045eadd19e1e988593912103a723b29083091f4d9f",
+  "typescript": "7.0.2",
+  "node": "v22.23.3",
+  "validation": {
+    "install": "npm ci --offline: exit 0",
+    "full_suite": "npm run check: exit 0",
+    "chapter_counts": {
+      "fences": 19,
+      "compiler_cases": 26,
+      "runtime_groups": 21
+    },
+    "book_counts": {
+      "fences": 318,
+      "compiler_cases": 424,
+      "runtime_groups": 140,
+      "default_cases": 2,
+      "searches": 2
+    }
+  },
+  "claude_reports": [
+    {
+      "path": "docs/editorial/ch17/CLAUDE-REVIEW.md",
+      "sha256": "32773739694246fff367e6cb7a8a89bf3ed2c1787dc0fc023d378f24a66eafc9"
+    },
+    {
+      "path": "docs/editorial/ch17/CLAUDE-PRINCIPLE-READ.md",
+      "sha256": "30489118b9ee770b80b6acfaff130fed3dc801ef64845e2e1cee96f8f4b38649"
+    },
+    {
+      "path": "docs/editorial/ch17/CLAUDE-FULL-READ.md",
+      "sha256": "2de5ef93dfe11d06940ef0bd1963cb06dfa55548eee8b0a1e5e98c741d2e7f2f"
+    }
+  ]
+}
