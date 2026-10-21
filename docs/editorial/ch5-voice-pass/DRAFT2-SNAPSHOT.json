@@ -1,0 +1,64 @@
+{
+  "baseline_commit": "891f1c6",
+  "chapter": "book/01-the-type-system/05-narrowing-strategies.md",
+  "baseline_sha256": "e6d6fbb7559a04161cf192442eaccc485a6691d6133790fa77bdb36527eb9892",
+  "baseline_words": 3258,
+  "all_fences_identical_in_order": true,
+  "fence_count": 13,
+  "fences": [
+    {
+      "ordinal": 1,
+      "sha256": "b9fc5398a9b656a96720b2479998c3c414dee05bc786a94fd2701784271c08ba"
+    },
+    {
+      "ordinal": 2,
+      "sha256": "bb7507b4eb0720af4dfb5ce1be58755cf8166fff05328de011fad9431b0cc2cc"
+    },
+    {
+      "ordinal": 3,
+      "sha256": "25fb171346c2c54c8a7183939a71cf0e0abc0c9699903558dfd7aea44afda34a"
+    },
+    {
+      "ordinal": 4,
+      "sha256": "1284b39a2bbc1030d8b6f5a3d7c1ff0f6a8dc9c55929a10fe7101cd1323340e1"
+    },
+    {
+      "ordinal": 5,
+      "sha256": "c73af425443e9a10b1ed9fcf6b6ad43530ef769cbe74136b311e02045401b28b"
+    },
+    {
+      "ordinal": 6,
+      "sha256": "ceaa983484fa28eddb5f8b65d4e53850563795c48f2d4734c5ab03b615b42b5f"
+    },
+    {
+      "ordinal": 7,
+      "sha256": "1ddc1e91d8d93fe67cb1ae8aaacf1482aa0fc943040ca7a1b09ab2b70be85286"
+    },
+    {
+      "ordinal": 8,
+      "sha256": "cb4822f661646b6153cc73443afd3ed440e6a7d4b3cfcd0e4f405308c2982756"
+    },
+    {
+      "ordinal": 9,
+      "sha256": "9f4f508170f8499f5df70f6a011813e79d0819c6e062de9505f3c4214b420b4c"
+    },
+    {
+      "ordinal": 10,
+      "sha256": "ee984683960a2f21f65657a61507cceebef106c7f73f35db14f5da5937426829"
+    },
+    {
+      "ordinal": 11,
+      "sha256": "0c73528c4f411a212f5f1a93e5fd459542cdfc99b90f1e152f767204bba75633"
+    },
+    {
+      "ordinal": 12,
+      "sha256": "2824fc1403d231fe2ae7b1d9df374ffb9c2617845d866a43b5295289f53f98c7"
+    },
+    {
+      "ordinal": 13,
+      "sha256": "218dfe340c80e7289e3d3eb515d02d1e083cf186462e9597e5ecf0ef8beaa69f"
+    }
+  ],
+  "draft2_sha256": "a94d99f3313b21f3ae10dd93b0dfc97fc824bba78b90008cba3d77b49e9cb0f1",
+  "draft2_words": 2961
+}

@@ -2,8 +2,6 @@
 
 ## The Principle
 
-The previous four chapters were about how TypeScript *describes* values: what the type can be, how to compose shapes, where the escape hatches live. This chapter is about a different verb. What does it mean, inside a function, to *prove* that a value has the type the compiler thinks it does?
-
 **Daniel Compiler** opens his laptop.
 
 ```typescript
@@ -18,7 +16,7 @@ function handle(x: string | number) {
 }
 ```
 
-"Look at the type of `x` inside each branch. The compiler tracks two different types in two different code paths — same variable, same scope, different facts known. That's narrowing. It's called *control flow analysis*. The compiler reads your code as a graph of paths and asks, 'on this path, what have we proven about this value?'"
+"Inside the first branch, `x` is a string. Inside the other, it's a number. The compiler follows the check along each path and narrows the type. That's *control flow analysis*."
 
 **Daniel** adds two null checks.
 
@@ -33,17 +31,15 @@ function process(input: string | null | undefined) {
 }
 ```
 
-"Same intent. Different narrowing. `!= null` is one of the few places the language uses loose equality on purpose — it excludes both `null` and `undefined`. Strict `!== null` excludes only `null`. The parameter still has `undefined` in it, so the strict check leaves it on the table. The compiler is right; the developer's mental model was off by one."
-
-He looks up.
-
-"You have already been using narrowing when you write checks like these. The compiler follows the conditions along each path."
+"`!= null` excludes both `null` and `undefined`. Strict `!== null` excludes only `null`. If you meant to remove both, the second check hasn't done it. The compiler follows the check you wrote, even when you meant a different one."
 
 **Chen Override**: "Does it check the body of a type guard too? If I say a function proves something?"
 
-**Daniel**: "It checks the body as code. But if you write a type predicate in the return annotation, it trusts that predicate. You can write one that always returns `true`."
+**Daniel**: "A return annotation like `value is User` is a type predicate: `true` tells the caller to treat `value` as a `User`. TypeScript checks that the body returns a boolean, but it doesn't prove that promise. The assertion-function form, `asserts value is User`, promises the type after a normal return."
 
-**Noam Kiperman**: "You can also test it."
+"For external input, prefer building a typed value from the fields you've checked. The compiler needs those checks before it will let you read the fields and use them in the new object. How a failed check reaches the caller is a separate choice."
+
+**Noam Kiperman**: "I want tests for that guard. Especially the inputs it should reject."
 
 ## The Debate
 
@@ -64,21 +60,21 @@ function describe(value: unknown): string {
 }
 ```
 
-"For the boring 80% — primitives, dates, arrays — these are all you need. Hover the variable inside each branch and the language server shows you the narrowed type. The compiler does its job."
+"For ordinary primitives, dates and arrays, start here. Hover the variable inside each branch to see what the check established."
 
-**Chen Override** unfolds his arms.
+**Chen Override**: "What do those checks leave unproven?"
 
-"What do those checks leave unproven?"
+**Linoy**: "Start with `typeof null === 'object'`. An object check still needs to exclude `null`."
 
-Linoy sighs, but she enjoys this.
+**Chen**: "Would your date check accept a `Date` from another iframe?"
 
-"`typeof null === "object"`. So if I write `if (typeof value === "object")` thinking I excluded null, I didn't. `typeof NaN === "number"`. So if I write `if (typeof value === "number")` thinking I have a usable number, I might have NaN. `instanceof` checks the prototype chain — if your `Date` came from another iframe or a Node `vm` context, `value instanceof Date` returns false because the prototype is different. `Array.isArray` is the one that's actually safe across realms — it doesn't check prototypes, it checks an internal slot. And `typeof x === "function"` matches arrow functions, regular functions, async functions, class constructors, and generators. They are not interchangeable."
+**Linoy**: "No. `instanceof` follows the prototype chain, and that iframe has a different `Date` constructor. A Node `vm` context can give you the same problem. `Array.isArray` works across those boundaries. It checks whether the value is an array, regardless of which constructor made it."
+
+"And `typeof x === 'function'` includes class constructors, async functions and generators as well as ordinary functions. I wouldn't call all of those the same way."
 
 **Chen**: "And `in`?"
 
-**Linoy** takes her time with this one:
-
-"The `in` operator does not check whether an object has the property as its own. It walks the prototype chain. Inherited properties — class methods, anything `Object.prototype` provides — return true. `"toString" in {}` is `true`."
+**Linoy**: "It walks the prototype chain too. `"toString" in {}` is `true`, although the empty object has no own `toString` property."
 
 ```typescript
 const empty = {};
@@ -100,11 +96,7 @@ function isResponse(x: object): x is { error: string } {
 
 **Linoy**: "And `if (x)` also rejects `0`, the empty string, `false`, `0n`, and `NaN`. If you only meant to reject nullish values, that check is too broad."
 
-**Chen**, satisfied: "Nothing to add."
-
-**Linoy**: "The checks work. You have to ask them the question you actually mean."
-
-**Daniel**: "`typeof NaN` is `number` in JavaScript too. Narrowing to `number` does not promise a finite number. That takes another check."
+**Daniel**: "`typeof NaN` is `number`. Narrowing to `number` does not promise a finite number. That takes another check."
 
 ---
 
@@ -112,7 +104,7 @@ function isResponse(x: object): x is { error: string } {
 
 **Noam** opens his guard function.
 
-"User-defined type guards. The construct that lets you write a function that *is* the narrowing logic, in one place, named, testable."
+"I want a named check I can test. This one lets a handler treat its input as a `User` when it returns `true`."
 
 ```typescript
 type User = { id: string; email: string; displayName: string };
@@ -143,9 +135,7 @@ function greet(input: unknown) {
 
 **Noam**: "`function isUser(value: unknown): value is User`."
 
-**Dafna**: "And what does TypeScript check, in that signature, to make sure the predicate is honest?"
-
-**Noam**: "It trusts the annotation. We just said that."
+**Dafna**: "This body would satisfy that signature too:"
 
 ```typescript
 // Looks safe. Is a lie.
@@ -160,15 +150,11 @@ if (isUser(x)) {
 }
 ```
 
-**Dafna**: "Then adding `value is User` has given me another claim to review. The compiler accepts this body too."
+**Daniel**: "Since [TypeScript 5.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html), it can infer a predicate from some function bodies without return annotations. An explicit predicate annotation takes the place of that inference."
 
-**Daniel**: "An explicit predicate is trusted. TypeScript can infer predicates from some function bodies, but that is a different case. Writing the annotation yourself does not make the checker prove it."
+**Noam**: "That always-true body fails the first rejection test. I'm not dropping the tests because I gave the function a return annotation."
 
-**Noam**: "That's why I want the tests. I'm still putting the check in one place."
-
-**Idan Greenfield**, half to herself: "You're all arguing about how to prove it. Nobody's asked when the value got the type in the first place."
-
-A pause. Noam looks over.
+**Idan Greenfield**: "I'd rather have the function return the fields it checked."
 
 ---
 
@@ -176,7 +162,7 @@ A pause. Noam looks over.
 
 **Guy Singleton** opens another function.
 
-"Assertion functions. `asserts x is T`. Imperative narrowing — the function throws if the value is wrong, and the compiler treats the *successful return* as proof of the type."
+"An assertion function can give the caller a straight path. `asserts value is User` tells TypeScript to narrow `value` after the function returns. This one throws if a field is wrong."
 
 ```typescript
 function assertIsUser(value: unknown): asserts value is User {
@@ -200,47 +186,43 @@ function greetOrFail(input: unknown) {
 }
 ```
 
-"This is how I write invariants. If `input` isn't a User, the program can't continue. The throw says so. The caller doesn't need a wrapping `if` — the assertion shapes the type going forward, and the failure case is a thrown exception, not a control flow branch I have to handle."
+"If this handler doesn't have a `User`, it has to stop. After `assertIsUser` returns, the rest of it can use the fields. I don't need an `if` around that work."
 
-**Dafna**: "Where does the caller see that it can fail? The signature returns `void`."
+**Dafna**: "Where does the caller see the failure? There's no error value in that signature."
 
 **Guy**: "It's an assertion. If it returns, the value is usable. If it throws, our request handler catches it."
 
-"And if I'm processing a list of inputs? I want to keep the good ones and report the rejected ones. A throw stops the traversal unless I catch it for each input."
+**Dafna**: "And if I'm processing a list of inputs? I want to keep the good ones and report the rejected ones. A throw stops the traversal unless I catch it for each input."
 
 **Guy**: "For that list, you would. In this handler, one invalid user rejects the request. I want it to stop."
 
-**Noam**: "Assertion functions belong with invariants. `assertNever`, a required value that's unexpectedly missing. External input is allowed to be wrong. We should handle that as a result."
+**Noam**: "I want assertions for broken invariants: a missing required value, or a case that should be unreachable. A helper like `assertNever(value: never)` handles that second job. External input is allowed to be wrong. We should handle that as a result."
 
 **Guy**: "You used `ApiUser.parse(raw)` in your API example. That throws. You said the error was clear and happened where we could handle it."
 
-Noam scrolls back to the example.
-
-"Yes. It does."
+**Noam**: "Yes, it does."
 
 **Guy**: "Was that wrong?"
 
-"The check was doing its job. I should have shown the handler too. I want to see who catches it. If there isn't a handler, use the result."
+**Noam**: "The check was doing its job. I should have shown the handler too. I want to see who catches it. If there isn't a handler, use the result."
 
 **Dafna**: "I'd use the result either way. I want the failure in the signature when I move that call."
 
 **Guy**: "And I don't want every function between the parser and the handler to repeat the same failure branch."
 
+**Idan**: "Parse at the handler and pass `User` down. Those functions never receive the result union."
+
+**Guy**: "That works. I'd still have the parser throw to the handler we already use for the request."
+
 ---
 
 ### "Parse, don't validate"
 
-**Idan Greenfield** had asked something earlier. Nobody picked it up. When Guy finishes, she leans forward to ask it differently.
+**Idan**: "Guy, where did this `unknown` come from?"
 
-"Guy. Where did the `unknown` come from?"
+**Guy**: "Whatever the client posted. It's `unknown` for a reason."
 
-Guy looks at her. "From the API."
-
-"And before the API?"
-
-"From whatever the client posted. Or a database column. I don't know — it's `unknown` for a reason."
-
-"Then show me where it becomes a `User` I can use. Your annotation says the input passed. I want the function to return the fields it checked."
+**Idan**: "Then show me where it becomes a `User` I can use. Your annotation says the input passed. I want the function to return the fields it checked."
 
 **Guy**: "They're already on the object."
 
@@ -272,19 +254,23 @@ function parseUser(input: unknown): ParseResult<User> {
 }
 ```
 
-*"Prove it by producing it."*
+**Idan**: "Drop the `email` check from `parseUser`. The `input.email` read in the return object no longer compiles. Drop the `email` check from `isUser`, and `isUser` still compiles. That's why I build the value."
 
-"Delete the `email` field from that return object. The function no longer compiles. Leave it out of an explicitly annotated predicate's checks, and the predicate can still compile. That's why I build the value."
+**Noam** tries removing the check, then restores it.
 
-**Noam** tries the deletion, then restores the field.
+**Noam**: "I still want `inputs.filter(isUser)` to give me `User[]`. A result doesn't fit there."
+
+**Idan**: "For this handwritten parser, keep a predicate that calls it: `const isUser = (v: unknown): v is User => parseUser(v).ok`. That filters the original objects. If you want only the checked fields, map through the parser and keep the successful values."
+
+**Noam**: "Then I don't have two sets of field checks to maintain."
 
 **Idan**: "And a failure tells the caller which check failed. Your assertion gives me one message for the whole object."
 
 **Guy**: "I can put the field name on an error. I can put the rejected value on it too."
 
-"Yes."
+**Idan**: "You can."
 
-"Then stop comparing yours to a generic message. I'll use your parser."
+**Guy**: "Then stop comparing your parser to a generic message. I'll use your parser."
 
 ```typescript
 class UserParseError extends Error {
@@ -305,25 +291,19 @@ function parseUserOrThrow(input: unknown): User {
 
 **Guy**: "Same checks, same fields, same reason if it fails. The request handler catches `UserParseError`."
 
-**Idan** reads the function.
+**Idan**: "And a caller outside that handler?"
 
-"And a caller outside that handler?"
+**Guy**: "Has to follow the same convention."
 
-"Has to follow the same convention."
+**Idan**: "I want them to see the failure in the return type."
 
-"I want them to see the failure in the return type."
-
-**Guy**: "I want one place that handles it. I'm not changing every call just to repeat that decision."
-
-**Noam**: "At least we're reviewing the same checks now."
+**Guy**: "For this request, the handler already knows how to reject the operation. I'll keep sending these failures to it."
 
 ---
 
 ### "Discriminated unions make the check ordinary"
 
-**Dafna Functor** picks up the thread.
-
-"Once you have a typed discriminated union, you can narrow with an ordinary `switch`. No separate guard function for each case."
+**Dafna**: "Once you have a typed discriminated union, you can narrow with an ordinary `switch`. No separate guard function for each case."
 
 ```typescript
 type RequestState<T> =
@@ -342,11 +322,11 @@ function describeRequest<T>(state: RequestState<T>): string {
 }
 ```
 
-"Inside `case "success"`, `state.data` is `T`. Inside `case "error"`, `state.error` is `Error`. No type guard. No predicate. No assertion. The discriminant *is* the narrowing. And if I add `{ kind: "retrying"; attempt: number }` to the union, every `switch` that doesn't handle it stops compiling — the same `never` exhaustiveness trick we used on enums works here too."
+"In the success case, `state.data` is `T`. In the error case, `state.error` is `Error`. The tag gives me access to the right fields. If I add `{ kind: 'retrying'; attempt: number }` without handling it, this function's `: string` return annotation catches the missing return."
 
-**Daniel**: "With strict null checking, the annotated return type `: string` catches a missing return here. Without the annotation, the inferred result can become `string | undefined`. An explicit `assertNever` check is another way to enforce exhaustiveness."
+**Daniel**: "That holds with strict null checking. Without that return annotation, the inferred result can become `string | undefined`. An explicit `assertNever` check is another way to enforce exhaustiveness."
 
-**Idan**: "If the value came from outside, first check that the tag and payload agree. This parser accepts in-memory values; its error case expects an actual `Error` object, not a JSON representation of one."
+**Idan**: "Our request module publishes state changes through an in-process event bus. The receiver gets `unknown`, so check the tag and payload together. Here an error event carries an actual `Error` object."
 
 ```typescript
 // At the boundary — produce the discriminated shape:
@@ -369,23 +349,21 @@ function parseEvent(input: unknown): ParseResult<RequestState<unknown>> {
 }
 ```
 
-**Guy**: "And if the external format uses a different tag?"
+**Guy**: "And if another module uses a different tag?"
 
 **Idan**: "Translate it in the parser. The rest of the code can keep using `RequestState`."
 
 ---
 
-### "Hand-written vs zod / valibot / arktype at the boundary"
+### "Who writes the parsers?"
 
-**Oded Shipley** picks up the practical question:
+**Oded Shipley**: "So `parseUser` is fine for one type. What about forty? I'm not writing forty of these. We already have a library for this."
 
-"So `parseUser` is fine for one type. What about forty? I'm not writing forty parsers and maintaining forty test suites. *We can fix it in the next sprint* — or we can use a schema library and ship today."
-
-**Linoy**: "We already depend on Zod. Start there. Valibot and ArkType are other options if we're evaluating libraries, but that's another PR."
+**Linoy**: "Use Zod, then. Valibot and ArkType are other options if we're evaluating libraries, but that's another PR."
 
 **Gil Benchmark**: "Keep the cases you would have tested against the handwritten parser. Missing fields, wrong element types, `null`, `undefined`. Run them against the schema. Importing a validator doesn't tell us whether we wrote the right schema."
 
-**Linoy**: "Here's the same user shape. I've also required an email address rather than just a string."
+**Linoy**: "Here's the same user shape. I've also required an email address rather than just a string. Its failure reason is Zod's issue list as text."
 
 ```typescript
 import { z } from "zod";
@@ -419,7 +397,7 @@ function parseUser(input: unknown): ParseResult<User> {
 
 ## The Turn
 
-**Gilad Stacktrace** points at `parseUser`, then at Guy's wrapper.
+**Gilad Stacktrace** scrolls back to Idan's handwritten `parseUser` and Guy's `parseUserOrThrow` wrapper.
 
 "Give them the same bad input."
 
@@ -449,17 +427,13 @@ try {
 
 **Chen**: "Can the caller ignore your result, Idan?"
 
-"They can ignore the call. They can't take its `value` as a `User` without dealing with the union. That's the check I want when this function gets used somewhere new."
-
-Guy leaves his wrapper on the screen.
+**Idan**: "They can ignore the call. They can't take its `value` as a `User` without dealing with the union. That's the check I want when this function gets used somewhere new."
 
 ## The Debate Continues
 
 The room has agreed to parse external input and keep the runtime checks in one place. It has not agreed on how every parser should report failure.
 
 Idan and Dafna prefer a result for expected rejection. The return type exposes the failure case, and a batch can retain failures alongside successes. Guy prefers throwing when an established handler owns rejection for the whole operation. Both versions above produce a checked `User`; both carry the same failure details.
-
-The unresolved choice is how much each caller should know about failure handling. That matters when code moves between a request handler, a batch, and a reusable library. A convention that works in one setting may need an adapter in another.
 
 | Situation | Starting point | Condition |
 |-----------|----------------|-----------|
@@ -480,8 +454,6 @@ The unresolved choice is how much each caller should know about failure handling
 
 ## Additional Takes
 
-**Noam Kiperman**: "Keep the predicate tests when the type changes. Adding a required field to `User` doesn't force an explicitly annotated `isUser` to check it."
-
-**Daniel Compiler**: "Since [TypeScript 5.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html), the compiler can infer predicates for some functions without return annotations. That inference comes from the body. It does not verify a predicate you explicitly wrote."
+**Noam Kiperman**: "Keep the predicate tests when the type changes. If `isUser` has its own field checks and a predicate annotation, adding a required field to `User` won't force those checks to change."
 
 **Eden Legacy**: "I would migrate the checks first. Get one parser behind the existing callers, including the ones that expect exceptions. Then change how failure travels where the callers need it. Those are separate changes; I'd like to review them separately."
