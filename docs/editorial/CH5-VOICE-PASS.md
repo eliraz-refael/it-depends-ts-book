@@ -1,0 +1,136 @@
+# Chapter 5 voice pass
+
+Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**, 2026-10-21.
+Baseline: `891f1c6`, after the approved Chapter 4 pass.
+Branch: `codex/chapter-5-voice-pass`.
+
+## Scope and calibration
+
+Apply the author-approved [Chapter 3 pilot](CH3-PILOT.md),
+[Chapters 1–2 pass](CH1-2-VOICE-PASS.md), and [Chapter 4 pass](CH4-VOICE-PASS.md).
+The author authorized this pass through Claude's brief. Codex owns the manuscript
+and records; Claude supplies independent discovery, readers and cross-review.
+
+This pass preserves parse-at-boundary, the schema-derived type, Guy's throwing
+adapter, and the unresolved result-versus-throw choice. Chapter 16 relies on
+those conclusions. No other manuscript chapter or registered technical fixture is edited.
+The worktree starts before the still-open continuity and Chapter 16 PRs; Claude
+will rebase before opening the final PR as needed.
+
+## Baseline reading and discovery
+
+Codex's fresh [opening-only reader](ch5-voice-pass/CODEX-BASELINE-PRINCIPLE-READ.md)
+received only the opening before the Debate. It identified descriptive rules
+about control flow and trusted predicates, but no prescription for designing
+reliable checks. Claude's separate [baseline reader](ch5-voice-pass/BASELINE-PRINCIPLE-READ.md)
+also found no stated prescriptive principle.
+
+Claude's [independent discovery](ch5-voice-pass/CLAUDE-DISCOVERY.md) arrived and
+was read before this draft was frozen. Its mandatory fixes are all applied:
+a stated principle, the handwritten-parser reset, and missing speaker tags.
+
+## Draft choices
+
+- Daniel states a preference for producing typed values from checked fields,
+  distinguishing compiler-checked output from trusted narrowing annotations.
+  It leaves result versus throw open: Guy's adapter also returns a produced User.
+- The opening recap, repeated control-flow conclusion and loose-equality
+  anthropomorphism are removed. The predicate syntax is explained at first use.
+- Linoy's catalogue is broken by Chen's concrete cross-realm question. NaN's
+  finite-number limit stays with Daniel; the repeated explanation is removed.
+- Noam retains a reusable, testable guard. Dafna still makes him confront the
+  annotation, and Guy still challenges his earlier use of a throwing parser.
+- Dafna, Noam, Guy and Idan receive explicit attribution at the broken exchanges.
+  The parser/wrapper comparison keeps the same checks and error details.
+- The Turn explicitly returns to Idan's handwritten `parseUser` and Guy's
+  `parseUserOrThrow`. The existing case `result-and-exception-reasons` compiles
+  fences 8 + 9 + 13, exactly that context. The Zod section retains its stronger
+  email-format check and replacement `User` definition.
+- Narrator judgments, stock silence, standalone catchphrases and the wrapper-left-
+  on-screen close are cut. No replacement gestures or jokes were added to fill quotas.
+- Dafna's exhaustiveness claim is limited to the shown annotated function;
+  Daniel retains strict-null-checking and inferred-return qualifications.
+- The Debate Continues and reference table stay. One repeated closing paragraph
+  is cut. The schema choice does not settle failure handling for every service.
+
+## Decisions on optional discovery suggestions
+
+Keep Noam's Take: adding a required field without forcing an explicit predicate
+body to change is a specific maintenance consequence, beyond his earlier request
+for tests. Daniel's repeated trust Take is cut; the TS5.5 history and source link
+move to his existing explanation of inference versus explicit annotations.
+
+Keep the comments in fence 4 unchanged. They contain an editorial aside, but
+repairing the prose and parser context needs no exception to the frozen-fence
+scope. Record the comment as a retained limitation rather than silently polishing it.
+
+The eleven-person cast and reference table remain, as in the approved Chapter 4
+calibration. The chapter still surveys several mechanisms; readers should assess
+whether the shorter prose preserves enough warmth and makes their connection clear.
+
+## Draft 1 snapshot and validation
+
+Draft 1: 2891 words including code (baseline 3,258).
+SHA-256: `70ae6073d037d597cf224c85283da31799efaaee932f3700a98b2c030d0cca16`.
+All **13 TypeScript fences** remain byte-identical and in the same order.
+No code, comment, fence-language, fixture or compiler-option exception was needed.
+The [snapshot manifest](ch5-voice-pass/DRAFT1-SNAPSHOT.json) records both manuscript
+hashes and each fence hash. `git diff --check` passes.
+
+`npm ci --offline` and `node checks/chapters1-6.cjs` succeeded on the frozen
+draft with TypeScript 7.0.2: 110 fences, 116 compiler cases and 8 runtime groups.
+Chapter 5 contributes 13 fences and 13 compiler cases, with no fixture edits.
+The full suite was deferred until review revisions, as the brief requested;
+fence preservation was not treated as final editorial approval.
+
+The existing [TypeScript 5.5 source](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html)
+was checked on 2026-10-21 and supports the moved inferred-predicate explanation.
+
+## Draft 2 and independent review
+
+Claude's [formal review](ch5-voice-pass/CLAUDE-REVIEW.md) and its
+[Principle-only](ch5-voice-pass/CLAUDE-DRAFT1-PRINCIPLE-READ.md) and
+[full reader](ch5-voice-pass/CLAUDE-DRAFT1-FULL-READ.md) asked for prose revisions.
+The Principle reader could restate the rule, but both readers found its placement
+abrupt. The full reader also identified repeated trust explanations and two
+unanswered competent alternatives.
+
+Draft 2 addresses those findings. The [response](ch5-voice-pass/CODEX-DRAFT2-RESPONSE.md)
+records each disposition. Daniel's rule now follows Chen's question, names the
+assertion-function syntax, limits the compiler's promise to fields and types,
+and separates construction from failure handling. Noam keeps a predicate for
+filtering, backed by this handwritten parser. Idan answers the propagation cost
+by parsing at the handler. The event parser now receives another module's
+in-memory state changes. Repeated trust explanations and the requested line
+friction are removed.
+
+Draft 2: **2961 words** including code.
+SHA-256: `a94d99f3313b21f3ae10dd93b0dfc97fc824bba78b90008cba3d77b49e9cb0f1`.
+All **13 TypeScript fences** remain byte-identical and in order against `891f1c6`.
+The [draft 2 manifest](ch5-voice-pass/DRAFT2-SNAPSHOT.json) preserves the snapshot;
+the draft 1 manifest and Claude's reports remain unchanged.
+
+`npm ci --offline` succeeded. The full `npm run check` exited 0 on TypeScript
+7.0.2: **282 fences / 371 compiler cases / 105 runtime groups**, plus two default
+cases and two searches. That run preceded only the final antecedent clarification
+from “And that fails” to “That always-true body fails”; the examples were unchanged.
+
+Two additional [editorial probes](ch5-voice-pass/INLINE-PROBES.cjs) compile and run
+independently on the final draft: the handwritten parser's predicate infers
+`User[]` through `filter` and preserves the original accepted object; the Zod
+failure reason parses as an issue array with the rejected field's path. These are
+**two compiler probes and two runtime groups**, separate from the book totals.
+Run them with `node docs/editorial/ch5-voice-pass/INLINE-PROBES.cjs`.
+
+This predicate adapter is scoped to the shown handwritten field-checking parser.
+It does not prove an arbitrary transforming parser's input has its output type;
+the explicit predicate annotation remains trusted. Zod's failure reason is an
+issue list rendered as text, unlike the handwritten reason. The Turn explicitly
+selects the handwritten parser, so its printed messages remain accurate.
+
+## Review state
+
+Draft 2 is frozen for Claude's targeted fresh-reader recheck and final diff review.
+Local commit is authorized for that handoff; no push or PR is authorized at this
+step. The manuscript is not marked settled before Claude's recheck. Claude owns
+publication after the review process.

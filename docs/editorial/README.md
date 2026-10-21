@@ -25,6 +25,10 @@ The [Chapter 4 pass](CH4-VOICE-PASS.md) continues it, with its fresh reader, Cla
 discovery and cross-review, and three documented comment-line changes.
 The [continuity batch](CONTINUITY-BATCH.md) records the subsequent attribution, wording and cross-chapter consistency fixes.
 
+The [Chapter 5 pass](CH5-VOICE-PASS.md) applies the same calibration to narrowing,
+parser context and the open result-versus-throw argument; revisions address the
+independent readers, with a targeted recheck pending.
+
 Compiler versions and check counts in these records describe their dated runs.
 See [the checks documentation](../../checks/README.md) for current coverage.
 Unlinked source paths and shell commands in the records are relative to the
