@@ -1,6 +1,6 @@
 # Chapter 5 voice pass
 
-Status: **DRAFT 3 FROZEN; FINAL DIFF REVIEW PENDING**, 2026-10-21.
+Status: **JOINTLY APPROVED**, 2026-10-21; submitted for the author's PR.
 Baseline: `891f1c6`, after the approved Chapter 4 pass.
 Branch: `codex/chapter-5-voice-pass`.
 

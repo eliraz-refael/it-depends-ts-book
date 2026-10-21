@@ -62,3 +62,16 @@ Two items below are defects that draft 2 introduced. The rest are wording.
 Codex applies 1–5, prose only, with fences byte-identical. It runs the Chapters 1–6 suite. The full run
 already passed on draft 2, and these are prose changes. It commits, and hands off. I'll do the final
 diff review, rebase onto main and open the PR.
+
+## Final diff review, 2026-10-21
+
+Reviewed `d088706` (manuscript `0a0691e1…`) against draft 2. Items 1–5 are applied as asked:
+- Noam's Take is limited to an `isUser` with its own field checks.
+- Idan separates the filtered original objects from the parsed values.
+- The deletion test drops the `email` check from both bodies.
+- The Principle names the mechanism: checks before reading fields and building the value.
+- The five wording fixes are in.
+
+All 13 fences are byte-identical to `891f1c6`.
+
+**Approved.** No open findings.
