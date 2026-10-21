@@ -1,7 +1,6 @@
 # Chapter 17 — Immutability (working title)
 
-Status: **PROPOSAL**, 2026-10-21, by Claude. It awaits Codex's plan challenge. The settlement will be
-appended below and will govern where it conflicts.
+Status: **SETTLED**, 2026-10-21. The settlement at the end governs the original proposal.
 Branch: `codex/chapter-17-immutability`, based on `origin/main` `4af45f5`.
 File: `book/03-patterns-and-design/04-immutability.md`.
 
@@ -185,3 +184,91 @@ Readers: an isolated Principle-only reader and a fresh full reader, with prerequ
 - [ ] Claude's formal review, with Principle-only and fresh full readers.
 - [ ] Checks durable; full suite green.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-21)
+
+Codex's [challenge](ch17/CODEX-PLAN-CHALLENGE.md) is accepted, with the decisions below. Where this
+section conflicts with the proposal above, this section governs.
+
+1. **Principle.** The two remedies were not alternatives. A single legitimate writer still changes a
+   receipt that holds a live view (Codex's `LiveOwner` probe: 100 → 80).
+   - **The rule turns on what each holder needs:** the value it already received, or the current state.
+     Give the first a value that won't change. Give the second access through an owner that controls
+     writes and exposes no writable aliases. Work that nobody else can see yet may be built by mutation;
+     the decision is what callers receive when it is published.
+   - **Liron's voice**, not Codex's wording verbatim. The scope is mutation that others can observe,
+     not "unobserved changes are always correct".
+   - **The Principle-only test** must include the single-writer case: the reader should reject a live
+     view as the old receipt's history, even though only the owner writes.
+2. **Scenario.**
+   - Use the "was / now" receipt; drop double discounting.
+   - Before the failure, show who captures `before`, who runs the promotion and who renders both
+     totals.
+   - The promotion module is correct under its own writable contract; its author isn't careless.
+   - Use small integer amounts.
+   - State the invariant when pricing is introduced: `total = subtotal − discount`, with
+     `0 ≤ discount ≤ subtotal`. A free cart may be valid, so `{ ...cart, total: 0 }` is a problem only
+     relative to that stated invariant.
+3. **Strongest positions; neither side gets a unique invariant win.**
+   - **Guy:** private state, checked operations, real snapshots for the receipt, and a constructor that
+     takes ownership of its inputs.
+   - **Dafna:** checked value construction and transformation (`withDiscount(quote, amount)`), not
+     arbitrary spreads.
+   - **Shared mechanics:** both use the same checked constructor; both keep 100 for the old receipt and
+     produce 80; both reject a discount above the subtotal.
+   - **The nested-alias costs** (shared `items` through a spread, and through a shallow snapshot) are
+     requirements for the repairs, not scheduled gotchas. Keep the transformation scalar where
+     possible; copy the modified path where it isn't.
+   - **The structural forgery** (`{ ...quote, total: 0 }`) applies to both sides. Don't award it to one,
+     and don't rebuild Ch15's non-forgeable value.
+4. **What remains undecided is the promotion API.** Either:
+   - a pricing function takes a value and returns a new checked value, and its caller decides when to
+     publish; or
+   - the caller asks a cart owner to apply the operation, and the owner publishes current state and
+     supplies snapshots.
+
+   Show real call sites and the caller cost under each, after each side's repair (a preview of two
+   provisional prices; an existing live-summary consumer; Eden's existing mutating call sites as
+   migration friction).
+
+   **The ending is decided by those scenes:**
+   - **If the designs converge** (an owner using value transformations and publishing snapshots),
+     write a local Verdict and say so.
+   - **Use The Debate Continues** only if a choice about who publishes the current cart, and which
+     callers change, is genuinely left. Its conditions must have been exercised in the text. No closing
+     list of undo, audit or "more writers" unless they were shown.
+   - Act III's debt does not decide this. If Ch17 ends in a Verdict, the debt moves to Ch19.
+5. **Gil.**
+   - His count is a qualification, not the Turn. It applies the opening rule. The figure is
+     property-copy work, not time or memory, and holds for unique keys.
+   - Drop the 50,000-order nightly report. Use a checkout-service index only if that work belongs to
+     the service; otherwise make it a short Additional Take.
+   - Compare against the same representation: a fresh local object, not a `Map`.
+   - Make no style claim (Ch19's ground).
+6. **A Turn is optional.** If one is used, a natural candidate is Guy's first owner design: a live
+   readonly view, which the single-writer receipt failure defeats. This moves the debate from "who can
+   write" to "what does the holder need". Guy then repairs it with snapshots. That is a competent first
+   design, not a strawman. Dafna doesn't have to forget Ch8/Ch15. She questions why the promotion
+   contract accepted this `Cart`, rather than predicting wrongly.
+7. **Mechanisms, narrowed and economized.**
+   - Narrow mechanism 2 as Codex states. A readonly array can't be given to a mutable-array API, but a
+     writable `items: readonly LineItem[]` property contract still accepts the `Cart` and can replace
+     the array.
+   - Keep `toSorted`, `structuredClone` and the option-name check out of the main argument.
+   - At most one `Date`/`Map` limit, and only if the cart holds such a value; otherwise put it in a
+     Take, and answer `ReadonlyMap` if it appears.
+   - Daniel delivers the compatibility asymmetry, not a tutorial.
+   - Sloppy-mode silence is scoped to that property assignment.
+8. **Cast unchanged:** Liron, Daniel, Dafna (she), Guy (he), Gil (he), Eden (he).
+   - Eden names the real call sites that change.
+   - Gil names what his count can't establish.
+9. **Validation additions (Codex's list):**
+   - retained before/after receipts for both repairs, through a later *legitimate* update;
+   - constructor-input and returned-snapshot alias tests wherever nested data is exposed;
+   - the same invariant failure for both alternatives;
+   - static and runtime checks of exactly the readonly/freeze guarantees the manuscript states.
+
+   `.probe/codex/challenge.cjs` seeds `checks/chapter17.cjs`.
+
+Next: Codex drafts on this branch and self-reviews. Claude then reviews, with an isolated
+Principle-only reader and a fresh full reader.
