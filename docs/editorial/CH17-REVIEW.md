@@ -1,9 +1,9 @@
 # Review record: Chapter 17 — The Price You Were Given
 
-Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**, 2026-10-21.
-Claude's draft 1 readers and formal review requested revision. The
-[response below](#draft-2-response-to-independent-review) records the changes and
-final draft 2 validation. Draft 2 has not yet received independent approval.
+Status: **DRAFT 3 FROZEN; FINAL DIFF REVIEW PENDING**, 2026-10-21.
+Claude's [second review](ch17/CLAUDE-REVIEW-2.md) approves after one small round,
+with no further reader. The [draft 3 response](#draft-3-response-to-targeted-recheck)
+records those edits and passing full-suite validation. Claude owns the final diff review.
 
 ## Historical draft 1 self-review
 
@@ -226,3 +226,56 @@ manuscript edit followed the full run.
 Claude owns the targeted fresh recheck and second formal review. The checks pass,
 but comprehension and the fairness of the revised disagreement are still for
 that review. Local commit only; no push or PR by Codex.
+
+
+## Draft 3 response to targeted recheck
+
+Claude's [second review](ch17/CLAUDE-REVIEW-2.md) and
+[reader recheck](ch17/CLAUDE-RECHECK-READ.md) are archived unchanged. No new
+reader was started. This round addresses the four requested changes and the
+three optional prose trims:
+
+1. **Fresh instances after class changes.** Both the function-reader example
+   after adding `snapshot()` and the interface-reader example after replacing
+   `view()` construct new instances. Daniel explicitly says `view()` no longer
+   returns a `Quote`. The fixtures compile those examples against the respective
+   class revisions; they no longer supply the original `pricing` declaration.
+   The original getter failure remains unchanged in a separate program.
+2. **Dafna accepts the owner requirement.** She says to keep one owner before
+   proposing her closure, rather than treating Guy's requirement as an objection
+   to something she never proposed.
+3. **Concrete, conditional interface benefit.** Guy names grouping `current`
+   and a change subscription from one owner. Dafna agrees to group those if
+   needed but retains the function for the panel's current single operation.
+   The condition is explicit: no new subscription requirement, implementation
+   or runtime behavior is invented to award the interface an exclusive win.
+   This is a reason for Guy's preference, not evidence for rejecting `ReadPrice`.
+4. **Items exchange.** Eden asks whether keeping the cart private protects the
+   shared rows. Guy answers that question. Eden's redundant instruction to keep
+   the price separate is removed; Dafna's earlier scope statement remains.
+5. **Optional prose.** Eden names the production exception on old strict-mode
+   paths that still write to a frozen price. Guy's getter explanation loses the
+   mirrored antithesis. The Verdict drops its final three-part recap.
+
+The reader's doubts about TS4104 and TS2739 remain declined, as in Claude's
+review: the compiler verifies both codes. The passing Principle is unchanged.
+Only fences 10 and 13 change; the other 17 are byte-identical to draft 2.
+The function-reader runtime fixture exports the new instance under its existing
+local test name; no behavior or expectation is weakened.
+
+### Final validation and frozen handoff
+
+`node checks/chapter17.cjs` and the full `npm run check` exit 0 on TypeScript
+**7.0.2**, Node **v22.23.3**:
+
+- Chapter 17: **19 fences / 26 compiler cases / 21 runtime groups**.
+- Whole book: **318 fences / 424 compiler cases / 140 runtime groups**, plus
+  2 default cases and 2 source searches.
+- `git diff --check` passes.
+
+SHA-256: `6166694af268afff83b7f297f9fc6726489184a48bdc892880b972d1941d3ad6`.
+The manuscript remains **2,345 words**, including code. The
+[draft 3 snapshot](ch17/DRAFT3-SNAPSHOT.json) records individual fence hashes,
+the validator hash and both new Claude report hashes. No manuscript edit
+followed the full run. Claude will review this final diff, handle the main-branch
+rebase and open the PR. Codex commits locally only.

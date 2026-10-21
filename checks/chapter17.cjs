@@ -32,7 +32,7 @@ const snapshot = block("snapshot():");
 const reader = block("type ReadPrice =");
 const viewType = block("interface PriceView");
 const viewMember = block("view(): PriceView");
-const badView = block("const view = pricing.view()");
+const badView = block("const currentPricing =");
 const repaired = block("const checkout =");
 const preview = block("const choosing =");
 const closure = block("function valueCheckout");
@@ -54,9 +54,8 @@ assert.equal(ownerWithSnapshot.split(getterMember).length, 2, "Unique view repla
 // Replace only the explicitly superseded view member; keep the earlier class
 // in separate programs for the frozen-getter failure and first function repair.
 const repairedOwner = ownerWithSnapshot.replace(getterMember, viewMember.trimEnd());
-const readType = before(reader, "const readPrice:");
+const readType = before(reader, "const functionPricing =");
 const readerFn = before(reader, "receipt(readPrice,");
-const pricingInit = before(live, "const summary =");
 const finalBase = base + valueFns + readType + viewType + repairedOwner;
 const deepType = before(date, "const stamp:");
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "ts-book-ch17-"));
@@ -96,16 +95,16 @@ assert.equal(errors.checked.diagnostics[0].message,
 assert(chapter.includes(errors.checked.diagnostics[0].message), "Printed property diagnostic");
 assert(chapter.includes(errors.checked.diagnostics[1].message), "Printed array diagnostic");
 const readerError = example("live-function-is-not-a-receipt-value",
-  base + valueFns + ownerWithSnapshot + pricingInit + reader, [2345]);
+  base + valueFns + ownerWithSnapshot + reader, [2345]);
 assert.match(readerError.checked.diagnostics[0].message, /ReadPrice/);
 const viewError = example("live-capability-is-not-a-receipt-value",
-  finalBase + pricingInit + badView, [2739]);
+  finalBase + badView, [2739]);
 for (const property of ["subtotal", "discount", "total"]) {
   assert(viewError.checked.diagnostics[0].message.includes(property));
 }
 const callable = example("function-reader-returns-snapshots",
-  base + valueFns + ownerWithSnapshot + pricingInit + readerFn +
-  "export {pricing, readPrice};\n");
+  base + valueFns + ownerWithSnapshot + readerFn +
+  "export {functionPricing as pricing, readPrice};\n");
 const originalApi = example("original-frozen-getter-api", base + valueFns + owner +
   "export {CartPricing};\n");
 example("snapshot-is-not-a-reader-function", finalBase +

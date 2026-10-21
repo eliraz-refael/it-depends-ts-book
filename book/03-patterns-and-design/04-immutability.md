@@ -126,7 +126,7 @@ try {
 console.log(original.total); // 100
 ```
 
-**Eden**: "That catches this writer because the package runs in strict mode. Some of our old JavaScript files would silently fail the same assignments. A missing exception won't tell me there are no writers left."
+**Eden**: "The package runs in strict mode. An old checkout path that still writes to this frozen price will throw in production too. Some of our old JavaScript files would silently fail the same assignments. A missing exception won't tell me there are no writers left."
 
 **Dafna**: "The frozen price stays unchanged either way. But the old caller won't have applied a promotion. It has to use the result of `withDiscount`."
 
@@ -155,9 +155,9 @@ console.log(invented.discount, invented.total); // 20 0
 
 **Dafna**: "The receipt's price doesn't need it. Keep that out of this snapshot. If we need a historical item list too, a spread of the cart isn't enough. We'd still share the array and its rows."
 
-**Guy**: "Putting the cart in a private field wouldn't fix that. I'd have to copy the rows on entry, or take values that are already kept immutable."
+**Eden**: "Would keeping the cart private protect those rows?"
 
-**Eden**: "I don't want the receipt showing an old price with tomorrow's quantities. Keep its price separate from the item list."
+**Guy**: "We'd still share them with whoever passed the cart in. I'd have to copy the rows on entry, or take values that are already kept immutable."
 
 ### Who changes the current price?
 
@@ -215,7 +215,7 @@ console.log(Object.isFrozen(savedForReceipt)); // true
 
 **Dafna**: "Even frozen."
 
-**Guy**: "The properties didn't change. What the getters read did. That view is for the summary. The receipt needs the stored quote."
+**Guy**: "The getters are reading the new current quote. Freezing them doesn't stop that. The receipt needs the stored quote."
 
 Guy adds a method to `CartPricing`:
 
@@ -233,9 +233,10 @@ snapshot(): Quote {
 
 ```typescript
 type ReadPrice = () => Quote;
-const readPrice: ReadPrice = () => pricing.snapshot();
+const functionPricing = new CartPricing(quote(100, 0));
+const readPrice: ReadPrice = () => functionPricing.snapshot();
 
-receipt(readPrice, pricing.snapshot()); // Error TS2345.
+receipt(readPrice, functionPricing.snapshot()); // Error TS2345.
 ```
 
 **Dafna**: "Call `readPrice()` when the panel renders. Saving that result takes a snapshot. Saving the function keeps a way to read the next price."
@@ -257,11 +258,12 @@ view(): PriceView {
 ```
 
 ```typescript
-const view = pricing.view();
-receipt(view, pricing.snapshot()); // Error TS2739.
+const currentPricing = new CartPricing(quote(100, 0));
+const view = currentPricing.view();
+receipt(view, currentPricing.snapshot()); // Error TS2739.
 ```
 
-**Daniel**: "`PriceView` has `current`. It doesn't have `subtotal`, `discount` or `total`. Neither live reader can be passed to this receipt."
+**Daniel**: "`view()` no longer returns a `Quote`. It returns a `PriceView`, with `current` instead of `subtotal`, `discount` and `total`. Neither live reader can be passed to this receipt."
 
 **Dafna**: "`ReadPrice` has a name too. You've put one function inside an object."
 
@@ -300,7 +302,7 @@ console.log(choosing.snapshot().total); // 100
 
 **Guy**: "Keep that calculation. But applying the choice still goes through one owner. I won't have each handler replacing its own idea of the current price while the panel reads another."
 
-**Dafna**: "I wasn't proposing that. A closure can own the current binding and give the panel the reader function."
+**Dafna**: "Keep one owner. A closure can own the current binding and give the panel the reader function."
 
 She puts the current quote in a closure:
 
@@ -339,11 +341,11 @@ function chooseDiscount(checkout: CartPricing, amount: number): string {
 
 ## The Verdict
 
-> Keep the price calculation as a value-returning function. Let the checkout owner publish the current price. Expose live access through a call; give the receipt stable values. A single writer, a readonly type, and a frozen object each leave the question of history unanswered on their own.
+> Keep the price calculation as a value-returning function. Let the checkout owner publish the current price. Expose live access through a call; give the receipt stable values.
 
-**Guy**: "I'd put `PriceView` in the panel's constructor. `current()` is the capability it needs, and the interface makes that dependency explicit."
+**Guy**: "I'd put `PriceView` in the panel's constructor. If the panel also needs change notifications, `current` and `subscribe` can come from the same owner through one interface."
 
-**Dafna**: "I'd take `ReadPrice`. It's one operation. If the function type already says what I need, I don't want an object around it."
+**Dafna**: "Then I'd group them too. This panel only asks for the current price. I'd take `ReadPrice` until it needs more."
 
 **Eden**: "Both reject the receipt's bad argument. I'll replace the promotion call and the panel and receipt bindings together. Adding `readonly` was a smaller diff. It just didn't do this job."
 

@@ -44,7 +44,7 @@ Chapter 15 examines scalar role brands and checked object brands; review progres
 
 Chapter 16 compares unknown-key and unknown-value policies, receipt retention, and consumer projections; its draft self-review is recorded in [CH16-REVIEW.md](../docs/editorial/CH16-REVIEW.md). Independent readers, a recheck and joint review are complete.
 
-Chapter 17 compares historical snapshots and live access, checked value transformations, and owner operations. Draft 2 addresses independent readers and formal review; the [review record](../docs/editorial/CH17-REVIEW.md) awaits the targeted recheck.
+Chapter 17 compares historical snapshots and live access, checked value transformations, and owner operations. Draft 3 addresses the targeted recheck; the full suite passes and the [review record](../docs/editorial/CH17-REVIEW.md) awaits final diff review.
 
 The suites extract all TypeScript fences in Chapters 1–17. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 

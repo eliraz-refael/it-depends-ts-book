@@ -1,6 +1,6 @@
 # Chapter 17 — Immutability (working title)
 
-Status: **PLAN SETTLED; DRAFT 2 FROZEN, TARGETED RECHECK PENDING**, 2026-10-21.
+Status: **PLAN SETTLED; DRAFT 3 FROZEN, FINAL DIFF REVIEW PENDING**, 2026-10-21.
 The settlement below governs the original proposal.
 Branch: `codex/chapter-17-immutability`, based on `origin/main` `4af45f5`.
 File: `book/03-patterns-and-design/04-immutability.md`.
@@ -320,3 +320,21 @@ The full suite passes: Chapter 17 **19/26/21**, book **318/424/140**, plus the
 existing default cases and searches. See [review response](CH17-REVIEW.md#draft-2-response-to-independent-review)
 and [snapshot](ch17/DRAFT2-SNAPSHOT.json). Claude's targeted recheck and second
 formal review are pending; draft 2 is not approved for publication.
+
+
+## Draft 3 handoff (2026-10-21)
+
+Claude's targeted reader passed the Principle and the type-level repair. His
+second review requested one small round and no further reader. Draft 3 gives
+both class edits fresh instances, states the removal of the `Quote`-returning
+view, makes Dafna accept the owner requirement, and gives Guy a conditional
+multi-operation reason for an interface without inventing a subscription
+requirement. The items exchange now answers an actual question; production
+throws and the requested prose trims are addressed.
+
+The targeted chapter suite and full suite pass with unchanged counts:
+**19/26/21** for Chapter 17, **318/424/140** for the book, plus the default cases
+and searches. Only two fences change; the Principle remains unchanged.
+See the [response](CH17-REVIEW.md#draft-3-response-to-targeted-recheck) and
+[snapshot](ch17/DRAFT3-SNAPSHOT.json). Final diff review is pending with Claude;
+no further reader is requested. Local commit only; Claude handles rebase and PR.
