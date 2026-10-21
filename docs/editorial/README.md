@@ -30,7 +30,7 @@ a targeted recheck and joint review.
 
 The [Chapters 6–7 pass](CH6-7-VOICE-PASS.md) applies the full calibration to
 Chapter 6 and light repetition and opening edits to Chapter 7. Chapter 7 is
-approved; Chapter 6 draft 2 awaits its targeted recheck.
+approved; Chapter 6 draft 3 awaits its final diff review.
 
 Compiler versions and check counts in these records describe their dated runs.
 See [the checks documentation](../../checks/README.md) for current coverage.

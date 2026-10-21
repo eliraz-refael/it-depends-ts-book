@@ -1,6 +1,6 @@
 # Chapters 6–7 voice pass
 
-Status: **DRAFT 2 FROZEN; CH6 TARGETED RECHECK PENDING, CH7 APPROVED**, 2026-10-21.
+Status: **DRAFT 3 FROZEN; CH6 FINAL DIFF REVIEW PENDING, CH7 APPROVED**, 2026-10-21.
 Baseline: `4af45f5`, after Chapter 5 merged in PR #17.
 Branch: `codex/chapters-6-7-voice-pass`.
 
@@ -200,7 +200,43 @@ final draft 2. Registered checks and compiler options are untouched.
 
 ## Review state
 
-Chapter 7 is approved and unchanged since that review. Chapter 6 draft 2 is
-frozen for Claude's targeted fresh recheck and final diff review. Local handoff
-commits are authorized, with PLAN.md separate. No push or publication by Codex;
-Claude owns rebase and PR after settlement.
+Chapter 7 is approved and unchanged since that review. Chapter 6 draft 3 is
+frozen for Claude's final diff review; no further reader was requested. Local
+handoff commits are authorized, with PLAN.md separate. No push or publication by
+Codex; Claude owns rebase and PR after settlement.
+
+
+## Draft 3: final prose round
+
+Claude's [second review](ch6-7-voice-pass/CLAUDE-REVIEW-2.md) and its
+[fresh recheck reader](ch6-7-voice-pass/CLAUDE-DRAFT2-RECHECK-READ.md) are archived
+unchanged. The Principle and both sides of the timing dispute passed. Claude
+requested four small fixes, followed by a final diff review without another reader.
+
+1. Daniel stops repeating that the element type argument does not check the DOM.
+   He names `instanceof HTMLInputElement` as the check when the markup cannot be
+   relied on.
+2. Noam says “generically” rather than “once.”
+3. Idan credits `get`'s object and key arguments for supplying `T` and `K`.
+4. The table describes the actual `T[] → T[]` example.
+
+Both optional suggestions are applied: Linoy explains why the fallback must be
+among the listed values, and one `loadState` comment becomes “T appears only in
+the return type.” This takes the explicitly offered comment-only exception;
+no executable code changes. Against the baseline, **43 of 44 fences remain
+byte-identical**. The sole difference is that comment in Chapter 6's fifteenth
+fence. Normalizing that exact replacement makes all 44 fences identical in order.
+The earlier snapshots and their unchanged-fence claims describe their own drafts.
+
+- **Chapter 6:** 2,609 words; SHA-256 `0ae9e934663b1f6b9118e4eb8a38b18f021d4ef355cf0d3cb8e9958651977a73`.
+- **Chapter 7:** 3,622 words; SHA-256 `f9495d4ff2c3401f14e30e971b6a81dca428d0906bb02975eee0708f8d11e085`.
+
+The [draft 3 snapshot](ch6-7-voice-pass/DRAFT3-SNAPSHOT.json) records the exception
+and both versions' fence hashes. Chapter 7 remains byte-identical to its approved
+snapshot.
+
+Validation on final draft 3: `node checks/chapters1-6.cjs` exits 0 on TypeScript
+7.0.2 (**110 fences / 116 compiler cases / 8 runtime groups**). The separate
+editorial inline probes pass **6 compiler probes / 1 runtime group**.
+`git diff --check` passes. The full-suite run above belongs to draft 2; it was not
+repeated for this bounded prose and comment round.

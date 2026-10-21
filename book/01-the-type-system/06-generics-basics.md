@@ -58,7 +58,7 @@ const name = firstItem(names); // string | null
 
 **Oded**: "Yes. Then we need it."
 
-**Noam**: "We don't need to wait for a second caller to write these three lines once."
+**Noam**: "We don't need to wait for a second caller to write these three lines generically."
 
 **Dima**: "So you agree about what the generic does. You disagree about when to introduce it."
 
@@ -112,11 +112,11 @@ const emailField = document.querySelector<HTMLInputElement>(".email");
 
 **Noam**: "So I should review that type argument like an assertion."
 
-**Daniel**: "Yes. `querySelector<HTMLInputElement>(".email")` can return a different kind of element at runtime. The type argument doesn't inspect the DOM."
+**Daniel**: "Yes. `querySelector<HTMLInputElement>(".email")` can return a different kind of element at runtime."
 
 **Oded**: "So we keep the brackets even though the caller has to justify them?"
 
-**Daniel**: "Here, yes. `E extends Element` limits the choice, and the DOM call really does return an `Element` or `null`. Knowing the markup can justify a narrower element type. The type argument still doesn't check that knowledge."
+**Daniel**: "Here, yes. `E extends Element` limits the choice, and the DOM call really does return an `Element` or `null`. Knowing the markup can justify a narrower element type. If you cannot rely on that markup, check the result with `instanceof HTMLInputElement` instead."
 
 ---
 
@@ -265,7 +265,7 @@ function parseConfig<T>(input: string): T {
 
 **Noam**: "Where would you look?"
 
-**Idan**: "At what supplies the return type. `lastItem` gets its `T` from the input array. `get` reads a property whose key is constrained. This function doesn't know what it has. Adding a constraint wouldn't make it check the JSON either. I'd return `unknown`, then parse the shape we need."
+**Idan**: "At what supplies the return type. `lastItem` gets its `T` from the input array. `get` gets `T` from the object argument and `K` from the key argument. This function doesn't know what it has. Adding a constraint wouldn't make it check the JSON either. I'd return `unknown`, then parse the shape we need."
 
 ```typescript
 // Honest: returns exactly what it has
@@ -334,7 +334,7 @@ Noam would keep `sortByName` because its body already states the small shared re
 |-----------|-------------|-----|
 | The output type depends on the input type | `<T>` tying both positions | The relationship is the whole point |
 | An unconstrained `<T>` appears only as a parameter type and affects nothing else | Consider `unknown` — or the concrete type | Check whether callers depend on explicit type arguments before removing it |
-| The body needs a property of `T` | `<T extends { ...minimal shape }>` | Unlocks the body; the `T → T` shape still preserves the caller's type |
+| The body needs a property of `T` | `<T extends { ...minimal shape }>` | Unlocks the body; the `T[] → T[]` shape still preserves the caller's type |
 | Two arguments must move together | Chain the parameters: `<T, K extends keyof T>` | The key must belong to the object; the selected key determines the result type |
 | Caller-supplied element subtype (`querySelector` style) | Justify the narrower type from the markup, as you would an `as` | The DOM supplies `Element` or `null`; the subtype claim is still unchecked |
 | The body can't produce its `T` | Return `unknown`, or a concrete `ParseResult<YourType>` from a real parser | The caller's type argument does not validate the value |
@@ -352,7 +352,7 @@ const departments = pluck(team, "department"); // string[]
 ```
 
 ```typescript
-// Danger: the anti-pattern. T exits everywhere and enters nowhere.
+// Danger: T appears only in the return type.
 function loadState<T>(key: string): T {
   return JSON.parse(localStorage.getItem(key) ?? "null");
   // any → T: no relationship, no evidence — and no cast required.
@@ -363,7 +363,7 @@ function loadState<T>(key: string): T {
 
 **Linoy Nightly**: "For literal routes, `function routes<const T extends readonly string[]>(paths: T): T` keeps `routes(["/home", "/about"])` as `readonly ["/home", "/about"]` instead of `string[]`. That's a `const` type parameter, introduced in 5.0."
 
-"For a fallback, there's `NoInfer<T>`, from 5.4: `function setDefault<T extends string>(values: T[], fallback: NoInfer<T>)`. Now `setDefault(["red", "green"], "blue")` is rejected. Without `NoInfer`, `"blue"` joins the inferred type. The fallback still has to fit `T`, but it doesn't help choose it."
+"When the fallback must be one of the listed values, there's `NoInfer<T>`, from 5.4: `function setDefault<T extends string>(values: T[], fallback: NoInfer<T>)`. Now `setDefault(["red", "green"], "blue")` is rejected. Without `NoInfer`, `"blue"` joins the inferred type. The fallback still has to fit `T`, but it doesn't help choose it."
 
 **Idan Greenfield**: "A generic parser can take the check as an argument: `function parseWith<T>(input: string, parse: (value: unknown) => ParseResult<T>): ParseResult<T>`. Now `T` comes from what that parser produces."
 
