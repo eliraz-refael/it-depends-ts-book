@@ -27,7 +27,7 @@ The [continuity batch](CONTINUITY-BATCH.md) records the subsequent attribution, 
 
 The [Chapter 5 pass](CH5-VOICE-PASS.md) applies the same calibration to narrowing,
 parser context and the open result-versus-throw argument; revisions address the
-independent readers, with a targeted recheck pending.
+independent readers and targeted recheck, with a final diff review pending.
 
 Compiler versions and check counts in these records describe their dated runs.
 See [the checks documentation](../../checks/README.md) for current coverage.

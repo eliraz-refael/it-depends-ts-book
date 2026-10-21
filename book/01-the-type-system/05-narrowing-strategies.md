@@ -37,7 +37,7 @@ function process(input: string | null | undefined) {
 
 **Daniel**: "A return annotation like `value is User` is a type predicate: `true` tells the caller to treat `value` as a `User`. TypeScript checks that the body returns a boolean, but it doesn't prove that promise. The assertion-function form, `asserts value is User`, promises the type after a normal return."
 
-"For external input, prefer building a typed value from the fields you've checked. The compiler checks that the returned object has the fields and types you promised. How a failed check reaches the caller is a separate choice."
+"For external input, prefer building a typed value from the fields you've checked. The compiler needs those checks before it will let you read the fields and use them in the new object. How a failed check reaches the caller is a separate choice."
 
 **Noam Kiperman**: "I want tests for that guard. Especially the inputs it should reject."
 
@@ -68,7 +68,7 @@ function describe(value: unknown): string {
 
 **Chen**: "Would your date check accept a `Date` from another iframe?"
 
-**Linoy**: "No. `instanceof` follows the prototype chain, and that iframe has a different `Date` constructor. A Node `vm` context can give you the same problem. `Array.isArray` works across those boundaries because it checks an internal slot instead."
+**Linoy**: "No. `instanceof` follows the prototype chain, and that iframe has a different `Date` constructor. A Node `vm` context can give you the same problem. `Array.isArray` works across those boundaries. It checks whether the value is an array, regardless of which constructor made it."
 
 "And `typeof x === 'function'` includes class constructors, async functions and generators as well as ordinary functions. I wouldn't call all of those the same way."
 
@@ -150,7 +150,7 @@ if (isUser(x)) {
 }
 ```
 
-**Daniel**: "Since [TypeScript 5.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html), it can infer a predicate from some function bodies without return annotations. That inference comes from the body."
+**Daniel**: "Since [TypeScript 5.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html), it can infer a predicate from some function bodies without return annotations. An explicit predicate annotation takes the place of that inference."
 
 **Noam**: "That always-true body fails the first rejection test. I'm not dropping the tests because I gave the function a return annotation."
 
@@ -196,11 +196,9 @@ function greetOrFail(input: unknown) {
 
 **Guy**: "For that list, you would. In this handler, one invalid user rejects the request. I want it to stop."
 
-**Noam**: "I want assertions for broken invariants: a missing required value, or a case that should be unreachable. `assertNever` accepts only `never` for that second job. External input is allowed to be wrong. We should handle that as a result."
+**Noam**: "I want assertions for broken invariants: a missing required value, or a case that should be unreachable. A helper like `assertNever(value: never)` handles that second job. External input is allowed to be wrong. We should handle that as a result."
 
 **Guy**: "You used `ApiUser.parse(raw)` in your API example. That throws. You said the error was clear and happened where we could handle it."
-
-Noam scrolls back to the example.
 
 **Noam**: "Yes, it does."
 
@@ -256,13 +254,13 @@ function parseUser(input: unknown): ParseResult<User> {
 }
 ```
 
-**Idan**: "Delete the `email` field from that return object. The function no longer compiles. Drop the `email` check from `isUser`, and `isUser` still compiles. That's why I build the value."
+**Idan**: "Drop the `email` check from `parseUser`. The `input.email` read in the return object no longer compiles. Drop the `email` check from `isUser`, and `isUser` still compiles. That's why I build the value."
 
-**Noam** tries the deletion, then restores the field.
+**Noam** tries removing the check, then restores it.
 
 **Noam**: "I still want `inputs.filter(isUser)` to give me `User[]`. A result doesn't fit there."
 
-**Idan**: "For this handwritten parser, keep a predicate that calls it: `const isUser = (v: unknown): v is User => parseUser(v).ok`."
+**Idan**: "For this handwritten parser, keep a predicate that calls it: `const isUser = (v: unknown): v is User => parseUser(v).ok`. That filters the original objects. If you want only the checked fields, map through the parser and keep the successful values."
 
 **Noam**: "Then I don't have two sets of field checks to maintain."
 
@@ -326,7 +324,7 @@ function describeRequest<T>(state: RequestState<T>): string {
 
 "In the success case, `state.data` is `T`. In the error case, `state.error` is `Error`. The tag gives me access to the right fields. If I add `{ kind: 'retrying'; attempt: number }` without handling it, this function's `: string` return annotation catches the missing return."
 
-**Daniel**: "With strict null checking. Without that return annotation, the inferred result can become `string | undefined`. An explicit `assertNever` check is another way to enforce exhaustiveness."
+**Daniel**: "That holds with strict null checking. Without that return annotation, the inferred result can become `string | undefined`. An explicit `assertNever` check is another way to enforce exhaustiveness."
 
 **Idan**: "Our request module publishes state changes through an in-process event bus. The receiver gets `unknown`, so check the tag and payload together. Here an error event carries an actual `Error` object."
 
@@ -456,6 +454,6 @@ Idan and Dafna prefer a result for expected rejection. The return type exposes t
 
 ## Additional Takes
 
-**Noam Kiperman**: "Keep the predicate tests when the type changes. Adding a required field to `User` doesn't force an explicitly annotated `isUser` to check it."
+**Noam Kiperman**: "Keep the predicate tests when the type changes. If `isUser` has its own field checks and a predicate annotation, adding a required field to `User` won't force those checks to change."
 
 **Eden Legacy**: "I would migrate the checks first. Get one parser behind the existing callers, including the ones that expect exceptions. Then change how failure travels where the callers need it. Those are separate changes; I'd like to review them separately."

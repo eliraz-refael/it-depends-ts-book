@@ -1,4 +1,4 @@
-// Editorial probes for the inline claims added in draft 2; separate from the book suite.
+// Editorial probes for the inline claims revised through draft 3; separate from the book suite.
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
@@ -22,15 +22,36 @@ const filtered = run('predicate', fences[4].split('\n\nfunction isUser')[0] + '\
 export const good = {id:'1', email:'plain string', displayName:'Ada', extra:true};
 const inputs: unknown[] = [good, null, {id:42,email:'e',displayName:'A'}, {id:'1',email:'e'}];
 export const users = inputs.filter(isUser);
+export const parsed = inputs.map(parseUser).filter(result => result.ok).map(result => result.value);
 type Equal<A,B> = (<T>()=>T extends A ? 1:2) extends (<T>()=>T extends B ? 1:2) ? true:false;
 const inferred: Equal<typeof users, User[]> = true;
 `);
 assert.deepEqual(filtered.users, [filtered.good]);
 assert.equal(filtered.users[0], filtered.good);
+assert.equal(filtered.users[0].extra, true);
+assert.deepEqual(filtered.parsed, [{id:'1', email:'plain string', displayName:'Ada'}]);
+assert.notEqual(filtered.parsed[0], filtered.good);
 const schema = run('schema', fences[7].split('\n\nfunction parseUser')[0] + '\n' + fences[11] + '\nexport { parseUser };');
 const failed = schema.parseUser({id:42,email:'ada@example.com',displayName:'Ada'});
 assert.equal(failed.ok, false);
 const issues = JSON.parse(failed.reason);
 assert(Array.isArray(issues));
 assert.deepEqual(issues[0].path, ['id']);
-console.log(JSON.stringify({typescript:version, compilerProbes:2, runtimeGroups:2, status:'PASS', scratch}, null, 2));
+// Same edit on both bodies: remove the email check, leaving the return untouched.
+const parserCheck = '  if (!("email" in input) || typeof input.email !== "string") {\n    return { ok: false, reason: "email missing or not a string", input };\n  }\n';
+const guardCheck = '    "email" in value && typeof value.email === "string" &&\n';
+assert(fences[7].includes(parserCheck));
+assert(fences[4].includes(guardCheck));
+const parserFile = path.join(scratch, 'parser-without-email-check.ts');
+const parserSource = fences[4].split('\n\nfunction isUser')[0] + '\n' + fences[7].replace(parserCheck, '') + '\nexport {};';
+fs.writeFileSync(parserFile, parserSource);
+const rejected = compile([parserFile], {noEmit:true}, scratch);
+assert.notEqual(rejected.status, 0);
+const readLine = parserSource.split('\n').findIndex(line => line.includes('email: input.email')) + 1;
+assert.deepEqual(rejected.diagnostics.map(d => ({line:d.line,code:d.code})), [{line:readLine,code:2339}]);
+assert.match(rejected.diagnostics[0].message, /Property 'email' does not exist/);
+const guardFile = path.join(scratch, 'guard-without-email-check.ts');
+fs.writeFileSync(guardFile, fences[4].replace(guardCheck, '') + '\nexport {};');
+const accepted = compile([guardFile], {noEmit:true}, scratch);
+assert.equal(accepted.status, 0, accepted.output);
+console.log(JSON.stringify({typescript:version, compilerProbes:4, runtimeGroups:2, status:'PASS', scratch}, null, 2));

@@ -1,6 +1,6 @@
 # Chapter 5 voice pass
 
-Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**, 2026-10-21.
+Status: **DRAFT 3 FROZEN; FINAL DIFF REVIEW PENDING**, 2026-10-21.
 Baseline: `891f1c6`, after the approved Chapter 4 pass.
 Branch: `codex/chapter-5-voice-pass`.
 
@@ -115,7 +115,7 @@ the draft 1 manifest and Claude's reports remain unchanged.
 cases and two searches. That run preceded only the final antecedent clarification
 from “And that fails” to “That always-true body fails”; the examples were unchanged.
 
-Two additional [editorial probes](ch5-voice-pass/INLINE-PROBES.cjs) compile and run
+At draft 2, two additional [editorial probes](ch5-voice-pass/INLINE-PROBES.cjs) compile and run
 independently on the final draft: the handwritten parser's predicate infers
 `User[]` through `filter` and preserves the original accepted object; the Zod
 failure reason parses as an issue array with the rejected field's path. These are
@@ -128,9 +128,46 @@ the explicit predicate annotation remains trusted. Zod's failure reason is an
 issue list rendered as text, unlike the handwritten reason. The Turn explicitly
 selects the handwritten parser, so its printed messages remain accurate.
 
+## Draft 3: final prose round
+
+Claude's [second review](ch5-voice-pass/CLAUDE-REVIEW-2.md), informed by the
+[fresh recheck reader](ch5-voice-pass/CLAUDE-DRAFT2-RECHECK-READ.md), accepts the
+first-round repairs and requests one final prose round, with no further reader.
+Both reports are preserved unchanged.
+
+All requested items are applied:
+
+1. Noam's maintenance Take now concerns an explicitly annotated predicate with
+   its **own** field checks. It no longer contradicts his delegating predicate.
+2. Idan says filtering retains the original objects. To get only the checked
+   fields, map through the parser and keep successful values. The inline probes
+   verify original identity and extra keys versus the newly constructed values.
+3. The deletion experiment removes the **email check** from both bodies. The
+   parser now fails at its `input.email` read with TS2339; the predicate compiles.
+   Noam removes and restores the check, rather than a return field. The probes
+   pin the parser diagnostic's code and line and the predicate's clean compile.
+4. Daniel's principle names the mechanism: checks permit the field reads and
+   their use in the constructed object. The failure-handling clause stays neutral.
+5. Daniel connects the TS5.5 remark to explicit annotations taking the place of
+   inference. Noam names `assertNever(value: never)` as a helper. Linoy describes
+   array identity without the internal-slot shorthand. The scrolling stage
+   direction is removed; Daniel's strict-null-checking sentence is complete.
+
+Draft 3: **3007 words** including code.
+SHA-256: `0a0691e1420e26a764462015fe5b5c784d0ff9ff810d0fd17ec40ba0bc11ab6d`.
+The [draft 3 manifest](ch5-voice-pass/DRAFT3-SNAPSHOT.json) confirms all **13 fences**
+are byte-identical and ordered against both `891f1c6` and draft 2 (`53710bf`).
+
+`node checks/chapters1-6.cjs` exits 0 on TypeScript 7.0.2:
+**110 fences / 116 compiler cases / 8 runtime groups**. The full-suite run remains
+the draft 2 run recorded above, as agreed in Claude's review; no full rerun is
+claimed for draft 3. The expanded editorial probes separately pass **4 compiler
+probes / 2 runtime groups**, including both deletion cases and the parsed-value
+comparison. No registered suite or example fence changed. `git diff --check` passes.
+
 ## Review state
 
-Draft 2 is frozen for Claude's targeted fresh-reader recheck and final diff review.
-Local commit is authorized for that handoff; no push or PR is authorized at this
-step. The manuscript is not marked settled before Claude's recheck. Claude owns
-publication after the review process.
+Draft 3 is frozen for Claude's final diff review. No further reader is requested.
+The local handoff commit includes Claude's second review and recheck reader.
+Final settlement, rebase and publication remain with Claude; nothing is pushed
+by Codex at this step.
