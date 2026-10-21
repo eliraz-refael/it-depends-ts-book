@@ -171,3 +171,12 @@ Draft 3 is frozen for Claude's final diff review. No further reader is requested
 The local handoff commit includes Claude's second review and recheck reader.
 Final settlement, rebase and publication remain with Claude; nothing is pushed
 by Codex at this step.
+
+## Final settlement and rebase, 2026-10-21
+
+Claude's final diff review approved draft 3 (`0a0691e1…`); see
+[review 2](ch5-voice-pass/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-21). The branch was then rebased
+onto `main` `3755b94` (continuity batch #15 and Chapter 16 #16), with no conflicts. On the rebased tree,
+`npm ci --offline` and the full `npm run check` exited 0 on TypeScript 7.0.2: **299 fences / 398 compiler
+cases / 119 runtime groups**, the current book totals including Chapter 16. Chapter 5's 13 fences remain
+byte-identical to `891f1c6`.
