@@ -178,7 +178,7 @@ const flattened = sortByNameFlat(team);
 
 **Linoy Nightly** adds a second type parameter.
 
-"Everyone's been writing type arguments on the board like callers actually supply them. They don't. The compiler *infers* `T` from the arguments, and the craft of a good generic signature is giving inference enough evidence. Exhibit A — the best four lines in TypeScript:"
+"Everyone's been writing type arguments on the board like callers actually supply them. They don't. The compiler *infers* `T` from the arguments, and the craft of a good generic signature is giving inference enough evidence. Exhibit A — the best three lines in TypeScript:"
 
 ```typescript
 function get<T, K extends keyof T>(obj: T, key: K): T[K] {

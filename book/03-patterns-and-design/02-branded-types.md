@@ -113,7 +113,7 @@ const next: PageNumber = selection.first + 1; // Error TS2322
 
 **Oded**: "And I can write `pageCount(selection.last)` and get the original bug back."
 
-**Noam**: "You can. Four passes either numeric check. Choosing which meaning to give it is still the caller's job. Now that choice has a name at the conversion site, where we can review it."
+**Noam**: "You can. `4` passes either numeric check. Choosing which meaning to give it is still the caller's job. Now that choice has a name at the conversion site, where we can review it."
 
 ### Checking the pair
 

@@ -105,7 +105,7 @@ function formatResponse(data: any) {
 
 **Oded**: "That's not fair—"
 
-**Noam**: "It's on a sticky note on your desk, Oded. *'We can fix it in the next sprint.'* That parameter had been there for eight sprints. I found the TODO at 2 AM, while I was tracing that `Invalid Date`."
+**Noam**: "That parameter had been there for eight sprints, Oded. I found the TODO at 2 AM, while I was tracing that `Invalid Date`."
 
 ---
 
@@ -536,7 +536,7 @@ function on(event: string, handler: (...args: any[]) => void): void {
 
 **Noam**: "If every `any` had a reason and a ticket to remove it, I could review that."
 
-**Oded**: "A ticket with an owner. We've already tried the sticky note."
+**Oded**: "A ticket with an owner. We've already tried the TODO."
 
 ---
 

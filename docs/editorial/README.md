@@ -22,6 +22,7 @@ The [Chapters 1–2 pass](CH1-2-VOICE-PASS.md) applies that calibration, with
 cross-reviews, fresh readers and preserved code examples.
 The [Chapter 4 pass](CH4-VOICE-PASS.md) continues it, with its fresh reader, Claude's
 discovery and cross-review, and three documented comment-line changes.
+The [continuity batch](CONTINUITY-BATCH.md) records the subsequent attribution, wording and cross-chapter consistency fixes.
 
 Compiler versions and check counts in these records describe their dated runs.
 See [the checks documentation](../../checks/README.md) for current coverage.

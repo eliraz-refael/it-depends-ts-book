@@ -80,7 +80,7 @@ receipt(csvCache);                 // Throws a TypeError.
 
 **Noam**: "The person who gets paged owns the receipt. The write that broke it is in another package, and both packages compile."
 
-**Linoy Nightly**: "I'd expect the assignment to work. `CsvResult` extends `ExportResult`. I can even put `out` on the cache."
+**Linoy Nightly**: "I'd expect the assignment to work. `CsvResult` extends `ExportResult`. There's even an annotation for that kind of assignment."
 
 **Noam**: "The cache fits the dashboard's parameter. The ZIP it let through doesn't fit what the receipt was promised."
 
