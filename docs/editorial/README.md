@@ -28,6 +28,10 @@ The [Chapter 5 pass](CH5-VOICE-PASS.md) applies the same calibration to narrowin
 parser context and the open result-versus-throw argument, with independent readers,
 a targeted recheck and joint review.
 
+The [Chapters 6–7 pass](CH6-7-VOICE-PASS.md) applies the full calibration to
+Chapter 6 and light repetition and opening edits to Chapter 7. Chapter 7 is
+approved; Chapter 6 draft 2 awaits its targeted recheck.
+
 Compiler versions and check counts in these records describe their dated runs.
 See [the checks documentation](../../checks/README.md) for current coverage.
 Unlinked source paths and shell commands in the records are relative to the

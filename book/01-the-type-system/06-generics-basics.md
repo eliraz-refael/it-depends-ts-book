@@ -2,13 +2,9 @@
 
 ## The Principle
 
-Five chapters of escape hatches, identities, choices, and proofs — and one construct has been standing quietly in the corner of nearly every code block. `ParseResult<T>`. `RequestState<T>`. The angle brackets have been *used* since Chapter 1 and explained exactly never. Time to pay that debt.
+**Prof. Eli Typeworth** writes `ParseResult<T>` on the board.
 
-**Prof. Eli Typeworth** begins, and for once he doesn't start with TypeScript.
-
-*"Let us return to first principles — this one is older than the language. Older than most languages."*
-
-"When you write `let x = 42`, you introduce a variable that stands for a value. All of programming rests on that move: say a thing once, with a placeholder, and let the placeholder take many values. A generic is exactly that move, performed one level up. `T` is a variable that stands for a *type*."
+"In `let x = 42`, `x` stands for a value. In `ParseResult<T>`, `T` stands for a type. We call `T` the type parameter and the `User` in `ParseResult<User>` its type argument. The same idea works in a function:"
 
 ```typescript
 function identity<T>(value: T): T {
@@ -19,11 +15,11 @@ const word = identity("hello");      // T becomes "hello" — the literal
 const user = identity({ id: "u1" }); // T becomes { id: string }
 ```
 
-"Read the signature out loud: *whatever type goes in is the type that comes out.* That sentence is the entire feature. Not 'this function accepts anything' — `unknown` already says that, without ceremony. The signature states a relationship between what enters and what leaves. The relationship is declared once; at each call site, the compiler fills in `T` from the evidence the call provides."
+"Read `identity` aloud: whatever type goes in is the type that comes out. The same `T` names the parameter type and the return type. The compiler infers it from the argument at each call."
 
-Eli caps the marker.
+"Use a type parameter when a caller needs a relationship between types in the signature. Ask what supplies the type argument and what depends on it. If nothing else depends on it, try removing it. If only the caller's chosen type supplies a return-only `T`, with no check to establish it, treat that as an assertion. The type argument is a claim, not evidence."
 
-"Everything we will argue about today — constraints, inference, lies — lives inside that one sentence. The debate, as ever, is about when the sentence is worth saying."
+"Whether to write the generic before a second caller needs it is a separate decision. This rule tells us what the signature promises, not when to generalize."
 
 ## The Debate
 
@@ -33,9 +29,9 @@ Eli caps the marker.
 
 "My billing function takes an `Invoice` and returns a `PaymentPlan`. That's all it needs to do. I use arrays and promises all day; I don't need to write my own generic just because I use somebody else's. Show me the second thing this function has to work on."
 
-**Noam Kiperman** counters:
+**Noam Kiperman**:
 
-"You reach for a generic any time the alternative *loses type information*. Watch what happens without one:"
+"Your billing function can stay concrete. But look at what this helper makes its caller forget:"
 
 ```typescript
 // Problem: the element type goes in — and never comes back out
@@ -54,15 +50,15 @@ function firstItem<T>(items: T[]): T | null {
 const name = firstItem(names); // string | null
 ```
 
-"The `unknown` version works — at runtime. The type system is where it dies: the caller hands you a `string[]` and gets back a shrug. You *had* the information. You threw it away in the signature. *Over my dead type definition.*"
+"I passed strings. Why am I checking the element's type again? I only need to handle the empty list."
 
-**Oded**: "And nine times out of ten the only caller is one file away, and you could have written `string[]` and gone home."
+**Oded**: "If the only caller passes strings, you could have written `string[]` and gone home."
 
 **Dima Bridge**: "Oded, would you accept `firstItem` if another caller passed a different element type?"
 
 **Oded**: "Yes. Then we need it."
 
-**Noam**: "We don't need to wait for a second caller to write three lines correctly."
+**Noam**: "We don't need to wait for a second caller to write these three lines once."
 
 **Dima**: "So you agree about what the generic does. You disagree about when to introduce it."
 
@@ -83,11 +79,11 @@ function logPayload<T>(payload: T): string | undefined {
 }
 ```
 
-"The return includes `undefined` because `JSON.stringify(undefined)` returns it. Question for the room: what work does `T` do here?"
+"`JSON.stringify(undefined)` returns `undefined`, although the library declares `string`. This annotation includes that missing case. But nothing in the return depends on `T`."
 
-Silence, then someone starts: "It lets you pass any—"
+**Oded**: "Can I pass the same values if you remove it?"
 
-"You can already pass any value to `unknown`. `T` appears in the parameter, but the return is always annotated `string | undefined`. None of the inferred call-site results use `T`. Replace it:"
+**Daniel**: "Use `unknown` for the parameter. You still can:"
 
 ```typescript
 function logPayload(payload: unknown): string | undefined {
@@ -96,7 +92,9 @@ function logPayload(payload: unknown): string | undefined {
 }
 ```
 
-"The calls that relied on inference still work. An explicit `logPayload<Something>(p)` would need changing, but the function has no reason to let callers choose a type argument."
+**Eden Legacy**: "Search the callers before removing it. `logPayload<Something>(p)` would need changing."
+
+**Daniel**: "Those using inference still work. This function has no reason to offer a type argument."
 
 **Oded**: "Finally. A refactor that deletes something."
 
@@ -114,11 +112,11 @@ const emailField = document.querySelector<HTMLInputElement>(".email");
 
 **Noam**: "So I should review that type argument like an assertion."
 
-"Yes. `querySelector<HTMLInputElement>(".email")` can return a different kind of element at runtime. The type argument doesn't inspect the DOM."
+**Daniel**: "Yes. `querySelector<HTMLInputElement>(".email")` can return a different kind of element at runtime. The type argument doesn't inspect the DOM."
 
-**Oded**: "The brackets aren't doing nothing, though. They change the result type."
+**Oded**: "So we keep the brackets even though the caller has to justify them?"
 
-**Daniel**: "Correct. This one makes a claim that the caller has to justify. `logPayload` didn't need a claim at all."
+**Daniel**: "Here, yes. `E extends Element` limits the choice, and the DOM call really does return an `Element` or `null`. Knowing the markup can justify a narrower element type. The type argument still doesn't check that knowledge."
 
 ---
 
@@ -140,7 +138,7 @@ function sortByName<T extends { name: string }>(items: T[]): T[] {
 }
 ```
 
-"`extends { name: string }` does two jobs at once. It unlocks the body — without it, `a.name` doesn't compile. And because the signature stays `T[] → T[]`, the caller's *whole* type survives the trip:"
+"`extends { name: string }` requires a string `name` on every element. Without it, `a.name` doesn't compile. We still return `T[]`, so an employee keeps its department:"
 
 ```typescript
 type Employee = { name: string; department: string };
@@ -164,11 +162,15 @@ const flattened = sortByNameFlat(team);
 
 "The objects still have departments at runtime in both versions. The generic preserves that information in the return type too."
 
-**Oded**, squinting at the board: "Or — radical idea — `function sortEmployees(items: Employee[]): Employee[]`. Concrete. Readable. Greppable."
+**Oded**: "Or `function sortEmployees(items: Employee[]): Employee[]`. I know where to look when payroll calls."
 
-**Noam**: "Then the vendor list needs sorting too. This implementation only uses `name`. Why require an entire `Employee`?"
+**Noam**: "This implementation only uses `name`. Why require an entire `Employee`?"
 
-**Oded**: "If the second caller ever shows up. Write it concrete, generalize on the second caller — that part of my position I'm keeping."
+**Oded**: "Because that's the caller I have. You're choosing `name` as the shared contract before we know what the vendor list needs. It might use `displayName`, or need a different tie-break."
+
+**Noam**: "The constraint describes what this body reads. I can test it with just `{ name: 'Ada' }`, without constructing an `Employee`. It doesn't promise to sort every future list."
+
+**Oded**: "Then let this one say `Employee`. I can generalize the signature later without changing `sortEmployees(team)`. When there's another caller, we'll know whether it actually shares the operation."
 
 **Daniel**: "Keep this use of `extends` in mind. In conditional types — `T extends U ? X : Y` — it asks whether a type is assignable, instead of requiring it as a constraint."
 
@@ -178,7 +180,7 @@ const flattened = sortByNameFlat(team);
 
 **Linoy Nightly** adds a second type parameter.
 
-"Everyone's been writing type arguments on the board like callers actually supply them. They don't. The compiler *infers* `T` from the arguments, and the craft of a good generic signature is giving inference enough evidence. Exhibit A — the best three lines in TypeScript:"
+"You don't have to supply the type arguments at every call. Here the object and the key give the compiler both type arguments. My favorite three lines:"
 
 ```typescript
 function get<T, K extends keyof T>(obj: T, key: K): T[K] {
@@ -197,9 +199,7 @@ get(settings, "fontsize");
 
 "`keyof T` gives you the object's keys. `T[K]` gives you the type at the chosen key. The compiler infers both from the arguments: `fontSize` gives `number`, `theme` gives `string`. And `fontsize` is rejected because it isn't a key. You don't write either type argument at the call site. That's the part I like."
 
-**Eden Legacy** turns from the window.
-
-"Now let me show you the same inference with bad evidence. *I've seen this fail at scale* — this exact line, hundreds of times, in one migration:"
+**Eden**: "In one migration, our stores started empty and filled after a request. This was the first call we typed:"
 
 ```typescript
 function createStore<T>(initial: T) {
@@ -218,7 +218,7 @@ store.set({ id: "u1" });
 //        parameter of type 'null'
 ```
 
-"Inference answers with the evidence it has, and the evidence at this call site is one `null`. Nobody made a mistake. The caller meant 'no user yet.' The author meant 'whatever you initialize with.' The compiler heard 'null, always.' The fix is to say what inference can't see:"
+"The initial value tells it `null`. It can't infer the user we intend to store after the request finishes. We have to supply that part:"
 
 ```typescript
 const userStore = createStore<{ id: string } | null>(null);
@@ -227,9 +227,9 @@ const userStore = createStore<{ id: string } | null>(null);
 
 "I also write explicit return types on exported functions when they express an API we intend to keep. Otherwise an implementation change can alter the declaration without anyone reviewing that as an API change."
 
-**Linoy**: "Return annotations, sure. But that doesn't mean callers should have to write type arguments everywhere."
+**Linoy**: "That's the return type you publish, though. You still wouldn't make callers write both type arguments to `get`."
 
-**Eden**: "Agreed. `createStore(null)` needed one because the initial value couldn't tell the compiler what we planned to store later. Your `get` example has enough evidence already."
+**Eden**: "No. The object and key tell it enough. The store's first value didn't."
 
 ---
 
@@ -249,11 +249,9 @@ config.retries.toFixed(1);
 // undefined throws a TypeError.
 ```
 
-"The caller chooses `T`. The body parses JSON and asserts that it got that type. Nothing checks the `retries` field."
+"The caller chooses an unconstrained `T`. Unlike the DOM call, this body can return any JSON value, not necessarily even an object. Nothing checks the `retries` field."
 
-**Idan Greenfield** leans forward.
-
-"It's worse than you're saying, Daniel. Delete the cast."
+**Idan Greenfield**: "Delete the cast, Daniel."
 
 ```typescript
 function parseConfig<T>(input: string): T {
@@ -261,13 +259,13 @@ function parseConfig<T>(input: string): T {
 }
 ```
 
-**Daniel**: "Yes. `JSON.parse` returns `any`, so the compiler accepts it as `T` even without an assertion."
+**Daniel**: "Still compiles. `JSON.parse` returns `any`, so the compiler accepts it as `T` even without the cast."
 
 **Idan**: "Now I can't even find the unchecked claim by searching for `as`."
 
 **Noam**: "Where would you look?"
 
-**Idan**: "At what the function returns. `lastItem` gets its `T` from the input array. `get` reads a property whose key is constrained. This function doesn't know what it has. I'd return `unknown`, then parse the shape we need."
+**Idan**: "At what supplies the return type. `lastItem` gets its `T` from the input array. `get` reads a property whose key is constrained. This function doesn't know what it has. Adding a constraint wouldn't make it check the JSON either. I'd return `unknown`, then parse the shape we need."
 
 ```typescript
 // Honest: returns exactly what it has
@@ -322,25 +320,27 @@ Liron looks back at Eli's first example.
 
 **Oded**: "And if the second subject never arrives?"
 
-"Then you and Noam still have a review to finish. The signature alone does not tell us whether you needed the function."
+**Liron**: "Then you and Noam still have a review to finish. The signature alone does not tell us whether you needed the generic."
 
 ## The Verdict
 
-> In a function signature, use a generic to express a relationship between types. Look for where the type argument comes from and what depends on it. A return-only parameter supplied by the caller may be an unchecked assertion; a parameter that affects nothing else may be unnecessary.
+> In a function signature, use a generic to express a relationship between types. Look for where the type argument comes from and what depends on it. A return-only parameter supplied solely by the caller, without evidence from the body, is an unchecked claim. A parameter that affects nothing else may be unnecessary; check existing calls before removing it.
 
-**The Accepted Standard — a decision framework:**
+Noam would keep `sortByName` because its body already states the small shared requirement. Oded would keep `sortEmployees` until another caller needs the same ordering. The relationship test does not decide that timing question.
+
+**The Accepted Standard:**
 
 | Situation | Recommended | Why |
 |-----------|-------------|-----|
 | The output type depends on the input type | `<T>` tying both positions | The relationship is the whole point |
 | An unconstrained `<T>` appears only as a parameter type and affects nothing else | Consider `unknown` — or the concrete type | Check whether callers depend on explicit type arguments before removing it |
 | The body needs a property of `T` | `<T extends { ...minimal shape }>` | Unlocks the body; the `T → T` shape still preserves the caller's type |
-| Two arguments must move together | Chain the parameters: `<T, K extends keyof T>` | Relationships can have more than two ends |
-| Caller-supplied, return-only `T` (`querySelector` style) | Treat it as a typed assertion — justify it like an `as` | The compiler is taking your word, not checking evidence |
-| The body can't produce its `T` | Return `unknown`, or a concrete `ParseResult<YourType>` from a real parser | A promise with no production is a lie in brackets |
+| Two arguments must move together | Chain the parameters: `<T, K extends keyof T>` | The key must belong to the object; the selected key determines the result type |
+| Caller-supplied element subtype (`querySelector` style) | Justify the narrower type from the markup, as you would an `as` | The DOM supplies `Element` or `null`; the subtype claim is still unchecked |
+| The body can't produce its `T` | Return `unknown`, or a concrete `ParseResult<YourType>` from a real parser | The caller's type argument does not validate the value |
 | Explicit type arguments vs inference | Infer from arguments; supply type arguments when those arguments lack needed information | Explicit return annotations are a separate choice for defining a stable public contract |
 
-**In practice — the two anchors:**
+**Daniel**: "Compare these two functions. `pluck` reads the selected property from each item. `loadState` parses a stored string, then promises whatever type its caller requests."
 
 ```typescript
 // The rule, visibly working: every position tied to another.
@@ -359,23 +359,12 @@ function loadState<T>(key: string): T {
 }
 ```
 
-Hold the rule up to the act behind you, and the act turns out to have been about relationships the whole time:
-
-- `any` lets values pass between otherwise incompatible types, bypassing checks on those relationships (Chapter 1).
-- Assertions fake relationships the compiler can't verify (Chapter 2).
-- `interface` and `type` describe the shapes that relationships hold between (Chapter 3).
-- Unions restrict a value to a finite set of alternatives (Chapter 4).
-- Narrowing proves which alternative you're holding — *this* discriminant means *that* payload (Chapter 5).
-- Generics **carry** relationships through code — stated once, enforced at every call site.
-
-**Daniel Compiler**: "Start with `pluck`: the input array and the selected key determine the output. Then compare `loadState`: the return type comes entirely from the caller's request. Look for that difference when you review the brackets."
-
 ## Additional Takes
 
-**Linoy Nightly**: "Two inference controls, for when the default is *almost* right. `const` type parameters — `function routes<const T extends readonly string[]>(paths: T): T` — tell inference to keep your literals: `routes(["/home", "/about"])` comes back `readonly ["/home", "/about"]` instead of `string[]`. And `NoInfer<T>` marks a position as *checked against* `T` but not *evidence for* it — `function setDefault<T>(values: T[], fallback: NoInfer<T>)` stops a stray fallback argument from joining the inference and smuggling itself into everybody's `T`. Shipped in 5.0 and 5.4. The cost is the same for both: the next reader has to know what they mean, and literal types are occasionally more specific than you wanted. We can look at both once these examples are familiar."
+**Linoy Nightly**: "For literal routes, `function routes<const T extends readonly string[]>(paths: T): T` keeps `routes(["/home", "/about"])` as `readonly ["/home", "/about"]` instead of `string[]`. That's a `const` type parameter, introduced in 5.0."
 
-**Sahar Firstclass**: "If this function only serves invoices, what would making it generic help you change?"
+"For a fallback, there's `NoInfer<T>`, from 5.4: `function setDefault<T extends string>(values: T[], fallback: NoInfer<T>)`. Now `setDefault(["red", "green"], "blue")` is rejected. Without `NoInfer`, `"blue"` joins the inferred type. The fallback still has to fit `T`, but it doesn't help choose it."
 
-**Prof. Eli Typeworth** waits for the chairs to stop scraping.
+**Idan Greenfield**: "A generic parser can take the check as an argument: `function parseWith<T>(input: string, parse: (value: unknown) => ParseResult<T>): ParseResult<T>`. Now `T` comes from what that parser produces."
 
-"What comes next is type-level *programming* — types that branch, types that walk an object's keys, types computed from other types. We have introduced the variable. Next we ask what we can compute with it."
+**Prof. Eli Typeworth**: "We can also compute with that type variable: branch on it, walk an object's keys, build another type from it."
