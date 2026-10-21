@@ -14,6 +14,7 @@ The [master plan](../../PLAN.md) remains at the repository root.
 | 13 — Module augmentation and ambient types | [Plan](CH13-PLAN.md) | [Review](CH13-REVIEW.md) |
 | 14 — Error handling | [Plan](CH14-PLAN.md) | [Review](CH14-REVIEW.md) |
 | 15 — Branded types | [Plan](CH15-PLAN.md) | [Review](CH15-REVIEW.md) |
+| 16 — Runtime validation | [Plan](CH16-PLAN.md) | [Draft self-review](CH16-REVIEW.md) |
 
 The [voice review](VOICE-REVIEW.md) covers the prologue and early chapters.
 The [Chapter 3 pilot](CH3-PILOT.md) records the author-approved calibration for

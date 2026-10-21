@@ -10,14 +10,17 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 ## Current Phase: Act III — Patterns & Design
 
-**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all fifteen completed chapters. Recheck the stable release and rerun the full suite before publication.
+**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all fifteen completed chapters and the Chapter 16 draft. Recheck the stable release and rerun the full suite before publication.
 
 Act II is complete. Chapter 14 opens Act III with **error handling** and is drafted, jointly reviewed and checked. Chapter 15, **branded types**, is drafted, jointly reviewed and checked, including isolated Principle-only and full-reader reviews.
+
+Chapter 16, **runtime validation**, is drafted and self-reviewed on the settled discovery plan; independent readers, a recheck and joint review are complete; it awaits the author's review. Its local Verdict leaves Act III's open-ending debt for a later chapter.
 
 ### Act III tasks
 
 - [x] Ch14: `01-error-handling.md` — exceptions and explicit results across a transaction boundary; fair alternatives, independent first-reader rechecks, joint review and compiler/runtime validation complete
 - [x] Ch15: `02-branded-types.md` — scalar meanings, stale object checks, working class and request alternatives; joint review, independent readers and compiler/runtime validation complete
+- [ ] Ch16: `03-runtime-validation.md` — raw receipts, unfamiliar values and consumer-specific projections; revised after independent readers and formal review; compiler/runtime checks pass; jointly approved, awaiting the author
 - [ ] Act III debt: at least one honest "The Debate Continues" chapter, with demonstrated conditions
 
 ### Completed Act II work
@@ -159,7 +162,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Scaffolding + Prologue      | Done            |                       |
 | Act I: The Type System      | Done            | 6 chapters; voice revisions merged |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
-| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–15 drafted, reviewed and checked (2 of 10) |
+| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–15 reviewed and checked (2 of 10); Ch16 jointly approved, awaiting the author |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |
