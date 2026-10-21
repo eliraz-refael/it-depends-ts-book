@@ -1,0 +1,204 @@
+{
+  "baseline_commit": "4af45f5",
+  "status": "draft 2 frozen; Chapter 6 targeted recheck pending, Chapter 7 approved",
+  "chapters": [
+    {
+      "path": "book/01-the-type-system/06-generics-basics.md",
+      "baseline_words": 2810,
+      "baseline_sha256": "c20af5c9042a00124c22bd972ed7df6462911f0e632123b8221b98aa9f0f691e",
+      "fence_count": 15,
+      "all_fences_identical_in_order": true,
+      "fences": [
+        {
+          "ordinal": 1,
+          "sha256": "4d9236fb0427157693d431a94e4924a6a2e3481fdc4447396978826d4193041f"
+        },
+        {
+          "ordinal": 2,
+          "sha256": "c768697e79008671fe1db513635330e08f9cf91c2ed06c74eeb77ebbbaf39ff9"
+        },
+        {
+          "ordinal": 3,
+          "sha256": "adcc0bce149cc8e5f990c35b378e57cc120eb451c9f933a30934af2addce9252"
+        },
+        {
+          "ordinal": 4,
+          "sha256": "96cc90ce444cfcd2a8d4972abbc0b87ec552718ee86b1d80d21e1655fa197f78"
+        },
+        {
+          "ordinal": 5,
+          "sha256": "75b4ae065117a40c0adb2b36f8046731531bc9dacfb458bd125deb23aca430f1"
+        },
+        {
+          "ordinal": 6,
+          "sha256": "dfc8afa729c223ccdc0a82aeff5bbc49e606a7863768bdf5f6e705e51f612be9"
+        },
+        {
+          "ordinal": 7,
+          "sha256": "062fdb929421e3a6a2b049d5c3b3f67bacf5d92dfe036294adfa35b1e0e33c85"
+        },
+        {
+          "ordinal": 8,
+          "sha256": "3db1065c519a5506388b8ee4b00c60c9a976fcbd423170f15df10dffc88968c1"
+        },
+        {
+          "ordinal": 9,
+          "sha256": "82e9d607b8aae5d8ecd3aca1afde21f8f36fc2d2b3c1650a0bd3a6c7c0767322"
+        },
+        {
+          "ordinal": 10,
+          "sha256": "b3545ab978a6f35fdecd8cd85b88eb60634d512141e783a917f3a46f6afb568f"
+        },
+        {
+          "ordinal": 11,
+          "sha256": "9694c842412edfac091f6ddf59e317e244a5f7783dc1a3db7abf3ac5101e3095"
+        },
+        {
+          "ordinal": 12,
+          "sha256": "376a8eec86e7cadf80de7e876af64d0a9eb10e25ab1a1b941e99683c2396a155"
+        },
+        {
+          "ordinal": 13,
+          "sha256": "4acbeaa8af6a882493501f9345bd9c17d3c0bb152ef13620c5c9f179aee4fdf6"
+        },
+        {
+          "ordinal": 14,
+          "sha256": "49bf9f38709a833108fadbaece92c907ce7e4834a63dbbe20e760ee0aec71677"
+        },
+        {
+          "ordinal": 15,
+          "sha256": "f24637855f20f49d4d3447b152932c33404ea9074e60545314881931aefb1e78"
+        }
+      ],
+      "draft2_sha256": "4e0c3efce6fc4ea7e5db039abca565780fc66564df5acba0abf177dd919267dd",
+      "draft2_words": 2599
+    },
+    {
+      "path": "book/02-advanced-typescript/01-conditional-types.md",
+      "baseline_words": 3675,
+      "baseline_sha256": "3671844ffa6dfe77665d7155c398ee0804bc03973246de61511eda218fe1dc16",
+      "fence_count": 29,
+      "all_fences_identical_in_order": true,
+      "fences": [
+        {
+          "ordinal": 1,
+          "sha256": "9444098a9c3ed26b24871070e7d174557c3091fcbd36f631262316ab577f7d8a"
+        },
+        {
+          "ordinal": 2,
+          "sha256": "337cac8d51900eed8187db1f3e9d24949da2e986775c355a3882e1e2bab843b3"
+        },
+        {
+          "ordinal": 3,
+          "sha256": "376f44a08a935e8a392369d33863120e46fb376b049a6285bced3350b9829196"
+        },
+        {
+          "ordinal": 4,
+          "sha256": "0ff9bc3de494eb84bd27e56c302cd4937565f70a1892937b529f244fb68793c8"
+        },
+        {
+          "ordinal": 5,
+          "sha256": "22b9e6a62ef7327f122158c597b7bfeaf46c2ad91ff494ee64b6dbea8c70e799"
+        },
+        {
+          "ordinal": 6,
+          "sha256": "ee488512f583bdbd1fa4b1fc890f411189599bfede82a33f04fd4d1db47fa7bc"
+        },
+        {
+          "ordinal": 7,
+          "sha256": "5769a90e7e55fc9ce277ade7e3df68572c9120dbf64c2dfc5fba358458a200f1"
+        },
+        {
+          "ordinal": 8,
+          "sha256": "2fb8201cdb4a8d0a219c437004954a6b00ce6d5c0c75771b68174a554cdba08b"
+        },
+        {
+          "ordinal": 9,
+          "sha256": "203225c9238c3c5f8fe125734d293208f1c71146a87452da2b89966e9313ab3c"
+        },
+        {
+          "ordinal": 10,
+          "sha256": "802b0b58d237f9bdb110b4d7f73509c9db340709f4ebb26a608a1c0688a90435"
+        },
+        {
+          "ordinal": 11,
+          "sha256": "6d21ff25fc54b3d3628bb50ece8b08a341b2577e1d4079ce5cc0b95be6064f1f"
+        },
+        {
+          "ordinal": 12,
+          "sha256": "6edab2db6a11fd756b3442ad1afaa1dcc4ec6d15d96715a8937e57f16d5d0d76"
+        },
+        {
+          "ordinal": 13,
+          "sha256": "41d9c4dea3cb05a6b432c5bf1806cd0a8f579255047c55e82c3376c27861452c"
+        },
+        {
+          "ordinal": 14,
+          "sha256": "e33cdbd27eb62f01c27d0803b7ad6a43055363fb52bc9cf4409ef208584a0f41"
+        },
+        {
+          "ordinal": 15,
+          "sha256": "890ebe7411e462126842d86ae71f272c79b93cfb053c53755d9c3327790531dc"
+        },
+        {
+          "ordinal": 16,
+          "sha256": "63275f620910f11a3c206091e149ffca45a15b4273083b1f89044a4db34514b7"
+        },
+        {
+          "ordinal": 17,
+          "sha256": "c5906d2250fa426e9bcdc7084384946c1215a4f5e53bfc057b20dc8d663bcd2b"
+        },
+        {
+          "ordinal": 18,
+          "sha256": "a1486ee46396b2a2fba46c0b62d4c74ff0460bcea442a20681504a478ca7fbc9"
+        },
+        {
+          "ordinal": 19,
+          "sha256": "6d2e774df5bf700983be8d0242be010b346d5a759e791fd248bc7c415179b0df"
+        },
+        {
+          "ordinal": 20,
+          "sha256": "dba0939b5857175650947cc6bee094a65b2d694d60ce5e19213aa552981a9606"
+        },
+        {
+          "ordinal": 21,
+          "sha256": "3a968584f34ad1ff8ac2c1840458305ae2ed8c6fcc5cda21273945188e567daa"
+        },
+        {
+          "ordinal": 22,
+          "sha256": "cdccfaee48c6574fce9638b7f00fc9a10741d18762961a551fd8fa5a893f9c4e"
+        },
+        {
+          "ordinal": 23,
+          "sha256": "4a1a8c9e6f2b713636f481ef9f023a8b4fc8cf6469324f2448a5eead08748e3d"
+        },
+        {
+          "ordinal": 24,
+          "sha256": "5b5c2787f39c4634d2116a714137ee82ac238943eba1718d962a50d38f361278"
+        },
+        {
+          "ordinal": 25,
+          "sha256": "18624b3703301c08f64e3e4c2b9e6533c3c90abefa737f2af85a85188379a01b"
+        },
+        {
+          "ordinal": 26,
+          "sha256": "7ff1b6acda36a77cf1b6315a71338f2c44a77b8c16a9fe5d744841c5feab08dd"
+        },
+        {
+          "ordinal": 27,
+          "sha256": "f2b38b4b56e213f6ab6b3a43088008217960613fa46e7144bf197db061cb882f"
+        },
+        {
+          "ordinal": 28,
+          "sha256": "639d2afd6f44247ec7d66434d0ee952ae1852793d21f2dbdc625cf051adfe58d"
+        },
+        {
+          "ordinal": 29,
+          "sha256": "7d757cbfdc2640987828c68da9dfbe462ef4d62f1d18b0ffd9c7a80ce3526b40"
+        }
+      ],
+      "draft2_sha256": "f9495d4ff2c3401f14e30e971b6a81dca428d0906bb02975eee0708f8d11e085",
+      "draft2_words": 3622
+    }
+  ]
+}

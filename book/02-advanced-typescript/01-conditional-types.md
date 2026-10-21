@@ -2,13 +2,9 @@
 
 ## The Principle
 
-Act I ended with a promise. "What comes next is type-level *programming*," Eli said — "types that branch, types that walk an object's keys, types computed from other types." This chapter is the first installment: types that branch.
+**Prof. Eli Typeworth** writes the `sortByName` signature again.
 
-**Prof. Eli Typeworth** picks up his own thread.
-
-*"Let us return to first principles."*
-
-"Daniel warned you that you would meet `extends` again, and that it would mean something different. This is that meeting."
+"Daniel pointed out that `extends` has another job. In `sortByName`, it requires a property. Here it chooses a branch:"
 
 ```typescript
 // extends as a gate — a requirement:
@@ -135,8 +131,6 @@ const slugs = slugify(post.tags);
 //     Argument of type 'string | string[]' is not assignable to parameter of type 'string[]'.
 //       Type 'string' is not assignable to type 'string[]'.
 ```
-
-Nobody says anything for a second.
 
 **Oded**: "It doesn't like either one?"
 
@@ -454,8 +448,6 @@ type Mistyped = Exclude<Channel, "smss">;
 ```
 
 "Misspell a case in a `switch` and the exhaustiveness check from the enum argument screams at you. Misspell a member here and the filter matches nothing, hands back your union untouched, and the build goes green. Has anyone worked out what warns you?"
-
-Nobody answers.
 
 **Linoy**: "Nothing warns you. But you can make the gate do it — constrain the second parameter to the first:"
 
