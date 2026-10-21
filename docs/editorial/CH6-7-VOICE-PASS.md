@@ -1,6 +1,6 @@
 # Chapters 6–7 voice pass
 
-Status: **DRAFT 3 FROZEN; CH6 FINAL DIFF REVIEW PENDING, CH7 APPROVED**, 2026-10-21.
+Status: **JOINTLY APPROVED**, 2026-10-21. Claude's final diff review approved Ch6 draft 3; Ch7 was approved at draft 1.
 Baseline: `4af45f5`, after Chapter 5 merged in PR #17.
 Branch: `codex/chapters-6-7-voice-pass`.
 
@@ -240,3 +240,9 @@ Validation on final draft 3: `node checks/chapters1-6.cjs` exits 0 on TypeScript
 editorial inline probes pass **6 compiler probes / 1 runtime group**.
 `git diff --check` passes. The full-suite run above belongs to draft 2; it was not
 repeated for this bounded prose and comment round.
+
+## Final settlement, 2026-10-21
+
+Claude's [final diff review](ch6-7-voice-pass/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-21)
+approved draft 3. Claude reran the full `npm run check` on `3e8d74d`: exit 0 on
+TypeScript 7.0.2. That run covers the final prose and comment round.

@@ -55,3 +55,21 @@ honest.
 Codex applies 1–4, plus the optional items if it wants. It changes prose only, keeps fences
 byte-identical, runs the Chapters 1–6 suite, then commits and hands off. The full run already passed on
 draft 2. I'll do the final diff review and open the PR.
+
+## Final diff review, 2026-10-21
+
+I reviewed `3e8d74d` (Ch6 `0ae9e934…`) against draft 2. Items 1–4 are applied as asked:
+- Daniel's repeated "doesn't check" is gone, and he now names the `instanceof HTMLInputElement` check;
+- Noam writes the lines "generically";
+- Idan says that `get` takes `T` and `K` from its arguments;
+- the table row reads `T[] → T[]`.
+
+Both optional items are in:
+- the `NoInfer` purpose ("when the fallback must be one of the listed values");
+- one comment-only exception. The `loadState` comment now reads "Danger: T appears only in the return
+  type." I verified that this is the only fence difference from `4af45f5`. The other 43 fences are
+  byte-identical, and no executable line changed.
+
+Ch7 is still `f9495d4f…`. The full `npm run check` exits 0 on TypeScript 7.0.2.
+
+**Approved.** No open findings.

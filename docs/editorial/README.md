@@ -29,8 +29,8 @@ parser context and the open result-versus-throw argument, with independent reade
 a targeted recheck and joint review.
 
 The [Chapters 6–7 pass](CH6-7-VOICE-PASS.md) applies the full calibration to
-Chapter 6 and light repetition and opening edits to Chapter 7. Chapter 7 is
-approved; Chapter 6 draft 3 awaits its final diff review.
+Chapter 6 and light repetition and opening edits to Chapter 7, with independent
+readers, a targeted recheck and joint review.
 
 Compiler versions and check counts in these records describe their dated runs.
 See [the checks documentation](../../checks/README.md) for current coverage.

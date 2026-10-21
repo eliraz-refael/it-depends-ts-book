@@ -28,7 +28,7 @@ Chapter 16, **runtime validation**, is complete and merged as PR #16 after indep
 - [x] Ch7: `01-conditional-types.md` — revised after voice review; complete overload comparison, local normalization decision, dissent preserved
 - [x] Initial voice revision: Ch1–7 and prologue; Ch5 ends with "The Debate Continues"
 - [x] Calibrated voice passes: Ch3 pilot and Ch1–2 (PR #13), Ch4 (PR #14), Ch5 (PR #17); independent readers and joint reviews complete
-- [ ] Calibrated Ch6–7 voice pass: full Ch6 pass, light Ch7 edits and Act I → Act II opening; Ch7 approved, Ch6 targeted recheck pending
+- [x] Calibrated Ch6–7 voice pass: full Ch6 pass, light Ch7 edits and Act I → Act II opening; independent readers, targeted recheck and joint review complete
 - [x] Writing guidance: disputed decisions, fair alternatives, flexible voice tendencies
 - [x] Pre-commit corrections: assignability, assertions, Express augmentation, enum interoperability, serialization; expert biographies revised
 - [x] Ch8: `02-mapped-types.md` — revised for voice and pacing; explicit partial-update behavior, repaired derivation and contract test, form/error mappings, and key-remapping handoff; examples checked
@@ -162,7 +162,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Phase                       | Status          | Notes                 |
 |-----------------------------|-----------------|-----------------------|
 | Scaffolding + Prologue      | Done            |                       |
-| Act I: The Type System      | Done            | 6 chapters; calibrated Ch1–5 passes merged; Ch6 pass in progress |
+| Act I: The Type System      | Done            | 6 chapters; calibrated voice passes complete |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
 | Act III: Patterns & Design  | **IN PROGRESS** | Ch14–16 reviewed, checked and merged (3 of 10) |
 | Act IV: The Real World      | Planned         | 4 chapters            |
