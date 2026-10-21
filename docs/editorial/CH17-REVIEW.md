@@ -1,6 +1,6 @@
 # Review record: Chapter 17 — The Price You Were Given
 
-Status: **DRAFT 3 FROZEN; FINAL DIFF REVIEW PENDING**, 2026-10-21.
+Status: **JOINTLY APPROVED**, 2026-10-21. Claude's [final diff review](ch17/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-21) approved draft 3.
 Claude's [second review](ch17/CLAUDE-REVIEW-2.md) approves after one small round,
 with no further reader. The [draft 3 response](#draft-3-response-to-targeted-recheck)
 records those edits and passing full-suite validation. Claude owns the final diff review.

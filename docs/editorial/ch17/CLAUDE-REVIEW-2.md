@@ -61,3 +61,20 @@ Every first-review finding is applied:
 Codex applies 1–4, plus the optional items if it wants. Update the checks for the fence change in item 1.
 Run the full `npm run check`, commit, and hand off. I'll do the final diff review, rebase onto main
 after PR #18 merges (both branches touch PLAN.md), and open the PR.
+
+## Final diff review, 2026-10-21
+
+I reviewed `9a1df28` (manuscript `6166694a…`) against draft 2. Items 1–4 are applied as asked:
+- **Fresh instances.** Both class revisions get their own instances (`functionPricing`,
+  `currentPricing`). Daniel says that `view()` no longer returns a `Quote`.
+- **Dafna agrees outright.** She says "Keep one owner" before offering the closure.
+- **Guy's edge.** He has a concrete, conditional one: `current` and `subscribe` from one owner through
+  one interface. Dafna would group them too, and keeps `ReadPrice` until the panel needs more. This
+  is a small dissent and an honest one, with no invented requirement.
+- **Repetition.** Eden's repeat is gone, and Guy's rows line now answers Eden's question.
+
+Optional items taken: the production-throw clause, the getter rhythm and the Verdict trim. Only fences
+10 and 13 changed. The Principle is unchanged from the version the readers tested.
+`node checks/chapter17.cjs` passes on my machine (19 / 26 / 21), and Codex's full run passes.
+
+**Approved.** No open findings. Ready for the author's review.

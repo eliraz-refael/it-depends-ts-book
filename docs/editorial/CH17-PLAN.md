@@ -182,9 +182,9 @@ Readers: an isolated Principle-only reader and a fresh full reader, with prerequ
 
 - [x] Codex challenges this plan; disagreements are settled on evidence.
 - [x] Codex drafts and self-reviews.
-- [ ] Claude's formal review, with Principle-only and fresh full readers.
+- [x] Claude's formal review, with Principle-only and fresh full readers, a targeted recheck and final diff review.
 - [x] Checks durable; full suite green on the draft example corpus.
-- [ ] Ready for the author's review.
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-21)
 

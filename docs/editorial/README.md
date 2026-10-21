@@ -15,7 +15,7 @@ The [master plan](../../PLAN.md) remains at the repository root.
 | 14 — Error handling | [Plan](CH14-PLAN.md) | [Review](CH14-REVIEW.md) |
 | 15 — Branded types | [Plan](CH15-PLAN.md) | [Review](CH15-REVIEW.md) |
 | 16 — Runtime validation | [Plan](CH16-PLAN.md) | [Draft self-review](CH16-REVIEW.md) |
-| 17 — Immutability | [Plan](CH17-PLAN.md) | [Review in progress](CH17-REVIEW.md) |
+| 17 — Immutability | [Plan](CH17-PLAN.md) | [Review](CH17-REVIEW.md) |
 
 The [voice review](VOICE-REVIEW.md) covers the prologue and early chapters.
 The [Chapter 3 pilot](CH3-PILOT.md) records the author-approved calibration for
