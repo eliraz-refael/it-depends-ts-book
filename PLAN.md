@@ -23,7 +23,7 @@ Chapter 16, **runtime validation**, is complete and merged as PR #16 after indep
 - [x] Ch16: `03-runtime-validation.md` — raw receipts, unfamiliar values and consumer-specific projections; independent readers and joint review complete; compiler/runtime checks pass; merged as PR #16
 - [x] Ch17: `04-immutability.md` — historical snapshots, live views and checked pricing updates; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #19
 - [x] Ch18: `05-pure-functions.md` — hidden inputs, required observations and cache boundaries; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #20
-- [ ] Ch19: `06-imperative-vs-declarative.md` — sequence rules a rewrite must keep; [plan](docs/editorial/CH19-PLAN.md) proposed, awaiting Codex's challenge
+- [ ] Ch19: `06-imperative-vs-declarative.md` — sequence rules a rewrite must keep; [plan](docs/editorial/CH19-PLAN.md) settled after Codex's challenge; drafting
 - [ ] Act III debt: at least one honest "The Debate Continues" chapter, with demonstrated conditions
 
 ### Completed Act II work

@@ -1,6 +1,6 @@
 # Chapter 19 — Imperative vs Declarative (working title)
 
-Status: **PROPOSED**, 2026-10-22. Awaiting Codex's challenge.
+Status: **PLAN SETTLED**, 2026-10-22. The settlement at the end governs the original proposal.
 Branch: `codex/chapter-19-imperative-declarative`, based on `origin/main` `ffc75c7`.
 File: `book/03-patterns-and-design/06-imperative-vs-declarative.md`.
 
@@ -216,8 +216,128 @@ Both get prerequisites only.
 
 ## Completion
 
-- [ ] Codex challenges this plan; disagreements are settled on evidence.
+- [x] Codex challenges this plan; disagreements are settled on evidence.
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and final diff review.
 - [ ] Checks durable; full suite green (final text).
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-22)
+
+Codex's [challenge](ch19/CODEX-PLAN-CHALLENGE.md) is accepted, with the decisions below. Where this
+section conflicts with the proposal above, this section governs.
+
+**Claude's own check of the central finding.** Session scratchpad, untracked.
+- **The simulation:** a fixed daily allowance that resets each day, every amount at most the allowance,
+  arrivals appended to the queue, payouts removed when paid. It compares the day each payout is paid
+  under stop and under skip.
+- **Under a fixed reset, skipping paid no payout later than stopping:**
+  - 200,000 random cases;
+  - all 78,125 cases of a four-payout opening queue plus one arrival on each of three later days,
+    amounts 1–5, allowance 5.
+
+  In many cases it paid some payouts earlier. That is evidence over those cases, not a proof. The
+  chapter claims no more than the cases it shows or names.
+- **Under a carry-forward balance** (unused allowance accrues), skipping can hold a large payout back.
+  With 500 a day accruing, P2 = 900 at the front, a 400 behind it and a 450 arriving each day, stopping
+  pays P2 on day 1 and skipping on day 7.
+
+So the plan's starvation story was wrong, as Codex says. The next-day result is stronger than an
+incident: it is the Turn.
+
+1. **The incident is overtaking, not starvation.**
+   - **The promise is stated before any code:** ready payouts in the account's currency above the
+     minimum are released in queue order, and each day's allowance resets.
+   - **Scope:** every eligible amount fits a fresh day's allowance. One clause; larger payouts take
+     a separate path that the chapter doesn't show.
+   - **The promise's owners:** the payouts team owns release order. Support quotes it to sellers, and
+     a support reply saying so is on the page.
+   - **Show an ordinary successful batch first.** The planner returns a batch plan, and submission
+     stays outside the examples.
+   - **The failure:** a seller sees newer payouts released while theirs waits, against what support
+     told them. Gil brings the batch IDs and queue positions. No multi-day age story.
+2. **The Principle:** Sahar, in the operation-specific direction of Codex's §2, not the proposal's
+   categorical text.
+   - Per-element decisions start with the operations that name them.
+   - Before replacing a loop, check:
+     - what one item changes for the next;
+     - where processing stops;
+     - what must happen in order.
+   - Keep those rules visible in whichever form you choose.
+   - "A callback returning is not the operation stopping" can stay if it reads naturally.
+   - **Drop the evaluation-order clause** about eager `filter().map()`. No callback here has effects,
+     and it would replay Ch18. The async case stays a Principle-only reader case.
+   - **The reader cases stand:** stop vs skip, per-element only, the optional property and async
+     order.
+3. **Repairs, all in their strongest form, without a gallery.**
+   - **Dafna's rewrite earns its stages before it fails.** These stay correct after the repair:
+     - separate status and currency filters, with inferred narrowing;
+     - per-rule tests.
+   - **Her skipping fold** pushes to a fresh local array, not a spread.
+   - **The loop returns the same typed stop reason as the fold.** The reason in a type is not the
+     fold's exclusive advantage, and Sahar doesn't miss the early return.
+   - **`findIndex` plus `slice`** (with the `-1` case), or `some`, gets one exchange: a stopping array
+     operation exists. Whether a counter inside a callback reads more clearly than the loop is the
+     question it raises.
+   - **Liron's first proposal is the domain operation** `planPayouts(queue, allowance)`, behind
+     which a loop or a fold is an implementation detail. No generic `prefixWithin<T>` unless a second
+     algorithm appears, and none does.
+   - **The Debate settles the refactor:** the change must restore stopping, and the room may converge
+     on the planner's form. Say so plainly. Don't stage a contest between equivalent implementations.
+4. **Held-row order is Chen's regression question inside the Debate,** not a Turn. Use H 1,200 then
+   R1 600 and R2 500: eligibility first selects R1, and the limit first selects nobody. Every competent
+   repair answers it by keeping the old order.
+5. **The Turn is the next day.** Chen asks when the overtaken payout is actually paid. Gil runs the
+   next days under both planners:
+   - stop: P1, then P2, then P3 and P4;
+   - skip: P1, P3 and P4, then P2.
+
+   P2 is paid on day 2 either way. Gil then runs the cases he can name and finds no payout paid later
+   under skip. The `break` kept a promise that protected nobody's payment date under this funding
+   model. The question changes from how to restore the rule to whether to keep it.
+   - **The refactor still restores stopping.** A refactor doesn't change the policy, and Dafna's
+     broken rewrite isn't retroactively declared a product change. Keep the two decisions in separate
+     scenes.
+   - **Skipping is not optimal packing.** It fills more of this batch; claim nothing more general.
+6. **The ending is The Debate Continues, on the explicit release-order policy.** The payouts team
+   owns that policy, so the decision belongs to people in the room. It stays open because a
+   condition it depends on is open, not because the room is shy.
+   - **Fixed daily allowance (today):** skipping paid no one later in Gil's cases, and paid some
+     earlier. Dafna argues to adopt it, on purpose this time.
+   - **Carry-forward balance:** finance is considering it. Establish this in one line well before
+     the ending. Under it, skipping can hold a large payout back for days, so show one short trace
+     (Claude's day 1 vs day 7, or Codex's own). Stopping is what keeps overtaking from becoming
+     starvation.
+   - **The seller-facing promise:** support's reply quotes queue order. Changing the policy changes
+     that text, whichever way it goes.
+   - **Optional secondary beat:** Sahar and Liron on whether the second policy gets written now. Liron
+     wants it as a named option; Sahar writes the one being shipped. Only if it lands.
+
+   Each condition is shown before the ending, and the ending introduces no new conditions. Any
+   change to the release order goes in a separate change with a stated owner, after the restoring
+   refactor. If drafting shows the room honestly deciding, stop and tell me; don't force it.
+7. **Cast:** Sahar, Liron, Dafna, Gil and Chen. **No Linoy.** Give the professionals the repair work,
+   following Codex's §6:
+   - Dafna implements her corrected fold and answers the short-circuit alternative.
+   - Gil's runs change claims twice: the overtaking evidence, then the next-day traces.
+   - Sahar and Liron are sparing.
+8. **Mechanism budget.**
+   - **Main text:**
+     - the discriminant filter;
+     - the combined-predicate loss, if shown (TS2339);
+     - stop vs skip;
+     - the typed stop reason;
+     - one stopping array operation;
+     - the traces.
+   - **At most one Take** from: the optional-property TS18048, `forEach`/TS1107, or iterator helpers
+     under the ES2025 lib. Drop the `{}`/`[]` seed errors.
+9. **Validation:** Codex's §8 list, plus:
+   - the fixed-reset next-day traces;
+   - the named case set behind "no one paid later", asserted exactly as the text states it;
+   - the carry-forward trace;
+   - selected IDs, total and stop reason pinned in every planner.
+
+   Assumptions (positive amounts, stable order, the reset model) stay explicit in `checks/README.md`.
+
+Next: Codex drafts on this branch and self-reviews. Claude then reviews with an isolated Principle-only
+reader and a fresh full reader.
