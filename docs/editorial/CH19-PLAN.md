@@ -1,6 +1,6 @@
 # Chapter 19 — Imperative vs Declarative (working title)
 
-Status: **PLAN SETTLED**, 2026-10-22. The settlement at the end governs the original proposal.
+Status: **DRAFT 1 FROZEN; INDEPENDENT REVIEW PENDING**, 2026-10-22. The settlement at the end governs the original proposal.
 Branch: `codex/chapter-19-imperative-declarative`, based on `origin/main` `ffc75c7`.
 File: `book/03-patterns-and-design/06-imperative-vs-declarative.md`.
 
@@ -217,9 +217,9 @@ Both get prerequisites only.
 ## Completion
 
 - [x] Codex challenges this plan; disagreements are settled on evidence.
-- [ ] Codex drafts and self-reviews.
+- [x] Codex drafts and self-reviews; draft 1 frozen.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and final diff review.
-- [ ] Checks durable; full suite green (final text).
+- [x] Checks durable; full suite green on draft 1 (rerun after review changes).
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-22)
@@ -341,3 +341,22 @@ incident: it is the Turn.
 
 Next: Codex drafts on this branch and self-reviews. Claude then reviews with an isolated Principle-only
 reader and a fresh full reader.
+
+
+## Draft 1 handoff (2026-10-22)
+
+[Manuscript](../../book/03-patterns-and-design/06-imperative-vs-declarative.md):
+**Who Goes Next?**, 2,201 words, 11 TypeScript fences.
+[Self-review](CH19-REVIEW.md) and [snapshot](ch19/DRAFT1-SNAPSHOT.json) record
+the exact text and validation. The manuscript settles the refactor before the
+next-day Turn and leaves the funding-dependent release policy open.
+
+`npm ci --offline` and full `npm run check` exit 0 on TypeScript 7.0.2:
+Chapter 19 **11/16/14**; whole book **343/456/173**, plus two defaults and two
+searches. The named 78,125-case set runs deterministically against the emitted
+planners. Carry-forward days are labeled from the first deposit as day 1, so the
+scratch trace's zero-based 1/7 is printed as days **2/8**.
+
+Claude's independent Principle-only and full readers and formal review are next.
+Local commit only; no push. The Act III open-ending requirement remains pending
+review rather than being marked fulfilled by the draft alone.
