@@ -14,7 +14,7 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 Act II is complete. Chapter 14 opens Act III with **error handling** and is drafted, jointly reviewed and checked. Chapter 15, **branded types**, is drafted, jointly reviewed and checked, including isolated Principle-only and full-reader reviews.
 
-Chapter 16, **runtime validation**, is complete and merged as PR #16 after independent readers, a recheck and joint review. Chapter 17, **immutability**, is complete and merged as PR #19 after independent readers, a targeted recheck and joint review. Chapter 18, **pure functions**, is complete and merged as PR #20 after three Principle-only reads, a full read, a targeted recheck and joint review. It reaches a local Verdict on caching deadlines, evaluating current status and recording at the boundary. Chapter 19's draft settles the refactor and leaves release-order policy open under two demonstrated funding models. Independent readers and formal review are pending; Act III's open-ending requirement is not marked complete yet.
+Chapter 16, **runtime validation**, is complete and merged as PR #16 after independent readers, a recheck and joint review. Chapter 17, **immutability**, is complete and merged as PR #19 after independent readers, a targeted recheck and joint review. Chapter 18, **pure functions**, is complete and merged as PR #20 after three Principle-only reads, a full read, a targeted recheck and joint review. It reaches a local Verdict on caching deadlines, evaluating current status and recording at the boundary. Chapter 19's second draft reaches a local Verdict after the reset argument and a bounded-reservation repair under accumulating funds. Independent readers and the first formal review are complete; targeted rechecks are pending. Act III's honest open-ending requirement moves to Ch20 (currying and partial application), whose plan must establish a real caller-dependent choice rather than force a split.
 
 ### Act III tasks
 
@@ -23,8 +23,8 @@ Chapter 16, **runtime validation**, is complete and merged as PR #16 after indep
 - [x] Ch16: `03-runtime-validation.md` — raw receipts, unfamiliar values and consumer-specific projections; independent readers and joint review complete; compiler/runtime checks pass; merged as PR #16
 - [x] Ch17: `04-immutability.md` — historical snapshots, live views and checked pricing updates; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #19
 - [x] Ch18: `05-pure-functions.md` — hidden inputs, required observations and cache boundaries; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #20
-- [ ] Ch19: `06-imperative-vs-declarative.md` — sequence rules a rewrite must keep; [plan](docs/editorial/CH19-PLAN.md) settled after Codex's challenge; draft 1 and compiler/runtime self-checks complete; independent readers and formal review pending
-- [ ] Act III debt: at least one honest "The Debate Continues" chapter, with demonstrated conditions
+- [ ] Ch19: `06-imperative-vs-declarative.md` — sequence rules a rewrite must keep; [plan](docs/editorial/CH19-PLAN.md) settled after Codex's challenge; draft 2 and compiler/runtime self-checks complete after independent readers and first review; targeted rechecks pending
+- [ ] Act III debt: at least one honest "The Debate Continues" chapter, with demonstrated conditions; moves to Ch20 after Ch19's bounded-reservation convergence
 
 ### Completed Act II work
 
@@ -167,7 +167,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Scaffolding + Prologue      | Done            |                       |
 | Act I: The Type System      | Done            | 6 chapters; calibrated voice passes complete |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
-| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–18 reviewed, checked and merged (5 of 10); Ch19 draft checked, independent review pending |
+| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–18 reviewed, checked and merged (5 of 10); Ch19 draft 2 checked, targeted rechecks pending |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |

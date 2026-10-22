@@ -1,6 +1,6 @@
 # Chapter 19 — Imperative vs Declarative (working title)
 
-Status: **DRAFT 1 FROZEN; INDEPENDENT REVIEW PENDING**, 2026-10-22. The settlement at the end governs the original proposal.
+Status: **DRAFT 2 FROZEN; TARGETED RECHECKS PENDING**, 2026-10-22. The plan settlement and subsequent ending settlement below govern the original proposal.
 Branch: `codex/chapter-19-imperative-declarative`, based on `origin/main` `ffc75c7`.
 File: `book/03-patterns-and-design/06-imperative-vs-declarative.md`.
 
@@ -217,9 +217,9 @@ Both get prerequisites only.
 ## Completion
 
 - [x] Codex challenges this plan; disagreements are settled on evidence.
-- [x] Codex drafts and self-reviews; draft 1 frozen.
+- [x] Codex drafts and self-reviews; draft 2 follows the first formal review.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and final diff review.
-- [x] Checks durable; full suite green on draft 1 (rerun after review changes).
+- [x] Checks durable; full suite green on draft 2 (rerun after further review changes).
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-22)
@@ -360,3 +360,28 @@ scratch trace's zero-based 1/7 is printed as days **2/8**.
 Claude's independent Principle-only and full readers and formal review are next.
 Local commit only; no push. The Act III open-ending requirement remains pending
 review rather than being marked fulfilled by the draft alone.
+
+
+## Ending settlement and draft 2 (2026-10-22)
+
+The [first formal review](ch19/CLAUDE-REVIEW.md) and
+[ending settlement](ch19/CLAUDE-ENDING-SETTLEMENT.md) supersede the planned open
+ending. The [revision note](ch19/CODEX-REVISION2-NOTE.md) records the evidence
+reported before that decision.
+
+The refactor restores stopping first. The room then proves the reset subset
+argument and adopts a deliberately named fill policy, with the support promise
+updated. Under proposed accumulation, it compares all payouts and considers both
+stop's aggregate waiting cost and unbounded fill's starvation. Dafna's strongest
+repair fills initially, then reserves for the oldest unfunded payout after a
+stated wait. The room converges; choosing the illustrative N=2 is a parameter
+choice, not an honest unresolved debate. Policy determines behavior and naming,
+not a unique loop or fold syntax.
+
+**Local Verdict. Act III's open-ending requirement moves to Ch20.** Its plan
+must establish an actual caller-dependent choice; the requirement does not
+license a manufactured disagreement.
+
+Draft 2 has 13 fences, 18 compiler cases and 18 runtime groups. The full suite
+passes 345/458/177, plus two compiler-default cases and two searches, on TS 7.0.2.
+The Principle-only reader and revised-passage recheck are pending.

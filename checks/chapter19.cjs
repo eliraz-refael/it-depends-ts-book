@@ -28,7 +28,9 @@ const skipping=block("function skipping(");
 const incident=block("const queue =");
 const folded=block("type Stop =");
 const looped=block("function looped(");
+const split=block("function split(");
 const held=block("const heldFirst:");
+const reservation=block("type WaitingPayout =");
 const reportFailure=block("type ReportRow =");
 const reportMap=block("const refundAmounts =");
 const reportFlat=block("const refunds =");
@@ -67,19 +69,12 @@ const loopApi=example("loop-same-stop-reason",base+batchTypes+looped+"export {lo
 const heldPrint=example("eligibility-before-allowance-output",base+batchTypes+looped+held);
 const namedApi=example("domain-planner-uses-the-loop-body",base+batchTypes+
   replaceOnce(looped,"function looped(","function planPayouts(")+"export {planPayouts,ready};\n");
-// The valid short-circuit proposal in dialogue, using the same eligibility,
-// result type and input as the printed repairs. Local state stays per call.
-const someApi=example("some-stops-on-first-failure",base+batchTypes+`
-function withSome(queue:readonly Payout[],allowance:number):Batch {
-  const released:Ready[]=[];let total=0;let stop:Stop={kind:"end"};
-  eligible(queue).some(payout=>{
-    if(total+payout.amount>allowance){stop={kind:"limit",id:payout.id};return true;}
-    released.push(payout);total+=payout.amount;return false;
-  });
-  return {released,total,stop};
-}
-export {withSome,ready};
-`);
+// Liron's printed split uses the same result type and eligibility stages.
+const splitApi=example("split-at-first-blocker",base+batchTypes+split+"export {split,ready};\n");
+const reserveApi=example("fill-then-reserve-with-explicit-day",base+batchTypes+reservation+
+  "export {fillThenReserve,ready};\n");
+const namedFillApi=example("named-fill-policy-retains-skipping-body",base+
+  replaceOnce(skipping,"function skipping(","function fillAvailable(")+"export {fillAvailable,ready};\n");
 const limitLine="    if (total + payout.amount > allowance) break;\n";
 const wrongOrder=replaceOnce(replaceOnce(original,limitLine,""),
   "  for (const payout of queue) {\n","  for (const payout of queue) {\n"+limitLine);
@@ -120,9 +115,11 @@ function group(name,fn){
 function simple(plan){return {ids:plan.released.map(p=>p.id),total:plan.total};}
 const {ready}=load(originalApi);
 const stopFunctions=[load(originalApi).original,load(foldApi).folded,
-  load(loopApi).looped,load(namedApi).planPayouts,load(someApi).withSome];
+  load(loopApi).looped,load(namedApi).planPayouts,load(splitApi).split];
 const typedFunctions=stopFunctions.slice(1);
 const skip=load(skipApi).skipping;
+const fillAvailable=load(namedFillApi).fillAvailable;
+const reserve=load(reserveApi).fillThenReserve;
 const queue=[ready("P1",400),ready("P2",900),ready("P3",200),ready("P4",300)];
 const heldQueue=[{id:"H",amount:1200,currency:"USD",status:"held",reason:"review"},
   ready("R1",600),ready("R2",500)];
@@ -145,9 +142,10 @@ group("all-repairs-agree-on-incident-and-reason",()=>{
   for(const f of stopFunctions)assert.deepEqual(simple(f(queue,1000)),{ids:["P1"],total:400});
   for(const f of typedFunctions)assert.deepEqual(f(queue,1000).stop,{kind:"limit",id:"P2"});
   assert.deepEqual(simple(skip(queue,1000)),{ids:["P1","P3","P4"],total:900});
+  assert.deepEqual(fillAvailable(queue,1000),skip(queue,1000));
 });
 group("fixture-that-hid-skip",()=>{
-  for(const f of [...stopFunctions,skip]){
+  for(const f of [...stopFunctions,skip,fillAvailable]){
     assert.deepEqual(simple(f(queue.slice(0,2),1000)),{ids:["P1"],total:400});
   }
 });
@@ -157,7 +155,7 @@ group("eligibility-individual-rules-and-inferred-destinations",()=>{
     ready("LOW",99),ready("MIN",100),ready("NEXT",200)];
   assert.deepEqual(m.eligible(fixture).map(p=>p.id),["MIN","NEXT"]);
   assert.deepEqual(m.destinations,["test-account","test-account"]);
-  for(const f of [...stopFunctions,skip])
+  for(const f of [...stopFunctions,skip,fillAvailable])
     assert.deepEqual(simple(f(fixture,1000)),{ids:["MIN","NEXT"],total:300});
 });
 group("held-before-and-after-blocker-and-wrong-order",()=>{
@@ -185,7 +183,7 @@ group("empty-exact-fit-and-exhausted-allowance",()=>{
 group("local-mutation-does-not-leak-between-calls-or-change-input",()=>{
   const input=queue.map(p=>Object.freeze({...p,account:Object.freeze({...p.account})}));
   Object.freeze(input);const expected=JSON.stringify(input);
-  for(const f of [...stopFunctions,skip]){
+  for(const f of [...stopFunctions,skip,fillAvailable]){
     const first=f(input,1000),second=f(input,1000);
     assert.deepEqual(first,second);assert.notEqual(first.released,second.released);
     first.released.length=0;assert(second.released.length>0);
@@ -193,7 +191,7 @@ group("local-mutation-does-not-leak-between-calls-or-change-input",()=>{
   }
 });
 group("printed-operation-counts",()=>{
-  assert(chapter.includes("Four reducer calls"));assert(chapter.includes("Only two allowance checks"));
+  assert(chapter.includes("Four reducer calls, two allowance checks"));
   const m=load(countApi);m.reset();m.folded(queue,1000);
   assert.deepEqual(m.counts(),{callbacks:4,budgetChecks:2});
   m.reset();m.looped(queue,1000);assert.deepEqual(m.counts(),{callbacks:0,budgetChecks:2});
@@ -206,11 +204,11 @@ function schedule(planner,arrivals,daily,carry=false,days=arrivals.length+8){
   for(let day=1;day<=days;day++){
     remaining.push(...(arrivals[day-1]??[]));
     balance=carry?balance+daily:daily;
-    const before=balance,result=planner(remaining,balance);
+    const before=balance,result=planner(remaining,balance,day);
     const ids=new Set(result.released.map(p=>p.id));
     for(const id of ids){assert(!paid.has(id));paid.set(id,day);}
     remaining=remaining.filter(p=>!ids.has(p.id));balance-=result.total;
-    assert(balance>=0);trace.push({day,before,released:[...ids],after:balance});
+    assert(balance>=0);trace.push({day,before,released:[...ids],after:balance,remaining:remaining.map(p=>p.id)});
   }
   return {paid,trace,remaining};
 }
@@ -239,6 +237,12 @@ group("named-78125-reset-cases-no-id-paid-later-under-skip",()=>{
     const stop=schedule(load(loopApi).looped,arrivals,500);
     const skipping=schedule(skip,arrivals,500);
     assert.equal(stop.paid.size,7);assert.equal(skipping.paid.size,7);
+    // The prose gives an induction, not a claim that this finite set proves it.
+    // Pin its daily subset invariant in every named case too.
+    for(let day=0;day<stop.trace.length;day++){
+      const pending=new Set(stop.trace[day].remaining);
+      assert(skipping.trace[day].remaining.every(id=>pending.has(id)));
+    }
     for(const [id,day] of stop.paid){
       assert(skipping.paid.get(id)<=day,"Later under skip: "+n+" id "+id);
       if(skipping.paid.get(id)<day)earlier++;
@@ -247,22 +251,98 @@ group("named-78125-reset-cases-no-id-paid-later-under-skip",()=>{
   }
   assert.equal(count,78125);assert(earlier>0);
 });
-group("carry-forward-table-human-days-two-and-eight",()=>{
-  const arrivals=[[ready("P2",900),ready("S1",400)]];
-  for(let day=2;day<=8;day++)arrivals.push([ready("S"+day,450)]);
-  const stop=schedule(load(loopApi).looped,arrivals,500,true,8);
-  const skipping=schedule(skip,arrivals,500,true,8);
-  assert.equal(stop.paid.get("P2"),2);assert.equal(skipping.paid.get("P2"),8);
-  assert.equal(skipping.paid.get("P2")-stop.paid.get("P2"),6);
-  const rows=[...chapter.matchAll(/^\| ([1-8]) \| (Waits; retains 500|Paid from 1,000|Already paid) \| (\d+); ([^|]+) \|$/gm)];
-  assert.equal(rows.length,8);
-  for(const [i,row] of rows.entries()){
-    assert.equal(skipping.trace[i].before,Number(row[3]));
-    assert.deepEqual(skipping.trace[i].released,[i===7?"P2":"S"+(i+1)]);
-    assert.equal(skipping.trace[i].before-skipping.trace[i].after,i===0?400:i===7?900:450);
+function fundingRuns(amount,arrivalThrough=8,days=12) {
+  const arrivals=[[{...ready("P2",900),arrivedOn:1},{...ready("S1",400),arrivedOn:1}]];
+  for(let day=2;day<=arrivalThrough;day++)
+    arrivals.push([{...ready("S"+day,amount),arrivedOn:day}]);
+  return [load(loopApi).looped,skip,(q,b,day)=>reserve(q,b,day,2)]
+    .map(f=>schedule(f,arrivals,500,true,days));
+}
+group("all-id-accumulation-table-and-thirteen-payout-days",()=>{
+  const runs=fundingRuns(450);
+  const rows=[...chapter.matchAll(/^\| (P2|S[1-8]) \| (\d+) \| (\d+) \| (\d+) \|$/gm)];
+  assert.equal(rows.length,9);
+  assert.equal(new Set(rows.map(r=>r[1])).size,9);
+  for(const [,id,...days] of rows){
+    assert.deepEqual(runs.map(r=>r.paid.get(id)),days.map(Number),id);
   }
-  assert.equal(stop.trace[0].after,500);assert.equal(stop.trace[1].before,1000);
-  assert.deepEqual(stop.trace[1].released,["P2"]);
+  assert(runs.every(r=>r.remaining.length===0));
+  const [stop,fill,bounded]=runs;
+  const differences=Array.from({length:8},(_,i)=>{
+    const id="S"+(i+1);return stop.paid.get(id)-fill.paid.get(id);
+  });
+  assert.deepEqual(differences,[2,2,2,2,2,2,1,0]);
+  assert.equal(differences.reduce((a,b)=>a+b,0),13);
+  assert.equal(differences.filter(d=>d>0).length,7);
+  assert.equal(fill.paid.get("P2")-stop.paid.get("P2"),6);
+  assert.deepEqual([bounded.paid.get("P2")-stop.paid.get("P2"),
+    bounded.paid.get("S1")-stop.paid.get("S1"),
+    bounded.paid.get("S2")-stop.paid.get("S2")],[2,-2,-2]);
+  for(let i=3;i<=8;i++)assert.equal(bounded.paid.get("S"+i),stop.paid.get("S"+i));
+  assert(chapter.includes("Thirteen payout-days across seven payouts"));
+});
+group("500-arrivals-ending-day-eight-all-ids-and-day-ten",()=>{
+  const runs=fundingRuns(500);
+  const ids=["P2",...Array.from({length:8},(_,i)=>"S"+(i+1))];
+  const expected=[
+    [2,3,4,5,6,7,8,9,10],
+    [10,1,2,3,4,5,6,7,8],
+    [4,1,2,5,6,7,8,9,10],
+  ];
+  runs.forEach((r,i)=>{
+    assert.deepEqual(ids.map(id=>r.paid.get(id)),expected[i]);
+    assert.equal(r.remaining.length,0);
+  });
+  assert(chapter.includes("P2 gets day 10"));
+});
+group("continuing-500-arrivals-thirty-days-and-recurring-balance",()=>{
+  const [stop,fill,bounded]=fundingRuns(500,30,30);
+  assert.equal(stop.paid.get("P2"),2);
+  assert.equal(fill.paid.get("P2"),undefined);
+  assert.equal(bounded.paid.get("P2"),4);
+  assert.equal(fill.trace[0].before,500);
+  for(let i=0;i<30;i++){
+    assert.equal(fill.trace[i].after,100);
+    if(i>0)assert.equal(fill.trace[i].before,600);
+    assert.deepEqual(fill.trace[i].released,["S"+(i+1)]);
+  }
+  // Assert every ID through the horizon, not just the oldest payout.
+  for(let i=1;i<=30;i++){
+    const id="S"+i;
+    assert.equal(fill.paid.get(id),i);
+    assert.equal(stop.paid.get(id),i+2<=30?i+2:undefined);
+    const boundedDay=i<=2?i:i+2;
+    assert.equal(bounded.paid.get(id),boundedDay<=30?boundedDay:undefined);
+  }
+  assert(chapter.includes("still unpaid on day 30"));
+  assert(chapter.includes("As long as those arrivals continue, P2 never gets paid"));
+  // The infinite claim uses the stated recurring-balance invariant; a 30-day
+  // run alone would not prove it. Later arrivals are always appended.
+});
+group("reservation-threshold-boundaries-and-visible-stop-reason",()=>{
+  const input=[{...ready("P2",900),arrivedOn:1},{...ready("S2",500),arrivedOn:2}];
+  assert.deepEqual(simple(reserve(input,600,2,2)),{ids:["S2"],total:500});
+  assert.deepEqual(reserve(input,600,2,2).stop,{kind:"end"});
+  assert.deepEqual(reserve(input,600,3,2),{released:[],total:0,stop:{kind:"limit",id:"P2"}});
+  assert.deepEqual(simple(reserve(input,1100,4,2)),{ids:["P2"],total:900});
+  assert.deepEqual(reserve(input,1100,4,2).stop,{kind:"limit",id:"S2"});
+  const originalQueue=queue.map(p=>({...p,arrivedOn:1}));
+  assert.deepEqual(reserve(originalQueue,1000,1,0),load(loopApi).looped(originalQueue,1000));
+  assert.deepEqual(simple(reserve(originalQueue,1000,1,100)),simple(skip(originalQueue,1000)));
+  assert.deepEqual(reserve([],1000,1,2),{released:[],total:0,stop:{kind:"end"}});
+  const exact=[{...ready("EXACT",500),arrivedOn:1}];
+  assert.deepEqual(simple(reserve(exact,500,3,2)),{ids:["EXACT"],total:500});
+  assert.deepEqual(reserve(exact,500,3,2).stop,{kind:"end"});
+});
+group("reservation-explicit-day-and-local-state",()=>{
+  const input=Object.freeze(queue.map(p=>Object.freeze({...p,arrivedOn:1})));
+  const oldClock=Date.now;Date.now=()=>{throw new Error("The planner must not read a clock");};
+  try {
+    const first=reserve(input,1000,1,2),second=reserve(input,1000,1,2);
+    assert.deepEqual(first,second);assert.notEqual(first.released,second.released);
+    first.released.length=0;assert(second.released.length>0);
+    assert.deepEqual(simple(reserve(input,1000,3,2)),{ids:["P1"],total:400});
+  }finally{Date.now=oldClock;}
 });
 group("refund-repairs-values-and-associated-ids",()=>{
   const rows=[{id:"A"},{id:"B",refund:{amount:0}},{id:"C",refund:{amount:700}}];

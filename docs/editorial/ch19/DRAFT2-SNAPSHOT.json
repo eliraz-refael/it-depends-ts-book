@@ -1,0 +1,87 @@
+{
+  "status": "draft 2 frozen; targeted readers and second formal review pending",
+  "date": "2026-10-22",
+  "first_review_commit": "a4e95e8",
+  "original_plan_settlement_commit": "bcb0c2d",
+  "ending_settlement": "docs/editorial/ch19/CLAUDE-ENDING-SETTLEMENT.md",
+  "ending_settlement_sha256": "f2860df59008d058d242588ee0973628161fa5ec88888690198d0ef88763444e",
+  "path": "book/03-patterns-and-design/06-imperative-vs-declarative.md",
+  "sha256": "8dc7823a1c26faec693386d0d317be2a7051e14b0f775e3860a8fb606dd519a6",
+  "manuscript_mtime_utc": "2026-10-22T19:47:28.944719+00:00",
+  "words": 2861,
+  "typescript_fences": 13,
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "sha256": "444c56b0671efa307c08e9e38ff871df828172487d23e011505913033b921f8f"
+    },
+    {
+      "ordinal": 2,
+      "sha256": "e36caa458f2e76ab39f36ba1c15a19d6f24c11a46da4805904dcf1dde6dba49a"
+    },
+    {
+      "ordinal": 3,
+      "sha256": "a6fece0e40a576cf69362205d7ca2ed88668f4f89276c96e22dbf3c0a89eb92d"
+    },
+    {
+      "ordinal": 4,
+      "sha256": "fc072c14a11db6db6f198ea9677774c6b622ba95452c531f8746054a36bdc2fe"
+    },
+    {
+      "ordinal": 5,
+      "sha256": "9c0511adbe9571a4719708442d1cecd6033e298201d8f4ae09e3a4cc19e3c30d"
+    },
+    {
+      "ordinal": 6,
+      "sha256": "48defdf472c8a44bb625fa515fa808024956e2275f48a5ea1f2e1705d853bc7c"
+    },
+    {
+      "ordinal": 7,
+      "sha256": "4900c555e8fee8184294dffe3b50204b533659909de456cc3929b17e38b82687"
+    },
+    {
+      "ordinal": 8,
+      "sha256": "0f7a20bfcab64d61601fd33b20147412bd90a13c2ce6a0b01226a8bc67dfda7d"
+    },
+    {
+      "ordinal": 9,
+      "sha256": "d67d6ecf03a878e3bdd4efd14c5683343f741421f683f777d9fda1da34cd544c"
+    },
+    {
+      "ordinal": 10,
+      "sha256": "3a86725cf906c600eb2b576ff358066c730d3202252acc0b9d29d5d1e4303454"
+    },
+    {
+      "ordinal": 11,
+      "sha256": "0b08eb48a5481abe97973837e9672a3700b58e636fe0bfcbb1692baf0739b65d"
+    },
+    {
+      "ordinal": 12,
+      "sha256": "935d34ca3cab7893d05e3cbf24ff9acd905c19d405abadc0d7130507b3443bf3"
+    },
+    {
+      "ordinal": 13,
+      "sha256": "644ab8a0d6d8f06efa776d417161e226c65b795d35a7699d55d58781a96adfe5"
+    }
+  ],
+  "validator_sha256": "74d4a98dc85a9ce380c4160d5d06e427f6b82b4c11faad851f96d01ffa37486d",
+  "typescript": "7.0.2",
+  "node": "v22.23.3",
+  "validation": {
+    "install": "npm ci --offline: exit 0",
+    "full_suite": "npm run check: exit 0",
+    "chapter_counts": {
+      "fences": 13,
+      "compiler_cases": 18,
+      "runtime_groups": 18
+    },
+    "book_counts": {
+      "fences": 345,
+      "compiler_cases": 458,
+      "runtime_groups": 177,
+      "default_cases": 2,
+      "searches": 2
+    }
+  }
+}

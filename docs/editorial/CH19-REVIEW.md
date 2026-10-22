@@ -1,6 +1,181 @@
 # Chapter 19 self-review — Who Goes Next?
 
-Status: **DRAFT 1 FROZEN; INDEPENDENT READERS AND FORMAL REVIEW PENDING**, 2026-10-22.
+Status: **DRAFT 2 FROZEN; TARGETED READERS AND SECOND FORMAL REVIEW PENDING**, 2026-10-22.
+
+## Draft 2 snapshot and validation
+
+- Manuscript SHA-256: `8dc7823a1c26faec693386d0d317be2a7051e14b0f775e3860a8fb606dd519a6`.
+- **2,861 words**, including code; **13 TypeScript fences**.
+- [Exact snapshot](ch19/DRAFT2-SNAPSHOT.json); draft 1's snapshot is preserved.
+- First formal review and independent readers: `a4e95e8`,
+  [CLAUDE-REVIEW](ch19/CLAUDE-REVIEW.md) and its two linked reports.
+- Governing [ending settlement](ch19/CLAUDE-ENDING-SETTLEMENT.md), agreed after the
+  [bounded-policy evidence](ch19/CODEX-REVISION2-NOTE.md) was sent before drafting
+  the revised ending. It supersedes the original requirement to leave Ch19 open.
+
+`npm ci --offline` and the full `npm run check` both **exit 0** on this exact
+manuscript and validator: TypeScript **7.0.2**, Node **v22.23.3**.
+
+- Chapter 19: **13 fences / 18 compiler cases / 18 runtime groups**.
+- Whole book: **345 fences / 458 compiler cases / 177 runtime groups**, plus
+  **2 compiler-default cases and 2 source searches**.
+- `git diff --check` passes.
+
+The targeted chapter run passed before the final small Principle and timeline
+trims. The full suite ran after them. No manuscript or validator change followed
+the full run. Later edits only record the results and hashes.
+
+## Response to the first review
+
+### 1. The ending: accepted, then settled as a local Verdict
+
+The draft-1 ending left a scheduling preference for another meeting after the
+characters had agreed on both funding models. It did not earn an open ending.
+The revision compares every payout under accumulating funds, gives Dafna the
+13 payout-days argument, and gives Gil the recurring-balance starvation case.
+
+Before drafting that ending, I challenged the two-policy choice: Dafna could
+fill initially but reserve for the oldest unfunded payout after a stated wait.
+Claude accepted a bounded probe and then agreed that its results support
+convergence. With N=2, versus stop, P2 waits two more days, S1 and S2 each get
+paid two days sooner, and all other dates are unchanged in the 450 case. P2 is
+paid on day 4 even with continuing 500 arrivals. The remaining N is an owner's
+parameter, not a sufficient disagreement for The Debate Continues.
+
+The manuscript now reaches a local **Verdict**. It restores the promised stop
+behavior before today's batch. A deliberate policy change adopts filling under
+the reset with a policy name and updated support wording. Under finance's
+proposed accumulation, the room accepts a reservation threshold, without
+mistaking the illustrative N=2 for a production decision. Sahar wants that
+proposal held until the funding model is approved. **Act III's honest open-ending
+requirement moves to Ch20**, in both master and chapter plans.
+
+One qualification to the review is explicit on the page: policy determines
+behavior and the name, not a unique syntax. Chen points out that filling can use
+a loop; Dafna recalls their three working stop implementations. The current
+`skipping` body is a valid implementation of filling, not an invalid use of
+`reduce` in general.
+
+### 2. Strong declarative repair and character roles: accepted
+
+Sahar asks what the caller needs and names the domain operation. Liron proposes
+the split at the first blocker with printed `findIndex` and `slice`, including
+`-1`. It replaces the `some` aside. Dafna prefers it to the closed-state fold,
+but reluctantly chooses the loop's adjacent allowance check and early return
+for this caller. The choice has a stated reading cost; no correct form is
+pretended broken. Her local push is owned briefly rather than explained in a
+narrator-style purity disclaimer. The old quadratic-spread detour stays out.
+
+### 3. Timeline, setup and account terminology: accepted
+
+Yesterday's first run of `skipping` caused the support ticket. The original loop
+is explicitly the implementation it replaced. The patch restores stopping before
+today's batch. Yesterday is day 1 of the reset replay, so P2 is paid today, day 2,
+under either rule. The earlier assertion that "we held" P3/P4 is now the
+counterfactual "Stopping would have held" them.
+
+The old tests checked the allowance bound and used a two-payout limit fixture;
+the text no longer implies a sum comparison on the incident would miss the bug.
+The opening rules are spread between the support reply, the working loop and
+its fixture. "Treasury" and "balance" refer to funding; `account.iban` remains
+the payee destination. The held-row order is examined when Chen asks, and the
+fresh-day scope names requests larger than a day's allowance.
+
+### 4. Principle: accepted; a second isolated read is pending
+
+The opening now asks what **carries** across items, says what the caller still
+needs, gives a reason to retain the loop, and names a visible return or split.
+It asks for the type after each step, and offers a remedy when narrowing is lost:
+keep a check with its use. The callback warning names `reduce` precisely.
+Changing its stopping behavior changes what callers get. These edits preserve
+the preference for independent per-element operations without prescribing one
+syntax for every sequence rule.
+
+### 5. Accumulation evidence: accepted and extended
+
+The printed comparison lists **every ID** for stop, fill and bounded filling in
+the 450-arrival trace. S8's equal payment day remains visible. The 500 variant
+states both the finite-arrival result (P2 day 10 if arrivals end on day 8) and
+the infinite-arrival invariant (100 retained nightly, then 600 before the next
+500 is paid). The day-30 run is evidence of the invariant, not a proof of
+infinite starvation by itself.
+
+The bounded rule gets **one fence**. It receives already-eligible payouts with
+arrival days, the current day and the threshold explicitly. No scheduler,
+clock-reading helper, aging framework or generalized policy abstraction is
+printed. The text distinguishes the start of reservation from a payment deadline.
+
+### 6. Smaller fixes: accepted
+
+The fold's outer result is `final`, so it no longer shadows the reducer parameter.
+The call-count exchange is one line. The hypothetical eligibility-order
+regression says "if someone moves". Gil reports the repair checks in dialogue;
+the narrator only identifies the replacement and when it ships. Consecutive Gil
+paragraphs are joined. No catchphrase was inserted to simulate voice.
+
+## Draft 2 self-review
+
+- **Principle:** actionable self-check on independent selection, stop/skip,
+  lost narrowing and ordered async work. This is not an independent reader pass.
+- **Fairness:** loop, closed-state fold and split preserve the same stop rule.
+  Fill is subsequently recognized as a valid policy implementation. The strongest
+  bounded response to starvation is on the page before the Verdict.
+- **Proof scope:** the reset argument inducts over daily remaining-queue
+  inclusion with the same arrivals, fixed amounts, stable order and equal fresh
+  allowance. Enumeration prompted the argument; it does not establish it alone.
+- **Onboarding:** the original working caller precedes failure; all three policy
+  meanings precede their comparison. The current deployment and hypothetical
+  funding proposal remain distinct.
+- **Voice:** Dafna gets a reluctance about the loop, a challenge to Gil's
+  P2-only evidence and her own repair. Liron brings the boundary pattern; Sahar
+  asks about the caller and the cost of shipping an unapproved policy. Chen's
+  next-day question still changes the inquiry. Gil accepts the finite threshold
+  rather than finding another objection to preserve an open ending.
+- **Economy:** 13 fences, five characters, one Take, no extra scheduling framework.
+  Independent recheck should judge whether the induction and reservation scene
+  carry too much explanation, and whether the longer Verdict reads as a decision
+  rather than a second recap.
+
+## Durable-check changes
+
+- The printed split replaces the fixture-only `some` alternative and joins all
+  stop-policy comparisons, including empty, exact-fit, first-blocker and later
+  blocker cases. This exercises both `cut === -1` and actual cut indices.
+- The named fill policy compiles from the unchanged `skipping` body and receives
+  the same ordinary, incident, eligibility and fresh-array checks.
+- All 78,125 reset cases retain the per-ID payment-date checks and now also assert
+  the remaining-queue subset at the end of every day.
+- The all-ID 450 table is parsed from the manuscript and checked against three
+  emitted implementations. Separate assertions verify seven delayed payouts,
+  13 payout-days, P2's six-day difference, and the bounded comparison.
+- The 500-arrival finite and continuing runs compare every ID through their
+  horizons. They verify the day-10 finite release and the repeated 100 balance,
+  not merely the oldest payout's presence or absence.
+- Threshold cases cover just before and exactly at N, N=0, a large N, an empty
+  queue, exact balance, and typed stop reasons. A separate run throws if the
+  reservation function reads the ambient clock. Fresh outputs and unchanged
+  inputs are retained.
+
+The shared book compiler profile still applies, including its array-index
+settings. No assertion is added to the split. Scheduler fixtures are hypothetical
+models; input validation, eligibility changes, concurrency and real payment
+submission are outside scope. The reservation inputs are already eligible, with
+valid day numbers and a nonnegative integer threshold. Positive daily deposits
+and the particular arrival streams are assumptions of the demonstrated results.
+
+## Draft 2 handoff
+
+Frozen for Claude's targeted Principle-only reader, revised-passage recheck and
+second formal review. Local commit only, including the new ending settlement
+and revision note. No push. The first-review records are already committed at
+`a4e95e8`. Probes and coordination/task-state files remain excluded.
+
+---
+
+## Draft 1 self-review (historical)
+
+The following records the original frozen `43b2fdd1…` draft. Its open-ending,
+proof-scope, timeline and coverage descriptions are superseded by draft 2 above.
 
 ## Snapshot
 
