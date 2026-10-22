@@ -39,18 +39,14 @@ const refresh=block("function refresh(");
 const local=block("function isBusinessMinute(");
 const zonePrint=block("console.log(new Date(deadlineFor(ticket))");
 const explicit=block("type SlaPolicy =");
-const replacement=block("const deadline = memoizeBy(ticketKey,");
-const finalPrint=block("const due = deadlineFor(ticket, policy)");
+const patchedFactory=block("function makeSla(policy:");
+const finalPrint=block("const record =");
 assert.equal(used.size,fences.length,"Every TypeScript fence extracted");
 const data=replaceOnce(opening,"declare function slaStatus(ticket: Ticket): SlaStatus;\n","");
 const key=before(cached,"const dashboardStatus =");
 const evaluationType=before(original,"function assess(");
 const assessOnly=before(original,"function slaStatus(");
 const walker=before(from(local,"function walkBusinessMinutes("),"function deadlineFor(");
-const patchedFactory=replaceOnce(factory,
-  "  const deadline = memoizeBy(ticketKey, deadlineFor);\n",
-  replacement.split("\n").filter(Boolean).map(l=>"  "+l).join("\n")+"\n");
-
 // Models of the two existing project helpers and the observation sink described
 // before use. These are fixture scaffolding, not third-party API stubs. Eviction
 // is optional; the finite runs retain entries. Both maps stay private.
@@ -109,8 +105,9 @@ const preZone=example("compatible-api-before-zone-fix",preZoneBase+factory+refre
   "export {ticket,slaStatus,refresh,makeSla,deadlineFor,riskRecords};\n");
 const zoneExample=example("local-calendar-output",originalBase+zonePrint);
 const fixedApi=example("compatible-api-explicit-zone",fixedBase+patchedFactory+refresh+
-  "export {ticket,policy,deadlineFor,evaluate,slaStatus,refresh,makeSla,riskRecords};\n");
-const fixedPrint=example("explicit-zone-output",fixedBase+patchedFactory+finalPrint);
+  "export {ticket,supportPolicy,deadlineFor,evaluate,slaStatus,refresh,makeSla,riskRecords};\n");
+const fixedPrint=example("retained-record-output",evaluationType+before(data,"const ticket:")+pure+finalPrint+
+  "export {record};\n");
 const badKey=example("pure-calculation-incomplete-key",fixedBase+`
 type Input={ticket:Ticket;policy:SlaPolicy};
 const wrong=memoizeBy((input:Input)=>ticketKey(input.ticket),
@@ -119,7 +116,7 @@ function scoped(policy:SlaPolicy) {
   const fixed=Object.freeze({timeZone:policy.timeZone});
   return memoizeBy(ticketKey,ticket=>deadlineFor(ticket,fixed));
 }
-export {ticket,policy,deadlineFor,wrong,scoped};
+export {ticket,supportPolicy,deadlineFor,wrong,scoped};
 `);
 example("effects-fit-the-same-signature",before(data,"const ticket:")+`
 type Reader=(ticket:Ticket)=>SlaStatus;
@@ -135,7 +132,7 @@ function throughClock(deadline:number,clock:Clock):Evaluation {
 export {throughClock};
 `);
 // Stronger alternative from Oded's one exchange, not another manuscript design.
-const thresholdApi=example("expire-at-next-status-boundary",fixedBase+`
+const thresholdSource=`
 function thresholdCache() {
   const entries=new Map<string,{deadline:number;since:number;until:number;value:Evaluation}>();
   let walks=0;
@@ -143,7 +140,7 @@ function thresholdCache() {
     read(ticket:Ticket,now:number):Evaluation {
       const key=ticketKey(ticket),old=entries.get(key);
       if(old && now>=old.since && now<old.until)return old.value;
-      const deadline=old?.deadline ?? (++walks,deadlineFor(ticket,policy));
+      const deadline=old?.deadline ?? (++walks,deadlineFor(ticket,supportPolicy));
       const value=evaluate(deadline,now);
       const until=value.status==="ok"?deadline-30*60_000:
         value.status==="at-risk"?deadline:Infinity;
@@ -152,8 +149,9 @@ function thresholdCache() {
     walks:()=>walks,
   };
 }
-export {ticket,thresholdCache};
-`);
+`;
+const thresholdApi=example("expire-at-next-status-boundary",fixedBase+thresholdSource+
+  "export {ticket,thresholdCache};\n");
 // Diagnostic instrumentation delegates to the unchanged local calendar body.
 // It counts walks, not elapsed time or observer-required business effects.
 const countedCalendar=replaceOnce(local,"function deadlineFor(","function uncountedDeadlineFor(")+`
@@ -163,7 +161,8 @@ function resetWalks():void {walks=0;}
 function readWalks():number {return walks;}
 `;
 const countsApi=example("walk-counts",base+key+countedCalendar+assessOnly+pure+factory+
-  "export {ticket,assess,makeSla,withTtl,ticketKey,resetWalks,readWalks};\n");
+  replaceOnce(thresholdSource,"deadlineFor(ticket,supportPolicy)","deadlineFor(ticket)")+
+  "export {ticket,assess,makeSla,withTtl,ticketKey,thresholdCache,resetWalks,readWalks};\n");
 
 let groups=0;
 function group(name,fn) {
@@ -259,14 +258,15 @@ group("local-deadline-table-and-consistent-host-repair",()=>{
   assert.equal(rows.length,3);
   for(const [,TZ,expected] of rows) assert.deepEqual(run(zoneExample,()=>{},TZ).output,[[expected]]);
 });
-group("explicit-zone-printed-values-independent-of-host",()=>{
-  const expected=inlineOutputs(finalPrint);assert.equal(expected.length,4);
+group("retained-record-printed-value-independent-of-host",()=>{
+  const expected=inlineOutputs(finalPrint);assert.equal(expected.length,1);
   for(const TZ of ["UTC","Asia/Jerusalem","America/New_York"]) {
     assert.deepEqual(run(fixedPrint,()=>{},TZ).output,expected);
   }
 });
 group("real-walker-closed-hours-weekend-and-1700-arrival",()=>{
   for(const TZ of ["UTC","Asia/Jerusalem","America/New_York"]) run(fixedApi,(m,assert)=>{
+    assert.equal(m.deadlineFor(m.ticket,m.supportPolicy),Date.UTC(2026,10,9,11));
     const cases=[
       [Date.UTC(2026,10,9,6),240,"2026-11-09T11:00:00.000Z"], // Mon 08:00 local.
       [Date.UTC(2026,10,9,15),240,"2026-11-10T11:00:00.000Z"], // Mon 17:00.
@@ -274,7 +274,7 @@ group("real-walker-closed-hours-weekend-and-1700-arrival",()=>{
       [Date.UTC(2026,10,14,10),1,"2026-11-16T07:01:00.000Z"], // Sat noon.
     ];
     for(const [openedAt,businessMinutes,expected] of cases) {
-      assert.equal(new Date(m.deadlineFor({...m.ticket,openedAt,businessMinutes},m.policy)).toISOString(),expected);
+      assert.equal(new Date(m.deadlineFor({...m.ticket,openedAt,businessMinutes},m.supportPolicy)).toISOString(),expected);
     }
   },TZ);
   // The original local walker does these calendar cases correctly when the
@@ -293,12 +293,39 @@ group("real-walker-closed-hours-weekend-and-1700-arrival",()=>{
 });
 group("pure-deadline-can-still-be-cached-under-an-incomplete-key",()=>run(badKey,(m,assert)=>{
   const utc={timeZone:"UTC"};
-  assert.equal(m.wrong({ticket:m.ticket,policy:m.policy}),Date.UTC(2026,10,9,11));
+  assert.equal(m.wrong({ticket:m.ticket,policy:m.supportPolicy}),Date.UTC(2026,10,9,11));
   assert.equal(m.wrong({ticket:m.ticket,policy:utc}),Date.UTC(2026,10,9,11));
   assert.equal(m.deadlineFor(m.ticket,utc),Date.UTC(2026,10,9,13));
   assert.equal(m.scoped(utc)(m.ticket),Date.UTC(2026,10,9,13));
-  assert.equal(m.scoped(m.policy)(m.ticket),Date.UTC(2026,10,9,11));
+  assert.equal(m.scoped(m.supportPolicy)(m.ticket),Date.UTC(2026,10,9,11));
 }));
+group("factory-owns-policy-copy-and-replacement-gets-new-cache",()=>run(fixedApi,(m,assert)=>{
+  const input={timeZone:"Asia/Jerusalem"},now=Date.UTC(2026,10,9,11);
+  const first=m.makeSla(input);
+  assert.equal(first(m.ticket,now),"breached");
+  input.timeZone="UTC";
+  // A later cache miss must still use the first factory's captured policy.
+  assert.equal(first({...m.ticket,id:"P1-43"},now),"breached");
+  const replacement=m.makeSla(input);
+  assert.equal(replacement(m.ticket,now),"ok");
+}));
+group("record-reconstruction-reads-retained-values-without-new-observation",()=>{
+  const actual=run(fixedApi,(m,assert)=>{
+    const now=Date.UTC(2026,10,9,10,40);
+    assert.equal(m.slaStatus(m.ticket,now),"at-risk");
+    const record=m.riskRecords[0];
+    const real=Date.now;
+    try {
+      Date.now=()=>{throw new Error("Reconstruction must not read the clock");};
+      assert.equal(m.evaluate(record.deadline,record.evaluatedAt).status,"at-risk");
+      assert.equal(m.riskRecords.length,1);
+      assert.equal(m.slaStatus(m.ticket,record.evaluatedAt),"at-risk");
+      assert.equal(m.riskRecords.length,2);
+    }finally{Date.now=real;}
+    return record;
+  }).result;
+  assert.deepEqual(run(fixedPrint,m=>m.record).result,actual);
+});
 group("revision-invalidates-deadline-cache",()=>run(fixedApi,(m,assert)=>{
   const now=Date.UTC(2026,10,9,10);
   const short={...m.ticket,businessMinutes:120,revision:2};
@@ -331,8 +358,8 @@ group("oded-exact-boundary-expiry-alternative",()=>run(thresholdApi,(m,assert)=>
   assert.equal(cache.walks(),1);
 }));
 group("printed-walk-counts-use-real-calendar",()=>{
-  const rows=[...chapter.matchAll(/^\| (No cache|Sixty-second TTL on the evaluation|Deadline cache, fresh comparison) \| ([\d,]+) \|$/gm)];
-  assert.equal(rows.length,3);
+  const rows=[...chapter.matchAll(/^\| (No cache|Sixty-second TTL on the evaluation|Expiry at the next status change, retaining the deadline|Deadline cache, fresh comparison) \| ([\d,]+) \|$/gm)];
+  assert.equal(rows.length,4);
   const expected=rows.map(r=>Number(r[2].replaceAll(",","")));
   const got=run(countsApi,(m,assert)=>{
     const tickets=Array.from({length:20_000},(_,i)=>({...m.ticket,id:String(i)}));
@@ -340,7 +367,9 @@ group("printed-walk-counts-use-real-calendar",()=>{
     const result=[];
     try {
       Date.now=()=>now;
-      const candidates=[m.assess,m.withTtl(m.ticketKey,m.assess,60_000),m.makeSla()];
+      const threshold=m.thresholdCache();
+      const candidates=[m.assess,m.withTtl(m.ticketKey,m.assess,60_000),
+        t=>threshold.read(t,Date.now()),m.makeSla()];
       for(const f of candidates) {
         m.resetWalks();
         for(const offset of [0,30_000,60_000]) {

@@ -368,3 +368,19 @@ the existing two default cases and two searches. See the
 [self-review](CH18-REVIEW.md) and [snapshot](ch18/DRAFT1-SNAPSHOT.json).
 Claude's isolated Principle-only reader, fresh full reader and formal review are
 pending. This is a draft handoff, not joint approval. Local commit only.
+
+
+## Draft 2 handoff after first formal review (2026-10-22)
+
+The first Principle-only reader, completed full-reader rerun and formal review
+are archived under `ch18/`. Draft 2 addresses all seven review findings: an
+operational Principle, a real policy parameter after the Turn, reconstruction
+from a retained record, clearer onboarding, equal count credit for boundary
+expiry, accepted refresh lag and the voice trims. The Intl cost is acknowledged
+without turning walk counts into a speed claim. The local Verdict remains.
+
+Offline clean install and full suite pass: Chapter 18 **14/16/19**, whole book
+**332/440/159**, plus two default cases and two searches. See the current
+[review record](CH18-REVIEW.md) and [snapshot](ch18/DRAFT2-SNAPSHOT.json).
+Claude's targeted Principle read and formal recheck remain pending. This does
+not mark the chapter approved or complete. No push by Codex.
