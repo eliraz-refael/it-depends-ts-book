@@ -13,7 +13,7 @@ npm run check
 
 ## Coverage
 
-Successful run on **2026-10-21**, TypeScript **7.0.2**, Node **22.23.3**:
+Successful run on **2026-10-22**, TypeScript **7.0.2**, Node **22.23.3**:
 
 | Suite | TypeScript fences | Compiler cases | Runtime scenario groups |
 | --- | ---: | ---: | ---: |
@@ -28,7 +28,8 @@ Successful run on **2026-10-21**, TypeScript **7.0.2**, Node **22.23.3**:
 | Chapter 15 | 13 | 30 | 16 |
 | Chapter 16 | 17 | 27 | 14 |
 | Chapter 17 | 19 | 26 | 21 |
-| Total | **318** | **424** | **140** |
+| Chapter 18 | 14 | 16 | 17 |
+| Total | **332** | **440** | **157** |
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
 
@@ -44,9 +45,11 @@ Chapter 15 examines scalar role brands and checked object brands; review progres
 
 Chapter 16 compares unknown-key and unknown-value policies, receipt retention, and consumer projections; its draft self-review is recorded in [CH16-REVIEW.md](../docs/editorial/CH16-REVIEW.md). Independent readers, a recheck and joint review are complete.
 
-Chapter 17 compares historical snapshots and live access, checked value transformations, and owner operations. Draft 3 addresses the targeted recheck; the full suite passes and the [review record](../docs/editorial/CH17-REVIEW.md) awaits final diff review.
+Chapter 17 compares historical snapshots and live access, checked value transformations, and owner operations. Its independent readers, targeted recheck and joint review are complete; see the [review record](../docs/editorial/CH17-REVIEW.md).
 
-The suites extract all TypeScript fences in Chapters 1–17. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
+Chapter 18 examines hidden clock/calendar inputs, required observations and caching boundaries. Its [draft self-review](../docs/editorial/CH18-REVIEW.md) awaits independent readers and formal review.
+
+The suites extract all TypeScript fences in Chapters 1–18. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 
 Specific adaptations and limits:
 
@@ -62,6 +65,7 @@ Specific adaptations and limits:
 - Chapter 15 extracts all 13 fences and separates repeated timeline definitions. Runtime variants omit only intentional-error lines. Checks distinguish page-number and page-count brands, arithmetic and widening, required versus optional markers, stale proofs retained by spread, and a cross-module copy whose brand symbol is unexported. The class repair rejects copied data statically and prevents mutable-alias writes at runtime under strict emitted JavaScript; a no-freeze variant demonstrates the remaining corruption. A stronger read-method class variant also rejects the old mutator and spread at compile time while producing the same renderer request. The checked-object and class variants both convert into the original renderer request; the suite substitutes the class parameter into the unchanged conversion body. Tests exercise printed outputs, both action responses during and after an endpoint edit, constructor limits, and the safe-integer guard before addition (a post-addition check can miss rounding). The page-number lists are executable models, not a document renderer or UI; document existence, actual files, form parsing and huge list allocation are outside their scope.
 - Chapter 16 extracts all 17 fences against the real locked Zod package. Replacement endpoints, refund functions and projections compile separately. Cases pin explicit versus inferred missing-return behavior, tag narrowing, enum expansion with and without a catch-all branch, and a reviewed status with an explicit refund rule. Runtime checks cover every printed output, strip/loose/strict behavior, malformed versus unfamiliar statuses, the faulty refund default, both repairs, and the printed projections for tracking, refunds and review. A negative compiler case checks that Oded's unknown-status branch cannot be written against the projection's input type. A fixture-only adapter compares the repaired open parser with the closed projection on the same inputs. The inbox double implements the stated snapshot contract; deferred and rejected writes test acknowledgement ordering, not real database durability. A repeated request demonstrates two receipt IDs producing the same refund instruction; payment deduplication is an obligation named in prose, not implemented by the fixture. Carrier retries, account suspension and the HTTP handler's error mapping are stipulated fictional behavior, not simulated infrastructure.
 - Chapter 17 extracts all 19 fences. Fixtures add the printed `snapshot` member and replace the getter-based `view` member at their stated points in the timeline. The original frozen-getter failure remains in separate programs. Every annotated console output is executed and checked, including receipt history, preview prices, Date mutation and property-copy count. Negative cases verify that `ReadPrice` and `PriceView` cannot be supplied to `receipt`, and that a stored `Quote` cannot be supplied where a live reader is required. Runtime groups retain the results of both reader calls through subsequent updates and compare the class and closure owners, including failed discounts, scalar input ownership and snapshot immutability. The compatibility-wrapper fixture models Eden's proposed delegation while preserving valid in-place callers; it is not another printed implementation. Property and nested aliases remain covered. Emitted strict mode is asserted, and the original promotion function also runs in a separate sloppy CommonJS script. The index count assumes unique numeric-string keys and makes no timing or memory claim. Fixtures model checkout state and receipt strings, not a browser, payment system, authorisation policy or concurrent checkout service.
+- Chapter 18 extracts all 14 fences. The public signature, original implementation, TTL patch and two stages of the service factory compile in separate programs; the stated cache-line replacement is applied only to the final factory. Fixtures implement the documented project memoization/TTL helpers and a recording sink. They use the actual manuscript business-minute walker, with parsed minute-aligned timestamps and positive budgets as its stated preconditions. They do not implement ingestion validation, holidays, paused SLAs, production logging, alert delivery or a browser. Original replay/count tests run in Jerusalem; both calendar versions run in isolated Node processes under three `TZ` settings. Tests cover all printed outputs and both tables, calendar close/weekend boundaries, revision invalidation, exact TTL expiry and retained evaluation timestamps, one clock read per refresh, defaulted legacy calls, a pure function cached under an incomplete key and an effectful wrapper cached under a complete value key. Fixture-only cases pin the Clock Take and the stronger next-status-boundary expiry proposal. The walk-count fixture adds a delegating counter around the unchanged local calendar body and uses 20,000 tickets at 0/30/60-second refreshes; this measures calls, not CPU or latency. No narrowing or effect-system guarantee is inferred from the compiler checks.
 - The suites do not benchmark compiler performance or establish the fictional characters' empirical claims. Chapter 3 attributes its performance recommendation to the TypeScript wiki and makes no measured TS7 speed claim.
 
 ## Compiler settings

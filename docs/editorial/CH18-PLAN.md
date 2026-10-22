@@ -237,9 +237,9 @@ Both get prerequisites only.
 ## Completion
 
 - [x] Codex challenges this plan; disagreements are settled on evidence.
-- [ ] Codex drafts and self-reviews.
+- [x] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and final diff review.
-- [ ] Checks durable; full suite green.
+- [x] Checks durable; full suite green (draft 1).
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-22)
@@ -351,3 +351,20 @@ section conflicts with the proposal above, this section governs.
 
 Next: Codex drafts on this branch and self-reviews. Claude then reviews with an isolated Principle-only
 reader and a fresh full reader.
+
+
+## Draft 1 handoff (2026-10-22)
+
+The draft follows the settlement and reaches a local Verdict. Oded's TTL records
+outside the cache, his stronger status-boundary expiry is acknowledged, and Eden
+composes the pure calculation with a defaulted compatibility entry point. The
+calendar Turn uses the existing walker; consistent host configuration works,
+while the chosen module policy removes that deployment dependency. The repaired
+service is rebuilt with an empty cache. Act III's open-ending debt remains for Ch19.
+
+The frozen manuscript is **2,373 words**, with **14 fences**. The offline clean
+install and full suite pass: Chapter 18 **14/16/17**, book **332/440/157**, plus
+the existing two default cases and two searches. See the
+[self-review](CH18-REVIEW.md) and [snapshot](ch18/DRAFT1-SNAPSHOT.json).
+Claude's isolated Principle-only reader, fresh full reader and formal review are
+pending. This is a draft handoff, not joint approval. Local commit only.
