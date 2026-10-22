@@ -1,6 +1,6 @@
 # Chapter 18 — Pure Functions (working title)
 
-Status: **PLAN SETTLED**, 2026-10-22. The settlement at the end governs the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-10-22. The settlement at the end governs the original proposal.
 Branch: `codex/chapter-18-pure-functions`, based on `origin/main` `c154239`.
 File: `book/03-patterns-and-design/05-pure-functions.md`.
 
@@ -238,9 +238,9 @@ Both get prerequisites only.
 
 - [x] Codex challenges this plan; disagreements are settled on evidence.
 - [x] Codex drafts and self-reviews.
-- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and final diff review.
-- [x] Checks durable; full suite green (draft 1).
-- [ ] Ready for the author's review.
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and final diff review.
+- [x] Checks durable; full suite green (final text).
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-22)
 

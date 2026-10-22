@@ -172,3 +172,52 @@ Use one name for it.
 Codex revises to draft 3. It runs `npm ci --offline` plus the full `npm run check`, then commits
 locally, including these records and both new reader reports. I'll run a Principle-only reader on the
 revised Principle, then do the final diff review. I'll rebase and open the PR after that.
+
+## Final diff review (2026-10-22)
+
+Draft 3 (`2afb6fed…`, `5bd7df0`) addresses every finding above:
+- **The remedy** now separates a value from outside the call ("reuse an answer only while that value
+  cannot change") from a fast-changing input ("reuse only the work that does not depend on it").
+- **The formatter cost** is closed by Eden's owned rollout condition: a cold whole-board refresh on the
+  dashboard host must fit the refresh interval, with the uncached path meanwhile. It makes no speed
+  claim.
+- **The reconstructed record** is one the repaired dashboard wrote, for Tuesday's P1-43.
+- **The policy copy** is explained by `Readonly` not stopping a caller's edit, and the freeze on it is
+  gone.
+- **Names and paths:** the escalation paths, `cachedDeadline`, `assess` → `evaluate`, boundary
+  expiry, the replaced clock in the count run, and the lead's acceptance are all clarified.
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md)** (a rerun; the first attempt ended
+on an API error) passed all four cases.
+- **The clock:** it cached the deadline by id and revision and compared it with `now` on every call,
+  quoting "reuse only the work that does not depend on it". The draft-2 reader had read the
+  corresponding sentence as "never cache".
+- **The record and the time zone:** it moved the record out of the cached function, and named the host
+  time zone as an outside value.
+- **The TTL:** it classified the TTL as a staleness decision, not purity.
+
+**My three prose-only settlement edits.** No fence changes.
+1. **The definition** read "without also doing required work"; the reader took it as "the work isn't
+   needed". It now says "and does no required work along the way".
+2. **The signature sentence** sat between the remedies and the staleness caveat, and made the next
+   sentence's "instead" point nowhere. It now closes the two questions: "An ordinary TypeScript function
+   signature won't answer either." The staleness caveat opens with "Or decide to accept some
+   staleness." Eden's closing line about `(ticket, now?) => SlaStatus` still pays it off.
+3. **The Verdict:** "While it runs, the board stays on the uncached path" became "Until it passes"; the
+   condition is the cold-refresh check.
+
+**Not adopted from the final reader:**
+- **"Host setting" → "time zone" in the Principle.** It would pre-empt the Turn and make Dafna's slip
+  implausible.
+- **Where required work goes, and logging frequency.** The chapter answers both by example: the
+  record moves to the entry point after the cache lookup, and the record contract is stated before the
+  fixes.
+- **The checklist tone of the second paragraph.** It is shorter than either earlier draft, and the
+  reader called the Principle's test "the most usable part of the section".
+
+**Final text:** SHA-256 `6aa89e936614124680fc5fe3ea8a2982bd37c3e629f4d9b74df3cb68463e78fa`, 2,505 words,
+14 fences, byte-identical to draft 3. `npm ci --offline` plus the full `npm run check` exit 0 on TypeScript
+7.0.2 and Node 22.23.3. Chapter 18 is 14/16/19, the book 332/440/159.
+
+**Approved.** The ending is a local Verdict with Oded's stated preference against boundary expiry; Act III's
+open-ending debt moves to Ch19.

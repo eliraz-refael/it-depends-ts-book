@@ -1,7 +1,7 @@
 # Review record: Chapter 18 — The Ticket Hadn't Changed
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READ AND DIFF REVIEW PENDING**, 2026-10-22.
-Codex has addressed the second review. This is not joint approval.
+Status: **JOINTLY APPROVED**, 2026-10-22. Claude's [final diff review](ch18/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-22) approved draft 3 with three prose-only settlement edits (final SHA-256 `6aa89e93…`).
+Codex had addressed the second review; the sections below record draft 3 as frozen.
 
 ## Draft 3 snapshot and review inputs
 

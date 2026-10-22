@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "A pure calculation gives the same result for the same input values, without also doing required work, such as writing a record someone relies on. Before reusing an earlier answer, ask two questions: what could change the answer without changing those inputs, and what required work would disappear if the call didn't run?"
+**Prof. Eli Typeworth**: "A pure calculation gives the same result for the same input values, and does no required work along the way, such as writing a record someone relies on. Before reusing an earlier answer, ask two questions: what could change the answer without changing those inputs, and what required work would disappear if the call didn't run? An ordinary TypeScript function signature won't answer either."
 
-"Make anything that can change the answer an explicit input. If a value comes from outside the call, like a host setting, reuse an answer only while that value cannot change. If an input changes too often to reuse the whole answer, like the clock, reuse only the work that does not depend on it. Put required work where returning a saved answer cannot skip it. An ordinary TypeScript function signature doesn't prove a function pure. You can instead decide to accept some staleness. But an acceptable old answer is still an old answer. Deciding how stale it may be is a separate decision from making the calculation pure."
+"Make anything that can change the answer an explicit input. If a value comes from outside the call, like a host setting, reuse an answer only while that value cannot change. If an input changes too often to reuse the whole answer, like the clock, reuse only the work that does not depend on it. Put required work where returning a saved answer cannot skip it. Or decide to accept some staleness. But an acceptable old answer is still an old answer. Deciding how stale it may be is a separate decision from making the calculation pure."
 
 ## The Debate
 
@@ -362,7 +362,7 @@ console.log(evaluate(record.deadline, record.evaluatedAt).status); // at-risk
 
 Gilad has checked with the lead: status as of the last thirty-second refresh is acceptable; an extra cache delay is not.
 
-**Eden**: "We'll keep `slaStatus` for the existing callers and require the cold-refresh check before each rollout. While it runs, the board stays on the uncached path. I'll correct the digest host too, but the module will use its own policy."
+**Eden**: "We'll keep `slaStatus` for the existing callers and require the cold-refresh check before each rollout. Until it passes, the board stays on the uncached path. I'll correct the digest host too, but the module will use its own policy."
 
 **Oded**: "The TTL would stop the indefinite stale answer. Boundary expiry would get the transitions right too, but I'd be maintaining the status rules in the cache. Keep the small comparison out of it."
 

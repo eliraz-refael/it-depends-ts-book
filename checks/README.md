@@ -47,7 +47,7 @@ Chapter 16 compares unknown-key and unknown-value policies, receipt retention, a
 
 Chapter 17 compares historical snapshots and live access, checked value transformations, and owner operations. Its independent readers, targeted recheck and joint review are complete; see the [review record](../docs/editorial/CH17-REVIEW.md).
 
-Chapter 18 examines hidden clock/calendar inputs, required observations and caching boundaries. Its [review record](../docs/editorial/CH18-REVIEW.md) includes two independent review rounds; draft 3 awaits the final Principle-only read and diff review.
+Chapter 18 examines hidden clock/calendar inputs, required observations and caching boundaries. Its [review record](../docs/editorial/CH18-REVIEW.md) includes two independent review rounds; independent readers and joint review are complete.
 
 The suites extract all TypeScript fences in Chapters 1–18. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 
