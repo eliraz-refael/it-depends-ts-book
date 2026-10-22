@@ -1,7 +1,90 @@
 # Review record: Chapter 18 — The Ticket Hadn't Changed
 
-Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**, 2026-10-22.
-Codex has addressed the first formal review. This is a revision handoff, not joint approval.
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READ AND DIFF REVIEW PENDING**, 2026-10-22.
+Codex has addressed the second review. This is not joint approval.
+
+## Draft 3 snapshot and review inputs
+
+- Manuscript SHA-256: `2afb6fed9717c3438302e87ff6a6f8a991709c1dfc918f15cb293f2d7658cbc8`.
+- **2,506 words**, including code; **14 TypeScript fences**.
+- [Snapshot](ch18/DRAFT3-SNAPSHOT.json) records manuscript, fence, validator and
+  review-input hashes. Drafts 1 and 2 retain their original snapshots.
+- Governing settlement: `45a584f`; previous draft: `67f61db`.
+- Read and archived unchanged: [Claude's second review](ch18/CLAUDE-REVIEW-2.md),
+  [draft 2 Principle reader](ch18/CLAUDE-DRAFT2-PRINCIPLE-READ.md) and
+  [targeted recheck reader](ch18/CLAUDE-RECHECK-READ.md).
+
+## Response to the second review
+
+| Finding | Disposition in draft 3 |
+|---|---|
+| 1. Clock remedy | Eli separates a value kept outside the call, such as a host setting, from a fast-changing input such as the clock. For the latter he explicitly says to reuse only the independent work. Accepting staleness is named as an alternative decision. “Required work” is used throughout the Principle and illustrated by a record someone relies on. |
+| 2. Formatter cost | Adopted the owned rollout decision. Eden requires a cold refresh of the entire board on its actual host to finish within the refresh interval before switching. Meanwhile the board uses the original uncached path in Jerusalem time. The story reports the check passing before rollout; the Verdict retains this check for future rollouts. The minute walker is unchanged. |
+| 3. Record provenance | The record now comes from the repaired dashboard for Tuesday's new ticket P1-43, after the rollout, not from Monday's isolated replay. The fixture executes the actual printed `refresh` function for that ticket and compares its sink record with the printed record. Reconstruction adds nothing; replaying through `slaStatus` adds a second record. |
+| 4. Copy ownership | Eden explains that `Readonly` does not stop a caller editing the object passed to the factory. The private copy stays, its unnecessary freeze goes. The existing mutable-alias/new-cache-miss regression still passes. |
+| 5. Naming and escalation | The escalation job is introduced as an hourly fallback for breached tickets; the lead can intervene from the board before the next run. `cachedDeadline` now names the cached function in both factories. The `assess` to `evaluate` replacement is explicit. “Boundary expiry” and “record” are used consistently. |
+| 6. Smaller snags | The count run now explicitly fixes the clock at 12:20:00/12:20:30/12:21:00 and says Oded implements boundary expiry for comparison. The first factory gives tests fresh caches. Chen asks where the run happened. Gilad reports checking the lead's tolerance. Eden's Verdict is reduced to callers, rollout and the host. |
+
+### Decisions and limits
+
+The cold-refresh check is a **fictional operational decision**, not a benchmark
+we ran or a general performance claim. The story gives Eden the responsibility,
+a pass condition, an interim correct path, and a reported rollout after that
+condition is met. No microsecond estimate, universal latency bound, hourly-stepping
+optimization or new calendar algorithm has been added. The suite still measures
+walk counts only; the checks README names this limit explicitly.
+
+Kept the optional choices narrow: no extra “minutes left” display field is
+introduced for reconstruction; its point is the absence of a new record. Oded's
+TTL concession remains next to its failing test because his stronger boundary
+expiry follows immediately and is credited equally in the table. Chen's short
+three-host result remains as evidence of the repair; an extra question about
+changing the host would repeat the policy explanation. Existing declines about
+TTL records, ICU data and cache capacity stand.
+
+## Draft 3 self-review and validation
+
+The Principle now supplies distinct actions for both examples the reader found
+ambiguous. A stable captured value can belong to a cache; a changing input need
+not make all work uncacheable. Required records stay outside skipped work. A
+permitted old answer is presented as a deliberate alternative, not proof of
+purity. Claude's final Principle-only reader remains pending.
+
+The narrative now moves explicitly from the original incident through a rollout
+to the repaired dashboard's next-day record. Both the job and the lead have an
+established escalation role. The count experiment is an artificial-clock count,
+while the deployment decision requires a separate real-host cold-refresh check.
+The private policy copy still protects later cache misses from a caller's edit.
+No earlier chapter changes, no new design alternatives, and no Act III split
+invented to discharge the open-ending requirement.
+
+`npm ci --offline` and full `npm run check` **exit 0** on this final manuscript and
+validator, TypeScript **7.0.2**, Node **v22.23.3**:
+
+- Chapter 18: **14 fences / 16 compiler cases / 19 runtime groups**.
+- Whole book: **332 fences / 440 compiler cases / 159 runtime groups**, plus
+  two compiler-default cases and two source searches.
+- `git diff --check` passes.
+
+The full run followed the final prose edits. No manuscript or validator edit
+followed it. Only fences 8, 13 and 14 differ from draft 2: the cached function
+names, private policy copy and Tuesday record. The record runtime group now
+uses `refresh` to produce the displayed result and record; it disables clock
+reads during reconstruction and confirms that only the explicit entry-point
+replay adds another record. Table-label extraction follows the unified name.
+All earlier calendar, cache, effect, alias, Clock and count cases remain covered.
+
+## Draft 3 handoff
+
+Local commit only, with all three second-round review files and the new snapshot.
+No push. Claude owns the final Principle-only reader and diff review. The
+untracked `.probe/` directory stays outside the commit.
+
+## Earlier rounds (historical)
+
+The following records describe their original snapshots. Draft 2's frozen private
+copy, isolated-replay record and unresolved formatter-cost question are superseded
+by the draft 3 response above and Claude's second review.
 
 ## Draft 2 snapshot
 

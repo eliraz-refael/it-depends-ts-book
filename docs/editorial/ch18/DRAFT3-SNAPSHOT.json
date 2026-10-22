@@ -1,0 +1,103 @@
+{
+  "status": "draft 3 frozen; final Principle-only reader and diff review pending",
+  "date": "2026-10-22",
+  "settled_plan_commit": "45a584f",
+  "previous_draft_commit": "67f61db",
+  "path": "book/03-patterns-and-design/05-pure-functions.md",
+  "sha256": "2afb6fed9717c3438302e87ff6a6f8a991709c1dfc918f15cb293f2d7658cbc8",
+  "manuscript_mtime_utc": "2026-10-22T13:41:14.545212+00:00",
+  "words": 2506,
+  "typescript_fences": 14,
+  "fence_hash_scope": "UTF-8 fence contents, without delimiters or final newline",
+  "fences": [
+    {
+      "ordinal": 1,
+      "sha256": "c2e299654b75d03bf33a503281feef9e7cee36c7e7fc80b41295172e5158cad0"
+    },
+    {
+      "ordinal": 2,
+      "sha256": "44929f9f4400690a41ba7c3f58cfd849a7bf1ab62ea617a0098e1c8b2d1cf53c"
+    },
+    {
+      "ordinal": 3,
+      "sha256": "e4775626f3a930fafe4ba3771be751a2ff61e55da5ab42f1c7661752c6d47d3c"
+    },
+    {
+      "ordinal": 4,
+      "sha256": "3a9291e71474ea4283b58b7fbbb90c5fa32f485f94bf4a39a7f21f78b04fc92c"
+    },
+    {
+      "ordinal": 5,
+      "sha256": "3f7dd34b16abfbca17dd5b2ae7f53cd15ddfc8527590a2d9bcd0d29ff4729012"
+    },
+    {
+      "ordinal": 6,
+      "sha256": "4dc4175445ceac86a4cecc12018c9dd63cfd39f703f082679e868b778962ec3e"
+    },
+    {
+      "ordinal": 7,
+      "sha256": "29ad0f4a8e9f0d05e7b1635b37252c3c854e5e8a2b85402f718babfd52da2c50"
+    },
+    {
+      "ordinal": 8,
+      "sha256": "c44edfe5c4f286ff07dd1466ef2c354d489c45aa4aadb1f06116e34b6c69ab45"
+    },
+    {
+      "ordinal": 9,
+      "sha256": "f9ea11300e5eb4ab82cd84290e761c78a88594a6a738b12c87e14e5345e278ca"
+    },
+    {
+      "ordinal": 10,
+      "sha256": "c37cc6c1c17939b59e0956ba52a15b369e79f61532dad807ab9047885ff3c67a"
+    },
+    {
+      "ordinal": 11,
+      "sha256": "a071e793374038e5989d0164ff92ccac492e7c0341d3ec277ecebc25870803b9"
+    },
+    {
+      "ordinal": 12,
+      "sha256": "d243966907214d27440f934f337c9d9f27c53e64c4c9086f260af50a9fd544ab"
+    },
+    {
+      "ordinal": 13,
+      "sha256": "030663ec6bb33274da4bb165774d07747a10cc1c7934abc524ffd04b37525358"
+    },
+    {
+      "ordinal": 14,
+      "sha256": "9f8d89a73cb5262d2c865ea38b71acdc72b40cdb7736b69425980d6e58575fa3"
+    }
+  ],
+  "validator_sha256": "43c7b9083f77ab7f5737f859477a1ac796bfc42750922a475db745383b8892c1",
+  "review_inputs": [
+    {
+      "path": "docs/editorial/ch18/CLAUDE-REVIEW-2.md",
+      "sha256": "f8da567e73b600a451d8fa5775f14cd4d4514646613508848fa5f3435d46502a"
+    },
+    {
+      "path": "docs/editorial/ch18/CLAUDE-DRAFT2-PRINCIPLE-READ.md",
+      "sha256": "5a980193b59df4339c1daa4e99276defb1de57997482ccdfedf53301945b2f77"
+    },
+    {
+      "path": "docs/editorial/ch18/CLAUDE-RECHECK-READ.md",
+      "sha256": "f68587cd64e8691f145de7868de411e6e88302128274fc93fdb8d970e730174e"
+    }
+  ],
+  "typescript": "7.0.2",
+  "node": "v22.23.3",
+  "validation": {
+    "install": "npm ci --offline: exit 0",
+    "full_suite": "npm run check: exit 0",
+    "chapter_counts": {
+      "fences": 14,
+      "compiler_cases": 16,
+      "runtime_groups": 19
+    },
+    "book_counts": {
+      "fences": 332,
+      "compiler_cases": 440,
+      "runtime_groups": 159,
+      "default_cases": 2,
+      "searches": 2
+    }
+  }
+}

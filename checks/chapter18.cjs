@@ -309,20 +309,22 @@ group("factory-owns-policy-copy-and-replacement-gets-new-cache",()=>run(fixedApi
   const replacement=m.makeSla(input);
   assert.equal(replacement(m.ticket,now),"ok");
 }));
-group("record-reconstruction-reads-retained-values-without-new-observation",()=>{
+group("record-reconstruction-reads-repaired-dashboard-record-without-new-record",()=>{
   const actual=run(fixedApi,(m,assert)=>{
-    const now=Date.UTC(2026,10,9,10,40);
-    assert.equal(m.slaStatus(m.ticket,now),"at-risk");
-    const record=m.riskRecords[0];
+    const nextTicket={...m.ticket,id:"P1-43",openedAt:Date.UTC(2026,10,10,7)};
     const real=Date.now;
     try {
+      Date.now=()=>Date.UTC(2026,10,10,10,40);
+      assert.deepEqual(m.refresh([nextTicket]),["at-risk"]);
+      assert.equal(m.riskRecords.length,1);
+      const record=m.riskRecords[0];
       Date.now=()=>{throw new Error("Reconstruction must not read the clock");};
       assert.equal(m.evaluate(record.deadline,record.evaluatedAt).status,"at-risk");
       assert.equal(m.riskRecords.length,1);
-      assert.equal(m.slaStatus(m.ticket,record.evaluatedAt),"at-risk");
+      assert.equal(m.slaStatus(nextTicket,record.evaluatedAt),"at-risk");
       assert.equal(m.riskRecords.length,2);
+      return record;
     }finally{Date.now=real;}
-    return record;
   }).result;
   assert.deepEqual(run(fixedPrint,m=>m.record).result,actual);
 });
@@ -358,7 +360,7 @@ group("oded-exact-boundary-expiry-alternative",()=>run(thresholdApi,(m,assert)=>
   assert.equal(cache.walks(),1);
 }));
 group("printed-walk-counts-use-real-calendar",()=>{
-  const rows=[...chapter.matchAll(/^\| (No cache|Sixty-second TTL on the evaluation|Expiry at the next status change, retaining the deadline|Deadline cache, fresh comparison) \| ([\d,]+) \|$/gm)];
+  const rows=[...chapter.matchAll(/^\| (No cache|Sixty-second TTL on the evaluation|Boundary expiry, retaining the deadline|Deadline cache, fresh comparison) \| ([\d,]+) \|$/gm)];
   assert.equal(rows.length,4);
   const expected=rows.map(r=>Number(r[2].replaceAll(",","")));
   const got=run(countsApi,(m,assert)=>{

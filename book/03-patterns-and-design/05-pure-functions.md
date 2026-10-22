@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "A pure calculation gives the same result for the same input values, without doing other work that someone needs to observe. Before reusing an earlier answer, ask two questions: what could change the answer without changing those inputs, and what required work would disappear if the call didn't run?"
+**Prof. Eli Typeworth**: "A pure calculation gives the same result for the same input values, without also doing required work, such as writing a record someone relies on. Before reusing an earlier answer, ask two questions: what could change the answer without changing those inputs, and what required work would disappear if the call didn't run?"
 
-"Make anything that can change the answer an explicit input. If you hold it outside the call, reuse an answer only while it stays fixed. Put required work where returning a saved answer cannot skip it. An ordinary TypeScript function signature doesn't prove a function pure. And an acceptable old answer is still an old answer. Deciding how stale it may be is a separate decision from making the calculation pure."
+"Make anything that can change the answer an explicit input. If a value comes from outside the call, like a host setting, reuse an answer only while that value cannot change. If an input changes too often to reuse the whole answer, like the clock, reuse only the work that does not depend on it. Put required work where returning a saved answer cannot skip it. An ordinary TypeScript function signature doesn't prove a function pure. You can instead decide to accept some staleness. But an acceptable old answer is still an old answer. Deciding how stale it may be is a separate decision from making the calculation pure."
 
 ## The Debate
 
@@ -18,7 +18,7 @@
 
 **Gilad**: "Nobody changed anything. That's the interesting part."
 
-Their support desk gives a P1 ticket four business hours, counted Monday to Friday, 09:00–17:00 in Jerusalem. It becomes at-risk thirty elapsed minutes before its deadline, and breached at the deadline. The lead uses the dashboard to decide which tickets to escalate.
+Their support desk gives a P1 ticket four business hours, counted Monday to Friday, 09:00–17:00 in Jerusalem. It becomes at-risk thirty elapsed minutes before its deadline, and breached at the deadline. The escalation job escalates breached tickets hourly. The lead uses the dashboard to intervene before that next run.
 
 Their calendar has no holidays or paused tickets. The existing `deadlineFor` walks those business minutes from the opening time and returns an epoch timestamp. `slaStatus` compares that deadline with the current time and returns one of three strings:
 
@@ -46,7 +46,7 @@ This ticket is due at 13:00 Jerusalem time, or 11:00Z. It should be `ok` at 12:2
 
 **Oded**: "It never showed at-risk."
 
-**Eden Legacy**: "The hourly job still called `slaStatus` directly. It escalated the ticket after the breach. That doesn't give us the missing at-risk record."
+**Eden Legacy**: "The escalation job still called `slaStatus` directly. It escalated the ticket after the breach. That doesn't give us the missing at-risk record."
 
 The ticket API and the digest also call `slaStatus` directly.
 
@@ -84,7 +84,7 @@ Only the direct call at 12:40 records an at-risk evaluation. The cached dashboar
 
 **Dafna Functor**: "Show me where it asks the clock."
 
-Eden opens the existing implementation. `assess` computes the answer; `slaStatus` also sends at-risk observations to the application's `recordRisk` sink:
+Eden opens the existing implementation. `assess` computes the answer; `slaStatus` also sends at-risk records to the application's `recordRisk` sink:
 
 ```typescript
 type Evaluation = Readonly<{
@@ -110,7 +110,7 @@ function slaStatus(ticket: Ticket): SlaStatus {
 }
 ```
 
-**Dafna**: "The cache skips both the clock read and the record. Even if the old string happened to be right, it wouldn't perform that observation again."
+**Dafna**: "The cache skips both the clock read and the record. Even if the old string happened to be right, it wouldn't write another record."
 
 ### Give the old answer an expiry
 
@@ -157,13 +157,13 @@ try {
 
 **Eden**: "Even after the cache expires, the lead still sees the old row until the board refreshes."
 
-**Oded**: "Then expire it at the next status change. We have the deadline. Before the warning window, expire at its start. Inside it, expire at the deadline."
+**Oded**: "Then use boundary expiry. We have the deadline. Before the at-risk window, expire at its start. Inside it, expire at the deadline."
 
 **Dafna**: "That can work. Keep the deadline in the entry and you don't have to walk it again. But now the cache knows our status thresholds. The comparison is three numbers. Why cache that part?"
 
 ### Keep the expensive answer
 
-Dafna takes the clock read and the calendar walk out of `assess`. Her new calculation receives the deadline and the instant to compare:
+Dafna replaces `assess` with `evaluate`, taking out the clock read and calendar walk. It receives the deadline and the instant to compare:
 
 ```typescript
 function evaluate(deadline: number, now: number): Evaluation {
@@ -179,13 +179,13 @@ function evaluate(deadline: number, now: number): Evaluation {
 
 **Eden**: "They don't. Keep their entry point. It can use her calculation."
 
-The module now constructs its exported `slaStatus` with Eden's factory. Each call to the factory creates a deadline cache.
+The module now constructs its exported `slaStatus` with Eden's factory. Each call creates a deadline cache, so tests can start with an empty one.
 
 ```typescript
 function makeSla() {
-  const deadline = memoizeBy(ticketKey, deadlineFor);
+  const cachedDeadline = memoizeBy(ticketKey, deadlineFor);
   return function slaStatus(ticket: Ticket, now = Date.now()): SlaStatus {
-    const result = evaluate(deadline(ticket), now);
+    const result = evaluate(cachedDeadline(ticket), now);
     if (result.status === "at-risk") {
       recordRisk(ticket.id, result.deadline, result.evaluatedAt);
     }
@@ -211,22 +211,22 @@ function refresh(tickets: readonly Ticket[]): SlaStatus[] {
 
 **Oded**: "Same calls for three consumers. One clock read for the board. That's not the migration I was objecting to."
 
-He repeats three thirty-second refreshes of the same 20,000 tickets, starting with empty caches and making no edits. His counter wraps the deadline walk:
+Oded implements boundary expiry and compares all four versions over the same 20,000 tickets. As in the replays, he replaces the clock: each refresh holds it at 12:20:00, 12:20:30 or 12:21:00 Jerusalem time. He starts with empty caches, makes no edits and counts deadline walks:
 
 | Version | Deadline walks across the three refreshes |
 |---|---:|
 | No cache | 60,000 |
 | Sixty-second TTL on the evaluation | 40,000 |
-| Expiry at the next status change, retaining the deadline | 20,000 |
+| Boundary expiry, retaining the deadline | 20,000 |
 | Deadline cache, fresh comparison | 20,000 |
 
-**Oded**: "First refresh, everyone walks twenty thousand. At thirty seconds none of the caches walks. At sixty, the TTL walks them all again. My boundary-expiry version keeps the deadline too. We tie there."
+**Oded**: "First refresh, everyone walks twenty thousand. At thirty seconds none of the caches walks. At sixty, the TTL walks them all again. My boundary expiry keeps the deadline too. We tie there."
 
 **Dafna**: "That is the part worth reusing. `deadlineFor` doesn't read the clock. It's a pure calculation we already had."
 
 ## The Turn
 
-**Chen Override**: "Which host did you count on?"
+**Chen Override**: "Which host did you run this on?"
 
 **Oded**: "The test runner. Why?"
 
@@ -310,17 +310,21 @@ function deadlineFor(ticket: Ticket, policy: SlaPolicy): number {
 
 **Oded**: "A formatter call for every minute now? Friday tickets walk the whole weekend."
 
-**Dafna**: "They do. The first refresh still needs measuring. Counting walks doesn't tell us what each one costs."
+**Dafna**: "They do. Counting walks doesn't tell us what each one costs."
 
-Eden replaces the factory so each cache keeps its own copy of the supplied policy, then rebuilds the entry point:
+**Eden**: "I'll time a cold refresh of the whole board on the dashboard host before we switch. It has to finish within the refresh interval. Until then, remove the status cache and keep the board on the old uncached path in Jerusalem time."
+
+"And I'll copy the policy. `Readonly` won't stop a caller editing the object it passed us. That would change the zone halfway through filling our cache."
+
+He replaces the factory and rebuilds the entry point:
 
 ```typescript
 function makeSla(policy: SlaPolicy) {
-  const fixedPolicy = Object.freeze({ timeZone: policy.timeZone });
-  const deadline = memoizeBy(ticketKey,
+  const fixedPolicy = { timeZone: policy.timeZone };
+  const cachedDeadline = memoizeBy(ticketKey,
     (ticket: Ticket) => deadlineFor(ticket, fixedPolicy));
   return function slaStatus(ticket: Ticket, now = Date.now()): SlaStatus {
-    const result = evaluate(deadline(ticket), now);
+    const result = evaluate(cachedDeadline(ticket), now);
     if (result.status === "at-risk") {
       recordRisk(ticket.id, result.deadline, result.evaluatedAt);
     }
@@ -335,26 +339,30 @@ const slaStatus = makeSla(supportPolicy);
 
 **Chen**: "Now it's 11:00Z in all three processes."
 
-**Gilad**: "Can I reconstruct an at-risk row without asking the clock what time it is now?"
+After the cold-refresh check passes on the dashboard host, Eden switches the board. The next day, ticket P1-43 opens at 09:00 Jerusalem time with the same four-hour budget. The repaired dashboard writes an at-risk record at 12:40.
+
+**Gilad**: "Can I reconstruct that row without asking the clock what time it is now?"
 
 **Dafna**: "Use the deadline and evaluation timestamp in its record."
 
-Gilad opens a retained observation from the 12:40 replay:
+Gilad opens that record:
 
 ```typescript
 const record = {
-  ticketId: "P1-42",
-  deadline: Date.UTC(2026, 10, 9, 11),
-  evaluatedAt: Date.UTC(2026, 10, 9, 10, 40),
+  ticketId: "P1-43",
+  deadline: Date.UTC(2026, 10, 10, 11),
+  evaluatedAt: Date.UTC(2026, 10, 10, 10, 40),
 };
 console.log(evaluate(record.deadline, record.evaluatedAt).status); // at-risk
 ```
 
-**Gilad**: "And replaying it through `slaStatus` would write another observation. This just reads the old one."
+**Gilad**: "And replaying it through `slaStatus` would write another record. This just reads the old one."
 
 ## The Verdict
 
-**Eden**: "The lead accepts a board showing status as of its last thirty-second refresh, without an extra cache delay. I'll keep `slaStatus` for the existing callers. The dashboard passes one instant per refresh. We cache the deadline under the fixed support policy, calculate status each time, and record outside the cache. I'll correct the digest host too, but the module won't depend on that setting."
+Gilad has checked with the lead: status as of the last thirty-second refresh is acceptable; an extra cache delay is not.
+
+**Eden**: "We'll keep `slaStatus` for the existing callers and require the cold-refresh check before each rollout. While it runs, the board stays on the uncached path. I'll correct the digest host too, but the module will use its own policy."
 
 **Oded**: "The TTL would stop the indefinite stale answer. Boundary expiry would get the transitions right too, but I'd be maintaining the status rules in the cache. Keep the small comparison out of it."
 
@@ -372,4 +380,4 @@ console.log(evaluate(record.deadline, record.evaluatedAt).status); // at-risk
 
 **Oded**: "Your memoizer writes to a Map. Are we allowing that?"
 
-**Dafna**: "It keeps a deadline inside this module. Nobody receives the Map, and a hit returns the same number a fresh walk would produce. That internal write doesn't replace any observation we promised. Caching the function that called `recordRisk` did."
+**Dafna**: "It keeps a deadline inside this module. Nobody receives the Map, and a hit returns the same number a fresh walk would produce. That internal write doesn't replace any record we promised. Caching the function that called `recordRisk` did."

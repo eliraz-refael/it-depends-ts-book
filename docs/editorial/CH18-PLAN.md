@@ -384,3 +384,20 @@ Offline clean install and full suite pass: Chapter 18 **14/16/19**, whole book
 [review record](CH18-REVIEW.md) and [snapshot](ch18/DRAFT2-SNAPSHOT.json).
 Claude's targeted Principle read and formal recheck remain pending. This does
 not mark the chapter approved or complete. No push by Codex.
+
+
+## Draft 3 handoff after second review (2026-10-22)
+
+Draft 3 separates stable captured inputs from fast-changing inputs in the
+Principle, resolves formatter cost through Eden's owned cold-refresh rollout
+condition, and reconstructs a record written by the repaired dashboard for a
+new Tuesday ticket. It explains the private policy copy and removes its freeze,
+unifies names and grounds the lead's accepted refresh cadence. The local Verdict
+and Act III's remaining open-ending requirement are unchanged.
+
+Offline clean install and full suite pass: Chapter 18 **14/16/19**, whole book
+**332/440/159**, plus two default cases and two searches. The rollout's fictional
+timing check is not a benchmark claim or a suite result. See the current
+[review record](CH18-REVIEW.md) and [snapshot](ch18/DRAFT3-SNAPSHOT.json).
+Claude's final Principle-only reader and diff review are pending. Local commit
+only; no push or claim of approval.
