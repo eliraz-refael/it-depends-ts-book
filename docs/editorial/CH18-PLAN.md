@@ -1,6 +1,6 @@
 # Chapter 18 — Pure Functions (working title)
 
-Status: **PROPOSED, awaiting Codex's challenge**, 2026-10-22.
+Status: **PLAN SETTLED**, 2026-10-22. The settlement at the end governs the original proposal.
 Branch: `codex/chapter-18-pure-functions`, based on `origin/main` `c154239`.
 File: `book/03-patterns-and-design/05-pure-functions.md`.
 
@@ -236,8 +236,118 @@ Both get prerequisites only.
 
 ## Completion
 
-- [ ] Codex challenges this plan; disagreements are settled on evidence.
+- [x] Codex challenges this plan; disagreements are settled on evidence.
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and final diff review.
 - [ ] Checks durable; full suite green.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-22)
+
+Codex's [challenge](ch18/CODEX-PLAN-CHALLENGE.md) is accepted, with the decisions below. Where this
+section conflicts with the proposal above, this section governs.
+
+1. **Principle.** Keep Eli and the reuse test, and drop the absolute "nothing in the program could
+   tell". Object identity, allocation, timing and the chapter's own counter can all tell.
+   - **Two questions:**
+     - what can change the answer without a change to the inputs;
+     - what required work would disappear if the call didn't run.
+   - **The decision:** make those dependencies and effects explicit at the boundary that owns them.
+     A TypeScript signature doesn't show them.
+   - **Three things stay distinct:** purity, a valid cache key and an acceptable approximation. A
+     TTL can be an acceptable cache policy without making anything pure.
+   - **Cut the list of consumers** (retries, reordering) unless a scene examines them.
+   - **The Principle-only hard cases stand:** the clock, the dropped log line and the host time zone.
+2. **Incident.**
+   - **Timeline:** use Codex's single ticket and threshold, stated before anything is cached:
+     - a 4-hour P1 opened Monday 2026-11-09 09:00 Jerusalem (07:00Z), due 13:00;
+     - at-risk in the last 30 minutes.
+
+     It is cached while `ok` at 12:20, stays `ok` at 12:40 and 13:00, and its at-risk line never
+     appears.
+   - **The observation contract, stated before any fix is judged:** each dashboard evaluation shown
+     as at-risk is recorded with its deadline and the instant used. On-call uses those records to
+     reconstruct what the lead saw. The contract is not "log on every call" because logging is an
+     effect. Gilad may want more than that (his old-system precaution), for one beat.
+   - **The other callers keep working.** The escalation job is uncached and catches the ticket on
+     its next hourly run. The consequence is the dashboard being wrong while the lead escalates from
+     it, and the missing records. Don't invent an outage elsewhere.
+   - **Keys:** use an explicit `revision` that every edit increments, not `updatedAt`. State that
+     contract where the cache is introduced.
+   - **No "CPU drops".** Oded's counter shows the walk count (60,000 → 40,000 → 20,000 across the
+     three strategies, cold caches, no edits). That is the demonstrated result; claim no timing.
+3. **Oded.**
+   - **TTL is the printed small patch.** No minute-bucket key in an unbounded map.
+   - **Staleness:** state it precisely. An answer cached 1 ms before the deadline is still at-risk 30
+     s after it. Separate the cached answer's age from how long a rendered row stays on screen.
+   - **The staleness budget belongs to the dashboard's owner.** "An SLA measured in hours" doesn't
+     grant a minute.
+   - **His logging repair is printed:** the observation moves outside the cache, and `evaluatedAt`
+     stays the time of the original evaluation.
+   - **Expiry at the next status boundary:** one exchange. Oded proposes it, and Dafna notes the
+     cache now knows the thresholds. No third cache implementation.
+4. **Dafna and Eden.**
+   - **The strongest repair is the composition:**
+     - a cached `deadlineFor` under one fixed policy;
+     - a pure `evaluate(deadline, now)` returning `{ status, deadline, evaluatedAt }`;
+     - Eden's `slaStatus(ticket, now = Date.now())` wrapper for existing callers, logging outside the
+       cache;
+     - the dashboard reading the clock once per refresh.
+   - **Eden shows it,** not as a weaker alternative waiting for Dafna's approval.
+   - **What the comparison drops:** four-caller migration and batch consistency don't separate the
+     sides; the composition disproves both.
+   - **What remains:**
+     - the wrapper is still effectful, and can be memoized wrongly again;
+     - Dafna's pure function can also be cached under an incomplete key.
+
+     Neither gets a compiler guarantee.
+   - **Any remaining dispute needs a caller.** If one is about which API new callers see, show the
+     caller that needs it. Don't stage a disagreement over identical working code.
+5. **The time-zone Turn stays,** on the existing walker. Dafna extracted it and called it pure; she
+   didn't write fresh local-time code to be caught.
+   - **Dates:** use the November fixtures throughout. The table is UTC → 13:00Z, Jerusalem → 11:00Z,
+     New York → 18:00Z; with the explicit zone, 11:00Z everywhere.
+   - **The setup:** tests ran under one shared zone, and the digest runs on an older host configured
+     differently. Name this once. Memoization didn't cause it.
+   - **The repair is complete:** the walker reads weekday and hour through an explicit-zone formatter
+     and walks epoch minutes, not just `getHours`.
+   - **The calendar code must not take over the chapter.** Establish the walker early and inspect its
+     local-time predicate when Chen asks.
+   - **Oded's consistent-`TZ` fix gets a fair hearing.** It works for this single-zone service.
+     Dafna's policy zone removes the reliance on every host's setting. Who needs zone independence
+     comes from the scene, if anyone; don't invent a second team.
+   - **Chen accepts an answer that covers the service.**
+   - **Policy:** use a cache scoped to one fixed policy rather than a policy key. Name its lifetime
+     where the cache is introduced, and test the incomplete-key failure in the checks, not on the
+     page.
+6. **Cast:** the same six.
+   - **A `Clock` interface gets one exchange or a Take, likely Eden's:** the same `Clock` read twice
+     gives `ok` then `breached`. A service that reads it once per refresh and passes the number into
+     the core is compatible with the composition.
+   - **No Guy.**
+   - **Cut TS2367.**
+   - **`Date.now` patch:** if a test patches it, restore it in `finally`, and don't let it stand in
+     for a time-zone test.
+7. **Ending:** still decided by the scenes. A local Verdict is the expected outcome on this evidence.
+   - **The Debate Continues** only if a consumer the text shows has an acceptable staleness budget
+     that TTL meets, and the factoring's owner declines its cost. Or if the team disagrees about the
+     API for a caller the text shows.
+   - **If the ending is a Verdict,** Act III's debt moves to Ch19, and PLAN.md says so.
+8. **Economy.**
+   - **The budget:** one incident, one small mitigation, one factoring with a compatibility wrapper,
+     and the calendar counterexample.
+   - **Not on the page:** a memoizer tutorial, three near-identical services or an SLA framework.
+   - **Sentence level:** let a successful repair change the argument, and avoid closing maxims for
+     everyone.
+   - **Length:** 2,300–3,200 words.
+9. **Validation:** Codex's probes seed `checks/chapter18.cjs`. Add:
+   - the real walker before and after the repair, under three `TZ` processes, including closed
+     hours, a Friday-to-Monday crossing and a 17:00 arrival;
+   - the walk counts;
+   - TTL staleness at the boundary;
+   - the composition: one clock read per batch, the wrapper reading the clock when called without
+     `now`, and records outside the cache;
+   - the incomplete-key failure.
+
+Next: Codex drafts on this branch and self-reviews. Claude then reviews with an isolated Principle-only
+reader and a fresh full reader.
