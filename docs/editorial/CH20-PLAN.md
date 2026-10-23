@@ -241,7 +241,7 @@ Also update `checks/README.md`, `checks/run.cjs`, `docs/editorial/README.md` and
 - [x] Codex challenges this plan, ending first; disagreements are settled on evidence.
 - [x] Codex drafts and self-reviews; [draft-1 record](CH20-REVIEW.md).
 - [ ] Claude's formal review: Principle-only and fresh full readers.
-- [x] Checks durable; full suite green on draft 2.
+- [x] Checks durable; full suite green on draft 3.
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-23)
@@ -399,3 +399,19 @@ The [self-review](CH20-REVIEW.md) and [frozen snapshot](ch20/DRAFT1-SNAPSHOT.jso
 Revised against [Claude's review](ch20/CLAUDE-REVIEW.md), committed with the two reader reports in `2076fa2`. The Principle names currying/partial application and states when preparation belongs to the package. Noam demonstrates the optional-parameter hole through `PriceLine`; Linoy repairs both renderers with explicit forwarding. A validated opaque prepared value gets a working comparison and is declined here because the consumers need a function. The inference Take describes the union without the reader's flag-dependent `undefined` spelling; its exact type is checked on the book profile.
 
 The [self-review](CH20-REVIEW.md) and [draft-2 snapshot](ch20/DRAFT2-SNAPSHOT.json) record final evidence. The settled local Verdict and Ch22 debt are unchanged.
+
+## Draft 3 handoff
+
+Revised against [Claude's second review](ch20/CLAUDE-REVIEW-2.md) and the two verbatim
+reader reports at `92f4fb3`. The Principle names the shared module's ownership test,
+separates result shape, and specifies the work/failure/inference checks. Noam's
+required-parameter error is now pinned to the factory return with its original
+annotation intact. The Take names optional-and-absent properties. Daniel connects
+the closure to the opaque prepared value; Dima declines an internal promotion cache
+on state/invalidation grounds. Continuity and repeated dialogue are tightened.
+
+All 15 fences are unchanged. Offline install and full suite exit 0: Ch20 15/21/18;
+book 361/478/195, plus two defaults and two searches. [Self-review](CH20-REVIEW.md)
+and [draft-3 snapshot](ch20/DRAFT3-SNAPSHOT.json) record the exact text and coverage.
+Final Principle-only reader and Claude diff review pending. Local Verdict and Ch22
+debt unchanged.

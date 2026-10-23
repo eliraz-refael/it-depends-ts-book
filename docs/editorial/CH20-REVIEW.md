@@ -1,5 +1,71 @@
 # Chapter 20 self-review — Before the First Line
 
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READ AND DIFF REVIEW PENDING**, 2026-10-23.
+
+Manuscript SHA-256: `d9c9d9aadb6fbfc0411966d34da323f0394b71ef4cae230ee7e58582f7c4b686`.
+**2,432 words**, including code; **15 TypeScript fences**, byte-identical to draft 2.
+[Draft-3 snapshot](ch20/DRAFT3-SNAPSHOT.json). Earlier snapshots remain unchanged.
+
+`npm ci --offline` and full `npm run check` both **exit 0**, on TypeScript **7.0.2**
+and Node **v22.23.3**. Ch20: **15 fences / 21 compiler cases / 18 runtime groups**.
+Whole book: **361 / 478 / 195**, plus two compiler-default cases and two searches.
+The full run followed the final manuscript and validator changes. Local logs:
+`.probe/ch20-draft3-install.log` and `.probe/ch20-draft3-full-check.log` (not committed).
+
+## Response to Claude's draft-2 review
+
+Read [CLAUDE-REVIEW-2](ch20/CLAUDE-REVIEW-2.md) and its two verbatim reader reports
+from `92f4fb3`. All requested changes are accepted.
+
+1. **Diagnostic location and union.** Noam points to `priceWith` and says a required
+   extra argument fails against `PriceLine` at its return. The revised compiler case
+   keeps the printed return annotation and adds only the required parameter to the
+   returned function. It requires TS2322 on that return line and no diagnostic at
+   `layout`. The old case changed the factory's return annotation too, so it tested
+   a different claim; that case is replaced rather than counted as new coverage.
+   The separate direct-call adaptation fixture still changes the annotation and
+   is labelled accordingly. The Take explicitly says optional and absent, spelling
+   `b?: never` and `a?: never`; its existing exact-type assertion checks both.
+2. **Principle.** A shared module owns the first call when that call does work only
+   the module can do. The choice of a returned function or prepared value is a
+   separate sentence. The inference sentence distinguishes deliberately choosing a
+   type argument from fixing one before later arguments supply enough information.
+   The checks name work, possible failure and fixed type arguments. Daniel's first-call
+   and parentheses lines stay. Definitions and `map`'s three arguments stay.
+3. **Daniel and the opaque alternative.** Cut the arrow quip. Daniel now identifies
+   the closure as an opaque prepared value with one operation. Dima names the
+   renderers' need, replacing the unexplained qualifier. The alternative's working
+   implementation and identical counts remain in the suite; no claim of technical
+   inferiority was added.
+4. **Cache question.** Dima declines caching by promotion inside `lineTotal` because
+   it would hide state and need invalidation if tiers change. He prefers reporting
+   retaining the prepared function. This is a local ownership choice, not a claim
+   that caching cannot work or that internal memoization necessarily changes a
+   function's results. No cache implementation, fixture or extra exchange was added.
+5. **Continuity and speech.** Name `price`; set aside the unadopted `discountedBy`
+   proposal; make the Verdict about adapters that only hold arguments, without
+   reviving the removed `Discount` API. Dima's input premise is two connected
+   sentences; the below-minimum result remains visible in code and checked. Cut
+   his repeated `map` explanation, keeping the package's one-line-call obligation.
+
+## Self-review and handoff
+
+The Principle supplies actions for the four review cases: forward the intended
+callback arguments; keep simple argument binding local; let the module perform
+private preparation and return the form its consumers need; inspect work, failure
+and inference at each call. This is a self-check, not an independent reader result.
+Claude's final Principle-only reader and diff review are pending. No further full
+reader was requested.
+
+The local Verdict, timing Turn, cast and preparation counts are unchanged.
+All 15 fence hashes match draft 2. Claude's three records from `92f4fb3` are
+untouched. The manuscript and validator were not edited after the final full run.
+Act III's open-ending debt remains with Ch22. Commit locally; no push.
+
+---
+
+## Historical draft-2 self-review
+
 Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**, 2026-10-23.
 
 Manuscript SHA-256:

@@ -85,8 +85,13 @@ const changedFactory=replaceOnce(replaceOnce(before(factory,"function lineTotal(
   "): PriceLine {", "): (line: Line, trace: string) => number {"),
   "function priceLine(line: Line): number", "function priceLine(line: Line, trace: string): number");
 const changedBase=lineType+renderers+privatePricing+changedFactory;
-example("stored-unary-contract-detects-required-argument",changedBase+promotion+
-  "const layout: {price:PriceLine} = {price:priceWith(promotion)}; // Error TS2322\n",[2322]);
+// Keep the printed PriceLine return annotation: the error belongs at the return,
+// not at layout's assignment. The separate changedBase fixture changes that annotation.
+const requiredReturn=replaceOnce(before(factory,"function lineTotal("),
+  "return function priceLine(line: Line): number {",
+  "return function priceLine(line: Line, trace: string): number { // Error TS2322");
+example("factory-return-rejects-required-argument",lineType+renderers+privatePricing+
+  requiredReturn+promotion+"const layout: {price:PriceLine} = {price:priceWith(promotion)};\n",[2322]);
 example("direct-call-can-adapt-without-changing-its-caller",changedBase+promotion+
   replaceOnce(from(factory,"function lineTotal("),"priceWith(promotion)(line)","priceWith(promotion)(line, 'checkout')")+
   "const result:number=lineTotal(orderLines[0],promotion);\n");

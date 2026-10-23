@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Daniel Compiler**: "Partial application supplies some arguments now and leaves a function for the rest. Currying turns a function taking several arguments into successive calls taking one argument each. Start with a local arrow when you only need to hold an argument for later. Ask the package to prepare something once when that work belongs inside it; return a function if that's what its consumers need."
+**Daniel Compiler**: "Partial application supplies some arguments now and leaves a function for the rest. Currying turns a function taking several arguments into successive calls taking one argument each. Start with a local arrow when you only need to hold an argument for later. A shared module should own the first call when that call does work only the module can do. Return a function if the consumers need a function, or a prepared value if they need that."
 
-"But the first call is still a call. It can do work and throw. TypeScript can choose type arguments there, before the later arguments arrive. Check each call separately. And check the code that calls your function: `map` passes the element, index and array. Write an arrow if you mean to forward only the element. Splitting the parentheses doesn't make those decisions for you."
+"But the first call is still a call. It can do work and throw. You can choose a type argument there deliberately, or inference can fix it before the later arguments supply enough information. Check what each call does, whether it can throw, and which type arguments it fixes. And check the code that calls your function: `map` passes the element, index and array. Write an arrow if you mean to forward only the element. Splitting the parentheses doesn't make those decisions for you."
 
 ## The Debate
 
@@ -101,9 +101,7 @@ console.log(preview(lines, price)); // 90,90,90
 
 **Linoy**: "That's what I want the package to return. We could replace the two-argument version with a factory."
 
-**Dima**: "You already have that function. Checkout has both arguments. Why should its callers make a function just to call it immediately?"
-
-**Daniel**: "We've removed one arrow and put it back. I'd like to keep this one long enough to use it."
+**Dima**: "You already have `price`. Checkout has both arguments. Why should its callers make a function just to call it immediately?"
 
 **Linoy**: "I could still offer this. The first call takes the discount and returns the line function. I can call that immediately or give it to the preview."
 
@@ -166,7 +164,7 @@ function lineTotal(line: Line, promotion: Promotion): number {
 }
 ```
 
-**Dima**: "Lines arrive with positive quantities and finite nonnegative unit prices already checked. I only check the tiers here. Below every minimum, the line stays full price. `prepare` and `evaluate` stay private."
+**Dima**: "The callers already checked that quantities are positive and unit prices are finite and nonnegative. We still have to check the promotion they give us."
 
 **Linoy**: "Here's the new run. Same two consumers, same arrow."
 
@@ -207,9 +205,11 @@ console.log(preview(orderLines, price)); // 100,180,240
 
 **Linoy**: "And I'd still write `line => pricePrepared(line, prepared)` for these renderers. Could you return that function? Then I don't need the prepared type and a separate pricing entry point."
 
-**Dima**: "For these consumers, yes. We can keep the prepared value inside it."
+**Daniel**: "The closure is an opaque prepared value too. It gives you one operation: price a line."
 
-She replaces `discountedBy` with a factory for the new promotion. Dima keeps the direct entry point, delegating to it:
+**Dima**: "That's all the renderers need. We can keep the tiers inside it."
+
+Linoy sets aside her `discountedBy` proposal and writes the factory for the new promotion. Dima keeps the direct entry point, delegating to it:
 
 ```typescript
 function priceWith(promotion: Promotion): PriceLine {
@@ -247,6 +247,8 @@ console.log(lineTotal(orderLines[0], promotion)); // 100
 
 **Dima**: "Checkout still prepares for each direct call, then. We haven't changed that cost just by making its implementation call the factory."
 
+"Caching by promotion inside `lineTotal` would hide state there and need invalidation if its tiers change. I'd rather let reporting keep the prepared function."
+
 **Gil**: "One checkout call prepared once before and prepares once now. The saving belongs to the reporting run that keeps the function."
 
 **Dima**: "We could also price a batch. Prepare once, map the lines internally, return the numbers."
@@ -255,7 +257,7 @@ console.log(lineTotal(orderLines[0], promotion)); // 100
 
 **Gil**: "One batch of six prepares once too. Two separate batches of three prepare twice."
 
-**Noam**, pointing to `layout`: "An extra required argument would break this assignment. An optional one wouldn't. And your renderers still pass `price` straight to `map`."
+**Noam**, pointing to `priceWith`: "An extra required argument would fail against `PriceLine` at this return. An optional one wouldn't. And your renderers still pass `price` straight to `map`."
 
 **Linoy**: "Even with `PriceLine`?"
 
@@ -287,7 +289,7 @@ function preview(lines: readonly Line[], price: PriceLine): string {
 console.log(preview(equalLines, priceWithExtra(promotion))); // 100,100,100
 ```
 
-**Dima**: "The package still owes you a function that works when called with one line. But that type doesn't restrict what `map` passes."
+**Dima**: "The package still owes you a function that works when called with one line."
 
 ## The Turn
 
@@ -338,7 +340,7 @@ try {
 
 **Noam**: "Keep the empty invalid run in the tests. If somebody moves the check back into the returned function, the prices alone won't tell us."
 
-**Dima**: "And this isn't a request for two exports for every calculation in the package. The ordinary discount adapter can live in reporting. This one earns its entry point because the package owns the preparation."
+**Dima**: "And this isn't a request for two exports for every calculation in the package. An adapter that only holds an argument can stay in reporting. This one earns its entry point because the package owns the preparation."
 
 ## Additional Take
 
@@ -354,7 +356,7 @@ pair({ a: 1 }, { b: 2 }); // Accepted.
 pairWith({ a: 1 })({ b: 2 }); // Error TS2353
 ```
 
-**Daniel**: "The two-argument call infers a union, marking the missing property optional in each member. `pairWith` has chosen `{ a: number }` before it sees `b`."
+**Daniel**: "The two-argument call infers a union, with the other property optional and absent in each member: `b?: never` or `a?: never`. `pairWith` has chosen `{ a: number }` before it sees `b`."
 
 **Linoy**: "If I want either shape, I can give that first call a union."
 
