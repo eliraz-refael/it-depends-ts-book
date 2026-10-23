@@ -31,6 +31,7 @@ const looped=block("function looped(");
 const split=block("function split(");
 const held=block("const heldFirst:");
 const reservation=block("type WaitingPayout =");
+const names=block("const stopAtFirstBlocker =");
 const reportFailure=block("type ReportRow =");
 const reportMap=block("const refundAmounts =");
 const reportFlat=block("const refunds =");
@@ -67,14 +68,16 @@ const incidentPrint=example("overtaking-printed-ids-and-totals",base+skipping+in
 const foldApi=example("closed-state-fold",base+folded+"export {folded,ready};\n");
 const loopApi=example("loop-same-stop-reason",base+batchTypes+looped+"export {looped,ready};\n");
 const heldPrint=example("eligibility-before-allowance-output",base+batchTypes+looped+held);
-const namedApi=example("domain-planner-uses-the-loop-body",base+batchTypes+
-  replaceOnce(looped,"function looped(","function planPayouts(")+"export {planPayouts,ready};\n");
+const namedApi=example("named-stop-and-fill-public-contracts",base+batchTypes+looped+skipping+names+`
+type Equal<A,B>=(<T>()=>T extends A?1:2) extends (<T>()=>T extends B?1:2)?true:false;
+const stopReturn:Equal<ReturnType<typeof stopAtFirstBlocker>,Batch>=true;
+const fillReturn:Equal<ReturnType<typeof fillAvailable>,Plan>=true;
+export {stopAtFirstBlocker,fillAvailable,ready};
+`);
 // Liron's printed split uses the same result type and eligibility stages.
 const splitApi=example("split-at-first-blocker",base+batchTypes+split+"export {split,ready};\n");
 const reserveApi=example("fill-then-reserve-with-explicit-day",base+batchTypes+reservation+
   "export {fillThenReserve,ready};\n");
-const namedFillApi=example("named-fill-policy-retains-skipping-body",base+
-  replaceOnce(skipping,"function skipping(","function fillAvailable(")+"export {fillAvailable,ready};\n");
 const limitLine="    if (total + payout.amount > allowance) break;\n";
 const wrongOrder=replaceOnce(replaceOnce(original,limitLine,""),
   "  for (const payout of queue) {\n","  for (const payout of queue) {\n"+limitLine);
@@ -115,10 +118,10 @@ function group(name,fn){
 function simple(plan){return {ids:plan.released.map(p=>p.id),total:plan.total};}
 const {ready}=load(originalApi);
 const stopFunctions=[load(originalApi).original,load(foldApi).folded,
-  load(loopApi).looped,load(namedApi).planPayouts,load(splitApi).split];
+  load(loopApi).looped,load(namedApi).stopAtFirstBlocker,load(splitApi).split];
 const typedFunctions=stopFunctions.slice(1);
 const skip=load(skipApi).skipping;
-const fillAvailable=load(namedFillApi).fillAvailable;
+const fillAvailable=load(namedApi).fillAvailable;
 const reserve=load(reserveApi).fillThenReserve;
 const queue=[ready("P1",400),ready("P2",900),ready("P3",200),ready("P4",300)];
 const heldQueue=[{id:"H",amount:1200,currency:"USD",status:"held",reason:"review"},
@@ -143,6 +146,9 @@ group("all-repairs-agree-on-incident-and-reason",()=>{
   for(const f of typedFunctions)assert.deepEqual(f(queue,1000).stop,{kind:"limit",id:"P2"});
   assert.deepEqual(simple(skip(queue,1000)),{ids:["P1","P3","P4"],total:900});
   assert.deepEqual(fillAvailable(queue,1000),skip(queue,1000));
+  assert.deepEqual(Object.keys(fillAvailable(queue,1000)).sort(),["released","total"]);
+  assert.deepEqual(Object.keys(load(namedApi).stopAtFirstBlocker(queue,1000)).sort(),["released","stop","total"]);
+  assert(chapter.includes("`fillAvailable` returns `Plan`"));
 });
 group("fixture-that-hid-skip",()=>{
   for(const f of [...stopFunctions,skip,fillAvailable]){
@@ -259,6 +265,7 @@ function fundingRuns(amount,arrivalThrough=8,days=12) {
     .map(f=>schedule(f,arrivals,500,true,days));
 }
 group("all-id-accumulation-table-and-thirteen-payout-days",()=>{
+  assert(chapter.includes("both arrive on day 1, with P2 first"));
   const runs=fundingRuns(450);
   const rows=[...chapter.matchAll(/^\| (P2|S[1-8]) \| (\d+) \| (\d+) \| (\d+) \|$/gm)];
   assert.equal(rows.length,9);
@@ -293,7 +300,7 @@ group("500-arrivals-ending-day-eight-all-ids-and-day-ten",()=>{
     assert.deepEqual(ids.map(id=>r.paid.get(id)),expected[i]);
     assert.equal(r.remaining.length,0);
   });
-  assert(chapter.includes("P2 gets day 10"));
+  // Retain the finite-arrival control after the day-10 dialogue was cut.
 });
 group("continuing-500-arrivals-thirty-days-and-recurring-balance",()=>{
   const [stop,fill,bounded]=fundingRuns(500,30,30);

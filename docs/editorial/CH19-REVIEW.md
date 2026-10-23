@@ -1,6 +1,91 @@
 # Chapter 19 self-review — Who Goes Next?
 
-Status: **DRAFT 2 FROZEN; TARGETED READERS AND SECOND FORMAL REVIEW PENDING**, 2026-10-22.
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**, 2026-10-23.
+
+## Draft 3 snapshot and validation
+
+- Manuscript SHA-256: `9b72d88b1064b0e7f95bf83bdaa8b26a91c7641771ccf12c3387d0252e55d3c6`.
+- **2,898 words**, including code; **14 TypeScript fences**.
+- [Exact snapshot](ch19/DRAFT3-SNAPSHOT.json). Both earlier snapshots remain unchanged.
+- Second review and readers: `01b6ba3`, [CLAUDE-REVIEW-2](ch19/CLAUDE-REVIEW-2.md)
+  and its two linked reports.
+
+`npm ci --offline` and full `npm run check` both **exit 0** on the frozen text,
+TypeScript **7.0.2**, Node **v22.23.3**:
+
+- Chapter 19: **14 fences / 17 compiler cases / 18 runtime groups**.
+- Whole book: **346 fences / 457 compiler cases / 177 runtime groups**, plus
+  two compiler-default cases and two source searches.
+- `git diff --check` passes.
+
+The targeted run passed before the final two prose clarifications; the full
+suite ran after them. No manuscript or validator edit followed the full run.
+All **13 draft-2 fences are byte-identical**, checked against their recorded
+hashes. One new fence prints the policy aliases. Compiler cases decrease by one
+because the two fixture-only function renames are replaced by one compiled
+program using both actual aliases and checking both public return types.
+
+## Response to the second review
+
+All requested changes are accepted. No new technical argument or policy change
+is introduced.
+
+1. **Verdict contracts and ownership.** Sahar retracts his own generic name and
+   names the stopping repair `stopAtFirstBlocker`, alongside `fillAvailable`.
+   The printed aliases preserve the existing bodies. Dafna explicitly says fill
+   returns `Plan` (selected payouts and total), with no single blocker. The
+   support explanation is scoped to **eligible** payouts left unpaid, so it
+   does not misdescribe held or wrong-currency rows. Gil states the evidence;
+   Dafna owns adopting filling and updating support. Sahar's finance condition
+   now precedes the last exchange. The Verdict ends with the local code choice:
+   a visible return for stopping, a fold with no closed state for filling.
+   Neither syntax is claimed uniquely capable of its rule.
+2. **Reset argument and accumulation setup.** Chen asks whether skip can leave
+   unpaid anything stop has paid. Liron owns the leftover-queue pattern, uses
+   crossing out already-paid items to explain it, and answers Chen's next-batch
+   challenge. Gil applies the same arrivals and reset to the next day. The
+   argument is unchanged mathematically. P2 and S1 explicitly **both arrive on
+   day 1**. The starvation mechanism names the balance ceiling of 600. The
+   reservation rule checks waiting time at a payout that fails to fit and says
+   why queue order reaches the oldest unpaid payout first.
+3. **Dafna's change and workload.** She still prefers the split to the
+   closed-state fold, but now connects her reluctance about its counter to the
+   bug she just shipped: tracking the total and missing callback control flow.
+   Liron's proof removes a substantial explanation from her part.
+4. **Principle referents.** The opening names the code calling the function,
+   carried state, stopping point and order. Splitting at the first failed item
+   replaces the unexplained named split. Type checking is explicitly after
+   each chain stage. Turning a stop into a skip replaces "that behavior", and
+   the consequence for calling code supplies the stake.
+5. **Economy.** Gil's spoken delay list is cut to its checked aggregate; the
+   table still lists every ID. The day-10 exchange is removed, while its finite
+   arrival control stays in the suite. The reservation setup is one sentence.
+   "Nobody would be paid" and the reservation sentence's queue referent are
+   explicit. The optional new defense of predictability was not inserted;
+   the support promise already supplies that concern.
+
+## Draft 3 check changes and handoff
+
+The policy-alias fixture proves exact return types `Batch` and `Plan`, and the
+runtime incident checks assert their returned field sets. Both functions still
+participate in the prior behavior comparisons. An assertion pins the stated
+arrival day to the model; removing the day-10 prose does not remove that runtime
+control. All reset enumeration, all-ID traces, starvation invariants and
+reservation boundary checks remain.
+
+Self-review finds the remaining edits consistent with the agreed local Verdict
+and the earlier mechanisms. Claude's final isolated Principle-only read and
+final diff review are pending; this record is not joint approval. Act III's
+open-ending requirement remains assigned to Ch20. Commit locally, no push.
+The second-review records are already committed at `01b6ba3`; scratch and
+coordination files remain excluded.
+
+---
+
+## Draft 2 self-review (historical)
+
+The following records frozen draft `8dc7823a…`; its pending-review status,
+counts and descriptions of passages changed above are historical.
 
 ## Draft 2 snapshot and validation
 

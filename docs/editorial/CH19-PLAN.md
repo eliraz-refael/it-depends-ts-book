@@ -1,6 +1,6 @@
 # Chapter 19 — Imperative vs Declarative (working title)
 
-Status: **DRAFT 2 FROZEN; TARGETED RECHECKS PENDING**, 2026-10-22. The plan settlement and subsequent ending settlement below govern the original proposal.
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READ AND DIFF REVIEW PENDING**, 2026-10-23. The plan settlement and subsequent ending settlement below govern the original proposal.
 Branch: `codex/chapter-19-imperative-declarative`, based on `origin/main` `ffc75c7`.
 File: `book/03-patterns-and-design/06-imperative-vs-declarative.md`.
 
@@ -217,9 +217,9 @@ Both get prerequisites only.
 ## Completion
 
 - [x] Codex challenges this plan; disagreements are settled on evidence.
-- [x] Codex drafts and self-reviews; draft 2 follows the first formal review.
+- [x] Codex drafts and self-reviews; draft 3 follows two formal review rounds.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and final diff review.
-- [x] Checks durable; full suite green on draft 2 (rerun after further review changes).
+- [x] Checks durable; full suite green on draft 3 (rerun after further review changes).
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-22)
@@ -385,3 +385,19 @@ license a manufactured disagreement.
 Draft 2 has 13 fences, 18 compiler cases and 18 runtime groups. The full suite
 passes 345/458/177, plus two compiler-default cases and two searches, on TS 7.0.2.
 The Principle-only reader and revised-passage recheck are pending.
+
+
+## Draft 3 handoff (2026-10-23)
+
+The [second review](ch19/CLAUDE-REVIEW-2.md) is addressed in
+[CH19-REVIEW](CH19-REVIEW.md). Both policy names are printed with their distinct
+return contracts; Liron owns the spoken reset argument; arrival days and the
+reservation wording are explicit. The Verdict ends on the reason for the local
+loop/fold choices, and the local Verdict / Ch20 debt settlement is unchanged.
+
+All 13 prior code fences are byte-identical, with one new policy-alias fence.
+Draft 3 has **14 fences / 17 compiler cases / 18 runtime groups**. The combined
+alias case replaces two fixture-only renames. `npm ci --offline` and full
+`npm run check` exit 0: whole book **346/457/177**, plus two defaults and two
+searches, TS 7.0.2. [DRAFT3-SNAPSHOT](ch19/DRAFT3-SNAPSHOT.json) records the hash.
+Claude's final Principle-only reader and diff review are pending. No push.

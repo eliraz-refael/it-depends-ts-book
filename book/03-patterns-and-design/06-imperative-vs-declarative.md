@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Sahar Firstclass**: "If each item can be selected or transformed on its own, start with `filter` and `map`. They tell the reader what you're doing. Before replacing a loop, ask what carries from one item to the next, where processing stops, and what must happen in order. The caller still needs those rules. If the rewrite hides its stopping point behind a flag you have to chase, keep the loop. A visible early return or a named split can be easier to read."
+**Sahar Firstclass**: "If each item can be selected or transformed on its own, start with `filter` and `map`. They tell the reader what you're doing. Before replacing a loop, ask what carries from one item to the next, where processing stops, and what must happen in order. The code calling this function still depends on its carried state, stopping point and order. If the rewrite hides its stopping point behind a flag you have to chase, keep the loop. An early return, or splitting at the first item that fails, can show the stopping point without that flag."
 
-"Check the type after each step, too. A check inside one callback may not narrow the value in the next. Keep the check and its use together if that narrowing gets lost. And returning from a `reduce` callback ends that call, not the `reduce`. Changing that behavior is a change to what the caller gets, even if the new code is shorter."
+"Check the type after each stage of the chain, too. A check inside one callback may not narrow the value in the next. Keep the check and its use together if that narrowing gets lost. And returning from a `reduce` callback ends that call, not the `reduce`. If you turn a stop into a skip, the code calling your function gets a different answer. Shorter code doesn't excuse that."
 
 ## The Debate
 
@@ -205,7 +205,7 @@ function split(queue: readonly Payout[], allowance: number): Batch {
 
 **Sahar**: "Then give it `planPayouts(queue, allowance)`. Choose the body here. The caller shouldn't have to choose an array operation."
 
-**Dafna**: "I wanted to get rid of that loop. Now the split has a counter hidden inside its search, and the fold has a state machine. Six months from now, I'd rather find the return next to the failed allowance check. Keep the loop after my filters."
+**Dafna**: "I like the split better than the closed-state fold. But I just shipped a bug by following the total and missing what the callback would do next. I don't want another search callback with a counter to follow. Keep the loop after my filters. I want the return next to the failed allowance check."
 
 **Liron**: "Fair. The split is useful if we want both parts. Here we're returning the batch and the blocker."
 
@@ -225,7 +225,7 @@ console.log(heldBatch.stop); // { kind: 'limit', id: 'R2' }
 
 **Chen**: "And if someone moves the allowance check above eligibility?"
 
-**Gil**: "Nobody paid. H would close the batch. I've added a test that would catch that move. Empty queue, exact allowance, yesterday's queue: all three repairs agree on the IDs, total and stop reason."
+**Gil**: "Nobody would be paid. H would close the batch. I've added a test that would catch that move. Empty queue, exact allowance, yesterday's queue: all three repairs agree on the IDs, total and stop reason."
 
 Dafna replaces the deployed `skipping` body with the loop after the filters, under `planPayouts`. The patch will ship before today's batch.
 
@@ -255,11 +255,15 @@ Gil runs all 78,125 combinations of four opening payouts and one arrival on each
 
 **Gil**: "No payout paid later under skip in that set. Some paid earlier."
 
-**Chen**: "Could skip ever have more unpaid payouts ahead of P2 than stop has?"
+**Chen**: "Can skip ever leave a payout unpaid that stop has already paid?"
 
-**Dafna**: "They start with the same queue. Suppose skip has already paid everything stop paid on previous days. Its remaining queue is a subset of stop's, in the same order. Take any payout stop pays today. Before reaching it, skip can only have spent money on a subset of the earlier payouts stop paid today. So it fits under skip too, unless skip already paid it."
+**Liron**: "Look at the queues left each morning. They start identical. After that, skip may have paid extra payouts early. Cross those out of stop's queue and you have skip's queue, still in the same order."
 
-**Gil**: "And that keeps the subset true tomorrow, when both get the same fresh allowance and the same arrivals. With that fresh allowance, fixed amounts and the same queue order, skipping pays no payout later."
+**Chen**: "But can that stop being true at the next batch?"
+
+**Liron**: "If stop can pay a payout today, it can afford everything before it too. Skip has at most those same earlier payouts left to pay. So it can afford that payout as well, unless it already paid it. That leaves skip's unpaid queue inside stop's again tonight."
+
+**Gil**: "Append the same arrivals and give both a fresh allowance tomorrow, and the same argument works again. Fixed amounts, same order, daily reset: skipping pays no payout later."
 
 **Dafna**: "Then I'd like a different rule: scan in queue order, pay what fits, leave the rest for tomorrow."
 
@@ -267,27 +271,23 @@ Gil runs all 78,125 combinations of four opening payouts and one arrival on each
 
 **Dafna**: "Yes. We wrote that promise. We can change it, with support, as a policy change. Today's patch still restores the old rule."
 
-Gil opens finance's proposal. The deposit would be 500 a day, and unused funds would stay in the treasury. Under that proposal, payouts can need more than one day's deposit. P2 is again 900, first in the queue. S1, for 400, is behind it on day 1. A payout for 450 joins each day from day 2 through day 8: S2 through S8. All are eligible on arrival and stay eligible.
+Gil opens finance's proposal. The deposit would be 500 a day, and unused funds would stay in the treasury. Under that proposal, payouts can need more than one day's deposit. P2, for 900, and S1, for 400, both arrive on day 1, with P2 first. A payout for 450 joins each day from day 2 through day 8: S2 through S8. All are eligible on arrival and stay eligible.
 
 **Gil**: "Start with no balance. First deposit on day 1. Stop pays P2 on day 2. Fill pays it on day 8. Each smaller payout spends funds we could have saved for P2."
 
 **Dafna**: "Now give me the other sellers. You compared every ID for the reset."
 
-**Gil**: "Stopping delays S1 by two days. S2 through S6 by two days each. S7 by one. S8 gets day 9 either way. Thirteen payout-days across seven payouts, to pay P2 six days sooner."
+**Gil**: "Thirteen payout-days across seven payouts, to pay P2 six days sooner."
 
 **Dafna**: "Then I don't want to call stopping the safe answer and hide those thirteen days."
 
-**Gil**: "Change the new arrivals from 450 to 500. Fill leaves 100 each night. Next morning there are 600, still not enough for P2. It pays the new 500 and leaves 100 again. As long as those arrivals continue, P2 never gets paid."
+**Gil**: "Change the new arrivals from 450 to 500. Fill leaves 100 each night. Next morning there are 600, still not enough for P2. It pays the new 500 and leaves 100 again. I ran thirty days and P2 was still unpaid on day 30. The balance never gets above 600. As long as those arrivals continue, P2 never gets paid."
 
-**Chen**: "What if they stop after day 8?"
-
-**Gil**: "P2 gets day 10. With them continuing, it's still unpaid on day 30. The repeated 100 is why it would stay unpaid."
-
-**Dafna**: "Then give filling a waiting limit. Fill while the oldest payout is young. Once it's waited N days and doesn't fit, reserve for it. We don't have to block the queue on its first day."
+**Dafna**: "Then give filling a waiting limit. At a payout that doesn't fit, check how long it's waited. If it's reached N days, stop there and reserve for it. Otherwise keep filling. The queue is oldest first, so we reach the oldest unpaid payout first. We don't have to stop the queue on that payout's first day."
 
 **Gil**: "Show me that against both arrival sizes."
 
-For this proposal, the planner receives already-eligible payouts with their arrival day. The caller supplies today's day number and the waiting threshold. Dafna writes the rule without reading a clock inside it:
+Dafna gives the planner already-eligible payouts with arrival days, and passes in today's day number and the waiting threshold:
 
 ```typescript
 type WaitingPayout = Ready & { arrivedOn: number };
@@ -336,19 +336,24 @@ Gil runs it with N = 2. Each cell below is the payment day for the original 450-
 
 ## The Verdict
 
-**Sahar**: "The caller needs to know which policy it's getting. `planPayouts` hid that once we had more than one. Name the rule."
+**Sahar**: "I called it `planPayouts` too soon. Now we have different rules. Name today's repair `stopAtFirstBlocker`. Filling gets `fillAvailable`."
 
-**Dafna**: "For the reset, `fillAvailable`. That's the `skipping` fold we already have. It was wrong as a replacement for stopping, but it does implement filling. I'll keep that body when we deliberately change the policy."
+```typescript
+const stopAtFirstBlocker = looped;
+const fillAvailable = skipping;
+```
 
-**Chen**: "You could write filling with a loop, too."
+**Dafna**: "`fillAvailable` returns `Plan`: the selected payouts and the total. There's no single blocker to report. Support can say an eligible payout left unpaid didn't fit the remaining allowance when we reached it. A later, smaller one may still go out."
 
-**Dafna**: "Of course. And we just wrote stopping three ways. The name says what callers may rely on. Here the fold can consider every payout without a closed state, so I'd use it."
+**Gil**: "P2's date wasn't delayed yesterday. We still broke the queue-order promise we gave its seller."
 
-**Gil**: "Today's repair restores the queue-order promise first. Then we adopt filling for the reset and update support's reply: a newer payout may go ahead if it fits. P2's date wasn't delayed yesterday, but we did break the promise we gave its seller."
+**Dafna**: "Restore that promise first. Then adopt filling for the reset as a policy change, with support's reply updated. If accumulation is approved, use `fillThenReserve` with a waiting threshold we set for it."
 
-**Dafna**: "If accumulation is approved, use `fillThenReserve`, with the waiting threshold we set for that policy. I don't want either of the unqualified rules there."
+**Sahar**: "Keep the reservation rule as a proposal until finance approves accumulation. We have one funding model to ship today."
 
-**Sahar**: "Keep that as a proposal until finance approves it. We have one funding model to ship today."
+**Chen**: "And filling could use a loop too?"
+
+**Dafna**: "Of course. We just wrote stopping three ways. For `stopAtFirstBlocker`, I want the loop's return beside the failed allowance check. For `fillAvailable`, I'll keep the fold: it considers every payout, with no closed state to carry. That body was wrong as a replacement for stopping. It does implement filling."
 
 ## Additional Takes
 
