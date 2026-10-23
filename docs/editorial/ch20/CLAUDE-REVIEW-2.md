@@ -112,3 +112,69 @@ Codex revises to draft 3. Update the checks for finding 1 (the TS2322 location, 
 claimed) and for any fence changes. Run `npm ci --offline` plus the full `npm run check`, and commit
 locally with these records. Then I'll run a Principle-only reader on the revised Principle and do the
 final diff review.
+
+## Final diff review (2026-10-23)
+
+Draft 3 (`d9c9d9aa…`, `18282ea`) addresses every finding above. All 15 fences are byte-identical to
+draft 2.
+- **The technical claims are right.**
+  - The Take now shows `b?: never` / `a?: never`.
+  - Noam points at `priceWith`'s return.
+  - The checks keep the `PriceLine` annotation and pin TS2322 at that return, with no error at
+    `layout`.
+- **The Principle has a test for ownership,** "A shared module should own the first call when that
+  call does work only the module can do". It says what to check at each call (what it does, whether
+  it can throw, which type arguments it fixes), and the type-argument sentence now has both sides.
+- **Daniel's quip is cut.** He now names the closure as an opaque prepared value with one operation,
+  which answers the cost "for these consumers" left unnamed.
+- **Dima dismisses a cache in `lineTotal` in one line,** for hidden state and invalidation, with no
+  implementation.
+- **The continuity is fixed:**
+  - Linoy sets `discountedBy` aside;
+  - the Verdict speaks of "an adapter that only holds an argument";
+  - "You already have `price`";
+  - Dima's checked-lines line is speech;
+  - his repeated closing is trimmed.
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md) applied the rule correctly to all
+four cases,** checking each with the book's compiler.
+- **The `map` index:** it named the arrow from the Principle "almost verbatim" and reproduced
+  `[10, 0, -10]`.
+- **Data-last inference:** it found the `unknown`, gave the fixes, and noted that the first rule
+  argues against the helper.
+- **One explicit type argument:** it found the split from "choose a type argument there
+  deliberately".
+- **The registry transfer:** a local arrow by default, and a registry-owned first call only for
+  validation, a listener bucket or payload typing.
+
+It stumbled on two sentences.
+
+**My two prose-only settlement edits** (no fence changes; the fence extract is byte-identical to
+draft 3):
+1. "You can choose a type argument there deliberately, or inference can fix it before the later
+   arguments supply enough information" read as two equal options. It now reads "You can choose a
+   type argument there deliberately. If you don't, inference may fix it before the later arguments
+   supply enough information."
+2. "Return a function if the consumers need a function, or a prepared value if they need that" was
+   circular. It now reads "Return the form its consumers take: a function, or a prepared value."
+
+**Not adopted from the final reader:**
+- **An example in the Principle** of "work only the module can do", or of a prepared value. The
+  chapter shows both within two pages, and an example would make the Principle documentation.
+- **When to curry fully, both forms, data-first vs data-last.** That's the reader's list; the chapter
+  decides one case.
+- **Whether a throw in the first call is a reason for or against a split.** The Turn answers it in
+  the chapter: it's a contract to state, and to handle where the function is made.
+- **The title.** It lands at the Turn.
+
+**Final text:** SHA-256 `1c6dd19e5d94561601b8b8807a5f5f672e937a9a250db67835acbd0b6fc9e126`, 2,429
+words, 15 fences, fence extract byte-identical to draft 3. The full `npm run check` exits 0 on
+TypeScript 7.0.2 and Node 22.23.3. Chapter 20 is 15/21/18, the book 361/478/195.
+
+**Approved.** The ending is a local Verdict:
+- publish the staged `priceWith`, which validates and prepares at its call;
+- keep `lineTotal` for checkout;
+- the renderers forward only the line;
+- an adapter that only holds an argument stays in reporting.
+
+Act III's open-ending debt moves to Ch22, as recorded.

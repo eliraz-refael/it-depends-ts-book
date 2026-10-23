@@ -1,6 +1,6 @@
 # Chapter 20 self-review — Before the First Line
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READ AND DIFF REVIEW PENDING**, 2026-10-23.
+Status: **JOINTLY APPROVED**, 2026-10-23. Final text SHA-256 `1c6dd19e5d94561601b8b8807a5f5f672e937a9a250db67835acbd0b6fc9e126`, after Claude's two prose-only Principle edits; see the final diff review in [CLAUDE-REVIEW-2](ch20/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-23).
 
 Manuscript SHA-256: `d9c9d9aadb6fbfc0411966d34da323f0394b71ef4cae230ee7e58582f7c4b686`.
 **2,432 words**, including code; **15 TypeScript fences**, byte-identical to draft 2.

@@ -14,7 +14,7 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 Act II is complete. Chapter 14 opens Act III with **error handling** and is drafted, jointly reviewed and checked. Chapter 15, **branded types**, is drafted, jointly reviewed and checked, including isolated Principle-only and full-reader reviews.
 
-Chapter 16, **runtime validation**, is complete and merged as PR #16 after independent readers, a recheck and joint review. Chapter 17, **immutability**, is complete and merged as PR #19 after independent readers, a targeted recheck and joint review. Chapter 18, **pure functions**, is complete and merged as PR #20 after three Principle-only reads, a full read, a targeted recheck and joint review. It reaches a local Verdict on caching deadlines, evaluating current status and recording at the boundary. Chapter 19's third draft reaches a local Verdict after the reset argument and a bounded-reservation repair under accumulating funds. It is complete and merged as PR #21 after three Principle-only reads, a full read, a targeted recheck and two formal reviews. Act III's honest open-ending requirement moves to Ch20 (currying and partial application), whose [plan](docs/editorial/CH20-PLAN.md) tested two candidate decisions under a bounded design round. Both converged, so Ch20 ends in a local Verdict and the requirement moves to Ch22 (configuration to function), whose plan will choose the decision up front.
+Chapter 16, **runtime validation**, is complete and merged as PR #16 after independent readers, a recheck and joint review. Chapter 17, **immutability**, is complete and merged as PR #19 after independent readers, a targeted recheck and joint review. Chapter 18, **pure functions**, is complete and merged as PR #20 after three Principle-only reads, a full read, a targeted recheck and joint review. It reaches a local Verdict on caching deadlines, evaluating current status and recording at the boundary. Chapter 19's third draft reaches a local Verdict after the reset argument and a bounded-reservation repair under accumulating funds. It is complete and merged as PR #21 after three Principle-only reads, a full read, a targeted recheck and two formal reviews. Act III's honest open-ending requirement moves to Ch20 (currying and partial application), whose [plan](docs/editorial/CH20-PLAN.md) tested two candidate decisions under a bounded design round. Both converged, so Ch20 ends in a local Verdict: a shared module owns a staged factory only when its first call does work the module alone can do. Chapter 20 is jointly approved after independent readers, a targeted recheck and two formal reviews, and awaits the author's review. The requirement moves to Ch22 (configuration to function), whose plan will choose the decision up front.
 
 ### Act III tasks
 
@@ -24,7 +24,7 @@ Chapter 16, **runtime validation**, is complete and merged as PR #16 after indep
 - [x] Ch17: `04-immutability.md` — historical snapshots, live views and checked pricing updates; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #19
 - [x] Ch18: `05-pure-functions.md` — hidden inputs, required observations and cache boundaries; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #20
 - [x] Ch19: `06-imperative-vs-declarative.md` — sequence rules a rewrite must keep; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #21
-- [ ] Ch20: `07-currying-partial-application.md` — argument shape for callers who fix arguments ahead of time; [plan](docs/editorial/CH20-PLAN.md) settled after Codex's challenge and a bounded ending round; local Verdict; draft 3 revised after independent readers and two formal reviews; final Principle-only read and diff review pending
+- [ ] Ch20: `07-currying-partial-application.md` — argument shape for callers who fix arguments ahead of time; [plan](docs/editorial/CH20-PLAN.md) settled after Codex's challenge and a bounded ending round; local Verdict; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; jointly approved, awaiting the author
 - [ ] Act III debt: at least one honest "The Debate Continues" chapter, with demonstrated conditions; moves to Ch22 after Ch20's bounded ending round converged
 
 ### Completed Act II work
@@ -168,7 +168,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Scaffolding + Prologue      | Done            |                       |
 | Act I: The Type System      | Done            | 6 chapters; calibrated voice passes complete |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
-| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–19 reviewed, checked and merged (6 of 10); Ch20 draft 3 revised, final review pending |
+| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–19 reviewed, checked and merged (6 of 10); Ch20 jointly approved, awaiting the author |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |

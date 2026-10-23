@@ -1,6 +1,6 @@
 # Chapter 20 — Currying and Partial Application (working title)
 
-Status: **PLAN SETTLED; LOCAL VERDICT**, 2026-10-23. The settlement and ending decision at the end govern the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-10-23. The settlement and ending decision at the end govern the original proposal.
 Branch: `codex/chapter-20-currying`, based on `origin/main` `388d9d8`.
 File: `book/03-patterns-and-design/07-currying-partial-application.md`.
 
@@ -240,9 +240,9 @@ Also update `checks/README.md`, `checks/run.cjs`, `docs/editorial/README.md` and
 
 - [x] Codex challenges this plan, ending first; disagreements are settled on evidence.
 - [x] Codex drafts and self-reviews; [draft-1 record](CH20-REVIEW.md).
-- [ ] Claude's formal review: Principle-only and fresh full readers.
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and final diff review.
 - [x] Checks durable; full suite green on draft 3.
-- [ ] Ready for the author's review.
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-23)
 
