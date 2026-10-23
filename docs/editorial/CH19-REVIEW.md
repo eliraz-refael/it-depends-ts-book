@@ -1,6 +1,6 @@
 # Chapter 19 self-review — Who Goes Next?
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**, 2026-10-23.
+Status: **JOINTLY APPROVED**, 2026-10-23. Final text SHA-256 `acef4815bdee83abf8586c949e55b1133d88489ff6765261d3014bfae317ae61`, after Claude's two prose-only Principle edits; see the final diff review in [CLAUDE-REVIEW-2](ch19/CLAUDE-REVIEW-2.md).
 
 ## Draft 3 snapshot and validation
 

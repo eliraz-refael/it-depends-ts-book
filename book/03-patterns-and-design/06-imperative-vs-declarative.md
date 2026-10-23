@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Sahar Firstclass**: "If each item can be selected or transformed on its own, start with `filter` and `map`. They tell the reader what you're doing. Before replacing a loop, ask what carries from one item to the next, where processing stops, and what must happen in order. The code calling this function still depends on its carried state, stopping point and order. If the rewrite hides its stopping point behind a flag you have to chase, keep the loop. An early return, or splitting at the first item that fails, can show the stopping point without that flag."
+**Sahar Firstclass**: "If each item can be selected or transformed on its own, start with `filter` and `map`. They tell the reader what you're doing. Before replacing a loop, ask what carries from one item to the next, where processing stops, and what must happen in order. The loop's callers depend on all three. If the rewrite hides the stopping point behind a flag you have to chase, keep the loop. An early return, or splitting at the first item that fails, can show the stopping point without that flag."
 
 "Check the type after each stage of the chain, too. A check inside one callback may not narrow the value in the next. Keep the check and its use together if that narrowing gets lost. And returning from a `reduce` callback ends that call, not the `reduce`. If you turn a stop into a skip, the code calling your function gets a different answer. Shorter code doesn't excuse that."
 

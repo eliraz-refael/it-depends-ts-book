@@ -1,6 +1,6 @@
 # Chapter 19 — Imperative vs Declarative (working title)
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READ AND DIFF REVIEW PENDING**, 2026-10-23. The plan settlement and subsequent ending settlement below govern the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-10-23. The plan settlement and subsequent ending settlement below govern the original proposal.
 Branch: `codex/chapter-19-imperative-declarative`, based on `origin/main` `ffc75c7`.
 File: `book/03-patterns-and-design/06-imperative-vs-declarative.md`.
 
@@ -218,9 +218,9 @@ Both get prerequisites only.
 
 - [x] Codex challenges this plan; disagreements are settled on evidence.
 - [x] Codex drafts and self-reviews; draft 3 follows two formal review rounds.
-- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and final diff review.
-- [x] Checks durable; full suite green on draft 3 (rerun after further review changes).
-- [ ] Ready for the author's review.
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and final diff review.
+- [x] Checks durable; full suite green (final text).
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-22)
 

@@ -150,3 +150,58 @@ including these records and both new reader reports.
 
 I'll run a Principle-only reader on the revised Principle, then do the final diff review. I'll push and
 open the PR after that.
+
+## Final diff review (2026-10-23)
+
+Draft 3 (`9b72d88b…`, `db58dcf`) addresses every finding above:
+- **The Verdict names both rules.** Sahar owns the reversal: "I called it `planPayouts` too soon."
+  `stopAtFirstBlocker` and `fillAvailable` are printed as aliases. `fillAvailable` returns `Plan`
+  with no blocker, and Dafna says what support can tell a seller instead.
+- **The Verdict ends on the subject.** Dafna closes on why each rule has its shape: the loop's return
+  beside the failed allowance check for stopping, and a fold for filling, which "considers every
+  payout, with no closed state to carry". The policy decision is hers, not Gil's.
+- **The reset argument is Liron's,** spoken at the queue level, and Chen's question now matches it
+  ("Can skip ever leave a payout unpaid that stop has already paid?"). Gil supplies the next-day
+  step. This also lightens Dafna's load.
+- **Dafna's turn to the loop is motivated by her own bug:** "I just shipped a bug by following the
+  total and missing what the callback would do next."
+- **The accumulation setup states both arrival days.** The waiting rule is described as the code
+  tests it, and the spoken delay list and the day-10 detour are gone. "The balance never gets above
+  600" replaces "the repeated 100".
+- **The Principle's referents are tightened.**
+
+All 13 draft-2 fences are byte-identical; one alias fence is added.
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md) applied the rule correctly to all
+four cases.**
+- **Stop vs skip:** it named the skip from "If you turn a stop into a skip", and built its own
+  counterexample.
+- **Per-element only:** it gave a preference for the pipeline, not just a warning.
+- **The optional property:** it found the lost narrowing and the `flatMap` repair.
+- **The async transfer:** it found the lost order and the changed stopping point.
+
+It stumbled on one sentence.
+
+**My two prose-only settlement edits** (no fence changes; fence extract byte-identical to draft 3):
+1. "The code calling this function still depends on its carried state, stopping point and order"
+   had no antecedent for "this function", and an ambiguous "its". It now reads "The loop's callers
+   depend on all three."
+2. "If the rewrite hides its stopping point" now reads "hides the stopping point". The reader wasn't
+   sure whose "its" it was.
+
+**Not adopted from the final reader:**
+- **An example of "a flag you have to chase", and naming `findIndex`.** The chapter shows both
+  within a page, and the Principle would become documentation.
+- **Side effects and async.** Ch18 covers purity. The checklist passed the async case unaided in all
+  three reads.
+- **The second paragraph's checklist tone.** It is shorter and more concrete than in either earlier
+  draft, and the reader found it "partly a person talking", quoting "Shorter code doesn't excuse
+  that."
+
+**Final text:** SHA-256 `acef4815bdee83abf8586c949e55b1133d88489ff6765261d3014bfae317ae61`, 2,890 words,
+14 fences, fence extract byte-identical to draft 3. The full `npm run check` exits 0 on TypeScript 7.0.2
+and Node 22.23.3. Chapter 19 is 14/17/18, the book 346/457/177.
+
+**Approved.** The ending is a local Verdict: restore stopping first; adopt filling under the reset as a
+deliberate, named policy; reserve after a stated wait if accumulation is approved. Act III's
+open-ending debt moves to Ch20, as recorded.
