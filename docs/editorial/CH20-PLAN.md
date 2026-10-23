@@ -1,6 +1,6 @@
 # Chapter 20 — Currying and Partial Application (working title)
 
-Status: **CHALLENGED; ENDING UNDER A BOUNDED DESIGN ROUND**, 2026-10-23. The settlement at the end governs the original proposal.
+Status: **PLAN SETTLED; LOCAL VERDICT**, 2026-10-23. The settlement and ending decision at the end govern the original proposal.
 Branch: `codex/chapter-20-currying`, based on `origin/main` `388d9d8`.
 File: `book/03-patterns-and-design/07-currying-partial-application.md`.
 
@@ -240,7 +240,7 @@ Also update `checks/README.md`, `checks/run.cjs`, `docs/editorial/README.md` and
 
 - [x] Codex challenges this plan, ending first; disagreements are settled on evidence.
 - [ ] Codex drafts and self-reviews.
-- [ ] Claude's formal review: Principle-only, fresh full and ending-only readers.
+- [ ] Claude's formal review: Principle-only and fresh full readers.
 - [ ] Checks durable; full suite green.
 - [ ] Ready for the author's review.
 
@@ -337,3 +337,53 @@ counts from preferences). Liron replaces a role only if the redesign needs his d
 **Next:** Codex runs the bounded design round (§2) in `.probe/`. It writes a short
 `ch20/CODEX-ENDING-PROBE.md` with the scene-level evidence for each criterion, or the kill, and
 then waits for my decision before drafting.
+
+## Ending decision after the bounded round (2026-10-23)
+
+Codex's [ending probe](ch20/CODEX-ENDING-PROBE.md) is accepted. **The kill rule applies.** Both
+forms pass the first two criteria and fail the third. Publishing only the staged `priceWith`
+alongside the direct `lineTotal` satisfies both owners, and a private refactor of the preparation
+kept every caller and count. That's a failure to earn an open dispute, not a failure of the design.
+
+**Ch20 ends in a local Verdict.** Act III's open-ending debt moves to **Ch22 (configuration to
+function)**. Its plan chooses the decision and its conditions before drafting, and gets the same
+ending-first challenge and kill rule.
+
+**The staged factory becomes the chapter's case,** because it gives the package a real reason to own
+the call boundary. That is the Principle's "a result now, or a function for later".
+- **Spine:**
+  1. the index incident and its repair;
+  2. reporting's need for a unary pricing function;
+  3. a local adapter as plain partial application;
+  4. `priceWith(promotion)` as a staged boundary the package owns. The count is 6 preparations
+     down to 1, across two three-line consumers.
+- **The Verdict is Codex's §4 ruling:**
+  - repair the callback mismatch;
+  - publish the staged entry point for the demonstrated need, with its unary numeric contract and
+    its validation timing stated;
+  - keep direct calls for checkout;
+  - other adapters stay local until they earn a shared entry point.
+- **Turn candidate:** validation moves to factory creation. An empty report now throws a
+  `RangeError` that the unused local adapter never did, so partial application changes *when* work
+  and failure happen. Codex may pick another Turn with a reason. Whatever it is, it must change what
+  the room thinks, not decorate it.
+- **The incident and staging need different second parameters.** A `Promotion` object already
+  rejects the `map` index. So the incident uses the earlier numeric discount, and the move to tiered
+  promotions must be motivated on the page. Its object parameter shouldn't be presented as a second
+  fix for the index. Codex chooses the repair (brand or options parameter) and says why in the
+  self-review. If it's the options parameter, Noam's role goes or changes.
+- **Budget, within 2,300–3,200 words:**
+  - one inference issue at most;
+  - one Take at most, from overload loss, naming or the TS2353 early-fixing case;
+  - the mechanism-4 `field<Order>()` material only if it earns its place against the staged case.
+
+  It must not become a second chapter.
+
+**Validation additions:** the preparation and validation counts, exactly as printed; the
+empty-report timing; the stored `PriceLine` compatibility case if the text claims it; and the
+TS2459 private-import case if the text claims it.
+
+**Readers:** a Principle-only reader and a fresh full reader. The ending-only reader is dropped:
+the ending is a Verdict.
+
+Next: Codex drafts on this branch and self-reviews, then hands off draft 1.
