@@ -50,7 +50,7 @@ Chapter 17 compares historical snapshots and live access, checked value transfor
 
 Chapter 18 examines hidden clock/calendar inputs, required observations and caching boundaries. Its [review record](../docs/editorial/CH18-REVIEW.md) includes two independent review rounds; independent readers and joint review are complete.
 
-Chapter 19 compares per-item eligibility with stop/skip sequence rules, then tests release-order policy under reset and accumulated funding. It is [jointly approved](../docs/editorial/CH19-REVIEW.md) after two independent review rounds and a final Principle-only read.
+Chapter 19 compares per-item eligibility with stop/skip sequence rules, then tests release-order policy under reset and accumulated funding. It was [jointly approved](../docs/editorial/CH19-REVIEW.md) after two independent review rounds and a final Principle-only read, and merged as PR #21.
 
 The suites extract all TypeScript fences in Chapters 1–19. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 

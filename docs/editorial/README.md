@@ -17,7 +17,8 @@ The [master plan](../../PLAN.md) remains at the repository root.
 | 16 — Runtime validation | [Plan](CH16-PLAN.md) | [Draft self-review](CH16-REVIEW.md) |
 | 17 — Immutability | [Plan](CH17-PLAN.md) | [Review](CH17-REVIEW.md) |
 | 18 — Pure functions | [Plan](CH18-PLAN.md) | [Review](CH18-REVIEW.md) |
-| 19 — Imperative vs declarative | [Plan](CH19-PLAN.md) | [Jointly approved](CH19-REVIEW.md) |
+| 19 — Imperative vs declarative | [Plan](CH19-PLAN.md) | [Review](CH19-REVIEW.md) |
+| 20 — Currying and partial application | [Plan](CH20-PLAN.md) | — |
 
 The [voice review](VOICE-REVIEW.md) covers the prologue and early chapters.
 The [Chapter 3 pilot](CH3-PILOT.md) records the author-approved calibration for
