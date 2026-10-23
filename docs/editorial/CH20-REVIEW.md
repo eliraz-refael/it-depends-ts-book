@@ -1,5 +1,93 @@
 # Chapter 20 self-review — Before the First Line
 
+Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**, 2026-10-23.
+
+Manuscript SHA-256:
+`80c6362ecf6930fdb69eb465ee5569e74eae9355be8545e62cab4c457742098a`.
+**2,376 words**, including code; **15 TypeScript fences**.
+[Draft-2 snapshot](ch20/DRAFT2-SNAPSHOT.json). The draft-1 snapshot is unchanged.
+
+`npm ci --offline` and final `npm run check` both **exit 0**, TypeScript **7.0.2**,
+Node **v22.23.3**. Ch20: **15 fences / 21 compiler cases / 18 runtime groups**.
+Whole book: **361 / 478 / 195**, plus two compiler-default cases and two searches.
+The full run followed all manuscript and validator changes; neither changed
+subsequently. `git diff --check` is clean. The local log is
+`.probe/ch20-draft2-full-check.log` and is not committed.
+
+## Response to Claude's draft-1 review
+
+Reviewed [CLAUDE-REVIEW](ch20/CLAUDE-REVIEW.md) and both verbatim reader reports
+from `2076fa2`. The main findings are accepted. One precise type-display suggestion
+is corrected on the book profile, as noted below.
+
+1. **Optional callback parameter.** Noam explicitly limits the assignment check
+   to required parameters, then catches the renderers passing `price` directly to
+   `map`. A printed factory returning an optional-extra-discount function still
+   fits `PriceLine` and produces `100,99,98`. Linoy replaces both renderer bodies
+   with arrows forwarding just the line; the same factory then gives
+   `100,100,100`. These are two new manuscript fences with compiler and runtime
+   cases. The Turn and final count/alternative fixtures use the repaired renderers;
+   the original programs remain to reproduce the pre-repair behavior. The Verdict
+   also names the single-line forwarding obligation.
+2. **Opaque prepared value.** Noam proposes a validated opaque `PreparedPromotion`
+   and `pricePrepared(line, prepared)`. Dima accepts it as a working way to hide
+   representation and validate once. Linoy prefers receiving the function her
+   consumers already need, without the prepared type and a separate evaluation
+   entry point. This is a local preference, not a claim that the opaque alternative
+   is unsafe or repeats preparation. Its fixture has a private constructor and
+   private state, checked creation and consumption, the same 1/3/6 counts and early
+   invalid-input rejection. Constructor access and a forged empty handle are
+   rejected. No memoization or promotion-keyed store was introduced.
+3. **Failure handling.** Cut the return-type sentence that suggested a Result
+   redesign. Dima still makes setup responsible for the thrown validation failure;
+   Noam's existing Verdict line keeps the empty-invalid regression. No extra
+   Result-versus-exception exchange or duplicate test request remains.
+4. **Principle.** It now names and distinguishes currying and partial application,
+   recommends a local arrow for holding an argument, and puts preparation with
+   the package that owns the work. It replaces “call boundary” and “commits to”
+   with the actual calls/work/types involved and explicitly names `map`'s three
+   arguments. Both requested Daniel lines survive. Moving the definitions here
+   frees his debate line for a brief reaction to removing and restoring the arrow.
+5. **Reread snags.** The opening establishes the old one-item fixture. Daniel
+   names `map` as the caller supplying the second argument. Linoy explicitly
+   proposes replacing the two-argument API before Dima objects. Gil supplies a
+   regression-test motive, names the invalid promotion and attributes his reply
+   in the Turn. The narration says the adapter never runs on an empty list.
+6. **Diagnostics and inference.** Error comments now print TS2345/TS2353 only;
+   dialogue explains their meaning. The validator retains exact line/code checks
+   and relevant diagnostic elaborations. The Take describes the inferred union
+   and optional missing properties without copying a flag-dependent display.
+   **Correction to the reader:** with `exactOptionalPropertyTypes: true`, TS7 emits
+   `{ a: number; b?: never } | { a?: never; b: number }`. The suggested optional
+   `undefined` spelling is emitted with that flag false. Both declarations were
+   independently checked in `.probe/draft2-union/`; the durable suite asserts the
+   exact inferred tuple under the book profile. This changes no conclusion about
+   early type inference.
+7. **Narration and economy.** Linoy's ticket now introduces tiers; Dima owns the
+   validated-line premise and private helpers; Gil scopes his own count table.
+   The authorial rounding sentence and the redundant lookup-function exchange
+   are cut. The latter's existing fixture remains a private-representation
+   regression, clearly labelled in the coverage notes. Batch and lazy alternatives
+   remain; Gil's opaque timing remark is removed. No cast member, inference topic,
+   Take or memo-cache discussion was added.
+
+## Recheck scope
+
+The local Verdict, package-versus-consumer ownership, 6-to-1 preparation result
+and setup-time validation choice remain as settled. The self-check finds the
+optional-parameter counterexample and opaque-value comparison answered in the
+scene, rather than hidden in fixtures. This is not an independent reader verdict.
+Claude's new Principle-only reader and targeted full-reader recheck are pending.
+
+The three Claude review/reader files from `2076fa2` remain untouched. The early
+Principle-only reader's stated TypeScript 5 run is not relabelled as TS7 evidence;
+the chapter's compiler/runtime claims use the locked toolchain above.
+
+---
+
+## Historical draft-1 self-review
+
+
 Status: **DRAFT 1 FROZEN; INDEPENDENT REVIEW PENDING**, 2026-10-23.
 
 Manuscript SHA-256:

@@ -24,6 +24,9 @@ const tiered=block("type Tier =");
 const tierRun=block("const promotion: Promotion =");
 const factory=block("function priceWith(promotion:");
 const stored=block("const layout:");
+const optional=block("function priceWithExtra(");
+const repairedRenderers=block("function statement(lines:");
+const safeRenderers=before(renderers,"function statement(")+before(repairedRenderers,"console.log(");
 const empty=block("const invalid:");
 const inference=block("function pair<T>");
 const explicit=block("type Either =");
@@ -36,6 +39,7 @@ const privatePricing=before(tiered,"function lineTotal(");
 const early=lineType+lines;
 const tierBase=lineType+renderers+tiered;
 const stagedBase=lineType+renderers+privatePricing+factory;
+const safeBase=lineType+safeRenderers+privatePricing+factory;
 const scratch=fs.mkdtempSync(path.join(os.tmpdir(),"ts-book-ch20-"));
 const cases=[];
 function program(name,files,codes=[]){
@@ -59,9 +63,17 @@ const optionsError=example("options-reject-index",early+options,[2345]);
 const optionsPrint=example("options-local-and-curried-callers",early+withoutErrors(options)+renderers+local+convenience+"export {lineTotal,lines};\n");
 const localPrint=example("tiers-local-adapter",tierBase+tierRun);
 const stagedPrint=example("tiers-stored-factory-and-checkout",stagedBase+promotion+stored);
-const emptyPrint=example("empty-invalid-report",stagedBase+empty);
+const optionalPrint=example("optional-parameter-passes-unary-type",stagedBase+promotion+optional);
+const repairedPrint=example("renderers-forward-only-the-line",safeBase+promotion+before(optional,"console.log(")+from(repairedRenderers,"console.log("));
+const emptyPrint=example("empty-invalid-report",safeBase+empty);
 const inferError=example("early-type-inference",inference,[2353]);
-const inferApi=example("early-type-inference-explicit-union",withoutErrors(inference)+explicit+"export {pair,pairWith};\n");
+const inferApi=example("early-type-inference-explicit-union",withoutErrors(inference)+explicit+`
+type Equal<A,B>=(<T>()=>T extends A?1:2) extends (<T>()=>T extends B?1:2)?true:false;
+const inferred=pair({a:1},{b:2});
+type InferredItem={a:number;b?:never}|{a?:never;b:number};
+const exact:Equal<typeof inferred,[InferredItem,InferredItem]>=true;
+export {pair,pairWith};
+`);
 const published=stagedBase+"export {lineTotal,priceWith};\n";
 program("preparation-is-private",{
   "pricing.ts":published,
@@ -94,18 +106,18 @@ function counted(source){
 }
 const apiExports="export {prepare,evaluate,lineTotal,promotion,orderLines,statement,preview,resetCounts,readCounts};\n";
 const localApi=example("instrumented-local-adapter",counted(tierBase)+promotion+apiExports);
-const stagedApi=example("instrumented-staged-factory",counted(stagedBase)+promotion+apiExports+"export {priceWith};\n");
+const stagedApi=example("instrumented-staged-factory",counted(safeBase)+promotion+apiExports+"export {priceWith};\n");
 const alternatives=`
-function priceLines(lines:readonly Line[],promotion:Promotion):number[]{return lines.map(priceWith(promotion));}
+function priceLines(lines:readonly Line[],promotion:Promotion):number[]{const price=priceWith(promotion);return lines.map(line=>price(line));}
 function lazyPriceWith(promotion:Promotion):PriceLine {
   let price:PriceLine|undefined;
   return line=>{price ??= priceWith(promotion);return price(line);};
 }
 export {priceLines,lazyPriceWith};
 `;
-const alternativesApi=example("batch-and-lazy-alternatives",counted(stagedBase)+promotion+apiExports+
+const alternativesApi=example("batch-and-lazy-alternatives",counted(safeBase)+promotion+apiExports+
   alternatives+"export {priceWith};\n");
-// A private-representation alternative, not additional manuscript implementation.
+// Retained discovery regression for the private representation, not a printed exchange.
 // The public return type stays PriceLine; the callback closes over a lookup,
 // rather than the Tier array used by evaluate in the printed implementation.
 const lookupFactory=`
@@ -121,9 +133,29 @@ function priceWith(promotion:Promotion):PriceLine {
 `;
 const lookupApi=example("internal-lookup-keeps-public-contract",lineType+renderers+privatePricing+
   lookupFactory+from(factory,"function lineTotal(")+promotion+stored+"export {priceWith,promotion};\n");
-// Abbreviated compiler excerpts printed in the manuscript must occur verbatim.
+// The manuscript now prints codes only; pin the relevant diagnostic elaborations too.
 assert(optionsError.diagnostics[0].message.includes("Type 'number' has no properties in common with type 'Discount'."));
 assert(inferError.diagnostics[0].message.includes("'b' does not exist in type '{ a: number; }'."));
+// Strong alternative raised in prose: an opaque prepared value validates at setup.
+// The class is an implementation detail, with a private constructor and private state;
+// public functions create and consume it. No memoization or promotion-keyed store.
+const opaque=`
+class PreparedPromotion {
+  #tiers:readonly Tier[];
+  private constructor(promotion:Promotion){this.#tiers=prepare(promotion);}
+  static from(promotion:Promotion):PreparedPromotion{return new PreparedPromotion(promotion);}
+  static price(line:Line,prepared:PreparedPromotion):number{return evaluate(line,prepared.#tiers);}
+}
+function preparePromotion(promotion:Promotion):PreparedPromotion{return PreparedPromotion.from(promotion);}
+function pricePrepared(line:Line,prepared:PreparedPromotion):number{return PreparedPromotion.price(line,prepared);}
+`;
+const opaqueBase=counted(lineType+safeRenderers+privatePricing)+opaque+promotion;
+const opaqueApi=example("opaque-prepared-value-validates-once",opaqueBase+
+  "export {preparePromotion,pricePrepared,promotion,orderLines,statement,preview,resetCounts,readCounts};\n");
+example("opaque-value-requires-checked-construction",opaqueBase+`
+new PreparedPromotion(promotion); // Error TS2673
+pricePrepared(orderLines[0],{}); // Error TS2741
+`,[2673,2741]);
 let groups=0;
 function group(name,fn){try{fn();}catch(e){e.message=name+": "+e.message;throw e;}groups++;}
 function run(test,fn){
@@ -160,6 +192,12 @@ group("printed-local-tier-output",()=>{
 group("printed-stored-factory-and-direct-checkout",()=>{
   const expected=printed(stored);assert.equal(expected.length,3);
   assert.deepEqual(run(stagedPrint,()=>{}).output,expected);
+});
+group("optional-parameter-reopens-index-hole",()=>{
+  assert.deepEqual(run(optionalPrint,()=>{}).output,[["100,99,98"]]);
+});
+group("forwarding-arrow-repairs-optional-parameter-hole",()=>{
+  assert.deepEqual(run(repairedPrint,()=>{}).output,[["100,100,100"]]);
 });
 group("printed-empty-invalid-report",()=>{
   assert(empty.includes("// Invalid promotion tier"));
@@ -219,6 +257,14 @@ group("private-lookup-repair-keeps-callers-and-prices",()=>{
     assert.deepEqual([1,2,3,4].map(quantity=>price({unitPrice:100,quantity})),[100,180,240,320]);
   }).output,printed(stored));
 });
+group("opaque-value-matches-factory-counts-and-early-validation",()=>run(opaqueApi,(m,assert)=>{
+  m.resetCounts();const prepared=m.preparePromotion(m.promotion);
+  const price=line=>m.pricePrepared(line,prepared);
+  assert.equal(m.statement(m.orderLines,price),520);assert.equal(m.preview(m.orderLines,price),"100,180,240");
+  assert.deepEqual(m.readCounts(),[1,3,6]);
+  m.resetCounts();assert.throws(()=>m.preparePromotion({tiers:[{minimum:1,percent:101}]}),RangeError);
+  assert.deepEqual(m.readCounts(),[1,1,0]);
+}));
 group("generic-pair-values-with-explicit-union",()=>run(inferApi,(m,assert)=>{
   assert.deepEqual(m.pair({a:1},{b:2}),[{a:1},{b:2}]);
   assert.deepEqual(m.pairWith({a:1})({b:2}),[{a:1},{b:2}]);

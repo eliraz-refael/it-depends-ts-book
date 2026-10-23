@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Daniel Compiler**: "Put a call boundary where a caller has enough information to make something it can use: a result now, or a function for later. If an argument is already known, you can fix it in an arrow and leave the remaining arguments for its caller. That doesn't require changing the original function's API."
+**Daniel Compiler**: "Partial application supplies some arguments now and leaves a function for the rest. Currying turns a function taking several arguments into successive calls taking one argument each. Start with a local arrow when you only need to hold an argument for later. Ask the package to prepare something once when that work belongs inside it; return a function if that's what its consumers need."
 
-"But the first call is still a call. It can do work, throw, and fix type arguments before the next call happens. Check what each call commits to, and what the next caller will actually pass. Splitting the parentheses doesn't make those decisions for you."
+"But the first call is still a call. It can do work and throw. TypeScript can choose type arguments there, before the later arguments arrive. Check each call separately. And check the code that calls your function: `map` passes the element, index and array. Write an arrow if you mean to forward only the element. Splitting the parentheses doesn't make those decisions for you."
 
 ## The Debate
 
@@ -14,7 +14,7 @@
 
 **Dima Bridge**: "There wasn't a promotion on that statement."
 
-Dima maintains the pricing package used by checkout and reporting. Checkout passes a line and its discount together. Reporting calls the same function to price the lines on a statement; omitting the discount means full price. The prices in their small fixture are integer amounts, chosen so no rounding is involved.
+Dima maintains the pricing package used by checkout and reporting. Checkout passes a line and its discount together. Reporting calls the same function to price the lines on a statement; omitting the discount means full price. Gil has expanded the existing one-item test to three identical lines.
 
 ```typescript
 type Line = { unitPrice: number; quantity: number };
@@ -50,7 +50,7 @@ console.log(lines.slice(0, 1).map(lineTotal).join(",")); // 100
 
 **Dima**: "We could make the discount required. Then a caller has to supply it."
 
-**Daniel**: "This caller does supply it. Making the parameter required still compiles."
+**Daniel**: "`map` does supply it. Making the parameter required still compiles."
 
 **Noam**: "I want the shortened call to fail. Keeping the arrow fixes this statement, but the next person can remove it again."
 
@@ -64,7 +64,7 @@ function lineTotal(line: Line, { percent = 0 }: Discount = {}): number {
 }
 
 console.log(lineTotal(lines[0], { percent: 10 })); // 90
-lines.map(lineTotal); // Error TS2345: Type 'number' has no properties in common with type 'Discount'.
+lines.map(lineTotal); // Error TS2345
 ```
 
 **Noam**: "That catches the call I was worried about. The index is still a number. It can't fill that parameter."
@@ -99,11 +99,11 @@ console.log(statement(lines, price)); // 270
 console.log(preview(lines, price)); // 90,90,90
 ```
 
-**Linoy**: "That's what I want the package to return."
+**Linoy**: "That's what I want the package to return. We could replace the two-argument version with a factory."
 
 **Dima**: "You already have that function. Checkout has both arguments. Why should its callers make a function just to call it immediately?"
 
-**Daniel**: "You've partially applied `lineTotal`: fixed the discount and made a function for the line. The original still takes both arguments in one call. Currying changes a multi-argument function into successive calls that each take an argument. You can partially apply a plain function without giving everyone a curried API."
+**Daniel**: "We've removed one arrow and put it back. I'd like to keep this one long enough to use it."
 
 **Linoy**: "I could still offer this. The first call takes the discount and returns the line function. I can call that immediately or give it to the preview."
 
@@ -129,7 +129,7 @@ Linoy looks back at the promotion ticket underneath the refactor.
 
 ### Preparing a promotion
 
-The next promotion gives different discounts for different quantities of a product. Its tiers arrive in no particular order. The package must validate them, order them for lookup, and choose the highest qualifying minimum for each line. This is why a single `percent` is no longer enough.
+**Linoy**: "The next promotion has quantity tiers. Buy more of a product, get a different discount. The saved tiers aren't ordered; we need the highest minimum the line qualifies for."
 
 **Dima**: "That work belongs here. A line with quantity three must get the same tier in checkout and on the statement. Reporting doesn't get to implement another tier search."
 
@@ -166,7 +166,7 @@ function lineTotal(line: Line, promotion: Promotion): number {
 }
 ```
 
-`prepare` and `evaluate` are private to the package. The renderers still receive a `PriceLine`. The lines supplied to pricing already have valid positive quantities and finite nonnegative unit prices; this code checks the promotion's rules. A line below every tier's minimum gets no discount.
+**Dima**: "Lines arrive with positive quantities and finite nonnegative unit prices already checked. I only check the tiers here. Below every minimum, the line stays full price. `prepare` and `evaluate` stay private."
 
 **Linoy**: "Here's the new run. Same two consumers, same arrow."
 
@@ -201,7 +201,13 @@ console.log(preview(orderLines, price)); // 100,180,240
 
 **Dima**: "It can't call our private helper. I'd have to publish the prepared representation, or let it into the package's internals. I don't want its callback depending on how we store the tiers."
 
-**Linoy**: "Then return the callback from here. Do your preparation before returning it."
+**Noam**: "What about a validated, opaque `PreparedPromotion`? Return that from preparation, and let `pricePrepared(line, prepared)` use it. Reporting wouldn't see the tiers either."
+
+**Dima**: "That works. It can validate once and keep the representation private."
+
+**Linoy**: "And I'd still write `line => pricePrepared(line, prepared)` for these renderers. Could you return that function? Then I don't need the prepared type and a separate pricing entry point."
+
+**Dima**: "For these consumers, yes. We can keep the prepared value inside it."
 
 She replaces `discountedBy` with a factory for the new promotion. Dima keeps the direct entry point, delegating to it:
 
@@ -232,7 +238,7 @@ console.log(preview(orderLines, layout.price)); // 100,180,240
 console.log(lineTotal(orderLines[0], promotion)); // 100
 ```
 
-Gil repeats his count for the two reporting calls, excluding that separate checkout call:
+**Gil**: "Here are the two reporting calls. I haven't included that separate checkout call."
 
 | Reporting path | Preparations | Tier validations | Line evaluations |
 |---|---:|---:|---:|
@@ -247,27 +253,51 @@ Gil repeats his count for the two reporting calls, excluding that separate check
 
 **Linoy**: "If I collect all six calls first, that works. These renderers ask for a function and call it when they have their lines. I'd have to change that handoff to give them prices."
 
-**Gil**: "One batch of six ties this count. Two separate batches of three prepare twice. We don't need a timing argument to distinguish them."
+**Gil**: "One batch of six prepares once too. Two separate batches of three prepare twice."
 
-**Noam**, pointing to `layout`: "That's a promise somebody can keep. One line in, number out. If you later need another required argument, this assignment stops compiling."
+**Noam**, pointing to `layout`: "An extra required argument would break this assignment. An optional one wouldn't. And your renderers still pass `price` straight to `map`."
 
-**Dima**: "Which is an extra contract for the package. I can change the prepared tiers, but I have to keep that function callable."
+**Linoy**: "Even with `PriceLine`?"
 
-**Linoy**: "That's the part I need you to keep. You can change the lookup underneath it."
+**Noam**: "It lets me call with one argument. It doesn't stop the implementation accepting more. Suppose the returned function gets an extra discount:"
 
-**Dima**: "Suppose I stop keeping a sorted array and build a lookup function instead. I don't want the array shape to become another thing we have to support."
+```typescript
+function priceWithExtra(promotion: Promotion): PriceLine {
+  const tiers = prepare(promotion);
+  return (line, extraPercent = 0) =>
+    evaluate(line, tiers) * (100 - extraPercent) / 100;
+}
+const equalLines = [orderLines[0], orderLines[0], orderLines[0]];
+console.log(preview(equalLines, priceWithExtra(promotion))); // 100,99,98
+```
 
-**Noam**: "It doesn't leave the package. The layout stores `PriceLine`, not the tiers. Check the replacement against the same quantities and prices. If those change, we have something else to discuss."
+**Linoy**: "I removed the arrow at the package call and left the same shortcut inside both renderers. I'll make them pass only the line."
+
+She replaces their implementations:
+
+```typescript
+function statement(lines: readonly Line[], price: PriceLine): number {
+  return lines.map(line => price(line)).reduce((total, value) => total + value, 0);
+}
+
+function preview(lines: readonly Line[], price: PriceLine): string {
+  return lines.map(line => price(line)).join(",");
+}
+
+console.log(preview(equalLines, priceWithExtra(promotion))); // 100,100,100
+```
+
+**Dima**: "The package still owes you a function that works when called with one line. But that type doesn't restrict what `map` passes."
 
 ## The Turn
 
-**Gil**: "The empty statement changed."
+**Gil**: "I added an empty list to the regression test, with an invalid promotion. The adapter returned zero. The factory threw."
 
-**Linoy**: "From zero to what?"
+**Linoy**: "Before the renderer ran?"
 
-"It doesn't get that far."
+**Gil**: "Before it got a function to call."
 
-The old adapter was never invoked on an empty list. The factory prepares before either renderer sees a line. Gil uses a promotion whose percentage is outside the allowed range:
+On an empty list the adapter never runs, so nothing validates. Gil uses a percentage outside the allowed range:
 
 ```typescript
 const invalid: Promotion = { tiers: [{ minimum: 1, percent: 101 }] };
@@ -296,8 +326,6 @@ try {
 
 **Dima**: "Then create the pricing function at promotion setup. Reporting must handle the error there, before either renderer starts."
 
-**Noam**: "And say the factory can reject the promotion. Its return type only describes the function you get if it succeeds."
-
 **Gil**: "A valid empty run still prepares once. It prices nothing."
 
 **Linoy**: "That's okay. Setup has work now. I was treating it as a shorter way to write the arrow."
@@ -306,7 +334,7 @@ try {
 
 **Dima**: "We'll publish `priceWith` for the tiered promotion. It validates and prepares at the call, then returns the unary pricing function. Checkout keeps `lineTotal`. Both use the same calculation."
 
-**Linoy**: "I'll create it when reporting accepts the promotion and give that function to the layout. The preview and statement can call it without doing the preparation again."
+**Linoy**: "I'll create it when reporting accepts the promotion and give that function to the layout. The preview and statement will pass it just the line, without doing the preparation again."
 
 **Noam**: "Keep the empty invalid run in the tests. If somebody moves the check back into the returned function, the prices alone won't tell us."
 
@@ -322,11 +350,13 @@ function pair<T>(first: T, second: T): [T, T] {
 }
 const pairWith = <T>(first: T) => (second: T): [T, T] => [first, second];
 
-pair({ a: 1 }, { b: 2 }); // Accepted: both arguments participate in inference.
-pairWith({ a: 1 })({ b: 2 }); // Error TS2353: 'b' does not exist in type '{ a: number; }'.
+pair({ a: 1 }, { b: 2 }); // Accepted.
+pairWith({ a: 1 })({ b: 2 }); // Error TS2353
 ```
 
-**Linoy**: "The first call already chose `{ a: number }`. If I want either shape, I can give that call a union."
+**Daniel**: "The two-argument call infers a union, marking the missing property optional in each member. `pairWith` has chosen `{ a: number }` before it sees `b`."
+
+**Linoy**: "If I want either shape, I can give that first call a union."
 
 ```typescript
 type Either = { a: number } | { b: number };

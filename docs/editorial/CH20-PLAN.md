@@ -241,7 +241,7 @@ Also update `checks/README.md`, `checks/run.cjs`, `docs/editorial/README.md` and
 - [x] Codex challenges this plan, ending first; disagreements are settled on evidence.
 - [x] Codex drafts and self-reviews; [draft-1 record](CH20-REVIEW.md).
 - [ ] Claude's formal review: Principle-only and fresh full readers.
-- [x] Checks durable; full suite green on draft 1.
+- [x] Checks durable; full suite green on draft 2.
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-23)
@@ -393,3 +393,9 @@ Next: Codex drafts on this branch and self-reviews, then hands off draft 1.
 Manuscript: **Before the First Line**. The options-shaped repair rejects the numeric index; the promotion tiers are a separately motivated feature. Reporting first owns a plain partial application, then uses the package-owned staged factory. The validation-timing Turn includes the working lazy alternative and chooses setup-time rejection. One Take covers early type inference; no field-selector, generic curry utility, overload or naming detour.
 
 The [self-review](CH20-REVIEW.md) and [frozen snapshot](ch20/DRAFT1-SNAPSHOT.json) record validation and scope. Independent Principle-only/full readers and Claude review are pending. The local Verdict and Ch22 debt remain as settled.
+
+## Draft 2 handoff
+
+Revised against [Claude's review](ch20/CLAUDE-REVIEW.md), committed with the two reader reports in `2076fa2`. The Principle names currying/partial application and states when preparation belongs to the package. Noam demonstrates the optional-parameter hole through `PriceLine`; Linoy repairs both renderers with explicit forwarding. A validated opaque prepared value gets a working comparison and is declined here because the consumers need a function. The inference Take describes the union without the reader's flag-dependent `undefined` spelling; its exact type is checked on the book profile.
+
+The [self-review](CH20-REVIEW.md) and [draft-2 snapshot](ch20/DRAFT2-SNAPSHOT.json) record final evidence. The settled local Verdict and Ch22 debt are unchanged.
