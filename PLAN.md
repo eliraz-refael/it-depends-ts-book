@@ -10,7 +10,7 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 ## Current Phase: Act III — Patterns & Design
 
-**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all nineteen completed chapters. Recheck the stable release and rerun the full suite before publication.
+**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all nineteen completed chapters and the Chapter 20 draft. Recheck the stable release and rerun the full suite before publication.
 
 Act II is complete. Chapter 14 opens Act III with **error handling** and is drafted, jointly reviewed and checked. Chapter 15, **branded types**, is drafted, jointly reviewed and checked, including isolated Principle-only and full-reader reviews.
 
@@ -24,7 +24,7 @@ Chapter 16, **runtime validation**, is complete and merged as PR #16 after indep
 - [x] Ch17: `04-immutability.md` — historical snapshots, live views and checked pricing updates; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #19
 - [x] Ch18: `05-pure-functions.md` — hidden inputs, required observations and cache boundaries; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #20
 - [x] Ch19: `06-imperative-vs-declarative.md` — sequence rules a rewrite must keep; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #21
-- [ ] Ch20: `07-currying-partial-application.md` — argument shape for callers who fix arguments ahead of time; [plan](docs/editorial/CH20-PLAN.md) settled after Codex's challenge and a bounded ending round; local Verdict; drafting
+- [ ] Ch20: `07-currying-partial-application.md` — argument shape for callers who fix arguments ahead of time; [plan](docs/editorial/CH20-PLAN.md) settled after Codex's challenge and a bounded ending round; local Verdict; draft 1 and compiler/runtime checks complete, independent readers and joint review pending
 - [ ] Act III debt: at least one honest "The Debate Continues" chapter, with demonstrated conditions; moves to Ch22 after Ch20's bounded ending round converged
 
 ### Completed Act II work
@@ -168,7 +168,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Scaffolding + Prologue      | Done            |                       |
 | Act I: The Type System      | Done            | 6 chapters; calibrated voice passes complete |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
-| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–19 reviewed, checked and merged (6 of 10); Ch20 planned |
+| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–19 reviewed, checked and merged (6 of 10); Ch20 draft 1 checked, review pending |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |

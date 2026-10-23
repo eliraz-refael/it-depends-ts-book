@@ -1,0 +1,84 @@
+{
+  "status": "draft 1 frozen; independent readers and formal review pending",
+  "date": "2026-10-23",
+  "settled_plan_commit": "15b0325",
+  "path": "book/03-patterns-and-design/07-currying-partial-application.md",
+  "sha256": "b75fc8a61ea816007359b7780814c324c613dddff9cbcee8fb9ee264be2d05aa",
+  "manuscript_mtime_utc": "2026-10-23T12:33:15.333102+00:00",
+  "words": 2309,
+  "typescript_fences": 13,
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "sha256": "386f14951e99c820dcbce35d993bb39d55c95cbfa736eab25c813eb1a9deb550"
+    },
+    {
+      "ordinal": 2,
+      "sha256": "ebd6b574d9cc0badb5f223d9bc61817ba16aaaba11da2ae6d8b4c0daf320021a"
+    },
+    {
+      "ordinal": 3,
+      "sha256": "386f97b56f955f3c8ecbc589f32d6ea6c362cc0df260333afde80ebf7cc135ba"
+    },
+    {
+      "ordinal": 4,
+      "sha256": "2f7990f3e176ac6cc3c37582c7806339ec740989e0b3eed5a5d2bba7df4dd653"
+    },
+    {
+      "ordinal": 5,
+      "sha256": "6ffedc1257a34466773d1153615a5835946528f20cc85c7303503ae4e0a5db15"
+    },
+    {
+      "ordinal": 6,
+      "sha256": "357b9d3741dee901436e203478ff1db772a86dbed41401145d09eaf270217856"
+    },
+    {
+      "ordinal": 7,
+      "sha256": "91af7d693611cadd6ca458ccca5c095c74d47520b32725d87d010f65cc614ee9"
+    },
+    {
+      "ordinal": 8,
+      "sha256": "6efdcb2752c8f0f19a1e894bc57fb21c59ec6567e1a48aef2877b1fc7f72269d"
+    },
+    {
+      "ordinal": 9,
+      "sha256": "e18c9484aeaa95cd652b1f941d4e2f17b0107e86b9d32cff0bec64b77d97b7f8"
+    },
+    {
+      "ordinal": 10,
+      "sha256": "e5b8a619660cc1b385e6f20f8a36e0789e1188be297ca04b21226f2e6088305f"
+    },
+    {
+      "ordinal": 11,
+      "sha256": "d7a6edf1854275e9cbd79f6780d9d447462ba6272a0252606704547ac93853d7"
+    },
+    {
+      "ordinal": 12,
+      "sha256": "80658b21329108fbee37d143c97c0a3cb22c7cf5e1af9b1043b3e92104e287f3"
+    },
+    {
+      "ordinal": 13,
+      "sha256": "0e2e07b13824884f75afe44fe877a88e6af615aaccc4087878415c8e5ed94261"
+    }
+  ],
+  "validator_sha256": "8542e325859747774f5ea82595da4fc1f1057be1dbaa04dbf381018bdc5a5125",
+  "typescript": "7.0.2",
+  "node": "v22.23.3",
+  "validation": {
+    "install": "npm ci --offline: exit 0",
+    "full_suite": "npm run check: exit 0 on final manuscript and validator; no subsequent edits to either",
+    "chapter_counts": {
+      "fences": 13,
+      "compiler_cases": 17,
+      "runtime_groups": 15
+    },
+    "book_counts": {
+      "fences": 359,
+      "compiler_cases": 474,
+      "runtime_groups": 192,
+      "default_cases": 2,
+      "searches": 2
+    }
+  }
+}

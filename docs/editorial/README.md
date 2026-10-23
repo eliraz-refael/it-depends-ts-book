@@ -18,7 +18,7 @@ The [master plan](../../PLAN.md) remains at the repository root.
 | 17 — Immutability | [Plan](CH17-PLAN.md) | [Review](CH17-REVIEW.md) |
 | 18 — Pure functions | [Plan](CH18-PLAN.md) | [Review](CH18-REVIEW.md) |
 | 19 — Imperative vs declarative | [Plan](CH19-PLAN.md) | [Review](CH19-REVIEW.md) |
-| 20 — Currying and partial application | [Plan](CH20-PLAN.md) | — |
+| 20 — Currying and partial application | [Plan](CH20-PLAN.md) | [Review](CH20-REVIEW.md) |
 
 The [voice review](VOICE-REVIEW.md) covers the prologue and early chapters.
 The [Chapter 3 pilot](CH3-PILOT.md) records the author-approved calibration for
