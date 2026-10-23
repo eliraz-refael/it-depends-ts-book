@@ -1,6 +1,6 @@
 # Chapter 20 — Currying and Partial Application (working title)
 
-Status: **PROPOSED**, 2026-10-23. Awaiting Codex's challenge.
+Status: **CHALLENGED; ENDING UNDER A BOUNDED DESIGN ROUND**, 2026-10-23. The settlement at the end governs the original proposal.
 Branch: `codex/chapter-20-currying`, based on `origin/main` `388d9d8`.
 File: `book/03-patterns-and-design/07-currying-partial-application.md`.
 
@@ -238,8 +238,102 @@ Also update `checks/README.md`, `checks/run.cjs`, `docs/editorial/README.md` and
 
 ## Completion
 
-- [ ] Codex challenges this plan, ending first; disagreements are settled on evidence.
+- [x] Codex challenges this plan, ending first; disagreements are settled on evidence.
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only, fresh full and ending-only readers.
 - [ ] Checks durable; full suite green.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-23)
+
+Codex's [challenge](ch20/CODEX-PLAN-CHALLENGE.md) is accepted. Where this section conflicts with the
+proposal above, this section governs.
+
+**1. The candidate ending converges, and the plan's two escape hatches don't hold.**
+- **The brand repairs the incident for both callers.** It's constructed once per reporting run, not
+  once per line. The plan can't charge it "every numeric parameter in the module", because no other
+  exposed parameter is established.
+- **An options-shaped second parameter** also rejects the callback, without a brand.
+- **Both exports can delegate to one body,** and passing the wrong factory to `map` is a TS2345
+  here. So the "wrong export recreates the bug" story is unsupported.
+- **The real lesson is Codex's:** currying a public API and partially applying a plain function are
+  two different decisions. A local named adapter is partial application. The chapter teaches that
+  distinction explicitly.
+
+The fallback (mechanism 4) also converges: contextual inference (`orders.map(pick2("total"))`), a
+structural selector and a once-bound `field<Order>()` answer it. It stays as teaching material,
+not as the ending.
+
+**2. One bounded design round for the ending, then a decision.** Codex tests the disputed decision it
+proposes: *does the shared package promise a partially applied entry point, or do consumers own
+their adapters?* Codex's own conditions in §3 are the pass criteria:
+- reporting has a repeated adaptation the shared helper removes, shown on the page;
+- the package owner has a maintenance obligation from publishing it, also shown;
+- the compromise ("publish only the helper with demonstrated demand, keep other adapters local") is
+  tried in the scene, and fails to satisfy one owner's stated requirement.
+
+**A variant worth testing, which gives the helper more than a one-line adapter's worth:** a *staged*
+factory. `priceWith(promotion)` does per-promotion work once (validating it, preparing its tiers)
+and returns the per-line function. A consumer can't write that adapter without the package's
+internals, so a "consumers own adapters" answer has a real cost. Publishing it also publishes the
+returned function's type, which consumers store and pass on, and that may be the package owner's
+real obligation. Counts only (how many times the preparation runs), no timing. Keep clear of Ch17's
+snapshot-versus-live question: if the variant turns on whether a stored function sees a changed
+promotion, it's Ch17's ground and is out.
+
+**The kill rule.** If neither form passes all three criteria, Ch20 ends in a local Verdict, and Act
+III's open-ending debt moves to **Ch22 (configuration to function)**. That isn't a default move:
+Ch22's subject has two owners by nature (people who edit and audit configuration as data, and
+engineers who need a function's full power). Its plan would choose the decision and its conditions
+up front, as this one did. I'd rather move the debt once more, to a chapter that holds it, than
+ship a staged dispute here.
+
+**3. Principle:** Daniel, in the call-boundary direction of Codex's §5, not the proposal's text.
+- A call boundary goes where a caller has enough to make something it can use: a result now, or a
+  function for later.
+- Check what each call fixes (values and type arguments) and what the eventual caller will pass.
+- A plain function can be partially applied without making every caller use a curried API.
+
+**Teach the syntax distinction first:**
+- currying splits one argument list across calls;
+- partial application fixes some arguments and returns a function for the rest;
+- `discountedBy` also *reorders* the direct function's arguments, which is a separate choice.
+
+A hand-written factory comes before any generic `curry2`.
+
+**The reader cases stand, with Codex's correction:** the `map` index case, data-last inference *in
+a stated context*, the explicit-type-argument case and the transfer case.
+
+**4. Scenario.**
+- **Keep the pricing incident as the opening:**
+  - one-line fixtures hide the bug, and three equal prices expose it;
+  - the ordinary statement, its expected total and the owner of `lineTotal` come before the
+    shortened callback;
+  - small integers, with no money rounding.
+- **Cut "the tidy-up is what the book's declarative lean recommends".** Ch19 requires preserving
+  what the caller gets. The author is competent because they saw a familiar-looking wrapper and
+  missed the callback's extra arguments.
+- **The census, if one is used,** counts caller snippets already printed. No thousands of closures:
+  the factory runs once before `map`.
+
+**5. Cast:** Daniel, Linoy (reporting's reusable API), Dima (checkout and the package's obligations;
+he defends that work, he doesn't mediate), Noam (the scalar repair) and Gil (reproduction; separating
+counts from preferences). Liron replaces a role only if the redesign needs his distinction.
+
+**6. Budget.**
+- **The spine:** the direct call, a reusable unary function, and the strongest repair.
+- **Inference:** one issue at most, and only if the real shared API needs it.
+- **Cut:** the predicate factory (mechanism 6).
+- **Overload loss or naming:** one Take at most.
+- **Also add,** for the Principle or one Take: Codex's early-fixing finding,
+  `curry2(pair)({ a: 1 })({ b: 2 })` gives TS2353 where `pair({ a: 1 }, { b: 2 })` compiles.
+
+**7. The ending-only reader, as Codex corrects it:**
+- Ask it to find a neglected alternative that satisfies both owners' stated requirements.
+- Ask it to restate the cost each owner declines.
+- Failure is an unanswered resolution, or a disagreement the text can't explain. A reader merely
+  having a preference is not failure.
+
+**Next:** Codex runs the bounded design round (§2) in `.probe/`. It writes a short
+`ch20/CODEX-ENDING-PROBE.md` with the scene-level evidence for each criterion, or the kill, and
+then waits for my decision before drafting.
