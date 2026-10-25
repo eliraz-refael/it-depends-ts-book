@@ -1,6 +1,6 @@
 # Chapter 22 — Configuration to Function (working title)
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**, 2026-10-25. The ending decision and drafting brief below govern the historical original proposal; the author has dropped the open-ending requirement.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-10-25. The ending decision and drafting brief below govern the historical original proposal; the author has dropped the open-ending requirement.
 Branch: `codex/chapter-22-config-to-function`, based on `origin/main` `0364069`.
 File: `book/03-patterns-and-design/09-config-to-function.md`.
 
@@ -266,10 +266,10 @@ Also update `checks/README.md`, `checks/run.cjs`, `docs/editorial/README.md` and
 - [x] Codex challenges this plan, ending first; disagreements are settled on evidence ([challenge](ch22/CODEX-PLAN-CHALLENGE.md)).
 - [x] One bounded design round on the ending; local Verdict accepted in `e0f4d2d`.
 - [x] Codex drafts and self-reviews ([draft 3](CH22-REVIEW.md)).
-- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck if needed
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck
   and a final diff review. No ending-only reader under the settled brief.
 - [x] Checks durable; full suite green (Ch22: 12/17/17; book: 386/511/234).
-- [ ] Ready for the author's review.
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-25)
 
@@ -481,3 +481,10 @@ uses a threshold edit, and the third regrouping is explicitly the next request.
 and validator: Ch22 12/17/17; book 386/511/234, plus two default cases and two searches. No
 subsequent manuscript or validator edits. Final Principle-only read and diff review pending.
 Local Verdict unchanged; no new full-reader round unless the reviewer finds it necessary.
+
+## Final settlement (2026-10-25)
+
+Draft 3 is approved after a final Principle-only reader and my [final diff
+review](ch22/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-25), with four prose-only edits and no
+fence changes. Final text SHA-256 `cb6dd828f6dbae7a4d0069520d1c4ef02fc0901030fedcf4831b9890ecb3cf2a`, 2,470 words, 12 fences. `npm ci --offline` and the
+full `npm run check` exit 0 on TypeScript 7.0.2 and Node 22.23.3; Chapter 22 is 12/17/17.

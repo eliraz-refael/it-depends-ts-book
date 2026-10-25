@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Liron Closure**: "Before you turn configuration into a function, find everyone who uses it. If every caller only calls it, a function is fine. But someone may need to save, edit or explain it later. Lisp let me treat code as data. JSON won't keep a JavaScript function. Save a description and let code read it and make the decision. That code is your evaluator. Or record the name of the exact code that made the decision, plus its parameters. Keep that code so you can rerun old decisions. Then test the round trip: save it, load it, and apply the same recorded input with the same evaluator version. Does it make the same decision?"
+**Liron Closure**: "Before you turn configuration into a function, find everyone who uses it. If every caller only calls it, a function is fine. But someone may need to save, edit or explain it later. Lisp let me treat code as data. JSON won't keep a JavaScript function. Save a description and let code read it and make the decision. That code is your evaluator. If the decision has to stay in code, record the name of the exact code that made it, plus its parameters, and keep that code so you can rerun old decisions. Then test the round trip: save it, load it, and apply the same recorded input with the same evaluator version. Does it make the same decision?"
 
-"For the next change, ask what kind of change it is. A new parameter value? Its author can edit the data. A combination the format already permits? A rule's author can write it. If engineers write the combinations as named templates, another combination needs an engineer. Or a new operation? An engineer must implement it in either design. When you load old stored values, parse them and preserve their old meaning or reject them. Editing a type won't do that job."
+"For the next change, ask what kind of change it is. A new parameter value? Its author can edit the data. A combination the format already permits? A rule's author can write it. If engineers write the combinations as named templates, another combination needs an engineer. Or a new operation? An engineer must implement it either way. When you load old stored values, parse them and preserve their old meaning or reject them. Editing a type won't do that job."
 
 ## The Debate
 
@@ -310,7 +310,7 @@ Gil has the policy requests from the past three months, including the open ticke
 | 2 | Existing conditions, new grouping | Add the large-total branch to country-and-velocity |
 | 1 | New condition | Add refund velocity to the total check |
 
-**Gil**: "Both versions handle the six parameter changes in the console. Both need us to implement a new condition. The two regroupings are the difference."
+**Gil**: "Both designs handle the six parameter changes in the console. Both need us to implement a new condition. The two regroupings are the difference."
 
 **Dafna**: "One of those is this ticket. Until the template is loaded, the country-and-velocity rule still lets large orders through."
 
@@ -338,7 +338,7 @@ Gil has the policy requests from the past three months, including the open ticke
 
 **Eden**: "Agreed. The service takes named templates for now, and will still read them when we add trees. Every decision logs the loaded evaluator version, the settings and the order facts, whichever format we accept."
 
-The existing reader validates the saved template name and parameters, and handles the version-1 window. The order consumer receives a function after that boundary:
+The existing reader validates the saved template name and parameters, and handles the format-1 window. The order consumer receives a function after that boundary:
 
 ```typescript
 declare function readSavedTemplate(input: unknown): Template;

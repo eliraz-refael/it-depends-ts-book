@@ -1,6 +1,6 @@
 # Chapter 22 self-review — The Policy's Alibi
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**, 2026-10-25.
+Status: **JOINTLY APPROVED**, 2026-10-25, after Claude's [final diff review](ch22/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-25) and four prose-only settlement edits. Final text SHA-256 `cb6dd828f6dbae7a4d0069520d1c4ef02fc0901030fedcf4831b9890ecb3cf2a`, 2,470 words; the fence extract is byte-identical to draft 3.
 
 [Manuscript](../../book/03-patterns-and-design/09-config-to-function.md): **2,464 words**, including code; **12 TypeScript fences**. SHA-256: `8f2ecb7c9e11f78a6a71ea09ff5f29c7488d9100e74ac668a08624e75d5b093d`.
 [Draft-3 snapshot](ch22/DRAFT3-SNAPSHOT.json). Earlier snapshots and Claude's verbatim reader reports are unchanged.

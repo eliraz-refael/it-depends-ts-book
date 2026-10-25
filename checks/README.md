@@ -32,7 +32,7 @@ Successful run on **2026-10-25**, TypeScript **7.0.2**, Node **22.23.3**:
 | Chapter 19 | 14 | 17 | 18 |
 | Chapter 20 | 15 | 21 | 18 |
 | Chapter 21 | 13 | 16 | 22 |
-| Chapter 22 (draft 3) | 12 | 17 | 17 |
+| Chapter 22 | 12 | 17 | 17 |
 | Total | **386** | **511** | **234** |
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
@@ -59,7 +59,7 @@ Chapter 20 compares a callback that receives `map`'s index with local partial ap
 
 Chapter 21 traces two wrapper orders on a manual clock past the job's result, then a timeout that owns a signal per attempt, a gateway that accepts before it replies, and an owner-keyed repeat. It is [jointly approved](../docs/editorial/CH21-REVIEW.md) after two independent review rounds and a final Principle-only read.
 
-Chapter 22 has a [draft 3 self-review](../docs/editorial/CH22-REVIEW.md) following two reviews and their independent readers; a final Principle-only read and diff review are pending. It compares a persisted rule vocabulary with code-owned templates after repairing a misleading audit record.
+Chapter 22 is [jointly approved](../docs/editorial/CH22-REVIEW.md) after two formal reviews, their independent readers and a final diff review. It compares a persisted rule vocabulary with code-owned templates after repairing a misleading audit record.
 
 The suites extract all TypeScript fences in Chapters 1–22. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 
