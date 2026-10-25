@@ -1,6 +1,6 @@
 # Chapter 22 — Configuration to Function (working title)
 
-Status: **PROPOSED**, 2026-10-25. Awaiting Codex's ending-first challenge.
+Status: **CHALLENGED; BOUNDED ROUND SET**, 2026-10-25. The settlement at the end governs the original proposal.
 Branch: `codex/chapter-22-config-to-function`, based on `origin/main` `0364069`.
 File: `book/03-patterns-and-design/09-config-to-function.md`.
 
@@ -263,10 +263,102 @@ Also update `checks/README.md`, `checks/run.cjs`, `docs/editorial/README.md` and
 
 ## Completion
 
-- [ ] Codex challenges this plan, ending first; disagreements are settled on evidence.
+- [x] Codex challenges this plan, ending first; disagreements are settled on evidence ([challenge](ch22/CODEX-PLAN-CHALLENGE.md)).
 - [ ] One bounded design round on the ending, if the challenge calls for one.
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only, fresh full and ending-only readers, a targeted recheck
   and a final diff review.
 - [ ] Checks durable; full suite green.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-25)
+
+Codex's [challenge](ch22/CODEX-PLAN-CHALLENGE.md) is accepted. Where this section conflicts with the
+proposal above, this section governs.
+
+**1. The ending isn't open yet, and the plan's costs were partly false.**
+- **The dry run works.** A representative replay catches the `any`/`all` mistake before activation.
+  Dafna gets that repair without qualification, and the caught mistake can't also be the data
+  design's last unrepaired cost.
+- **A wrong combination compiles in both representations** (`any`, `||`). TypeScript's win is a
+  missing field or kind at a checked use, not a correct business rule.
+- **Migration is a shared cost.** Code-owned parameters are stored too, and a versioned reader that
+  supplies `days: 7` for version-1 records repairs both. Mechanism 6 stays, restricted to "literals
+  fail to compile; persisted values need parsing and a compatibility decision". It isn't Eden's
+  winning argument.
+- **Hot-loaded engineer-written policy removes the service release.** Eden offers it himself. His
+  remaining cost is authorship or approval, not a release.
+- **Console-generated TypeScript is still the data design** with another executor. Interpreter vs
+  generated code is incidental.
+
+**The surviving decision** is Codex's: *what the console lets an analyst author.* Either analysts
+compose an approved vocabulary of conditions with `all`/`any`, or they tune parameters and choose
+among named templates that engineers write.
+
+**2. One bounded round, with Codex's three conditions plus one.** Test the request
+`large total OR (country FR AND refund velocity)`, whose risk reason is established before any
+implementation, against both repaired proposals:
+- **Dafna:** a bounded vocabulary with composable `all`/`any`, parsed and versioned, replayed before
+  activation. No arbitrary JavaScript.
+- **Eden:** code-owned named predicates with parsed, versioned parameters in a separately checked,
+  hot-loaded policy artifact, and a working template for this request.
+
+Both get the same input facts, activation checks, reason identifiers, audit record and known-version
+migration.
+
+**The pass criteria:**
+1. **A real gain for the console owner** after the hot-load repair: the grouping is authored without
+   an engineer writing a predicate. Show the authorship step that still matters; don't count one wait
+   twice.
+2. **A real cost for the service owner** after replay and versioning: the general shape it now
+   promises to support, such as the recursive rule type and its explanation behaviour. Give the
+   template design its simpler shape. No inflated "giant language".
+3. **The best restricted hybrid still asks someone to give something up.** Add the template for this
+   request and let it work. Then ask whether the interface promises analyst-authored combinations or
+   only the named options.
+4. **(Added.) The deferral is tried in the scene:** "templates now, and the general editor when a
+   third recombination arrives". It must fail one owner's *stated* requirement, stated before the
+   ending by someone with the authority to state it. This is the Ch20 compromise test, and I expect
+   it to be the likeliest convergence. If both owners can live with it, that's the local Verdict.
+
+**Authority.** Dafna owns the console and represents the analysts' change process. Eden owns the
+service and its supported authoring surface. The interface between their systems is theirs to decide
+together, which is what makes the decision belong to the room. Neither is the risk-policy owner, and
+the chapter mustn't imply that a regulation requires either design.
+
+**The kill rule stands as changed.** If the repaired requirements converge, write the local Verdict,
+and I'll take the debt to the author. It doesn't move to Ch23.
+
+**3. Incident: the in-memory enriched policy.** Parameters load as data. An engineer attaches a
+working hold predicate for evaluation, and it passes the behaviour test. The audit log promises a
+complete account of the active policy, which is established before the save, and records JSON
+that two different runtime policies share. Eden's repair is a record naming the code version, its
+parameters and the input facts. The data design gets one clause pinning its evaluator version too.
+No event-sourcing framework. The Turn candidate is Codex's: once the audit is repaired, *who gets to
+change the next grouping?*
+
+**4. Claims.**
+- **The threshold:** "three refunds in seven days" is `count: 2` with `>`, or `>= 3`, used
+  consistently.
+- **`Json` is a static check** at a visible boundary, not a runtime guarantee. Don't claim every copy
+  or diff treats a function as invisible.
+- **Clone and source text are at most one small Take.** Source text is not the captured
+  environment, and that doesn't disprove versioned code.
+- **The chapter reaches "configuration to a function".** The consumer obtains a callable over the
+  accepted configuration (`order => evaluate(rules, order)`) in one line, without re-teaching Ch20.
+
+**5. Principle: Liron, in Codex's §5 direction.** Follow the value through its consumers. Test the
+round trip against the same input under the recorded evaluator version. Classify the requested
+change: a parameter, a combination the format permits, or a new operation. Drop "a function earns
+its place when only code can do it" (an evaluator is code too) and "invisible to anything that
+treats it as data". Codex's answers to the four reader cases are the pass key.
+
+**6. Cast and budget:** Liron, Dafna, Eden, Chen, Sahar and Gil. Gil is confined to the census and
+what it doesn't establish. No Daniel or Idan. Sahar offers the named-template repair and the
+deferral. Chen may accept an answer. Show Dafna's and Eden's responsibilities before their
+preferences. 12–14 fences, with the census used once to delimit the question (6 / 2 / 1), not to
+answer it.
+
+**Next:** Codex runs the bounded round in `.probe/` and writes `ch22/CODEX-ENDING-PROBE.md` with
+scene-level evidence for each of the four criteria, or the kill. Then it waits for my decision before
+drafting.
