@@ -145,3 +145,73 @@ Codex revises to draft 3. Update the checks for:
 Run `npm ci --offline` plus the full `npm run check`, freeze `ch21/DRAFT3-SNAPSHOT.json`, and commit
 locally with these records. Then I'll run a Principle-only reader on the revised Principle and do the
 final diff review.
+
+## Final diff review (2026-10-25)
+
+Draft 3 (`50905ab9…`, `7efd917`) addresses every finding above. Its only fence change is the opening
+output comment.
+- **The Verdict's fallback matches the job's requirement.**
+  - At the Turn, Oded stops retrying timeouts and retries only a temporary failure the client proves
+    didn't send, like a refused connection.
+  - Guy says what the client can and can't clear.
+  - The Verdict names the predicate: never a timeout or a lost reply.
+  - The checks pin refused-then-success, bounded refusals and refusal-then-timeout.
+- **The Principle defines its terms.** It says whom to ask (the operation's owner), what counts (a key
+  the operation honours), and which failures are ambiguous (a timeout, a lost reply). "Retry it anyway
+  and…" replaces the misreadable "Otherwise". It says plainly that the compiler accepts a detached
+  method.
+- **`RetryingSender` is declined on the scenes' evidence.** Idan names the shared caller signal and the
+  missing `shouldRetry`, and Guy names the repairs it would need. The object keeps its real strength
+  for callers that need `Sender`. Oded's decline is local.
+- **The line-level list is fixed:**
+  - Oded's repeat is cut;
+  - "Leave that test in" / "The test, yes" settles `sendWithinBudget`;
+  - Idan's "We need both fixes before this ships" says why the running requests come first;
+  - "keep" is thinned;
+  - the per-attempt key, "rethrows", the comment, the Take's opening and the Verdict's "called through
+    its instance" are all fixed.
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md) applied the rule correctly to all
+four cases,** checking them with the book's compiler and Node.
+- **The unknown `chargeCard`:** it asked the owner for a guarantee, removed the blanket retry without
+  one, and reported "unknown" for a timeout.
+- **The two orders:** it followed the call in and the failure out. It found the per-attempt and
+  whole-wait meanings, the overlapping attempts, and the loop that outlives the caller.
+- **The overloads:** it found the lost string overload, with TS2345.
+- **The debounced method:** it found the lost receiver, compiler-accepted even with `this:`, and the
+  skipped saves.
+
+It stumbled on two phrases: where the key comes from, and whether "can retain only the last overload"
+is a hedge.
+
+**My three prose-only settlement edits** (no fence changes; the fence extract is byte-identical to
+draft 3):
+1. "such as a key the operation honors to prevent duplicate work" now reads "a key the operation
+   honors on every attempt". The chapter's point that a new key per attempt is a new message is now in
+   the rule.
+2. "can retain only the last overload" now reads "keeps only the last overload". Inference from an
+   overloaded function uses its last signature; it isn't a hedge.
+3. Gilad's "A connection error in a log isn't proof that nothing was sent", which came right after
+   Guy says the client can prove a refused connection, read as contradicting him. It now reads "A
+   connection error in a log isn't that proof."
+
+**Not adopted from the final reader:**
+- **A typed "unknown" outcome.** The job returns a label, and Ch14 owns result representation.
+- **Naming "idempotency".** "Repeating it is safe" is the chapter's plainer term.
+- **The overload remedy, and debounce's `void` result.** As in the earlier reviews.
+- **Whether the retry loop must also check the signal.** That's the late-rejection case, and the
+  settlement kept it out of the page.
+- **The opening definition.** A Principle-only reader needs it.
+
+**Final text:** SHA-256 `3b397da160e5d0dd386a8d0712261198bf1d158606a554916abbde6669215ca7`, 2,523
+words, 13 fences, fence extract byte-identical to draft 3. `npm ci --offline` and the full
+`npm run check` exit 0 on TypeScript 7.0.2 and Node 22.23.3. Chapter 21 is 13/16/22.
+
+**Approved.** The ending is a local Verdict:
+- one named composition with a fresh two-second timeout per attempt;
+- the timeout supplies a signal, and the client uses it;
+- retry repeats only the owner's keyed `sendOnce`, with the same notice ID on every attempt;
+- exhausted temporary failures are recorded as unconfirmed, and reconciliation looks them up;
+- without a repeat-safe operation, retry only failures the client proves didn't send.
+
+Ch22 keeps Act III's open-ending debt.

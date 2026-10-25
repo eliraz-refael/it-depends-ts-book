@@ -1,6 +1,6 @@
 # Chapter 21 self-review — The Message Kept Going
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READ AND DIFF REVIEW PENDING**, 2026-10-25.
+Status: **JOINTLY APPROVED**, 2026-10-25. Final text SHA-256 `3b397da160e5d0dd386a8d0712261198bf1d158606a554916abbde6669215ca7`, after Claude's three prose-only edits; see the final diff review in [CLAUDE-REVIEW-2](ch21/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-25).
 
 Manuscript SHA-256: `50905ab9e162387da889e15569cff998f3548a67b6e011319048da7513b5c46f`.
 **2,524 words**, including code; **13 TypeScript fences**.

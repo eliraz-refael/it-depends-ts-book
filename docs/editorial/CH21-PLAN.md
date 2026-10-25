@@ -1,6 +1,6 @@
 # Chapter 21 — Higher-Order Function Patterns (working title)
 
-Status: **PLAN SETTLED**, 2026-10-25. The settlement at the end governs the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-10-25. The settlement at the end governs the original proposal.
 Branch: `codex/chapter-21-hof-patterns`, based on `origin/main` `bd3966e`.
 File: `book/03-patterns-and-design/08-hof-patterns.md`.
 
@@ -236,9 +236,9 @@ Afterwards a targeted recheck, if a second draft needs one.
 
 - [x] Codex challenges this plan; disagreements are settled on evidence.
 - [x] Codex drafts and self-reviews; [draft-1 record](CH21-REVIEW.md).
-- [ ] Claude's formal review: Principle-only and fresh full readers, then a final diff review.
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final diff review.
 - [x] Checks durable; full suite green on draft 3.
-- [ ] Ready for the author's review.
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-25)
 
@@ -392,3 +392,11 @@ comment changed; executable fences are unchanged. Offline install and full suite
 exit 0: Ch21 **13/16/22**; book **374/494/217**, plus two defaults and two searches.
 Claude's final Principle-only read and diff review are pending. Local Verdict;
 Ch22's open-ending debt unchanged.
+
+## Final settlement (2026-10-25)
+
+Claude's [final diff review](ch21/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-25) approves draft 3
+with three prose-only edits: the key is honoured on every attempt, a wrapper "keeps" only the last
+overload, and Gilad's "that proof" now points back to Guy's guarantee. There are no fence changes.
+Final SHA-256 `3b397da160e5d0dd386a8d0712261198bf1d158606a554916abbde6669215ca7`. The full suite exits
+0 on TS 7.0.2 / Node 22.23.3. Local Verdict; Ch22 keeps the open-ending debt.

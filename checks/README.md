@@ -31,7 +31,7 @@ Successful run on **2026-10-25**, TypeScript **7.0.2**, Node **22.23.3**:
 | Chapter 18 | 14 | 16 | 19 |
 | Chapter 19 | 14 | 17 | 18 |
 | Chapter 20 | 15 | 21 | 18 |
-| Chapter 21 (draft 3) | 13 | 16 | 22 |
+| Chapter 21 | 13 | 16 | 22 |
 | Total | **374** | **494** | **217** |
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
@@ -56,7 +56,9 @@ Chapter 19 compares per-item eligibility with stop/skip sequence rules, then tes
 
 Chapter 20 compares a callback that receives `map`'s index with local partial application, then a staged factory owned by the shared module, including when it validates. It was [reviewed](../docs/editorial/CH20-REVIEW.md) in two independent rounds and a final Principle-only read, and merged as PR #22.
 
-The suites extract all TypeScript fences in Chapters 1–20. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
+Chapter 21 traces two wrapper orders on a manual clock past the job's result, then a timeout that owns a signal per attempt, a gateway that accepts before it replies, and an owner-keyed repeat. It is [jointly approved](../docs/editorial/CH21-REVIEW.md) after two independent review rounds and a final Principle-only read.
+
+The suites extract all TypeScript fences in Chapters 1–21. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 
 Specific adaptations and limits:
 

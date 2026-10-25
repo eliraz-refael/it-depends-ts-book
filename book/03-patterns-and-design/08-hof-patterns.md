@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Gilad Stacktrace**: "A higher-order function takes a function or returns one. A wrapper can keep the call's types while changing what it skips, repeats or leaves running. Ask whether the operation allows those changes. A rejection doesn't prove the work didn't happen. Ask the operation's owner for a guarantee that repeating it is safe, such as a key the operation honors to prevent duplicate work. Without that guarantee, don't retry a failure where the work may already have happened, like a timeout or a lost reply. Report the outcome as unknown. Retry it anyway and you can have a failed job and a customer with three messages."
+**Gilad Stacktrace**: "A higher-order function takes a function or returns one. A wrapper can keep the call's types while changing what it skips, repeats or leaves running. Ask whether the operation allows those changes. A rejection doesn't prove the work didn't happen. Ask the operation's owner for a guarantee that repeating it is safe, such as a key the operation honors on every attempt to prevent duplicate work. Without that guarantee, don't retry a failure where the work may already have happened, like a timeout or a lost reply. Report the outcome as unknown. Retry it anyway and you can have a failed job and a customer with three messages."
 
-"For stacked wrappers, follow the outside call inward, then the failure back out to find who retries and who stops waiting. Stopping the wait doesn't stop the work: an `AbortSignal` helps only if the operation uses it. The compiler can accept a detached method through a generic wrapper, even with an explicit `this` parameter. Call through the instance so the wrapper doesn't lose the receiver. Try each public overload on the returned function, too. A wrapper that infers one argument tuple and result can retain only the last overload."
+"For stacked wrappers, follow the outside call inward, then the failure back out to find who retries and who stops waiting. Stopping the wait doesn't stop the work: an `AbortSignal` helps only if the operation uses it. The compiler can accept a detached method through a generic wrapper, even with an explicit `this` parameter. Call through the instance so the wrapper doesn't lose the receiver. Try each public overload on the returned function, too. A wrapper that infers one argument tuple and result keeps only the last overload."
 
 ## The Debate
 
@@ -277,7 +277,7 @@ The fixture now honors cancellation by abandoning the response wait. It cannot r
 
 **Oded**: "Then record unconfirmed. That's what we know. If we can't safely repeat it, I'd rather have one uncertain send than three definite ones."
 
-**Gilad**: "Someone would have to resolve that unconfirmed job. A connection error in a log isn't proof that nothing was sent."
+**Gilad**: "Someone would have to resolve that unconfirmed job. A connection error in a log isn't that proof."
 
 **Oded**: "Yes. If the client can't do better, that's the job."
 
