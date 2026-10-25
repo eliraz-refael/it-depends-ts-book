@@ -1,6 +1,6 @@
 # Chapter 21 — Higher-Order Function Patterns (working title)
 
-Status: **PROPOSED**, 2026-10-25. Awaiting Codex's challenge.
+Status: **PLAN SETTLED**, 2026-10-25. The settlement at the end governs the original proposal.
 Branch: `codex/chapter-21-hof-patterns`, based on `origin/main` `bd3966e`.
 File: `book/03-patterns-and-design/08-hof-patterns.md`.
 
@@ -234,8 +234,112 @@ Afterwards a targeted recheck, if a second draft needs one.
 
 ## Completion
 
-- [ ] Codex challenges this plan; disagreements are settled on evidence.
+- [x] Codex challenges this plan; disagreements are settled on evidence.
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only and fresh full readers, then a final diff review.
 - [ ] Checks durable; full suite green.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-25)
+
+Codex's [challenge](ch21/CODEX-PLAN-CHALLENGE.md) is accepted, with the budget decisions below. Where
+this section conflicts with the proposal above, this section governs. Codex reproduced all seven
+mechanisms (16 compiler cases / 14 manual-clock runtime groups).
+
+**1. The centre: a timeout that owns a fresh signal per call, not order safety by type.**
+- **No claim that types make the incident's order a compile error.** A retry-owned signal rejects the
+  reversed order but accepts the incident's own order. Zero-argument functions and an adapter that
+  ignores its signal pass anyway. Both orders can be legitimate.
+- **The repair is §1B.** `withTimeout` takes `(signal, ...args) => Promise<R>`, creates a controller on
+  each call and returns `(...args) => Promise<R>`. `withRetry` stays generic and repeats that call.
+- **The type's real win:** the old client, which can't take a signal, is rejected at `withTimeout`
+  (TS2345). That shows the input is now required, not that the operation uses it. The text says
+  both halves.
+- Show the concrete sender signature before the generic tuple. No brands, conditional types or
+  composition helper.
+
+**2. The incident, with its setup first.**
+- **Before the nested expression, the page shows:**
+  - the request;
+  - a working send;
+  - the gateway contract: a fulfilled promise confirms acceptance, and a rejection or missing reply
+    doesn't prove non-acceptance;
+  - why the job retries, and which wait it needs.
+- **The fixture runs past the caller's rejection** to the last delivery, using Codex's table: 3
+  starts, delivered at 3/5/7 s, the caller timing out at 6 s; against 1 start, delivered at 3 s, the
+  caller timing out at 2 s. The fast fixtures pass both orders.
+- **Oded's swap gets its win** for the slow-success case. Its limit is stated: the job still writes
+  "failed" for a message that was delivered.
+- **The late-rejection trace (3 deliveries by 9 s after a 2 s caller timeout) is a fallback, not a
+  second scene.** Use it only if the Turn can't carry "an outer timeout doesn't stop the retry loop",
+  and then in one exchange.
+- **Don't fault per-attempt timeouts.** State the job's actual requirement before ruling.
+
+**3. The Turn: an abort can't recall an accepted message.**
+- **The wait is cancelled, but the message was already accepted.** The fresh signals are honoured:
+  accepted at 1 s, acknowledged at 3 s, 3 deliveries.
+- **Guy owns the client and the gateway contract,** and he demands this fixture. He doesn't discover
+  his own API.
+- **The repair:** an owner-provided stable key with the fictional gateway's stored receipt. That gives
+  2 starts, 1 delivery, and success at 2.1 s.
+- **Its scope gets one line:** same logical message, same key through every attempt, and the key is
+  never generated inside retry. No storage implementation, no dedupe framework, no Ch16 rerun.
+- **"Don't retry an ambiguous send" is heard in full.** If no repeat-safe operation exists, that's the
+  ruling.
+- **The owner decides which failures merit another attempt.** That's one line, with no error taxonomy
+  (Ch14).
+
+**4. Budget, within 2,300–3,200 words.** Print one implementation family:
+- retry and timeout in two orders;
+- the signal-owning timeout;
+- one short bound-adapter vs object-decorator exchange. Oded's `request => client.send(request)` is
+  heard, and the job's function-valued callback is established early as its local reason;
+- the Turn;
+- at most one Take on overload loss in a real client signature, paired with "a generic function
+  stays generic". It is a reminder of Ch10, not a revelation.
+
+**Cut from the page:** `once`, `name`/`length`, a decorator tutorial, `pipe`/`compose`, the logging
+wrapper and curried wrappers. If decorators are mentioned, a decorator that forwards with `apply`
+keeps the receiver on method calls; decorating doesn't bind extraction.
+
+**5. Principle: Gilad, tightened.** Codex's candidate is the direction, but nine sentences is a
+checklist. The Ch18–20 readers stalled on undefined terms. Two short paragraphs, and every check
+testable from the Principle alone:
+- what a higher-order function is, in one clause;
+- the same arguments and result type can hide a change in when and how often the function runs;
+- check what the wrapper may skip, repeat or leave running, and whether the operation allows it;
+- a timeout stops the waiting, not the work, unless the operation takes the signal and uses it;
+- a retry needs the operation's owner to say repeating it is safe;
+- with stacked wrappers, trace from the outside call in, and back out through failures;
+- the receiver and overloads are part of the signature the wrapper may not keep.
+
+Never say types prove "the same function", or that an `AbortSignal` input guarantees cancellation.
+The reader cases and expectations are Codex's §5.
+
+**6. Cast: five people.** Gilad (the Principle; outcome vs deliveries), Oded (small wrappers, the named
+composition, the swap and the no-retry fallback), Guy (the client, its receiver, the gateway
+contract), Idan (makes the signal input explicit, then separates performing the work from labelling
+a function safe; no phantom brand) and Eli (one narrow correction on what a signature checks). No
+sixth speaker.
+
+**7. Verdict: Codex's §6, locally.**
+1. One named sender composition where the job gets its callback, saying whether its timeout applies
+   per attempt or to the whole wait.
+2. Timeout owns a controller per call and exposes the signal. The receiver stays attached.
+3. Retry only the owner's repeat-safe operation, with a stable request identity. Otherwise no
+   retries for ambiguous sends, and "timed out" is never reported as "not accepted".
+4. The slow-success and accepted-before-acknowledgement fixtures stay beside the old fast ones.
+
+Ch22's open-ending debt is untouched.
+
+**8. Validation additions:**
+- the delivery times and caller outcomes exactly as printed, past the caller's rejection;
+- the TS2345 of the old client at `withTimeout`, at the location the text names;
+- the keyed-receipt fixture's 2 starts, 1 delivery and 2.1 s;
+- every count the text states.
+
+**Readers:** a Principle-only reader with the four cases, and a fresh full reader.
+
+**Next:** Codex drafts on this branch and self-reviews in `CH21-REVIEW.md`. It then freezes
+`ch21/DRAFT1-SNAPSHOT.json`, runs `npm ci --offline` and the full `npm run check`, commits locally
+and hands off.
