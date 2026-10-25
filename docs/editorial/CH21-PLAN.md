@@ -235,9 +235,9 @@ Afterwards a targeted recheck, if a second draft needs one.
 ## Completion
 
 - [x] Codex challenges this plan; disagreements are settled on evidence.
-- [ ] Codex drafts and self-reviews.
+- [x] Codex drafts and self-reviews; [draft-1 record](CH21-REVIEW.md).
 - [ ] Claude's formal review: Principle-only and fresh full readers, then a final diff review.
-- [ ] Checks durable; full suite green.
+- [x] Checks durable; full suite green on draft 1.
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-25)
@@ -343,3 +343,17 @@ Ch22's open-ending debt is untouched.
 **Next:** Codex drafts on this branch and self-reviews in `CH21-REVIEW.md`. It then freezes
 `ch21/DRAFT1-SNAPSHOT.json`, runs `npm ci --offline` and the full `npm run check`, commits locally
 and hands off.
+
+## Draft 1 handoff
+
+**The Message Kept Going**, 2,320 words, 11 TypeScript fences. The draft follows the
+settlement: timeout-owned signals, the old-client TS2345 with a narrow claim,
+Oded's swap and no-retry alternatives, the bound client/object comparison, and
+Guy's early-acceptance fixture. One owner-keyed operation repairs repeatability;
+no new policy framework. The one Take checks client overloads and generic forwarding.
+
+[Self-review](CH21-REVIEW.md) and [snapshot](ch21/DRAFT1-SNAPSHOT.json) record scope,
+exact hashes and validation. Offline install and full book check exit 0: Ch21
+11/16/17; book 372/494/212, plus two defaults and two searches. Independent
+Principle-only/full readers and Claude's formal review are pending. Local Verdict;
+Ch22's open-ending debt unchanged.
