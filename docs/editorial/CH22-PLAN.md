@@ -392,3 +392,49 @@ For Ch22 that means:
   add, then the people who decide who writes it. Keep the reader wanting the next scene.
 - **Readers are also asked** where they enjoyed it, where they got bored or skimmed, and which scene
   they'd retell to a colleague. A correct chapter that drags fails review.
+
+## Ending decision after the bounded round (2026-10-25)
+
+Codex's [ending probe](ch22/CODEX-ENDING-PROBE.md) is accepted. **Ch22 ends in a local Verdict:**
+- named templates now, with console-editable parameters;
+- the current grouping added as a checked template;
+- the general authoring editor when the third recombination request arrives. That threshold is a
+  trigger the two owners agree, not a number the census proves.
+
+Both repaired designs hold the same five of eight orders, with the same reasons. Replay, the
+version-1 reader and audit replay work for both. The deferral fails no stated requirement, and
+defeating it would mean inventing one. No staged dissent.
+
+**The drafting brief.** The premise section above governs. This is a story, not the probe report.
+- **Hook: the audit that can't answer.** Compliance asks why an order was held on the 3rd. The log's
+  policy record wouldn't hold it, because the hold predicate was a function attached in memory and the
+  saved JSON doesn't have it. Two different live policies wrote the same record. The engineer who
+  attached it was competent, and the behaviour test passed. Establish the log's promise ("a complete
+  account of the active policy") before the save.
+- **Repair: Eden's versioned code plus parameters.** The record names the code version, its
+  parameters and the input facts. Keep it short, with the `Json` check as the type win at the
+  boundary. One clause pins the evaluator version for the data design too.
+- **Then the real argument: a new grouping.** The risk team asks for `large OR (FR AND velocity)`,
+  with its reason stated first. Dafna writes it as a tree in the console; Eden writes a template.
+  Show each owner's responsibility before their preference.
+- **Turn candidate: the two designs agree on every order.** The room expected the representation to
+  decide it. It doesn't: same five holds, same reasons, and the dry run catches the same `any`
+  mistake in both. What's left is the promise the console makes to its analysts. If Codex has a
+  stronger Turn, use it with a reason. It must change what the room thinks.
+- **Census once** (Gil: 6 / 2 / 1), to show that only recombinations distinguish the designs. Then
+  Sahar's deferral; Chen tests it and accepts it. Dafna and Eden decide their interface.
+- **Reach "configuration to a function":** the consumer turns the accepted configuration into
+  `(order: Order) => Decision` after parsing, in one line.
+- **One line each, or cut:** the version-1 `days: 7` reader, hot-load, TS2820 for an unknown
+  template, the recursive type's extra surface, and the third shape the later editor accepts.
+- **At most one Take:** `structuredClone`'s explicit refusal, or source text missing its captured
+  value.
+- **Principle:** Liron, Codex's three checks (follow the value through its consumers, test the round
+  trip, classify the change), in one or two ordinary paragraphs, before the scenario.
+- **Cast:** Liron, Dafna (she), Eden, Chen, Sahar, Gil (all he).
+- **Budget:** 2,300–3,200 words, 12–14 fences, small integers, no timing, vendor or regulation
+  claims.
+
+**Readers:** an isolated Principle-only reader with the four cases, and a fresh full reader, plus a
+targeted recheck if needed. Each is also asked where they enjoyed it, where they got bored or
+skimmed, and which scene they'd retell. No ending-only reader.
