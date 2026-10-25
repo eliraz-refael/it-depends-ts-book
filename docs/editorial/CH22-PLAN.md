@@ -377,3 +377,18 @@ section governs the "first job" and kill-rule sections above.
 - **An open ending is still allowed** if all four criteria hold on the page. It must be earned, not
   needed.
 - **The ending-only reader goes,** unless the ending is open.
+
+## The book's premise governs the draft (2026-10-25)
+
+The author's bar for every chapter is that it's **fun to read, and the reader learns something while
+enjoying it.** Endings follow the subject: open only when the question is actually a matter of
+opinion, otherwise a Verdict.
+
+For Ch22 that means:
+- **The settlement's repairs are for the room's honesty, not a checklist for the page.** The dry
+  run, versioned reader, hot-loaded artifact, audit record and templates each get the scene they
+  need, and none gets a tutorial. If a repair can be a line, it's a line.
+- **One story carries it:** the audit that recorded the wrong policy, then the grouping nobody can
+  add, then the people who decide who writes it. Keep the reader wanting the next scene.
+- **Readers are also asked** where they enjoyed it, where they got bored or skimmed, and which scene
+  they'd retell to a colleague. A correct chapter that drags fails review.
