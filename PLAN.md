@@ -25,7 +25,7 @@ Chapter 16, **runtime validation**, is complete and merged as PR #16 after indep
 - [x] Ch18: `05-pure-functions.md` — hidden inputs, required observations and cache boundaries; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #20
 - [x] Ch19: `06-imperative-vs-declarative.md` — sequence rules a rewrite must keep; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #21
 - [x] Ch20: `07-currying-partial-application.md` — argument shape for callers who fix arguments ahead of time; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #22
-- [ ] Ch21: `08-hof-patterns.md` — what a wrapper changes, and the order it's stacked in; [plan](docs/editorial/CH21-PLAN.md) settled; draft 2 revised after independent readers and formal review; targeted recheck pending
+- [ ] Ch21: `08-hof-patterns.md` — what a wrapper changes, and the order it's stacked in; [plan](docs/editorial/CH21-PLAN.md) settled; draft 3 revised after the targeted recheck; final Principle-only read and diff review pending
 - [ ] Act III debt: at least one honest "The Debate Continues" chapter, with demonstrated conditions; moves to Ch22 after Ch20's bounded ending round converged
 
 ### Completed Act II work
@@ -169,7 +169,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Scaffolding + Prologue      | Done            |                       |
 | Act I: The Type System      | Done            | 6 chapters; calibrated voice passes complete |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
-| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–20 reviewed, checked and merged (7 of 10); Ch21 draft 2, targeted recheck pending |
+| Act III: Patterns & Design  | **IN PROGRESS** | Ch14–20 reviewed, checked and merged (7 of 10); Ch21 draft 3, final Principle-only read and diff review pending |
 | Act IV: The Real World      | Planned         | 4 chapters            |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |

@@ -1,5 +1,97 @@
 # Chapter 21 self-review — The Message Kept Going
 
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READ AND DIFF REVIEW PENDING**, 2026-10-25.
+
+Manuscript SHA-256: `50905ab9e162387da889e15569cff998f3548a67b6e011319048da7513b5c46f`.
+**2,524 words**, including code; **13 TypeScript fences**.
+[Draft-3 snapshot](ch21/DRAFT3-SNAPSHOT.json). Earlier snapshots and Claude's
+verbatim reader reports remain unchanged.
+
+`npm ci --offline` and full `npm run check`: **exit 0**, TypeScript **7.0.2**,
+Node **v22.23.3**. Chapter 21: **13 fences / 16 compiler cases / 22 runtime groups**.
+Full book: **374 / 494 / 217**, plus two default cases and two searches.
+No manuscript or validator edits followed the full run. Local logs are
+`.probe/ch21-draft3-install.log`, `.probe/ch21-draft3-targeted.log`, and
+`.probe/ch21-draft3-full-check.log` (not committed). The targeted run preceded the
+last prose-only Idan clause; the full run covers the exact frozen text.
+
+## Response to Claude's draft-2 review
+
+All findings in [CLAUDE-REVIEW-2](ch21/CLAUDE-REVIEW-2.md), committed with the
+verbatim readers at `0a8fcef`, are accepted. The historical one-attempt fallback
+below is superseded by this revision.
+
+1. **Fallback and the job's requirement.** At the Turn, Oded proposes retrying only
+   temporary failures the client proves occurred before sending, such as a refused
+   connection. Guy confirms the scope of that evidence: it cannot clear a timeout
+   or lost reply. Those remain unconfirmed, with the existing cost of resolving
+   the job. Gilad distinguishes the client's proof from a connection-error log.
+   The Verdict now carries that selective fallback rather than an unconditional
+   one-attempt rule. For the keyed operation, Guy says the wrapper *rethrows* its
+   last error; a final failure to connect cannot clear an earlier accepted attempt.
+2. **Principle.** Still two paragraphs. The operation's owner supplies the
+   repeatability guarantee, with an honored key as a concrete example. A timeout
+   or lost reply can leave work already done; without that guarantee it must not
+   be retried, and its outcome is unknown. “Retry it anyway” replaces the misleading
+   else-branch. Compiler acceptance of a detached method is explicit, including
+   the `this` parameter. The action is to call through the instance. The qualified
+   last-overload rule, call/failure tracing and transfer word “skips” remain.
+3. **Object alternative.** Its code is unchanged. Guy retains the real benefit:
+   existing callers use `sender.send`, and the inner receiver stays intact. Idan
+   identifies the current implementation's shared signal and missing predicate.
+   Guy answers with the required repairs (timeout inside each attempt, predicate
+   passed into retry); the chapter does not claim an object cannot supply them.
+   Oded chooses the already assembled callback for this function-taking job. No
+   second retry algorithm or general policy framework was added.
+4. **Line fixes and voice.** The swapped composition's test is retained, while its
+   total budget is explicitly declined. The timer/send explanation is no longer
+   repeated by Oded and Guy. Idan says both repairs are required before shipping
+   and puts stopping each request before starting another. Repeated “keep” lines
+   are thinned. Oded names a new key *per attempt*, the receipt-lookup note is a
+   comment, the successful opening output is conditional on a reply, and the
+   Verdict calls `sendOnce` through its instance. The standalone lookup Take no
+   longer refers to a bound receiver. Gilad's log-evidence line is his own
+   operational objection, not another count reading.
+
+## Validation and limits
+
+All 13 fences are extracted uniquely. Only the first fence differs from draft 2,
+by its output comment; all executable chapter code is unchanged. Compiler cases
+remain 16. The object fixture also compiles the printed repaired timeout so the
+shared-signal comparison executes the manuscript's actual functions.
+
+The former one-attempt runtime group becomes two selective-fallback groups. They
+exercise a client-owned pre-send refusal error (not an arbitrary message match):
+refusal then success, three refusals stopping at the bound, refusal then timeout,
+and refusal then a lost reply. Both ambiguous cases stop after the second call
+with one actual delivery; neither launches a third call. Two additional object
+groups pin the claims: all three inner calls share one signal, the outer timeout
+expires at two seconds, and already-aborted retries launch no new request; the
+object also retries a programming error three times because it forwards no
+predicate. The existing final composition tests reject that error after one call.
+These replace one group with two and add two: **19 → 22** runtime groups.
+
+All original printed times, counts, errors and diagnostic locations still pass.
+No new platform/library claim, late-rejection scene, cache, curried wrapper,
+decorator tutorial or distributed deduplication implementation was introduced.
+The gateway and its guarantees remain fictional fixture behavior.
+
+## Self-check and handoff
+
+Against the guide and Ch7 calibration: no narrator scores a winner; Guy gives the
+repair his alternative needs; Oded's fallback now preserves his original retry
+requirement. The Principle supplies actions for the four existing transfer cases:
+unknown side-effecting charge, timeout/retry order, overloaded parser, and a
+skipping wrapper around a method. This is my self-check, not a new independent
+reader result. Claude's final Principle-only reader and diff review are pending.
+
+Master tracking and coverage say draft 3, not completed. The local Verdict and
+Ch22 open-ending debt are unchanged. **Local commit only; no push.**
+
+---
+
+## Historical draft-2 self-review
+
 Status: **DRAFT 2 FROZEN; PRINCIPLE READ AND TARGETED RECHECK PENDING**, 2026-10-25.
 
 Manuscript SHA-256: `e53251d7bebd3878b92de05b8da4a68ac91e00e0d6d16b89f558799ca24b71f5`.

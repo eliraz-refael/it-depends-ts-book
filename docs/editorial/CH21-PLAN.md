@@ -237,7 +237,7 @@ Afterwards a targeted recheck, if a second draft needs one.
 - [x] Codex challenges this plan; disagreements are settled on evidence.
 - [x] Codex drafts and self-reviews; [draft-1 record](CH21-REVIEW.md).
 - [ ] Claude's formal review: Principle-only and fresh full readers, then a final diff review.
-- [x] Checks durable; full suite green on draft 2.
+- [x] Checks durable; full suite green on draft 3.
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-25)
@@ -374,3 +374,21 @@ exit 0: Ch21 13/16/19; book 374/494/214, plus two defaults and two searches. The
 new keyed-only overlap test required the fake to check its key at acceptance too;
 all original printed results remain unchanged. Principle-only reader and targeted
 recheck pending. Local Verdict and Ch22's debt unchanged.
+
+
+## Draft 3 handoff
+
+Revised against [Claude's second review](ch21/CLAUDE-REVIEW-2.md) at `0a8fcef`.
+The fallback retries temporary failures only when the client proves no send
+occurred, and stops on a timeout or lost reply. The Principle defines the owner,
+guarantee and ambiguous outcome. Guy's object retains its interface benefit;
+its shared signal and omitted predicate are tested, and he names the repairs it
+would need. The swapped test versus rejected composition, receiver wording and
+other line fixes are resolved.
+
+[Self-review](CH21-REVIEW.md) and [draft-3 snapshot](ch21/DRAFT3-SNAPSHOT.json)
+record 2,524 words, 13 fences and the exact hashes. Only the opening fence's
+comment changed; executable fences are unchanged. Offline install and full suite
+exit 0: Ch21 **13/16/22**; book **374/494/217**, plus two defaults and two searches.
+Claude's final Principle-only read and diff review are pending. Local Verdict;
+Ch22's open-ending debt unchanged.

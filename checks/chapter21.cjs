@@ -66,7 +66,7 @@ const stillAccepted:Send=withRetry(withTimeout(ignores,2000),3);
 `);
 const detachedApi=example('printed-detached-timeout',signal+before(client,'const attempt:')+
  detached+'export {detached};\n');
-const objectApi=example('printed-object-decorator',types+retryAndError+objectSender+'export {RetryingSender};\n');
+const objectApi=example('printed-object-decorator',types+retryAndError+repaired+objectSender+'export {RetryingSender,withTimeout,Timeout};\n');
 const overload=example('overload-loss',types+take,[2345]);
 assert(overload.diagnostics[0].message.includes("Argument of type 'string' is not assignable to parameter of type 'readonly string[]'."));
 const generic=example('generic-and-selected-overload',types+take.split('\n').filter(l=>!l.includes('// Error TS')).join('\n')+`
@@ -178,10 +178,33 @@ async function group(name,fn){try{await fn();groups++;}catch(error){error.messag
   assert.deepEqual(g.trace.filter(e=>e[0]==='deliver'),[['deliver',1,1000],['deliver',2,3000],['deliver',3,5000]]);
   for(const row of ['| 1 | 0 s | 1 s | 2 s |','| 2 | 2 s | 3 s | 4 s |','| 3 | 4 s | 5 s | 6 s |'])assert(chapter.includes(row));
  }));
- await group('no-retry-alternative',()=>fixture(rawApi,{accept:1000,reply:3000,cancellable:true},async({m,clock,g})=>{
-  const out=watch(m.withTimeout(g.attempt,2000)(m.notice),clock);await clock.advance(7000);
-  assert(out.error instanceof m.Timeout);assert.equal(out.at,2000);assert.deepEqual(g.stats(),{starts:1,deliveries:1,acks:0,aborts:1});
- }));
+ // This error is the fixture client's proof of a refused connection before any send.
+ // It is not inferred by a wrapper from arbitrary transport-error text.
+ class ConnectionRefusedBeforeSend extends Error {}
+ const retryUnsent=error=>error instanceof ConnectionRefusedBeforeSend;
+ await group('connect-only-fallback-retries-proven-unsent-failures',async()=>{
+  for(const alwaysRefused of [false,true])await fixture(rawApi,{accept:0,reply:0,cancellable:true},async({m,clock,g})=>{
+   const refusal=new ConnectionRefusedBeforeSend();let calls=0;
+   const attempt=(signal,notice)=>++calls===1||alwaysRefused?Promise.reject(refusal):g.attempt(signal,notice);
+   const out=watch(m.withRetry(m.withTimeout(attempt,2000),3,retryUnsent)(m.notice),clock);
+   await clock.advance(0);
+   if(alwaysRefused){assert.equal(calls,3);assert.equal(out.error,refusal);assert.equal(g.stats().starts,0);}
+   else{assert.equal(calls,2);assert.deepEqual(out,{value:{messageId:m.notice.id},at:0});
+    assert.deepEqual(g.stats(),{starts:1,deliveries:1,acks:1,aborts:0});}
+  });
+ });
+ await group('connect-only-fallback-stops-on-timeout-or-lost-reply',async()=>{
+  for(const lost of [false,true])await fixture(rawApi,{accept:1000,reply:lost?1500:3000,cancellable:true,lost},async({m,clock,g})=>{
+   let calls=0;const attempt=(signal,notice)=>++calls===1?
+    Promise.reject(new ConnectionRefusedBeforeSend()):g.attempt(signal,notice);
+   const out=watch(m.withRetry(m.withTimeout(attempt,2000),3,retryUnsent)(m.notice),clock);
+   await clock.advance(7000);
+   assert.equal(calls,2,'The proven refusal retries; the ambiguous second failure does not');
+   assert.equal(retryUnsent(out.error),false);assert.equal(out.at,lost?1500:2000);
+   if(lost)assert.equal(out.error.message,'reply lost');else assert(out.error instanceof m.Timeout);
+   assert.deepEqual(g.stats(),{starts:1,deliveries:1,acks:0,aborts:lost?0:1});
+  });
+ });
  await group('keyed-repair-printed-counts',()=>fixture(keyedApi,{accept:1000,reply:3000,cancellable:true,keyed:true},async({m,clock,g})=>{
   const out=watch(m.runJob(m.sendShipped),clock);await clock.advance(7000);
   assert.deepEqual(out,{value:'accepted',at:2100});assert.deepEqual(g.stats(),{starts:2,deliveries:1,acks:1,aborts:1});
@@ -211,6 +234,22 @@ async function group(name,fn){try{await fn();groups++;}catch(error){error.messag
   }};
   assert.deepEqual(await new m.RetryingSender(failFirst,3).send(new AbortController().signal,{id:'r2',to:'t',text:'x'}),{messageId:'r2'});
   assert.equal(calls,2);
+ }));
+ await group('object-sender-shares-signal-and-gets-total-budget',()=>fixture(objectApi,{cancellable:true},async({m,clock,g})=>{
+  const signals=[];const inner={send(signal,notice){signals.push(signal);return g.attempt(signal,notice);}};
+  const sender=new m.RetryingSender(inner,3);
+  const out=watch(m.withTimeout((signal,notice)=>sender.send(signal,notice),2000)({id:'r',to:'t',text:'x'}),clock);
+  await clock.advance(7000);
+  assert(out.error instanceof m.Timeout);assert.equal(out.at,2000);
+  assert.equal(signals.length,3);assert.equal(new Set(signals).size,1);assert(signals.every(s=>s.aborted));
+  // The subsequent inner calls see the same already-aborted signal and launch no request.
+  assert.deepEqual(g.stats(),{starts:1,deliveries:0,acks:0,aborts:1});
+ }));
+ await group('object-sender-does-not-forward-a-failure-predicate',()=>fixture(objectApi,{},async({m,clock})=>{
+  let calls=0;const fault=new TypeError('broken call');
+  const sender=new m.RetryingSender({async send(){calls++;throw fault;}},3);
+  const out=watch(sender.send(new AbortController().signal,{id:'r',to:'t',text:'x'}),clock);
+  await clock.advance(0);assert.equal(out.error,fault);assert.equal(calls,3);
  }));
  await group('keyed-send-without-cancellation-keeps-work-running',async()=>{
   for(const accept of [1000,3000])await fixture(oldApi,{accept,reply:3000,keyed:true},async({m,clock,g})=>{

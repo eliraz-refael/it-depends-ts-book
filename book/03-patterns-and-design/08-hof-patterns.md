@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Gilad Stacktrace**: "A higher-order function takes a function or returns one. A wrapper can keep the call's types while changing what it skips, repeats or leaves running. Ask whether the operation allows those changes. A rejection doesn't prove the work didn't happen. If the owner can't establish safe repetition, don't retry an ambiguous failure; report the outcome as unknown. Otherwise you can have a failed job and a customer with three messages."
+**Gilad Stacktrace**: "A higher-order function takes a function or returns one. A wrapper can keep the call's types while changing what it skips, repeats or leaves running. Ask whether the operation allows those changes. A rejection doesn't prove the work didn't happen. Ask the operation's owner for a guarantee that repeating it is safe, such as a key the operation honors to prevent duplicate work. Without that guarantee, don't retry a failure where the work may already have happened, like a timeout or a lost reply. Report the outcome as unknown. Retry it anyway and you can have a failed job and a customer with three messages."
 
-"For stacked wrappers, follow the outside call inward, then the failure back out to find who retries and who stops waiting. Stopping the wait doesn't stop the work: an `AbortSignal` helps only if the operation uses it. Call a method through its instance; a generic wrapper can accept a detached method, even with an explicit `this` parameter, and lose its receiver. Try each public overload on the returned function, too. A wrapper that infers one argument tuple and result can retain only the last overload."
+"For stacked wrappers, follow the outside call inward, then the failure back out to find who retries and who stops waiting. Stopping the wait doesn't stop the work: an `AbortSignal` helps only if the operation uses it. The compiler can accept a detached method through a generic wrapper, even with an explicit `this` parameter. Call through the instance so the wrapper doesn't lose the receiver. Try each public overload on the returned function, too. A wrapper that infers one argument tuple and result can retain only the last overload."
 
 ## The Debate
 
@@ -37,7 +37,7 @@ async function runJob(deliver: Send): Promise<string> {
   }
 }
 
-runJob(send).then(console.log); // accepted
+runJob(send).then(console.log); // accepted, when the gateway replies
 ```
 
 **Guy Singleton**: "That last label is yours. My client didn't say nothing happened."
@@ -122,9 +122,7 @@ His test clock advances without waiting in real time. In this first fixture, del
 
 **Gilad**: "Three starts. Three deliveries. That last delivery happens after the job has finished."
 
-**Oded**: "Clearing the timer doesn't touch the send."
-
-**Guy**: "There's no instruction here that could touch it. `Promise.race` gives you an answer from one promise. The other operation is still running. We have `sendOnce` to prevent duplicate messages. It would still leave these requests running and waiting for replies."
+**Guy**: "`Promise.race` gives you an answer from one promise. The other operation is still running. We have `sendOnce` to prevent duplicate messages. It would still leave these requests running and waiting for replies."
 
 **Oded**: "First, put the timeout around the whole thing. At least it won't launch three copies while this send is slow."
 
@@ -135,9 +133,9 @@ runJob(sendWithinBudget).then(console.log); // failed, in the slow fixture
 
 **Gilad**: "One start. The job records failed at two seconds. One delivery at three seconds."
 
-**Oded**: "That's two fewer texts. Keep that result."
+**Oded**: "That's two fewer texts. Leave that test in."
 
-**Guy**: "Keep it. But now the two seconds covers the whole retry operation. It doesn't give each attempt two seconds. And we still have a failed job with a delivered message."
+**Guy**: "The test, yes. This composition gives us the wrong wait: the two seconds covers the whole retry operation. It doesn't give each attempt two seconds. And we still have a failed job with a delivered message."
 
 **Idan**: "Both functions fit `Send`. Nothing at the job's call tells it which wait it got."
 
@@ -145,7 +143,7 @@ runJob(sendWithinBudget).then(console.log); // failed, in the slow fixture
 
 ### Give the operation something it can use
 
-**Idan**: "Let's stop the requests left running first. `sendOnce` doesn't do that. The timeout should take a function that accepts a signal, and supply one."
+**Idan**: "We need both fixes before this ships. Let's make the timeout stop its request before retry starts another. It should take a function that accepts a signal, and supply one."
 
 **Guy**: "The client has a cancellable send. It stops the request and the response wait when that signal aborts. It doesn't undo a message the gateway already accepted."
 
@@ -209,7 +207,7 @@ const attempt: SendAttempt = (signal, notice) => client.send(signal, notice);
 const sendShipped: Send = withRetry(withTimeout(attempt, 2000), 3);
 ```
 
-**Guy**: "Keep that arrow. Passing the method alone compiles, even with its `this` parameter. Here it is without the instance:"
+**Guy**: "That arrow calls through the client. Passing the method alone compiles, even with its `this` parameter. Here it is without the instance:"
 
 ```typescript
 const detached = withTimeout(client.send, 2000); // Compiles.
@@ -217,7 +215,7 @@ detached(notice).catch(error => console.log(error.message));
 // Cannot read properties of undefined (reading 'connection')
 ```
 
-**Guy**: "Or keep the sender interface. A retrying sender holds the client and calls its method through that instance:"
+**Guy**: "Or use the sender interface. A retrying sender holds the client and calls its method through that instance:"
 
 ```typescript
 interface Sender {
@@ -235,11 +233,11 @@ class RetryingSender implements Sender {
 
 **Guy**: "Our existing callers could keep calling `sender.send`. The inner method never gets passed on its own."
 
-**Oded**: "That works. This job still needs a function, though. I'd write an arrow around your sender. The arrow around the client already keeps its instance."
+**Idan**: "It passes the same caller signal to every attempt. Put timeout around that sender and we're back to two seconds for the whole retry. It doesn't pass `shouldRetry` either."
 
-**Guy**: "Then keep it."
+**Guy**: "I'd have to put the timeout inside each attempt and pass the predicate into retry. The object would still serve callers that need `Sender`."
 
-**Oded**: "I will."
+**Oded**: "This job takes a function. We already have the arrow and the timeout in the right place for it."
 
 Gilad runs the same three-second fixture, now listening to each attempt's signal. Aborting cancels its pending delivery and rejects its promise.
 
@@ -273,19 +271,19 @@ The fixture now honors cancellation by abandoning the response wait. It cannot r
 
 **Idan**: "Then the wrapper did what we asked. We asked it to cancel the request, and treated that as permission to repeat the message."
 
-**Oded**: "Stop retrying this one. Leave the timeout. One invocation, at most one message from us."
+**Oded**: "Stop retrying timeouts on this one. Retry a temporary failure only if the client proves it didn't send, like a refused connection."
 
-**Guy**: "It would still be unconfirmed."
+**Guy**: "The client can tell you when a connection was refused before sending. It can't clear a timeout or a lost reply."
 
 **Oded**: "Then record unconfirmed. That's what we know. If we can't safely repeat it, I'd rather have one uncertain send than three definite ones."
 
-**Gilad**: "Someone would have to resolve that job instead of getting the automatic retry."
+**Gilad**: "Someone would have to resolve that unconfirmed job. A connection error in a log isn't proof that nothing was sent."
 
 **Oded**: "Yes. If the client can't do better, that's the job."
 
 **Guy**: "That's why I want `sendOnce` here: the notice ID is the key for the same logical message on every attempt, and an already accepted key returns its stored receipt without sending another message."
 
-**Oded**: "Fine. Wrap that operation. Don't have retry invent an ID."
+**Oded**: "Fine. Wrap that operation. A new key per attempt would make it a new message."
 
 Guy exposes that part of the client as `keyedClient`.
 
@@ -318,7 +316,7 @@ The first request starts at zero and is accepted at one second. At two seconds i
 
 **Oded**: "If a retryable error gets past `withRetry`, we've used up the attempts. I'll record that as unconfirmed and let other errors reach the error handler."
 
-**Guy**: "A final failure to connect proves that attempt didn't send. Your wrapper returns the last error; an earlier attempt may have got through."
+**Guy**: "Even if the last error is a failure to connect, that only clears the last attempt. The wrapper rethrows that error. An earlier attempt may have got through."
 
 Oded replaces the job's catch:
 
@@ -336,21 +334,21 @@ async function runJob(deliver: Send): Promise<string> {
 
 **Guy**: "The reconciliation worker looks up the notice ID before closing an unconfirmed job. It uses the client's receipt lookup."
 
-**Oded**: "I'll put that next to `sendShipped`, so the next person knows where these jobs go."
+**Oded**: "I'll put that in a comment next to `sendShipped`, so the next person knows where these jobs go."
 
 ## The Verdict
 
-The shipment job keeps `sendShipped`: three attempts, a fresh two-second timeout for each, around the bound `sendOnce` operation. The timeout supplies a signal; the client uses it. The same notice ID reaches every attempt. A received receipt means accepted; exhausted temporary failures mean unconfirmed.
+The shipment job keeps `sendShipped`: three attempts, a fresh two-second timeout for each, around `sendOnce`, called through its instance. The timeout supplies a signal; the client uses it. The same notice ID reaches every attempt. A received receipt means accepted; exhausted temporary failures mean unconfirmed.
 
-**Guy**: "For a gateway without that repeat-safe operation, use Oded's one-attempt version. Don't copy this composition and assume the new client has the same contract."
+**Guy**: "Without that repeat-safe operation, use the client's predicate to retry only temporary failures it proves happened before sending. Never a timeout or a lost reply. Those stay unconfirmed. Don't copy this composition and assume the new client has the same contract."
 
 **Oded**: "I'll keep the slow test running after the job returns. In the old composition, the third delivery happened after it returned."
 
-**Gilad**: "Keep the early acceptance too. That's the one where cancellation worked and we still sent three."
+**Gilad**: "And the early acceptance test. That's the one where cancellation worked and we still sent three."
 
 ## Additional Take
 
-**Prof. Eli Typeworth**: "Check the public signatures when wrapping a client method, even after you've bound its receiver. This small forwarding wrapper keeps a generic function generic. It doesn't keep every overload."
+**Prof. Eli Typeworth**: "Check the public signatures when wrapping the receipt lookup, too. This small forwarding wrapper keeps a generic function generic. It doesn't keep every overload."
 
 ```typescript
 function forward<A extends unknown[], R>(f: (...args: A) => R): (...args: A) => R {
