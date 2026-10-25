@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Liron Closure**: "Before you turn configuration into a function, find everyone who uses it. Some callers need something they can call. Others need something they can save, edit or explain later. A function value isn't a saved account of its code and captured values. Store a description your evaluator understands, or identify retained code and the parameters it used. Then test the round trip: save it, load it, and apply the same recorded input with the same evaluator version. Does it make the same decision?"
+**Liron Closure**: "Before you turn configuration into a function, find everyone who uses it. Some callers need something they can call. Others need something they can save, edit or explain later. Lisp spoiled me for treating code as data, but JSON won't keep a JavaScript function. Save a description and let code read it and make the decision. That code is your evaluator. Or save the name of a code version you'll keep available for replay, plus its parameters. Then test the round trip: save it, load it, and apply the same recorded input with the same evaluator version. Does it make the same decision?"
 
-"For the next change, ask what kind of change it is. A new parameter value? A combination the format already permits? Or a new operation somebody must implement? An editable rule format gives its authors the choices its evaluator supports. Putting the combinations in code gives those choices to the code's authors. Neither arrangement updates old stored values when you edit a type. Parse those values and decide what their old shape means."
+"For the next change, ask what kind of change it is. A new parameter value? Its author can edit the data. A combination the format already permits? A rule's author can write it. With named combinations in code, an engineer still has to do that work. Or a new operation? An engineer must implement it in either design. When you load old stored values, parse them and preserve their old meaning or reject them. Editing a type won't do that job."
 
 ## The Debate
 
@@ -67,7 +67,7 @@ console.log(holds(restored, order)); // false
 
 **Eden**: "The function worked. I sent the logger an object it couldn't preserve."
 
-**Chen**: "And gave the object without the function the same record. Which of those was running on the third?"
+**Chen**: "Two different policies, one record. And `?.` lets the restored one carry on without the missing check. Which policy was running on the third?"
 
 **Eden**: "This release had the refund hook. I can recover that from the release artifact. Nobody reading this JSON should have to guess it."
 
@@ -89,7 +89,7 @@ const savedPolicy: Json = active; // Error TS2322
 
 **Eden**: "I need to store which code ran. The parameters alone aren't the policy."
 
-He gives the refund check its own retained evaluator version. The record contains the parameters and input facts, rather than a live callback:
+He records the parameters and input under `"review-2"`, using `as const` to keep that name as a literal key for the lookup:
 
 ```typescript
 const parameters = { reviewAbove: 500, refundCount: 2, refundDays: 7 };
@@ -128,17 +128,19 @@ Dafna adds the saved-and-replayed order to the test. This time, both decisions s
 
 **Dafna**: "That fixes the record. It doesn't fix my next ticket."
 
-Since the third, the risk team narrowed the policy to repeated refunds in the FR campaign. Its next request adds high totals back for every country: **large total OR (FR AND refund velocity)**. The refund threshold is still three within seven days. The console already has the country-and-velocity template; this ticket needs the extra branch.
+The console already uses named templates: analysts choose one and edit its fields, while engineers write the combinations. It started with separate total and country checks.
 
-The console can change thresholds. It cannot change those parentheses.
+On the third, Eden added refund velocity to the total check. The first regrouping then replaced that policy with **FR AND velocity**, dropping the total branch; its version-1 settings stored the count and fixed the window at seven days. Version 2 added `days` when analysts asked to edit that window.
+
+Now the risk team wants **large total OR (FR AND refund velocity)**, bringing high totals back for every country. Dafna wants to replace the template selector with an editor where analysts can make that combination themselves.
 
 **Dafna**: "We have all three conditions. An analyst should be able to join them. Today they send me the grouping, and I send you a request to write it."
 
-**Eden**: "They shouldn't have to wait for the orders service to release. I'll load a checked policy artifact separately."
+**Eden**: "I can load the policy code separately from the orders service. One of us writes the template, another reviews its expression and replay cases, then we load that version."
 
 **Dafna**: "They still need you to write the expression."
 
-These are the parameters both proposals use, and the decision the order consumer expects. A matching rule ID lets the console find the policy behind the hold:
+Both proposals use the current settings and return the matching policy ID with a hold:
 
 ```typescript
 type Params = { amount: number; country: string; count: number; days: number };
@@ -146,7 +148,7 @@ type Decision = { hold: boolean; reasons: string[] };
 const params: Params = { amount: 500, country: "FR", count: 2, days: 7 };
 ```
 
-Dafna gives the console an explicit vocabulary. It can describe the three conditions and join them with `all` or `any`. It cannot submit arbitrary JavaScript:
+**Dafna**: "Let them compose these conditions. Three leaves, two joins. We still supply the code for each."
 
 ```typescript
 type Condition =
@@ -164,33 +166,23 @@ function matches(condition: Condition, order: Order): boolean {
       return order.refundDaysAgo.filter(age => age <= condition.days).length > condition.count;
     case "all": return condition.conditions.every(c => matches(c, order));
     case "any": return condition.conditions.some(c => matches(c, order));
-    default: {
-      const missing: never = condition;
-      throw new Error(`Unsupported condition: ${missing}`);
-    }
   }
+  const missing: never = condition;
+  throw new Error(`Unsupported condition: ${missing}`);
 }
 ```
 
 **Dafna**: "The editor produces a tree like this. The service parses it when it loads the policy."
 
 ```typescript
+const large: Condition = { kind: "totalAbove", amount: params.amount };
+const inCountry: Condition = { kind: "country", code: params.country };
+const velocity: Condition = { kind: "refundsAbove", count: params.count, days: params.days };
 const rule: Rule = {
-  version: 2,
-  id: "review-hold",
-  when: {
-    kind: "any",
-    conditions: [
-      { kind: "totalAbove", amount: params.amount },
-      {
-        kind: "all",
-        conditions: [
-          { kind: "country", code: params.country },
-          { kind: "refundsAbove", count: params.count, days: params.days },
-        ],
-      },
-    ],
-  },
+  version: 2, id: "review-hold",
+  when: { kind: "any", conditions: [
+    large, { kind: "all", conditions: [inCountry, velocity] },
+  ] },
 };
 ```
 
@@ -252,11 +244,11 @@ console.log(JSON.stringify(templateHold(order))); // {"hold":true,"reasons":["re
 
 **Eden**: "That's the limit I'm offering. This request has one now."
 
-**Chen**: "Your earlier refund settings didn't have `days`. What happens to those?"
+**Dafna**: "I still need to open the old campaign activations. Their settings don't have `days`."
 
-**Eden**: "The version-1 reader supplies seven, which was their meaning. Version 2 requires it. Editing `Params` doesn't update stored JSON."
+**Eden**: "The version-1 reader supplies seven. It rejects a version-2 record without it, so a broken save can't quietly choose a window."
 
-**Dafna**: "The rule reader needs that too. And the audit record needs the evaluator version, just as yours does. Saving the tree doesn't preserve an old implementation of `matches`."
+**Dafna**: "I'll need versioned readers if the tree changes too. And the audit still needs the evaluator version. Saving the tree doesn't preserve an old implementation of `matches`."
 
 ## The Turn
 
@@ -292,13 +284,7 @@ She flattens the joins to reproduce that mistake:
 
 ```typescript
 const tooBroad: Rule = {
-  version: 2,
-  id: rule.id,
-  when: { kind: "any", conditions: [
-    { kind: "totalAbove", amount: params.amount },
-    { kind: "country", code: params.country },
-    { kind: "refundsAbove", count: params.count, days: params.days },
-  ] },
+  ...rule, when: { kind: "any", conditions: [large, inCountry, velocity] },
 };
 const expected = [false, true, false, false, true, true, true, true];
 console.log(samples.filter((o, i) => evaluate(tooBroad, o).hold !== expected[i]).length); // 2
@@ -316,7 +302,7 @@ console.log(samples.filter((o, i) => evaluate(tooBroad, o).hold !== expected[i])
 
 **Dafna**: "That's what I'm asking for. With the tree, an analyst can write another grouping from these conditions. With the templates, they can only pick a grouping you've already written."
 
-**Sahar Firstclass**: "How often have they needed to?"
+**Sahar**: "How often have they needed to?"
 
 Gil has the policy requests from the past three months, including the open ticket. He separates them into three kinds:
 
@@ -324,15 +310,21 @@ Gil has the policy requests from the past three months, including the open ticke
 |---:|---|---|
 | 6 | Parameter values | Change the refund window from seven days to fourteen |
 | 2 | Existing conditions, new grouping | Add the large-total branch to country-and-velocity |
-| 1 | New condition | Add refund velocity to a policy that only knew totals and country |
+| 1 | New condition | Add refund velocity to the total check |
 
 **Gil**: "Both versions handle the six parameter changes in the console. Both need us to implement a new condition. The two regroupings are the difference."
 
-**Dafna**: "One of those is this ticket. While it waited, the old country-and-velocity rule let some large orders through."
+**Dafna**: "One of those is this ticket. Until the template is loaded, the country-and-velocity rule still lets large orders through."
 
-**Eden**: "Three in this batch. They're held once this template is loaded."
+**Eden**: "Three of Gil's eight samples. The new template holds them."
 
-**Sahar**: "Then use the templates now. Build the general editor when a third regrouping request arrives."
+**Dafna**: "And you counted tickets, not everything they wanted. If asking means waiting for us to write code, they may stop asking."
+
+**Gil**: "I can't count requests they didn't file. Two doesn't tell us there were only two they wanted."
+
+**Sahar**: "Then ask for the ones they held back. Use the templates now, and start the general editor at the third regrouping request, including those."
+
+**Dafna**: "I'll ask them directly. If there's another grouping waiting, it counts now. We don't reset the count when we ship this one."
 
 **Chen**: "Dafna, does today's analyst need a grouping that's still missing?"
 
@@ -344,11 +336,11 @@ Gil has the policy requests from the past three months, including the open ticke
 
 **Eden**: "We can continue accepting the old named records when we add trees. The old audit entries still use their retained code versions."
 
-**Chen**: "That answers it."
+**Chen**: "The old activations aren't waiting for the editor, then."
 
 ## The Verdict
 
-**Dafna**: "I'll add the template to the console. The third regrouping request starts the editor work. Let's put that in our backlog agreement, so the next request doesn't become this meeting again."
+**Dafna**: "I'll add the template and ask about the requests they held back. The third regrouping starts the editor work. Let's put that in our backlog agreement, so the next request doesn't become this meeting again."
 
 **Eden**: "Agreed. I'll own the service's rule input when we get there. For now, it accepts these named templates and their parameters."
 

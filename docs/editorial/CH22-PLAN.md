@@ -1,6 +1,6 @@
 # Chapter 22 — Configuration to Function (working title)
 
-Status: **DRAFT 1 FROZEN; INDEPENDENT REVIEW PENDING**, 2026-10-25. The ending decision and drafting brief below govern the historical original proposal; the author has dropped the open-ending requirement.
+Status: **DRAFT 2 FROZEN; PRINCIPLE-ONLY READ AND TARGETED RECHECK PENDING**, 2026-10-25. The ending decision and drafting brief below govern the historical original proposal; the author has dropped the open-ending requirement.
 Branch: `codex/chapter-22-config-to-function`, based on `origin/main` `0364069`.
 File: `book/03-patterns-and-design/09-config-to-function.md`.
 
@@ -265,10 +265,10 @@ Also update `checks/README.md`, `checks/run.cjs`, `docs/editorial/README.md` and
 
 - [x] Codex challenges this plan, ending first; disagreements are settled on evidence ([challenge](ch22/CODEX-PLAN-CHALLENGE.md)).
 - [x] One bounded design round on the ending; local Verdict accepted in `e0f4d2d`.
-- [x] Codex drafts and self-reviews ([draft 1](CH22-REVIEW.md)).
+- [x] Codex drafts and self-reviews ([draft 2](CH22-REVIEW.md)).
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck if needed
   and a final diff review. No ending-only reader under the settled brief.
-- [x] Checks durable; full suite green (Ch22: 12/16/16; book: 386/510/233).
+- [x] Checks durable; full suite green (Ch22: 12/17/17; book: 386/511/234).
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-25)
@@ -452,3 +452,18 @@ current grouping and back to the historical order. No Additional Take.
 plus two default cases and two searches. Independent readers and formal review remain pending.
 The self-review calls out the tree/interpreter length, policy chronology, and census/deferral
 pacing for the fresh reader rather than treating correctness as evidence of enjoyment.
+
+## Draft 2 handoff after formal review (2026-10-25)
+
+[Draft 2](ch22/DRAFT2-SNAPSHOT.json) responds to the findings committed at `c5c80a5`;
+[dispositions and pacing self-review](CH22-REVIEW.md). The history now places the original
+checks, new refund operation, two regroupings and version-1 settings in one sequence. Templates
+are explicitly the existing interface. Dafna challenges suppressed demand; the agreed trigger
+counts requests analysts had held back, without assuming how many exist. The three additional
+holds are explicitly synthetic samples. The interpreter/tree presentation is shorter, and
+opening old activations motivates the legacy reader.
+
+2,518 words; 12 fences. `npm ci --offline` and full `npm run check` exit 0 on the frozen
+manuscript and validator: Ch22 12/17/17; full book 386/511/234, plus two default cases and
+two searches. No subsequent manuscript or validator edits. The revised Principle-only read
+and targeted recheck are pending. Local Verdict unchanged; no ending quota or staged dissent.

@@ -10,7 +10,7 @@ function before(s,at){const i=s.indexOf(at);assert(i>=0,'Split: '+at);return s.s
 function replace(s,a,b){assert.equal(s.split(a).length,2,'Unique replacement: '+a);return s.replace(a,b);}
 const opening=block('type Order ='),loss=block('console.log(JSON.stringify(active))'),json=block('type Json =');
 const record=block('const parameters ='),params=block('type Params ='),conditions=block('type Condition =');
-const rule=block('const rule:'),evaluation=block('function evaluate('),template=block('type Template =');
+const rule=block('const large:'),evaluation=block('function evaluate('),template=block('type Template =');
 const samples=block('const samples:'),wrongRule=block('const tooBroad:'),load=block('declare function readSavedTemplate');
 assert.equal(used.size,fences.length,'All fences extracted');
 const jsonType=before(json,'const savedPolicy:');
@@ -33,6 +33,11 @@ const first=example('printed-incident',opening+loss+'export {active,holds,order,
 const jsonError=example('json-rejects-visible-callback',opening+json,[2322]);
 assert(jsonError.diagnostics[0].message.includes("Property 'extraHold' is incompatible with index signature."));
 const repaired=example('printed-versioned-record',opening+jsonType+record+'export {auditRecord,evaluators,reviewV2,parameters,order};');
+const widenedKey=example('record-name-needs-literal-key',opening+jsonType+replace(
+ replace(record,'} as const satisfies Json;','} satisfies Json;'),
+ 'console.log(evaluators[auditRecord.evaluator](',
+ 'console.log(evaluators[auditRecord.evaluator]( // Error TS7053'),[7053]);
+assert(widenedKey.diagnostics[0].message.includes("expression of type 'string' can't be used to index"));
 const data=example('printed-rule',opening+params+conditions+rule+evaluation+'export {ruleHold,rule,order,matches,evaluate};');
 const named=example('printed-template',opening+params+template+'export {templateHold,selected,order,evaluateTemplate};');
 const compared=example('printed-comparison-and-wrong-rule',all+'export {samples,expected,rule,selected,params,tooBroad,ruleHold,templateHold,evaluate,evaluateTemplate,matches};');
@@ -43,10 +48,10 @@ const requiredKind=example('new-kind-needs-handler',before(opening,'function hol
 assert(requiredKind.diagnostics[0].message.includes("Type '{ kind: \"newAccount\"; days: number; }' is not assignable to type 'never'."));
 example('code-condition-needs-window',types+'const old: Condition = { kind: "refundsAbove", count: 2 }; // Error TS2322\n',[2322]);
 example('code-parameters-need-window',types+'const old: Params = { amount: 500, country: "FR", count: 2 }; // Error TS2741\n',[2741]);
-const stale=example('asserted-stored-rule-is-not-checked',common+`
-const stored='{"version":1,"id":"review-hold","when":{"kind":"refundsAbove","count":2}}';
-const staleRule=JSON.parse(stored) as Rule;
-export {staleRule,order,evaluate};
+const stale=example('asserted-stored-template-is-not-checked',common+`
+const stored='{"version":1,"id":"review-hold","name":"country-velocity","params":{"amount":500,"country":"FR","count":2}}';
+const staleTemplate=JSON.parse(stored) as Template;
+export {staleTemplate,order,evaluateTemplate};
 `);
 const hidden=example('json-boundary-does-not-remove-hidden-callback',opening+jsonType+`
 const narrower:{reviewAbove:number}=active;
@@ -84,27 +89,26 @@ const readers=example('fixture-versioned-readers',types+`
 import {z} from 'zod';
 const amount=z.number().finite().nonnegative(),count=z.number().int().nonnegative();
 const days=z.number().int().positive(),country=z.string().min(1);
-function schema(legacy:boolean):z.ZodType<Condition>{
- const condition:z.ZodType<Condition>=z.lazy(()=>z.discriminatedUnion('kind',[
-  z.object({kind:z.literal('totalAbove'),amount}),
-  z.object({kind:z.literal('country'),code:country}),
-  z.object({kind:z.literal('refundsAbove'),count,days:legacy?days.default(7):days}),
-  z.object({kind:z.literal('all'),conditions:z.array(condition)}),
-  z.object({kind:z.literal('any'),conditions:z.array(condition)}),
- ]));return condition;
-}
+const condition:z.ZodType<Condition>=z.lazy(()=>z.discriminatedUnion('kind',[
+ z.object({kind:z.literal('totalAbove'),amount}),
+ z.object({kind:z.literal('country'),code:country}),
+ z.object({kind:z.literal('refundsAbove'),count,days}),
+ z.object({kind:z.literal('all'),conditions:z.array(condition)}),
+ z.object({kind:z.literal('any'),conditions:z.array(condition)}),
+]));
 const names=z.enum(['country-velocity','large-or-country-velocity']);
 const paramShape={amount,country,count};
 const templateShape={id:z.string(),name:names};
-const TemplateV1=z.object({version:z.literal(1),...templateShape,params:z.object({...paramShape,days:days.default(7)})});
+const TemplateV1=z.object({version:z.literal(1),id:z.string(),name:z.literal('country-velocity'),params:z.object(paramShape).strict()});
 const TemplateV2=z.object({version:z.literal(2),...templateShape,params:z.object({...paramShape,days})});
-const RuleV1=z.object({version:z.literal(1),id:z.string(),when:schema(true)});
-const RuleV2=z.object({version:z.literal(2),id:z.string(),when:schema(false)});
+// The tree is a new proposal, not a deployed version-1 format.
+const RuleV2=z.object({version:z.literal(2),id:z.string(),when:condition});
 export function readSavedTemplate(input:unknown):Template{
- const parsed=z.union([TemplateV1,TemplateV2]).parse(input);return {...parsed,version:2};
+ const parsed=z.union([TemplateV1,TemplateV2]).parse(input);
+ return {...parsed,version:2,params:{...parsed.params,days:parsed.version===1?7:parsed.params.days}};
 }
 export function readSavedRule(input:unknown):Rule{
- const parsed=z.union([RuleV1,RuleV2]).parse(input);return {...parsed,version:2};
+ return RuleV2.parse(input);
 }
 `);
 function capture(program,fn){const output=[],log=console.log;
@@ -150,16 +154,32 @@ group('shared-replay-rejects-both-wrong-combinations',()=>capture(wrongCode,(m)=
  assert.throws(()=>gate(wrongData),/sample-0,sample-3/);assert.throws(()=>gate(m.tooBroadInCode),/sample-0,sample-3/);
  assert.equal(gate(model.ruleHold),model.ruleHold);assert.equal(gate(model.templateHold),model.templateHold);
 }));
-group('version-one-readers-restore-known-seven-day-meaning',()=>{
- const oldRule=copy(model.rule);oldRule.version=1;delete oldRule.when.conditions[1].conditions[1].days;
- const oldTemplate=copy(model.selected);oldTemplate.version=1;delete oldTemplate.params.days;
- assert.deepEqual(reader.readSavedRule(oldRule),model.rule);assert.deepEqual(reader.readSavedTemplate(oldTemplate),model.selected);
- assert.throws(()=>reader.readSavedRule({...oldRule,version:2}));assert.throws(()=>reader.readSavedTemplate({...oldTemplate,version:2}));
- assert.throws(()=>reader.readSavedRule({...oldRule,version:99}));assert.throws(()=>reader.readSavedTemplate({...oldTemplate,version:99}));
+group('old-campaign-reader-preserves-seven-day-window',()=>{
+ const oldTemplate={...copy(model.selected),version:1,name:'country-velocity'};delete oldTemplate.params.days;
+ const migrated=reader.readSavedTemplate(oldTemplate);
+ assert.deepEqual(migrated,{...model.selected,name:'country-velocity'});
+ assert.deepEqual(model.samples.filter(o=>model.evaluateTemplate(migrated,o).hold).map(o=>o.id),['sample-1','sample-5']);
+ assert.throws(()=>reader.readSavedTemplate({...oldTemplate,params:{...oldTemplate.params,days:14}}));
+ assert.throws(()=>reader.readSavedTemplate({...oldTemplate,name:'large-or-country-velocity'}));
+ assert.throws(()=>reader.readSavedTemplate({...oldTemplate,version:2}));
+ assert.throws(()=>reader.readSavedTemplate({...oldTemplate,version:99}));
+ const brokenRule=copy(model.rule);delete brokenRule.when.conditions[1].conditions[1].days;
+ assert.throws(()=>reader.readSavedRule(brokenRule));
+ assert.throws(()=>reader.readSavedRule({...model.rule,version:1}));
+ assert.throws(()=>reader.readSavedRule({...model.rule,version:99}));
 });
-group('assertion-on-stored-rule-silently-loses-match',()=>capture(stale,(m)=>{
- assert.deepEqual(m.evaluate(m.staleRule,m.order),{hold:false,reasons:[]});
- assert.deepEqual(m.evaluate(reader.readSavedRule(m.staleRule),m.order),{hold:true,reasons:['review-hold']});
+group('assertion-on-stored-template-silently-loses-match',()=>capture(stale,(m)=>{
+ assert.deepEqual(m.evaluateTemplate(m.staleTemplate,m.order),{hold:false,reasons:[]});
+ assert.deepEqual(m.evaluateTemplate(reader.readSavedTemplate(m.staleTemplate),m.order),{hold:true,reasons:['review-hold']});
+}));
+group('history-first-regrouping-drops-total-and-restricts-refunds',()=>capture(first,(m)=>{
+ const ids=fn=>model.samples.filter(fn).map(o=>o.id);
+ // The incident's live hook was total OR velocity, with no country condition.
+ assert.deepEqual(ids(o=>m.holds(m.active,o)),['sample-1','sample-3','sample-4','sample-5','sample-6','sample-7']);
+ const campaign={...model.selected,name:'country-velocity'};
+ assert.deepEqual(ids(o=>model.evaluateTemplate(campaign,o).hold),['sample-1','sample-5']);
+ // The second regrouping restores large totals globally, but keeps the FR restriction on velocity.
+ assert.deepEqual(ids(o=>model.templateHold(o).hold),['sample-1','sample-4','sample-5','sample-6','sample-7']);
 }));
 group('invalid-reader-inputs-rejected',()=>{
  for(const bad of [null,{}, {...model.selected,name:'unregistered'}, {...model.selected,params:{...model.params,days:0}},
@@ -182,12 +202,12 @@ group('parameter-edits-remain-available-in-both',()=>{
   for(const order of model.samples)assert.deepEqual(model.evaluate(parsedRule,order),model.evaluateTemplate(parsedTemplate,order));
  }
 });
-group('conditional-old-policy-batch-cost-is-repaired',()=>{
+group('three-of-eight-samples-change-with-new-template',()=>{
  const old={...model.selected,name:'country-velocity'};
  const extra=model.samples.filter(o=>!model.evaluateTemplate(old,o).hold&&model.templateHold(o).hold);
  assert.deepEqual(extra.map(o=>o.id),['sample-4','sample-6','sample-7']);
  assert.deepEqual(model.samples.map(model.templateHold),model.samples.map(model.ruleHold));
- assert(text.includes('Three in this batch.'));
+ assert(text.includes("Three of Gil's eight samples."));
 });
 group('serialized-rule-and-template-audit-replay',()=>{
  const registry={
@@ -210,10 +230,12 @@ group('later-authoring-retains-named-records-and-consumers',()=>capture(later,(m
 }));
 group('fictional-census-categories-and-printed-counts',()=>{
  const requests=[
-  ['parameter','refundDays 7 to 14'],['parameter','amount 500 to 450'],['parameter','count 2 to 3'],
-  ['parameter','country FR to US'],['parameter','amount 450 to 500'],['parameter','count 3 to 2'],
-  ['combination','country AND velocity'],['combination','large OR (country AND velocity)'],
-  ['operation','refund velocity'],
+  ['operation','add refund velocity to total check'],
+  ['combination','replace total OR velocity with country AND velocity'],
+  ['parameter','refundDays 7 to 14 (version 2 exposes the window)'],['parameter','refundDays 14 to 7'],
+  ['parameter','amount 500 to 450'],['parameter','amount 450 to 500'],
+  ['parameter','count 2 to 3'],['parameter','count 3 to 2'],
+  ['combination','large OR (country AND velocity), current request'],
  ];
  const totals=requests.reduce((acc,[kind])=>{acc[kind]++;return acc;},{parameter:0,combination:0,operation:0});
  assert.deepEqual(totals,{parameter:6,combination:2,operation:1});

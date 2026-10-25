@@ -1,4 +1,46 @@
-# Chapter 22 — draft 1 self-review
+# Chapter 22 self-review — The Policy's Alibi
+
+Status: **DRAFT 2 FROZEN; PRINCIPLE-ONLY READ AND TARGETED RECHECK PENDING**, 2026-10-25.
+
+[Manuscript](../../book/03-patterns-and-design/09-config-to-function.md): **2,518 words**, including code; **12 TypeScript fences**. SHA-256: `89f14da7b95043c9e23260d86de1eab22b88df8cf734eb1b4652225a475b9e5c`.
+[Draft-2 snapshot](ch22/DRAFT2-SNAPSHOT.json). Draft 1's snapshot and Claude's verbatim reports remain unchanged.
+
+`npm ci --offline` and the full `npm run check`: **exit 0**, TypeScript **7.0.2**, Node **v22.23.3**. Chapter 22: **12 fences / 17 compiler cases / 17 runtime groups**. Full book: **386 / 511 / 234**, plus two default cases and two searches. No manuscript or validator edits followed the full run. Logs: `.probe/ch22-draft2-install.log`, `.probe/ch22-draft2-targeted.log`, `.probe/ch22-draft2-full-check.log` (untracked). The targeted pass preceded the last prose clauses and the restriction of the legacy reader to the historical campaign; the full pass covers the exact snapshot.
+
+## Response to Claude's draft-1 review
+
+The [formal review](ch22/CLAUDE-REVIEW.md), [Principle-only report](ch22/CLAUDE-PRINCIPLE-READ.md) and [full-reader report](ch22/CLAUDE-FULL-READ.md) were committed at `c5c80a5`. All must/should findings are addressed. The optional interface digression is declined below.
+
+1. **One history.** The console started with separate total and country templates. On the third, Eden added refund velocity to the total check. The first regrouping replaced that policy with FR AND velocity, explicitly dropping the total branch. Its version-1 settings fixed the window at seven days; version 2 exposed `days`. Today's request restores the large-total branch globally. The new-condition census row now names adding refunds to the total check, not a policy that supposedly checked country on the third. The two regroupings are identifiable events. The fixture request ledger now orders these events and uses six parameter edits in three out-and-back pairs, consistent with today's settings.
+2. **Status quo and authorship cost.** Before the tree, the prose says that the console uses named templates and that Dafna wants to replace its selector with a composition editor. Eden names the remaining work: an engineer writes the template, another reviews the expression and replay cases, then the policy version loads separately from the orders service. There is no duration or production-volume claim.
+3. **Dafna's strongest objection.** The three new holds are explicitly three of Gil's eight samples. Dafna then challenges the request count: a slow engineering path can discourage requests. Gil concedes that the table cannot measure those. Sahar's deferral counts requests analysts held back; Dafna will ask directly and count another existing request now, without resetting the count when this ticket ships. Neither side invents the number of suppressed requests. The current grouping works; the editor trigger remains a negotiated work trigger, not an empirical optimum or a promise of same-day delivery.
+4. **Principle voice and consequences.** Liron's Lisp clause leads to JSON dropping JavaScript functions. He defines evaluator as the code reading a description and deciding, and retained code as a named version kept available for replay. The three questions now say who can act: edit a parameter, author a permitted composition (or ask the engineer who owns combinations in code), implement a new operation. The round-trip test and its closing question remain. Old values must retain their meaning or be rejected; changing a type does neither.
+5. **Middle and legacy reader.** The setup is shorter. The switch keeps its complete leaf logic, recursive `all`/`any`, and `never` check, with the redundant default block removed. Named leaf values shorten the tree and let the wrong-rule fence show just the mistaken flattening. Dafna now needs to reopen old campaign activations; Eden's known-version default and current-version rejection answer that need. Her hypothetical future tree migration is separate from existing template history. No version-1 tree is invented in the fixture.
+6. **Line-level.** Chen names two policies sharing one record and the optional call carrying on after the check disappeared. The record introduction names the literal-key purpose of `as const`; a new compiler case pins TS7053 at the lookup without it. Sahar's second full name is removed. Chen accepts continued access to old activations while the editor is built, rather than supplying a generic closing line.
+
+**Declined optional item:** an `interface Order` versus `Json` detour. The printed type alias works; the dialogue already restricts the static guarantee to visible properties. An implicit-index-signature explanation would add a separate type-system argument precisely where the reader asked for less machinery. This is not a claim that the two declarations are interchangeable at this boundary.
+
+## Self-check and remaining reader questions
+
+The local Verdict remains templates now, with editor work at the third regrouping request, including requests the analysts previously withheld. The first request is not erased when this one ships. Dafna and Eden own the interface decision; risk owns the hold policy. The agreement does not resolve how much hidden demand exists.
+
+The Principle self-check still covers the four required cases: an optional persisted callback needs a replayable record; an unsupported workspace-admin condition needs implementation; a new required field needs parsing and an old-meaning decision; a dashboard consuming configuration needs a usable description or named code and recorded inputs. These are my self-checks, not the new independent reader's results.
+
+The opening's alibi line and restored-false reveal remain. Claude's first full reader enjoyed them, would retell the audit scene and accepted the Turn. Draft 2 retains those strengths. The code middle is shorter, but the chapter grows by 139 words overall because the history and suppressed-demand objection needed answers. The fresh recheck should judge whether naming the three leaves improves reading, whether the policy history can now be retold without rereading, and whether the deferral survives Dafna's objection instead of simply postponing it. The interpreter is still the likeliest place to skim. No new Take, parser tutorial, deployment tutorial or artificial dissent was added.
+
+## Revised validation scope
+
+All 12 fences are extracted, with every printed output still checked. The new compiler case removes `as const` and asserts the exact TS7053 location and message. The new runtime group follows the three policies through the same eight inputs: incident total OR velocity, first regrouping country AND velocity, and current large OR (country AND velocity). The unchanged decision counts and reason IDs remain verified.
+
+The stored-value assertion fixture now uses the actual old country-and-velocity template. Its missing window silently loses the match when asserted as current; the version-1 reader restores seven days. That reader accepts the known historical name and absent window, rejects an explicit incompatible window or an anachronistic template name, and normalizes to version 2. Current templates and the proposed tree require the window. The new tree has no historical version-1 reader. This replaces draft 1's overly broad fixture without adding machinery to the page.
+
+The request ledger and samples are fictional evidence, not production counts or a study. No test establishes the optimal editor trigger, how many unfiled requests exist, delivery time, or performance. The suite verifies known records and the stated contracts; it does not build the console or prove arbitrary future compatibility. The historical draft-1 self-review below is superseded where it describes the old history, sample wording, reader fixture or pending first readers.
+
+Next: Claude's revised Principle-only reader and targeted recheck. **Local commit only; no push.**
+
+---
+
+## Historical draft-1 self-review
 
 Status: **DRAFT 1 FROZEN; independent readers and Claude's formal review pending**, 2026-10-25.
 
