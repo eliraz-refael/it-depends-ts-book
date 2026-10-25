@@ -1,6 +1,6 @@
 # Chapter 22 — Configuration to Function (working title)
 
-Status: **CHALLENGED; BOUNDED ROUND SET**, 2026-10-25. The settlement at the end governs the original proposal.
+Status: **DRAFT 1 FROZEN; INDEPENDENT REVIEW PENDING**, 2026-10-25. The ending decision and drafting brief below govern the historical original proposal; the author has dropped the open-ending requirement.
 Branch: `codex/chapter-22-config-to-function`, based on `origin/main` `0364069`.
 File: `book/03-patterns-and-design/09-config-to-function.md`.
 
@@ -264,11 +264,11 @@ Also update `checks/README.md`, `checks/run.cjs`, `docs/editorial/README.md` and
 ## Completion
 
 - [x] Codex challenges this plan, ending first; disagreements are settled on evidence ([challenge](ch22/CODEX-PLAN-CHALLENGE.md)).
-- [ ] One bounded design round on the ending, if the challenge calls for one.
-- [ ] Codex drafts and self-reviews.
-- [ ] Claude's formal review: Principle-only, fresh full and ending-only readers, a targeted recheck
-  and a final diff review.
-- [ ] Checks durable; full suite green.
+- [x] One bounded design round on the ending; local Verdict accepted in `e0f4d2d`.
+- [x] Codex drafts and self-reviews ([draft 1](CH22-REVIEW.md)).
+- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck if needed
+  and a final diff review. No ending-only reader under the settled brief.
+- [x] Checks durable; full suite green (Ch22: 12/16/16; book: 386/510/233).
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-25)
@@ -438,3 +438,17 @@ defeating it would mean inventing one. No staged dissent.
 **Readers:** an isolated Principle-only reader with the four cases, and a fresh full reader, plus a
 targeted recheck if needed. Each is also asked where they enjoyed it, where they got bored or
 skimmed, and which scene they'd retell. No ending-only reader.
+
+## Draft 1 handoff (2026-10-25)
+
+[The Policy's Alibi](../../book/03-patterns-and-design/09-config-to-function.md) is frozen at
+2,379 words and 12 TypeScript fences. [Snapshot](ch22/DRAFT1-SNAPSHOT.json);
+[self-review](CH22-REVIEW.md). The local Verdict is templates now, with the third regrouping
+request triggering editor work by agreement. The audit incident carries the story into the
+current grouping and back to the historical order. No Additional Take.
+
+`npm ci --offline` and the full `npm run check` exit 0. Chapter 22 has 16 compiler cases and
+16 runtime groups; the full book has 386 fences, 510 compiler cases and 233 runtime groups,
+plus two default cases and two searches. Independent readers and formal review remain pending.
+The self-review calls out the tree/interpreter length, policy chronology, and census/deferral
+pacing for the fresh reader rather than treating correctness as evidence of enjoyment.

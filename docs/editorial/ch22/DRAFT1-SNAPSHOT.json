@@ -1,0 +1,80 @@
+{
+  "status": "draft 1 frozen; independent readers and formal review pending",
+  "date": "2026-10-25",
+  "settled_plan_commit": "e0f4d2d",
+  "path": "book/03-patterns-and-design/09-config-to-function.md",
+  "sha256": "13db9f3c6087607a2c4505ae08d6a9b3f493245af18ffa448b1d49184bdb8f64",
+  "manuscript_mtime_utc": "2026-10-25T13:35:11.816913+00:00",
+  "words": 2379,
+  "typescript_fences": 12,
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "sha256": "3ef088257f71903976505399fd407d89e87edf94bdeab28750128c3273fac136"
+    },
+    {
+      "ordinal": 2,
+      "sha256": "53ef5b7b40820c15e7e3c35f205c246805246b74b70ed2c2e78c248c6d461e8a"
+    },
+    {
+      "ordinal": 3,
+      "sha256": "af6d389998f654731fb8a92f17878589c49c95060b569244f2b06fa50b8fe85b"
+    },
+    {
+      "ordinal": 4,
+      "sha256": "99bdd99ec3713d8adcc742dd5d4c0bc199158f3ccb05baf3f3e348a428a40da5"
+    },
+    {
+      "ordinal": 5,
+      "sha256": "7409607b83458ba5a3b17ffad98c11f27fb019cec6352133d051a5c87d803004"
+    },
+    {
+      "ordinal": 6,
+      "sha256": "68d2b1c187ae715e8c31ea77a41cfbc3d295905807beb1a5a4196cc982b0e61c"
+    },
+    {
+      "ordinal": 7,
+      "sha256": "0060cd9b1ab1a989a41a617961a60b8d6dc9cb98d97b3b9677611a240aabcb84"
+    },
+    {
+      "ordinal": 8,
+      "sha256": "bfb7822d36970ef740ecd20e9c22ba60a094792859a9423703ac163fc34981f7"
+    },
+    {
+      "ordinal": 9,
+      "sha256": "3d455cff708d94211904a48311525331d6deff094eeb9c65d772843ecfe27141"
+    },
+    {
+      "ordinal": 10,
+      "sha256": "ac840216d28508e28f763df1e6dcbc5548906f4b171009e98e36e32c2db7d194"
+    },
+    {
+      "ordinal": 11,
+      "sha256": "b5764d312c049e79781477e98debad903642f0f23c686a09826cf3fcaf11f1f4"
+    },
+    {
+      "ordinal": 12,
+      "sha256": "28e2ca5a86948ec61f32ab33dfeea8355f814b8c29625345553aa62cbcb7187a"
+    }
+  ],
+  "validator_sha256": "3c0e64eb7da50896179e03ef26dcd1de76db8efa6e88b238242747cdc8f4913e",
+  "typescript": "7.0.2",
+  "node": "v22.23.3",
+  "validation": {
+    "install": "npm ci --offline: exit 0",
+    "full_suite": "npm run check: exit 0 on frozen draft 1; no subsequent manuscript or validator edits",
+    "chapter_counts": {
+      "fences": 12,
+      "compiler_cases": 16,
+      "runtime_groups": 16
+    },
+    "book_counts": {
+      "fences": 386,
+      "compiler_cases": 510,
+      "runtime_groups": 233,
+      "default_cases": 2,
+      "searches": 2
+    }
+  }
+}
