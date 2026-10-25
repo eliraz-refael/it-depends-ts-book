@@ -237,7 +237,7 @@ Afterwards a targeted recheck, if a second draft needs one.
 - [x] Codex challenges this plan; disagreements are settled on evidence.
 - [x] Codex drafts and self-reviews; [draft-1 record](CH21-REVIEW.md).
 - [ ] Claude's formal review: Principle-only and fresh full readers, then a final diff review.
-- [x] Checks durable; full suite green on draft 1.
+- [x] Checks durable; full suite green on draft 2.
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-25)
@@ -357,3 +357,20 @@ exact hashes and validation. Offline install and full book check exit 0: Ch21
 11/16/17; book 372/494/212, plus two defaults and two searches. Independent
 Principle-only/full readers and Claude's formal review are pending. Local Verdict;
 Ch22's open-ending debt unchanged.
+
+## Draft 2 handoff
+
+Revised against [Claude's review](ch21/CLAUDE-REVIEW.md) and both verbatim reader
+reports from `108e810`. Guy names `sendOnce` early, with duplicate delivery and
+outstanding work treated separately. The Principle states ambiguous rejection,
+no-retry/unknown fallback, receiver loss and last-overload risk. New fences show
+the detached call's exact runtime failure and Guy's concrete sender object. The
+job explains exhausted failures, reconciliation and the last connection error;
+continuity and repeated explanations are tightened.
+
+[Self-review](CH21-REVIEW.md) and [draft-2 snapshot](ch21/DRAFT2-SNAPSHOT.json)
+record 2,383 words, 13 fences and the exact hashes. Offline install and full suite
+exit 0: Ch21 13/16/19; book 374/494/214, plus two defaults and two searches. The
+new keyed-only overlap test required the fake to check its key at acceptance too;
+all original printed results remain unchanged. Principle-only reader and targeted
+recheck pending. Local Verdict and Ch22's debt unchanged.

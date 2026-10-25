@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Gilad Stacktrace**: "A higher-order function takes a function or returns one. A wrapper can keep its arguments and result type while changing when it runs and how often. Before wrapping an operation, check what the wrapper may skip, repeat or leave running, and whether the operation allows that. For retries, get the operation's owner to establish that repeating it is safe. A timeout only stops waiting unless someone also stops the work. Passing a cancellation signal isn't enough; the operation has to use it."
+**Gilad Stacktrace**: "A higher-order function takes a function or returns one. A wrapper can keep the call's types while changing what it skips, repeats or leaves running. Ask whether the operation allows those changes. A rejection doesn't prove the work didn't happen. If the owner can't establish safe repetition, don't retry an ambiguous failure; report the outcome as unknown. Otherwise you can have a failed job and a customer with three messages."
 
-"With stacked wrappers, follow the outside call inward, then follow a failure back out. Find which wrapper gets to call the operation again and which one stops waiting. Keep a method attached to its instance, or make the wrapper forward its receiver. Check the returned signatures before giving the function to callers who need its overloads. The same-looking call can do different work."
+"For stacked wrappers, follow the outside call inward, then the failure back out to find who retries and who stops waiting. Stopping the wait doesn't stop the work: an `AbortSignal` helps only if the operation uses it. Call a method through its instance; a generic wrapper can accept a detached method, even with an explicit `this` parameter, and lose its receiver. Try each public overload on the returned function, too. A wrapper that infers one argument tuple and result can retain only the last overload."
 
 ## The Debate
 
@@ -23,7 +23,7 @@ type Notice = { id: string; to: string; text: string };
 type Receipt = { messageId: string };
 type Send = (notice: Notice) => Promise<Receipt>;
 
-declare const send: Send; // The notification client's bound send operation.
+declare const send: Send; // The job's old notice-only adapter over the client.
 const notice: Notice = {
   id: "shipped-42", to: "+1555010042", text: "Your order has shipped.",
 };
@@ -44,7 +44,9 @@ runJob(send).then(console.log); // accepted
 
 **Oded**: "It was the job's catch. Before I added the timeout, it mostly meant we couldn't connect."
 
-The job is allowed three attempts, with two seconds to wait for each reply. A temporary connection failure shouldn't lose the shipment notice. It has no two-second limit for the whole job. Oded put that behavior in the shared wrappers module:
+"The job allows three attempts and two seconds for each reply. Not two seconds for the whole job. A temporary connection failure shouldn't lose the notice."
+
+He put that behavior in the shared wrappers module:
 
 ```typescript
 function withRetry<A extends unknown[], R>(
@@ -87,11 +89,11 @@ function withTimeout<A extends unknown[], R>(
 }
 ```
 
-**Oded**: "Retry calls the function again if it rejects. Timeout waits for whichever promise settles first. I clear the timer when we're done. The predicate can stop retries for a particular failure. This job was using the default, which retries every rejection."
+**Oded**: "Retry sees the timeout reject and tries again. The predicate could veto that, but this job retries every rejection."
 
-**Idan Greenfield**: "Which thing is done?"
+**Idan Greenfield**: "Your `finally` clears the timer. Where do you stop the send?"
 
-**Oded**: "The call to the wrapper. I see where you're going."
+**Oded**: "I don't. I stopped waiting for it."
 
 He opens the composition the job uses:
 
@@ -122,9 +124,9 @@ His test clock advances without waiting in real time. In this first fixture, del
 
 **Oded**: "Clearing the timer doesn't touch the send."
 
-**Guy**: "There's no instruction here that could touch it. `Promise.race` gives you an answer from one promise. The other operation is still ours."
+**Guy**: "There's no instruction here that could touch it. `Promise.race` gives you an answer from one promise. The other operation is still running. We have `sendOnce` to prevent duplicate messages. It would still leave these requests running and waiting for replies."
 
-**Oded**: "Then put the timeout around the whole thing. At least it won't launch three copies while this send is slow."
+**Oded**: "First, put the timeout around the whole thing. At least it won't launch three copies while this send is slow."
 
 ```typescript
 const sendWithinBudget: Send = withTimeout(withRetry(send, 3), 2000);
@@ -143,7 +145,7 @@ runJob(sendWithinBudget).then(console.log); // failed, in the slow fixture
 
 ### Give the operation something it can use
 
-**Idan**: "The timeout needs to tell the operation to stop. It should take a function that accepts a signal, and supply one."
+**Idan**: "Let's stop the requests left running first. `sendOnce` doesn't do that. The timeout should take a function that accepts a signal, and supply one."
 
 **Guy**: "The client has a cancellable send. It stops the request and the response wait when that signal aborts. It doesn't undo a message the gateway already accepted."
 
@@ -207,15 +209,39 @@ const attempt: SendAttempt = (signal, notice) => client.send(signal, notice);
 const sendShipped: Send = withRetry(withTimeout(attempt, 2000), 3);
 ```
 
-**Guy**: "I could put retry in a sender object implementing our interface. It holds the client and calls `inner.send`. Nobody has to remember which instance the method came from."
+**Guy**: "Keep that arrow. Passing the method alone compiles, even with its `this` parameter. Here it is without the instance:"
 
-**Oded**: "That works. Then I'd still need a function for the job. This arrow keeps the instance too, and I can see the call."
+```typescript
+const detached = withTimeout(client.send, 2000); // Compiles.
+detached(notice).catch(error => console.log(error.message));
+// Cannot read properties of undefined (reading 'connection')
+```
 
-**Guy**: "Provided you keep it. Passing `client.send` to your generic wrapper compiles even with that `this` parameter. It doesn't bind the method."
+**Guy**: "Or keep the sender interface. A retrying sender holds the client and calls its method through that instance:"
 
-**Oded**: "I'm keeping the arrow. I'm not adding a sender class just to remove it."
+```typescript
+interface Sender {
+  send(signal: AbortSignal, notice: Notice): Promise<Receipt>;
+}
 
-Gil runs the same three-second fixture, now listening to each attempt's signal. Aborting cancels its pending delivery and rejects its promise.
+class RetryingSender implements Sender {
+  constructor(private inner: Sender, private attempts: number) {}
+
+  send(signal: AbortSignal, notice: Notice): Promise<Receipt> {
+    return withRetry(() => this.inner.send(signal, notice), this.attempts)();
+  }
+}
+```
+
+**Guy**: "Our existing callers could keep calling `sender.send`. The inner method never gets passed on its own."
+
+**Oded**: "That works. This job still needs a function, though. I'd write an arrow around your sender. The arrow around the client already keeps its instance."
+
+**Guy**: "Then keep it."
+
+**Oded**: "I will."
+
+Gilad runs the same three-second fixture, now listening to each attempt's signal. Aborting cancels its pending delivery and rejects its promise.
 
 **Gilad**: "Starts at zero, two and four seconds. Three different signals. All three abort. Zero deliveries. The job still records failed at six seconds."
 
@@ -224,6 +250,8 @@ Gil runs the same three-second fixture, now listening to each attempt's signal. 
 **Oded**: "And retry hasn't changed."
 
 **Idan**: "It calls the function it's given. Each call now creates the controller as well as starting the request."
+
+**Oded**: "Then do we still need `sendOnce`? There aren't any copies left in that test."
 
 ## The Turn
 
@@ -255,13 +283,13 @@ The fixture now honors cancellation by abandoning the response wait. It cannot r
 
 **Oded**: "Yes. If the client can't do better, that's the job."
 
-**Guy**: "It can do better here. We have `sendOnce` for this gateway: the notice ID is the key for the same logical message on every attempt, and an already accepted key returns its stored receipt without sending another message."
-
-**Idan**: "That promise comes from the gateway operation. Adding a marker to an ordinary function wouldn't give it that behavior."
+**Guy**: "That's why I want `sendOnce` here: the notice ID is the key for the same logical message on every attempt, and an already accepted key returns its stored receipt without sending another message."
 
 **Oded**: "Fine. Wrap that operation. Don't have retry invent an ID."
 
-Guy exposes that part of the client to the job as `keyedClient` and changes the bound adapter to call `sendOnce`. Its failure predicate allows retries for timeouts and the gateway's temporary transport failures, not a bad address or a programming error.
+Guy exposes that part of the client as `keyedClient`.
+
+**Guy**: "Use its failure predicate too. Timeouts and temporary transport failures can get another attempt. A bad address or a programming error shouldn't."
 
 ```typescript
 declare const keyedClient: {
@@ -282,17 +310,17 @@ const sendShipped: Send = withRetry(
 
 The first request starts at zero and is accepted at one second. At two seconds its local wait times out. The second request carries the same notice ID and gets the existing receipt at 2.1 seconds.
 
-**Gilad**: "Two starts, one delivery, accepted at 2.1 seconds as far as the job is concerned."
-
-**Guy**: "The gateway accepted at one. That's when the message went out."
-
-**Gilad**: "Right. The job learns it at 2.1."
+**Gilad**: "Two starts, one delivery at one second. The job gets confirmation at 2.1."
 
 **Oded**: "And if that receipt doesn't get back either?"
 
 **Guy**: "The key still prevents another delivery. Exhausting our attempts doesn't tell us whether the gateway accepted the first one."
 
-Oded changes the job's outcome for those exhausted failures. Other errors still escape to its error handler:
+**Oded**: "If a retryable error gets past `withRetry`, we've used up the attempts. I'll record that as unconfirmed and let other errors reach the error handler."
+
+**Guy**: "A final failure to connect proves that attempt didn't send. Your wrapper returns the last error; an earlier attempt may have got through."
+
+Oded replaces the job's catch:
 
 ```typescript
 async function runJob(deliver: Send): Promise<string> {
@@ -306,9 +334,9 @@ async function runJob(deliver: Send): Promise<string> {
 }
 ```
 
-**Idan**: "So the wrapper owns the timer and the repetition. The client owns what cancellation stops and whether repetition is safe."
+**Guy**: "The reconciliation worker looks up the notice ID before closing an unconfirmed job. It uses the client's receipt lookup."
 
-**Oded**: "That I can put next to `sendShipped`. I can't put 'safe retry' on every function the module accepts."
+**Oded**: "I'll put that next to `sendShipped`, so the next person knows where these jobs go."
 
 ## The Verdict
 
@@ -316,13 +344,13 @@ The shipment job keeps `sendShipped`: three attempts, a fresh two-second timeout
 
 **Guy**: "For a gateway without that repeat-safe operation, use Oded's one-attempt version. Don't copy this composition and assume the new client has the same contract."
 
-**Oded**: "I'll keep the slow test running after the job returns. The third delivery happens after it returns."
+**Oded**: "I'll keep the slow test running after the job returns. In the old composition, the third delivery happened after it returned."
 
 **Gilad**: "Keep the early acceptance too. That's the one where cancellation worked and we still sent three."
 
 ## Additional Take
 
-**Eli Typeworth**: "Check the public signatures when wrapping a client method, even after you've bound its receiver. This small forwarding wrapper keeps a generic function generic. It doesn't keep every overload."
+**Prof. Eli Typeworth**: "Check the public signatures when wrapping a client method, even after you've bound its receiver. This small forwarding wrapper keeps a generic function generic. It doesn't keep every overload."
 
 ```typescript
 function forward<A extends unknown[], R>(f: (...args: A) => R): (...args: A) => R {
@@ -335,7 +363,7 @@ declare const lookupReceipt: {
 };
 
 const lookup = forward(lookupReceipt);
-lookup(["shipped-42"]); // Accepted.
+lookup(["shipped-42"]); // Compiles.
 lookup("shipped-42"); // Error TS2345
 
 const identity = <T>(value: T): T => value;

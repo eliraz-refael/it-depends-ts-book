@@ -19,6 +19,8 @@ const attemptType=block('type SendAttempt =');
 const repaired=block('function withTimeout<');
 const oldError=block('withTimeout(send,');
 const client=block('declare class GatewayClient');
+const detached=block('const detached =');
+const objectSender=block('interface Sender {');
 const keyed=block('declare const keyedClient:');
 const jobRepair=block('async function runJob(');
 const take=block('function forward<');
@@ -62,22 +64,9 @@ example('signal-input-can-be-ignored',signal+`
 const ignores:SendAttempt=(_signal,notice)=>send(notice);
 const stillAccepted:Send=withRetry(withTimeout(ignores,2000),3);
 `);
-const detachedApi=example('receiver-erased-by-generic-wrapper',signal+before(client,'const attempt:')+`
-const detached:SendAttempt=withRetry(client.send,3);
-export {detached};
-`);
-const objectApi=example('object-decorator-alternative',types+attemptType+`
-interface Sender {send(signal:AbortSignal,notice:Notice):Promise<Receipt>}
-class RetryingSender implements Sender {
- constructor(private inner:Sender,private attempts:number){}
- async send(signal:AbortSignal,notice:Notice):Promise<Receipt>{
-  for(let attempt=1;;attempt++){
-   try{return await this.inner.send(signal,notice);}catch(error){if(attempt===this.attempts)throw error;}
-  }
- }
-}
-export {RetryingSender};
-`);
+const detachedApi=example('printed-detached-timeout',signal+before(client,'const attempt:')+
+ detached+'export {detached};\n');
+const objectApi=example('printed-object-decorator',types+retryAndError+objectSender+'export {RetryingSender};\n');
 const overload=example('overload-loss',types+take,[2345]);
 assert(overload.diagnostics[0].message.includes("Argument of type 'string' is not assignable to parameter of type 'readonly string[]'."));
 const generic=example('generic-and-selected-overload',types+take.split('\n').filter(l=>!l.includes('// Error TS')).join('\n')+`
@@ -117,7 +106,11 @@ function gateway(clock,{accept=3000,reply=3000,cancellable=false,keyed=false,ign
   const n=++starts;trace.push(['start',n,clock.now]);requests.push(notice);if(signal)signals.push(signal);
   return new Promise((resolve,reject)=>{
    const stored=keyed&&receipts.get(notice.id);let receipt=stored;let acceptTimer;
-   if(!stored)acceptTimer=clock.setTimeout(()=>{deliveries++;receipt={messageId:notice.id};receipts.set(notice.id,receipt);trace.push(['deliver',n,clock.now]);},accept);
+   if(!stored)acceptTimer=clock.setTimeout(()=>{
+    // A second request can begin before the first accepts. Deduplicate at acceptance too.
+    receipt=keyed&&receipts.get(notice.id);
+    if(!receipt){deliveries++;receipt={messageId:notice.id};receipts.set(notice.id,receipt);trace.push(['deliver',n,clock.now]);}
+   },accept);
    const replyTimer=clock.setTimeout(()=>{detach();if(lost){reject(new Error('reply lost'));return;}
     acks++;trace.push(['reply',n,clock.now]);resolve(receipt);
    },stored?100:reply);
@@ -135,7 +128,7 @@ async function fixture(test,options,fn){
  const keys=['setTimeout','clearTimeout','send','client','keyedClient','lookupReceipt'];
  const previous=new Map(keys.map(k=>[k,Object.getOwnPropertyDescriptor(globalThis,k)]));const log=console.log;
  const client={connection:'gateway',send(signal,notice){assert.equal(this.connection,'gateway');return g.attempt(signal,notice);}};
- const keyedClient={sendOnce:client.send.bind(client),shouldRetry:error=>error instanceof Error&&['timeout','reply lost'].includes(error.message)};
+ const keyedClient={sendOnce:client.send.bind(client),shouldRetry:error=>error instanceof Error&&['timeout','reply lost','could not connect'].includes(error.message)};
  try{
   globalThis.setTimeout=(fn,ms)=>clock.setTimeout(fn,ms);globalThis.clearTimeout=id=>clock.clearTimeout(id);
   globalThis.send=g.send;globalThis.client=client;globalThis.keyedClient=keyedClient;
@@ -203,14 +196,39 @@ async function group(name,fn){try{await fn();groups++;}catch(error){error.messag
   const out=watch(m.withRetry(m.withTimeout(ignores,2000),3)(m.notice),clock);await clock.advance(7000);
   assert(out.error instanceof m.Timeout);assert.deepEqual(g.stats(),{starts:3,deliveries:3,acks:3,aborts:0});
  }));
- await group('receiver-erasure-and-arrow-repair',()=>fixture(detachedApi,{cancellable:true},async({m,clock,client})=>{
-  const out=watch(m.detached(new AbortController().signal,{id:'r',to:'t',text:'x'}),clock);await clock.advance(0);
-  assert(out.error instanceof TypeError);assert(out.error.message.includes('connection'));
+ await group('printed-receiver-erasure-and-arrow-repair',()=>fixture(detachedApi,{cancellable:true},async({clock,output,g})=>{
+  await clock.advance(0);
+  const message="Cannot read properties of undefined (reading 'connection')";
+  assert(detached.includes('// '+message));
+  assert.deepEqual(output,[{args:[message],at:0}]);assert.equal(g.stats().starts,0);
   // The printed bound adapter is exercised in the cooperative and Turn groups.
  }));
- await group('object-decorator-repair',()=>fixture(objectApi,{accept:0,reply:0,cancellable:true},async({m,clock,g,client})=>{
+ await group('printed-object-decorator-repair',()=>fixture(objectApi,{accept:0,reply:0,cancellable:true},async({m,clock,g,client})=>{
   const sender=new m.RetryingSender(client,3),out=watch(sender.send(new AbortController().signal,{id:'r',to:'t',text:'x'}),clock);
   await clock.advance(0);assert.deepEqual(out,{value:{messageId:'r'},at:0});assert.equal(g.stats().deliveries,1);
+  let calls=0;const failFirst={connection:'kept',async send(signal,notice){
+   assert.equal(this.connection,'kept');if(++calls===1)throw new Error('refused');return {messageId:notice.id};
+  }};
+  assert.deepEqual(await new m.RetryingSender(failFirst,3).send(new AbortController().signal,{id:'r2',to:'t',text:'x'}),{messageId:'r2'});
+  assert.equal(calls,2);
+ }));
+ await group('keyed-send-without-cancellation-keeps-work-running',async()=>{
+  for(const accept of [1000,3000])await fixture(oldApi,{accept,reply:3000,keyed:true},async({m,clock,g})=>{
+   const out=watch(m.withRetry(m.withTimeout(g.send,2000),3)(m.notice),clock);
+   const learned=accept===1000?2100:4100;
+   await clock.advance(learned);assert.deepEqual(out,{value:{messageId:m.notice.id},at:learned});
+   assert.equal(g.stats().deliveries,1);assert(clock.events.size>0,'A request still has a response pending');
+   assert(g.stats().acks<g.stats().starts);
+   await clock.advance(6000);assert.equal(g.stats().starts,accept===1000?2:3);
+   assert.equal(g.stats().acks,g.stats().starts);assert.equal(g.stats().deliveries,1);
+  });
+ });
+ await group('last-connect-failure-cannot-rule-out-earlier-acceptance',()=>fixture(keyedApi,{accept:1000,reply:3000,cancellable:true,keyed:true},async({m,clock,g,keyedClient})=>{
+  const sendOnce=keyedClient.sendOnce;let calls=0;
+  keyedClient.sendOnce=(signal,notice)=>++calls===1?sendOnce(signal,notice):Promise.reject(new Error('could not connect'));
+  const out=watch(m.runJob(m.sendShipped),clock);await clock.advance(7000);
+  assert.deepEqual(out,{value:'unconfirmed',at:2000});assert.equal(calls,3);
+  assert.deepEqual(g.stats(),{starts:1,deliveries:1,acks:0,aborts:1});
  }));
  await group('selective-retry-and-escaping-errors',()=>fixture(keyedApi,{},async({m,clock,keyedClient})=>{
   const fault=new TypeError('broken call');let calls=0;const f=async()=>{calls++;throw fault;};

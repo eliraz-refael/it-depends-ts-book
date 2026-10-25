@@ -1,0 +1,85 @@
+{
+  "status": "draft 2 frozen; Principle-only read and targeted recheck pending",
+  "date": "2026-10-25",
+  "settled_plan_commit": "fb762c4",
+  "review_commit": "108e810",
+  "path": "book/03-patterns-and-design/08-hof-patterns.md",
+  "sha256": "e53251d7bebd3878b92de05b8da4a68ac91e00e0d6d16b89f558799ca24b71f5",
+  "manuscript_mtime_utc": "2026-10-25T10:27:48.645386+00:00",
+  "words": 2383,
+  "typescript_fences": 13,
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "sha256": "d2bed59f042480a10bdc7f9f21b8debff6f3f13966efbb5009a181244aa1c2c6"
+    },
+    {
+      "ordinal": 2,
+      "sha256": "9bf79da620de2ff5a854e789c304b79a3e01b8b106f2762fc8df085e0d18cd07"
+    },
+    {
+      "ordinal": 3,
+      "sha256": "d023572383321084c663d4653e01683cc8823b1bac6beaf2c68124b302073e7c"
+    },
+    {
+      "ordinal": 4,
+      "sha256": "9248de81296a6670456513647ce349c015fda24e9d9196175fbe343c00966ca7"
+    },
+    {
+      "ordinal": 5,
+      "sha256": "02dc0348dc0e4c30ef5cc20392810e8405960a4b185b5f112aca751fa711e225"
+    },
+    {
+      "ordinal": 6,
+      "sha256": "9578332a361c89c995210dadb8a0632bb31c486750c61f3663eeffd376f3b64c"
+    },
+    {
+      "ordinal": 7,
+      "sha256": "37718817e05e24fc6c1635a90de5d24ae96365d2b5e70336301b531f03b42bbb"
+    },
+    {
+      "ordinal": 8,
+      "sha256": "c6cb1c5999450c97696b2e3c1dc08a3843b75c1b803e4c38a9ab16bbdba6d896"
+    },
+    {
+      "ordinal": 9,
+      "sha256": "b811a923d0f556922428564996050e11126171fab1f3f571115d9b6c7d236696"
+    },
+    {
+      "ordinal": 10,
+      "sha256": "ee850e36933bd57ec910104d3b9a636cecd5f5421eb59a265f32ed4ed4670a57"
+    },
+    {
+      "ordinal": 11,
+      "sha256": "76d2de47cdf4d9fae0114dc37dfaa593b1a6cbc2be55df112fa4a3d7f8e6acbf"
+    },
+    {
+      "ordinal": 12,
+      "sha256": "9ddb46c0c13a2db516154063e649dc2b97eb81052867a373cdc8c8ea1aab04a2"
+    },
+    {
+      "ordinal": 13,
+      "sha256": "28ff702e38752a137109165816e0187b97efe9bcbc8cc5d18f19eef8dee96003"
+    }
+  ],
+  "validator_sha256": "92aff3e7254e37f94f5119fa7cc4486f150258e189b06277d2c7c8180a643ca0",
+  "typescript": "7.0.2",
+  "node": "v22.23.3",
+  "validation": {
+    "install": "npm ci --offline: exit 0",
+    "full_suite": "npm run check: exit 0 on frozen draft 2; no subsequent manuscript or validator edits",
+    "chapter_counts": {
+      "fences": 13,
+      "compiler_cases": 16,
+      "runtime_groups": 19
+    },
+    "book_counts": {
+      "fences": 374,
+      "compiler_cases": 494,
+      "runtime_groups": 214,
+      "default_cases": 2,
+      "searches": 2
+    }
+  }
+}
