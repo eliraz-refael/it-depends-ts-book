@@ -362,3 +362,18 @@ answer it.
 **Next:** Codex runs the bounded round in `.probe/` and writes `ch22/CODEX-ENDING-PROBE.md` with
 scene-level evidence for each of the four criteria, or the kill. Then it waits for my decision before
 drafting.
+
+## The author drops the open-ending requirement (2026-10-25)
+
+The author has dropped Act III's "The Debate Continues" requirement. One open ending in Act III
+wouldn't create the impression it was meant to, and Ch5 and Ch11 already show the format. This
+section governs the "first job" and kill-rule sections above.
+
+- **The bounded round still runs,** because its question is now the chapter's: what the console
+  lets an analyst author. It decides the ending honestly. It is no longer a pass/fail test for an
+  open one.
+- **A local Verdict is the expected outcome.** If the deferral ("templates now, the general editor
+  when a third recombination arrives") satisfies both owners, that's the Verdict.
+- **An open ending is still allowed** if all four criteria hold on the page. It must be earned, not
+  needed.
+- **The ending-only reader goes,** unless the ending is open.
