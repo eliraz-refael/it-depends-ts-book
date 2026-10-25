@@ -32,7 +32,7 @@ function example(name,source,codes=[]){
 const first=example('printed-incident',opening+loss+'export {active,holds,order,restored};');
 const jsonError=example('json-rejects-visible-callback',opening+json,[2322]);
 assert(jsonError.diagnostics[0].message.includes("Property 'extraHold' is incompatible with index signature."));
-const repaired=example('printed-versioned-record',opening+jsonType+record+'export {auditRecord,evaluators,reviewV2,parameters,order};');
+const repaired=example('printed-versioned-record',opening+jsonType+record+'export {auditRecord,evaluators,reviewRefunds,parameters,order};');
 const widenedKey=example('record-name-needs-literal-key',opening+jsonType+replace(
  replace(record,'} as const satisfies Json;','} satisfies Json;'),
  'console.log(evaluators[auditRecord.evaluator](',
@@ -76,7 +76,7 @@ type Configuration=Rule|Template;
 function toFunction(config:Configuration):(order:Order)=>Decision {
  return 'when' in config?order=>evaluate(config,order):order=>evaluateTemplate(config,order);
 }
-const third:Rule={version:2,id:rule.id,when:{kind:'all',conditions:[
+const third:Rule={version:1,id:rule.id,when:{kind:'all',conditions:[
  {kind:'totalAbove',amount:params.amount},
  {kind:'any',conditions:[{kind:'country',code:params.country},{kind:'refundsAbove',count:params.count,days:params.days}]},
 ]}};
@@ -101,14 +101,14 @@ const paramShape={amount,country,count};
 const templateShape={id:z.string(),name:names};
 const TemplateV1=z.object({version:z.literal(1),id:z.string(),name:z.literal('country-velocity'),params:z.object(paramShape).strict()});
 const TemplateV2=z.object({version:z.literal(2),...templateShape,params:z.object({...paramShape,days})});
-// The tree is a new proposal, not a deployed version-1 format.
-const RuleV2=z.object({version:z.literal(2),id:z.string(),when:condition});
+// The proposed tree starts at its first format; only templates have an older shape.
+const RuleV1=z.object({version:z.literal(1),id:z.string(),when:condition});
 export function readSavedTemplate(input:unknown):Template{
  const parsed=z.union([TemplateV1,TemplateV2]).parse(input);
  return {...parsed,version:2,params:{...parsed.params,days:parsed.version===1?7:parsed.params.days}};
 }
 export function readSavedRule(input:unknown):Rule{
- return RuleV2.parse(input);
+ return RuleV1.parse(input);
 }
 `);
 function capture(program,fn){const output=[],log=console.log;
@@ -129,9 +129,9 @@ group('hidden-function-remains-at-runtime',()=>capture(hidden,(m)=>{
 group('printed-repaired-record-and-historical-code',()=>capture(repaired,(m,out)=>{
  assert.deepEqual(out,[[true],[true]]);const log=copy(m.auditRecord);
  assert.equal(m.evaluators[log.evaluator](log.parameters,log.input),log.held);
- // Retaining review-2, rather than invoking the new default, is what makes the old record reproducible.
- const versions={...m.evaluators,'review-3':()=>false};
- assert.equal(versions['review-3'](),false);assert.equal(versions[log.evaluator](log.parameters,log.input),true);
+ // Retaining release-a81f, rather than invoking the new default, is what makes the old record reproducible.
+ const versions={...m.evaluators,'release-c49b':()=>false};
+ assert.equal(versions['release-c49b'](),false);assert.equal(versions[log.evaluator](log.parameters,log.input),true);
  assert.equal(typeof log.parameters,'object');assert.equal(log.input.refundDaysAgo[2],7);
 }));
 group('printed-rule-output',()=>capture(data,(m,out)=>{
@@ -154,7 +154,7 @@ group('shared-replay-rejects-both-wrong-combinations',()=>capture(wrongCode,(m)=
  assert.throws(()=>gate(wrongData),/sample-0,sample-3/);assert.throws(()=>gate(m.tooBroadInCode),/sample-0,sample-3/);
  assert.equal(gate(model.ruleHold),model.ruleHold);assert.equal(gate(model.templateHold),model.templateHold);
 }));
-group('old-campaign-reader-preserves-seven-day-window',()=>{
+group('old-country-velocity-reader-preserves-seven-day-window',()=>{
  const oldTemplate={...copy(model.selected),version:1,name:'country-velocity'};delete oldTemplate.params.days;
  const migrated=reader.readSavedTemplate(oldTemplate);
  assert.deepEqual(migrated,{...model.selected,name:'country-velocity'});
@@ -165,7 +165,7 @@ group('old-campaign-reader-preserves-seven-day-window',()=>{
  assert.throws(()=>reader.readSavedTemplate({...oldTemplate,version:99}));
  const brokenRule=copy(model.rule);delete brokenRule.when.conditions[1].conditions[1].days;
  assert.throws(()=>reader.readSavedRule(brokenRule));
- assert.throws(()=>reader.readSavedRule({...model.rule,version:1}));
+ assert.throws(()=>reader.readSavedRule({...model.rule,version:2}));
  assert.throws(()=>reader.readSavedRule({...model.rule,version:99}));
 });
 group('assertion-on-stored-template-silently-loses-match',()=>capture(stale,(m)=>{
@@ -176,8 +176,8 @@ group('history-first-regrouping-drops-total-and-restricts-refunds',()=>capture(f
  const ids=fn=>model.samples.filter(fn).map(o=>o.id);
  // The incident's live hook was total OR velocity, with no country condition.
  assert.deepEqual(ids(o=>m.holds(m.active,o)),['sample-1','sample-3','sample-4','sample-5','sample-6','sample-7']);
- const campaign={...model.selected,name:'country-velocity'};
- assert.deepEqual(ids(o=>model.evaluateTemplate(campaign,o).hold),['sample-1','sample-5']);
+ const countryVelocity={...model.selected,name:'country-velocity'};
+ assert.deepEqual(ids(o=>model.evaluateTemplate(countryVelocity,o).hold),['sample-1','sample-5']);
  // The second regrouping restores large totals globally, but keeps the FR restriction on velocity.
  assert.deepEqual(ids(o=>model.templateHold(o).hold),['sample-1','sample-4','sample-5','sample-6','sample-7']);
 }));
@@ -194,12 +194,13 @@ group('printed-reader-to-callable',()=>{
  });}finally{if(prior)Object.defineProperty(globalThis,'readSavedTemplate',prior);else delete globalThis.readSavedTemplate;}
 });
 group('parameter-edits-remain-available-in-both',()=>{
- for(const p of [{...model.params,amount:501},{...model.params,count:3},{...model.params,country:'US'},{...model.params,days:6}]){
+ for(const p of [{...model.params,amount:450},{...model.params,count:3},{...model.params,country:'US'},{...model.params,days:6}]){
   const rule=copy(model.rule);rule.when.conditions[0].amount=p.amount;
   rule.when.conditions[1].conditions[0].code=p.country;
   Object.assign(rule.when.conditions[1].conditions[1],{count:p.count,days:p.days});
   const parsedRule=reader.readSavedRule(rule),parsedTemplate=reader.readSavedTemplate({...model.selected,params:p});
   for(const order of model.samples)assert.deepEqual(model.evaluate(parsedRule,order),model.evaluateTemplate(parsedTemplate,order));
+  if(p.amount===450)assert.equal(model.samples.filter(o=>model.evaluateTemplate(parsedTemplate,o).hold).length,8);
  }
 });
 group('three-of-eight-samples-change-with-new-template',()=>{
@@ -211,11 +212,11 @@ group('three-of-eight-samples-change-with-new-template',()=>{
 });
 group('serialized-rule-and-template-audit-replay',()=>{
  const registry={
-  'rules-2':(policy,order)=>model.evaluate(reader.readSavedRule(policy),order),
-  'templates-2':(policy,order)=>model.evaluateTemplate(reader.readSavedTemplate(policy),order),
+  'rules-release-b46e':(policy,order)=>model.evaluate(reader.readSavedRule(policy),order),
+  'templates-release-f62c':(policy,order)=>model.evaluateTemplate(reader.readSavedTemplate(policy),order),
  };
  let count=0;
- for(const [artifact,policy]of [['rules-2',model.rule],['templates-2',model.selected]])for(const input of model.samples){
+ for(const [artifact,policy]of [['rules-release-b46e',model.rule],['templates-release-f62c',model.selected]])for(const input of model.samples){
   const record=copy({artifact,policy,input,decision:registry[artifact](policy,input)});
   assert.deepEqual(registry[record.artifact](record.policy,record.input),record.decision);count++;
  }
@@ -230,10 +231,10 @@ group('later-authoring-retains-named-records-and-consumers',()=>capture(later,(m
 }));
 group('fictional-census-categories-and-printed-counts',()=>{
  const requests=[
+  ['parameter','amount 500 to 450'],['parameter','amount 450 to 500'],
   ['operation','add refund velocity to total check'],
   ['combination','replace total OR velocity with country AND velocity'],
-  ['parameter','refundDays 7 to 14 (version 2 exposes the window)'],['parameter','refundDays 14 to 7'],
-  ['parameter','amount 500 to 450'],['parameter','amount 450 to 500'],
+  ['parameter','country FR to US'],['parameter','country US to FR'],
   ['parameter','count 2 to 3'],['parameter','count 3 to 2'],
   ['combination','large OR (country AND velocity), current request'],
  ];

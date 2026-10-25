@@ -1,5 +1,39 @@
 # Chapter 22 self-review — The Policy's Alibi
 
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**, 2026-10-25.
+
+[Manuscript](../../book/03-patterns-and-design/09-config-to-function.md): **2,464 words**, including code; **12 TypeScript fences**. SHA-256: `8f2ecb7c9e11f78a6a71ea09ff5f29c7488d9100e74ac668a08624e75d5b093d`.
+[Draft-3 snapshot](ch22/DRAFT3-SNAPSHOT.json). Earlier snapshots and Claude's verbatim reader reports are unchanged.
+
+`npm ci --offline` and full `npm run check`: **exit 0**, TypeScript **7.0.2**, Node **v22.23.3**. Chapter 22: **12 fences / 17 compiler cases / 17 runtime groups**; full book **386 / 511 / 234**, plus two default cases and two searches. No manuscript or validator edits followed the full run. Local logs: `.probe/ch22-draft3-install.log`, `.probe/ch22-draft3-targeted.log`, `.probe/ch22-draft3-full-check.log` (untracked). The targeted pass preceded the final request-ledger ordering, threshold assertion and whitespace cleanup; the full run covers the exact snapshot.
+
+## Response to Claude's draft-2 review
+
+All findings in [CLAUDE-REVIEW-2](ch22/CLAUDE-REVIEW-2.md), committed with the verbatim [Principle read](ch22/CLAUDE-DRAFT2-PRINCIPLE-READ.md) and [targeted recheck](ch22/CLAUDE-RECHECK-READ.md) at `c25817f`, are accepted. No new argument or implementation family is added.
+
+1. **History separated from versions.** The opening now identifies the total template as the console's selection on the third and the live policy as what the logger received. The later history is two turns: Eden recalls total/country templates, adding refunds to total, then country-and-velocity; Dafna specifies that the last change replaced the active policy and dropped the total branch. Today's request adds that branch back globally. Settings versions are absent from this exchange.
+2. **Three unrelated version labels removed.** The exact retained evaluator is named `release-a81f`, with the implementation named `reviewRefunds`. The proposed tree starts at format 1. The existing template settings still have a format-1/format-2 migration. The reader fixtures follow those separate histories; evaluator release identifiers in audit replay are distinct from data-format numbers. The census uses a total-threshold change (500 to 450), not the request that exposed the window field.
+3. **Old settings cued by the code.** Dafna points to `country-velocity` in Eden's template union and asks to reopen its old activations for compliance. Eden answers in one turn: old format fixed seven days, current format requires the editable window. The unexplained campaign and the extra hypothetical tree-migration turn are gone. The Principle's old-value rule still has an actual scene.
+4. **The next regrouping.** Dafna explicitly identifies the third request as the next one. Suppressed requests still count immediately. Gil distinguishes counting requests from calculating when to build an editor; he no longer denies having found the number three. The agreement remains a work trigger, not a same-day delivery promise or an evidence-derived optimum.
+5. **Principle.** Liron says Lisp let him treat code as data; the reversed idiom is gone. Option B names the exact code that made the decision and says to keep it to rerun old decisions. Named templates are introduced as combinations engineers write. The optional all-callers-only-call case is included: a function is fine there. The round-trip question and 'Editing a type won't do that job' remain.
+6. **Line-level.** 'A template' replaces 'one'; loading explicitly needs no orders-service release. The compatibility tail leaves the Turn and becomes Eden's Verdict commitment. That same turn confirms that every decision records the loaded evaluator version, settings and order facts for either format.
+
+## Validation and self-check
+
+The suite retains the same count because this revision mostly renames and narrows existing cases. It checks the renamed release lookup and its TS7053 regression, the tree's first format and rejection of unsupported format 2, template migration from the known old shape, replay through distinct retained releases, and continued support for named callers when trees are added. The printed threshold example is now one of the four parameter edits: changing 500 to 450 holds all eight fixed sample orders in both designs. The fictional ledger puts the two total-threshold edits before the refund operation, with country/count edits on the later template; none of the six edits depends on adding a window field. The ledger does not claim to enumerate engineering format changes or unfiled requests.
+
+The four Principle transfer cases still have an answer in the text: persist a replayable record for the optional callback; implement an unsupported operation in either design; parse old records rather than trusting a new type; and check the dashboard as a consumer rather than assuming the build caller is the only one. This is a self-check, not the final isolated reader's verdict.
+
+The manuscript is 54 words shorter than draft 2. The alibi and restored-false reveal remain; the recheck reader still chose them as the scene to retell. The tree/interpreter code is unchanged apart from its first format number. The remaining pacing test is whether two speakers make the policy history easier to retain and whether pointing at the template name earns the old-settings question. No additional full reader is requested by Claude's brief; the final Principle-only read and diff review are pending.
+
+No production counts, timings or regulatory requirements were added. The sample count, request census, parser fixtures and audit replay retain the limits in the checks README. The historical draft-2 and draft-1 assessments below are superseded where they describe version names, the window census example or the chronology presentation.
+
+**Local commit only; no push.**
+
+---
+
+## Historical draft-2 self-review
+
 Status: **DRAFT 2 FROZEN; PRINCIPLE-ONLY READ AND TARGETED RECHECK PENDING**, 2026-10-25.
 
 [Manuscript](../../book/03-patterns-and-design/09-config-to-function.md): **2,518 words**, including code; **12 TypeScript fences**. SHA-256: `89f14da7b95043c9e23260d86de1eab22b88df8cf734eb1b4652225a475b9e5c`.

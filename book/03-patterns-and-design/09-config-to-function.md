@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Liron Closure**: "Before you turn configuration into a function, find everyone who uses it. Some callers need something they can call. Others need something they can save, edit or explain later. Lisp spoiled me for treating code as data, but JSON won't keep a JavaScript function. Save a description and let code read it and make the decision. That code is your evaluator. Or save the name of a code version you'll keep available for replay, plus its parameters. Then test the round trip: save it, load it, and apply the same recorded input with the same evaluator version. Does it make the same decision?"
+**Liron Closure**: "Before you turn configuration into a function, find everyone who uses it. If every caller only calls it, a function is fine. But someone may need to save, edit or explain it later. Lisp let me treat code as data. JSON won't keep a JavaScript function. Save a description and let code read it and make the decision. That code is your evaluator. Or record the name of the exact code that made the decision, plus its parameters. Keep that code so you can rerun old decisions. Then test the round trip: save it, load it, and apply the same recorded input with the same evaluator version. Does it make the same decision?"
 
-"For the next change, ask what kind of change it is. A new parameter value? Its author can edit the data. A combination the format already permits? A rule's author can write it. With named combinations in code, an engineer still has to do that work. Or a new operation? An engineer must implement it in either design. When you load old stored values, parse them and preserve their old meaning or reject them. Editing a type won't do that job."
+"For the next change, ask what kind of change it is. A new parameter value? Its author can edit the data. A combination the format already permits? A rule's author can write it. If engineers write the combinations as named templates, another combination needs an engineer. Or a new operation? An engineer must implement it in either design. When you load old stored values, parse them and preserve their old meaning or reject them. Editing a type won't do that job."
 
 ## The Debate
 
@@ -18,7 +18,7 @@
 
 Dafna maintains the risk team's console. Analysts use it to edit review settings and activate revisions. Eden owns the orders service, which decides whether an order can ship or needs manual review. They jointly own the interface between the console and the service. The risk team decides which orders should be held.
 
-The audit log promises a complete account of the active policy alongside the order facts and the decision. These are the facts it retained for order forty-two. The refund ages were measured at that decision, not when Dafna opened the record:
+The audit log promises a complete account of the active policy alongside the order facts and the decision. On the third, the console had selected the total template; the logger received its live policy object, shown below. The refund ages were measured at that decision, not when Dafna opened the record:
 
 ```typescript
 type Order = {
@@ -89,22 +89,22 @@ const savedPolicy: Json = active; // Error TS2322
 
 **Eden**: "I need to store which code ran. The parameters alone aren't the policy."
 
-He records the parameters and input under `"review-2"`, using `as const` to keep that name as a literal key for the lookup:
+He records the parameters and input under `"release-a81f"`, using `as const` to keep that name as a literal key for the lookup:
 
 ```typescript
 const parameters = { reviewAbove: 500, refundCount: 2, refundDays: 7 };
 
-function reviewV2(p: typeof parameters, order: Order): boolean {
+function reviewRefunds(p: typeof parameters, order: Order): boolean {
   return order.total > p.reviewAbove
     || order.refundDaysAgo.filter(age => age <= p.refundDays).length > p.refundCount;
 }
 
-const evaluators = { "review-2": reviewV2 };
+const evaluators = { "release-a81f": reviewRefunds };
 const auditRecord = {
-  evaluator: "review-2",
+  evaluator: "release-a81f",
   parameters,
   input: order,
-  held: reviewV2(parameters, order),
+  held: reviewRefunds(parameters, order),
 } as const satisfies Json;
 
 console.log(evaluators[auditRecord.evaluator](
@@ -112,9 +112,9 @@ console.log(evaluators[auditRecord.evaluator](
 )); // true
 ```
 
-**Dafna**: "And after `review-3` replaces it?"
+**Dafna**: "And after the next release replaces it?"
 
-**Eden**: "The old record still names `review-2`. We retain that artifact for replay. I can't quietly give the old name new code."
+**Eden**: "The old record still names `release-a81f`. We retain that artifact for replay. I can't quietly give the old name new code."
 
 **Dafna**: "Then I can answer the question about the third. The JSON has no function, but it tells me which one to use."
 
@@ -128,15 +128,15 @@ Dafna adds the saved-and-replayed order to the test. This time, both decisions s
 
 **Dafna**: "That fixes the record. It doesn't fix my next ticket."
 
-The console already uses named templates: analysts choose one and edit its fields, while engineers write the combinations. It started with separate total and country checks.
+The console offers named templates: analysts choose one and edit its fields, while engineers write the combinations. Dafna wants to replace the selector with an editor for combining conditions.
 
-On the third, Eden added refund velocity to the total check. The first regrouping then replaced that policy with **FR AND velocity**, dropping the total branch; its version-1 settings stored the count and fixed the window at seven days. Version 2 added `days` when analysts asked to edit that window.
+**Eden**: "We started with total and country templates. On the third, I added refunds to the total one. Then came country-and-velocity."
 
-Now the risk team wants **large total OR (FR AND refund velocity)**, bringing high totals back for every country. Dafna wants to replace the template selector with an editor where analysts can make that combination themselves.
+**Dafna**: "Which replaced it. Risk dropped the total branch. Now they want high totals back for every country, alongside FR and refund velocity. We have the conditions. They send me the grouping, and I send you a request to write it."
 
-**Dafna**: "We have all three conditions. An analyst should be able to join them. Today they send me the grouping, and I send you a request to write it."
+The requested grouping is **large total OR (FR AND refund velocity)**.
 
-**Eden**: "I can load the policy code separately from the orders service. One of us writes the template, another reviews its expression and replay cases, then we load that version."
+**Eden**: "I can load the policy code without an orders-service release. One of us writes the template, another reviews its expression and replay cases, then we load that version."
 
 **Dafna**: "They still need you to write the expression."
 
@@ -156,7 +156,7 @@ type Condition =
   | { kind: "country"; code: string }
   | { kind: "refundsAbove"; count: number; days: number }
   | { kind: "all" | "any"; conditions: readonly Condition[] };
-type Rule = { version: 2; id: string; when: Condition };
+type Rule = { version: 1; id: string; when: Condition };
 
 function matches(condition: Condition, order: Order): boolean {
   switch (condition.kind) {
@@ -179,7 +179,7 @@ const large: Condition = { kind: "totalAbove", amount: params.amount };
 const inCountry: Condition = { kind: "country", code: params.country };
 const velocity: Condition = { kind: "refundsAbove", count: params.count, days: params.days };
 const rule: Rule = {
-  version: 2, id: "review-hold",
+  version: 1, id: "review-hold",
   when: { kind: "any", conditions: [
     large, { kind: "all", conditions: [inCountry, velocity] },
   ] },
@@ -242,13 +242,11 @@ console.log(JSON.stringify(templateHold(order))); // {"hold":true,"reasons":["re
 
 **Dafna**: "We can change the amount, the country, the count and the days. The next grouping is another template."
 
-**Eden**: "That's the limit I'm offering. This request has one now."
+**Eden**: "That's the limit I'm offering. This request has a template now."
 
-**Dafna**: "I still need to open the old campaign activations. Their settings don't have `days`."
+**Dafna**: "You've kept `country-velocity` in the list. Can I reopen its old activations for compliance? Their settings have a count but no `days`."
 
-**Eden**: "The version-1 reader supplies seven. It rejects a version-2 record without it, so a broken save can't quietly choose a window."
-
-**Dafna**: "I'll need versioned readers if the tree changes too. And the audit still needs the evaluator version. Saving the tree doesn't preserve an old implementation of `matches`."
+**Eden**: "Those are format 1, when the window was fixed at seven days. The reader supplies seven for them. Format 2 allows an editable window and rejects a missing `days`."
 
 ## The Turn
 
@@ -308,7 +306,7 @@ Gil has the policy requests from the past three months, including the open ticke
 
 | Changes | Kind | Example |
 |---:|---|---|
-| 6 | Parameter values | Change the refund window from seven days to fourteen |
+| 6 | Parameter values | Change the total threshold from 500 to 450 |
 | 2 | Existing conditions, new grouping | Add the large-total branch to country-and-velocity |
 | 1 | New condition | Add refund velocity to the total check |
 
@@ -324,7 +322,7 @@ Gil has the policy requests from the past three months, including the open ticke
 
 **Sahar**: "Then ask for the ones they held back. Use the templates now, and start the general editor at the third regrouping request, including those."
 
-**Dafna**: "I'll ask them directly. If there's another grouping waiting, it counts now. We don't reset the count when we ship this one."
+**Dafna**: "That's the next one. I'll ask them directly. If there's another grouping waiting, it counts now."
 
 **Chen**: "Dafna, does today's analyst need a grouping that's still missing?"
 
@@ -334,15 +332,11 @@ Gil has the policy requests from the past three months, including the open ticke
 
 **Dafna**: "I haven't promised that. It triggers the work. We still have to build it."
 
-**Eden**: "We can continue accepting the old named records when we add trees. The old audit entries still use their retained code versions."
-
-**Chen**: "The old activations aren't waiting for the editor, then."
-
 ## The Verdict
 
 **Dafna**: "I'll add the template and ask about the requests they held back. The third regrouping starts the editor work. Let's put that in our backlog agreement, so the next request doesn't become this meeting again."
 
-**Eden**: "Agreed. I'll own the service's rule input when we get there. For now, it accepts these named templates and their parameters."
+**Eden**: "Agreed. The service takes named templates for now, and will still read them when we add trees. Every decision logs the loaded evaluator version, the settings and the order facts, whichever format we accept."
 
 The existing reader validates the saved template name and parameters, and handles the version-1 window. The order consumer receives a function after that boundary:
 
@@ -355,9 +349,9 @@ const evaluateOrder = (order: Order): Decision => evaluateTemplate(loaded, order
 console.log(evaluateOrder(order).hold); // true
 ```
 
-**Gil**: "Three wasn't in my findings. I counted two requests."
+**Gil**: "I counted requests. I didn't calculate when you should build an editor."
 
-**Dafna**: "Three is where we've agreed to start the work. You don't have to certify it."
+**Dafna**: "We're agreeing to start at the next regrouping. You don't have to certify it."
 
 **Sahar**: "And the question about order forty-two?"
 

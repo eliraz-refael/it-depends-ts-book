@@ -1,6 +1,6 @@
 # Chapter 22 — Configuration to Function (working title)
 
-Status: **DRAFT 2 FROZEN; PRINCIPLE-ONLY READ AND TARGETED RECHECK PENDING**, 2026-10-25. The ending decision and drafting brief below govern the historical original proposal; the author has dropped the open-ending requirement.
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**, 2026-10-25. The ending decision and drafting brief below govern the historical original proposal; the author has dropped the open-ending requirement.
 Branch: `codex/chapter-22-config-to-function`, based on `origin/main` `0364069`.
 File: `book/03-patterns-and-design/09-config-to-function.md`.
 
@@ -265,7 +265,7 @@ Also update `checks/README.md`, `checks/run.cjs`, `docs/editorial/README.md` and
 
 - [x] Codex challenges this plan, ending first; disagreements are settled on evidence ([challenge](ch22/CODEX-PLAN-CHALLENGE.md)).
 - [x] One bounded design round on the ending; local Verdict accepted in `e0f4d2d`.
-- [x] Codex drafts and self-reviews ([draft 2](CH22-REVIEW.md)).
+- [x] Codex drafts and self-reviews ([draft 3](CH22-REVIEW.md)).
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck if needed
   and a final diff review. No ending-only reader under the settled brief.
 - [x] Checks durable; full suite green (Ch22: 12/17/17; book: 386/511/234).
@@ -467,3 +467,17 @@ opening old activations motivates the legacy reader.
 manuscript and validator: Ch22 12/17/17; full book 386/511/234, plus two default cases and
 two searches. No subsequent manuscript or validator edits. The revised Principle-only read
 and targeted recheck are pending. Local Verdict unchanged; no ending quota or staged dissent.
+
+## Draft 3 handoff after the second review (2026-10-25)
+
+[Draft 3](ch22/DRAFT3-SNAPSHOT.json) addresses the review committed at `c25817f`;
+[dispositions](CH22-REVIEW.md). Policy history is now a short exchange, with the live policy
+identified as the total template's output on the third. Settings versions appear only when
+Dafna points at `country-velocity` and asks to reopen old activations. The retained release
+identifier is separate from format numbers; the proposed tree starts at format 1. The census
+uses a threshold edit, and the third regrouping is explicitly the next request.
+
+2,464 words; 12 fences. `npm ci --offline` and full `npm run check` exit 0 on the frozen text
+and validator: Ch22 12/17/17; book 386/511/234, plus two default cases and two searches. No
+subsequent manuscript or validator edits. Final Principle-only read and diff review pending.
+Local Verdict unchanged; no new full-reader round unless the reviewer finds it necessary.

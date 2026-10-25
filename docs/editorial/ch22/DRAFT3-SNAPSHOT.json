@@ -1,0 +1,82 @@
+{
+  "status": "draft 3 frozen; final Principle-only reader and diff review pending",
+  "date": "2026-10-25",
+  "settled_plan_commit": "e0f4d2d",
+  "path": "book/03-patterns-and-design/09-config-to-function.md",
+  "sha256": "8f2ecb7c9e11f78a6a71ea09ff5f29c7488d9100e74ac668a08624e75d5b093d",
+  "manuscript_mtime_utc": "2026-10-25T14:14:09.988074+00:00",
+  "words": 2464,
+  "typescript_fences": 12,
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "sha256": "3ef088257f71903976505399fd407d89e87edf94bdeab28750128c3273fac136"
+    },
+    {
+      "ordinal": 2,
+      "sha256": "53ef5b7b40820c15e7e3c35f205c246805246b74b70ed2c2e78c248c6d461e8a"
+    },
+    {
+      "ordinal": 3,
+      "sha256": "af6d389998f654731fb8a92f17878589c49c95060b569244f2b06fa50b8fe85b"
+    },
+    {
+      "ordinal": 4,
+      "sha256": "c319c237f601a4ba80459647c0634d6e47a9f8cf76fd609e2818591062b48591"
+    },
+    {
+      "ordinal": 5,
+      "sha256": "7409607b83458ba5a3b17ffad98c11f27fb019cec6352133d051a5c87d803004"
+    },
+    {
+      "ordinal": 6,
+      "sha256": "bc3aa8a7632965b2adb38a1dc019ced69bebd0ac0b3d3bbb27862eed563b194b"
+    },
+    {
+      "ordinal": 7,
+      "sha256": "6d69b435f6972d6891c224a55481eacecbe58a7f29304984c67cc31bea8db555"
+    },
+    {
+      "ordinal": 8,
+      "sha256": "bfb7822d36970ef740ecd20e9c22ba60a094792859a9423703ac163fc34981f7"
+    },
+    {
+      "ordinal": 9,
+      "sha256": "3d455cff708d94211904a48311525331d6deff094eeb9c65d772843ecfe27141"
+    },
+    {
+      "ordinal": 10,
+      "sha256": "ac840216d28508e28f763df1e6dcbc5548906f4b171009e98e36e32c2db7d194"
+    },
+    {
+      "ordinal": 11,
+      "sha256": "73be67ee09004a8ca24c8db1c6b9fb3938242de02cc4b259f801841edce381a9"
+    },
+    {
+      "ordinal": 12,
+      "sha256": "28e2ca5a86948ec61f32ab33dfeea8355f814b8c29625345553aa62cbcb7187a"
+    }
+  ],
+  "validator_sha256": "9cbc77b6e1385eead621f835d11c6e51eb0290aba313c053fdda1836c43c2f91",
+  "typescript": "7.0.2",
+  "node": "v22.23.3",
+  "validation": {
+    "install": "npm ci --offline: exit 0",
+    "full_suite": "npm run check: exit 0 on frozen draft 3; no subsequent manuscript or validator edits",
+    "targeted_suite": "node checks/chapter22.cjs: exit 0 before final ledger ordering, threshold assertion and whitespace cleanup; full suite covers the exact frozen draft",
+    "chapter_counts": {
+      "fences": 12,
+      "compiler_cases": 17,
+      "runtime_groups": 17
+    },
+    "book_counts": {
+      "fences": 386,
+      "compiler_cases": 511,
+      "runtime_groups": 234,
+      "default_cases": 2,
+      "searches": 2
+    }
+  },
+  "review_commit": "c25817f"
+}
