@@ -9,14 +9,14 @@ function block(prefix){const matches=fences.map((s,i)=>({s,i})).filter(x=>x.s.st
 function before(s,at){const i=s.indexOf(at);assert(i>=0,'Split: '+at);return s.slice(0,i);}
 function replace(s,a,b){assert.equal(s.split(a).length,2,'Unique replacement: '+a);return s.replace(a,b);}
 const types=block('type Result<T, E> ='),res=block('class Res<T, E> {');
-const preview=block('function preview(text:'),nested=block('const nested ='),onlyBadQty=block('const onlyBadQty:');
+const preview=block('function preview(text:'),nested=block('const nested =');
 const promises=block('const increased ='),arrays=block('console.log(JSON.stringify([2, 7].map');
 const load=block('async function loadPreview('),inspect=block('async function inspect()');
 const worker=block('const counts ='),helper=block('function andThen<T'),ladder=block('function plainPreview(');
 const repair=block('async function checkRepair()'),asyncMap=block('async function availabilityAsync(');
+const unwrap=block('async function loadUnwrapped('),resolve=block('const refusedAgain =');
 assert.equal(used.size,fences.length,'All fences extracted');
 const previewFn=before(preview,'console.log('),workerFn=before(worker,'const goodJob =');
-const helperFn=before(helper,'const offered =');
 const base=types+res+previewFn;
 // The manuscript explicitly renames only the method and call sites; retain their bodies byte-for-byte.
 const fixedRes=replace(res,'  then<U, F>','  andThen<U, F>');
@@ -39,7 +39,9 @@ const printed=example('printed-sync-preview-and-nesting',types+res+preview+neste
 type Nested=Assert<Equal<typeof nested,Res<Result<Offer,NoStock>,BadQty>>>;
 export {preview,nested,Res,parseQty,availability,ok};
 `);
-const union=example('printed-lost-no-stock',base+onlyBadQty,[2322]);
+const union=example('error-union-keeps-no-stock',base+`
+const onlyBadQty:Res<Preview,BadQty>=preview('7'); // Error TS2322
+`,[2322]);
 assert(union.diagnostics[0].message.includes("Type 'NoStock' is not assignable to type 'BadQty'."));
 const flat=example('printed-plain-union-helper',types+helper+equal+`
 type Offered=Assert<Equal<typeof offered,Result<Offer,BadQty|NoStock>>>;
@@ -59,6 +61,14 @@ const incident=example('printed-worker-incident',base+load+worker+equal+`
 type Adopted=Assert<Equal<Awaited<ReturnType<typeof loadPreview>>,Preview>>;
 export {counts,goodJob,refusedJob,runJob,loadPreview};
 `);
+const unwrapped=example('printed-unwrap-at-boundary',base+workerFn+unwrap+equal+`
+type Unwrapped=Assert<Equal<Awaited<ReturnType<typeof loadUnwrapped>>,Result<Preview,BadQty|NoStock>>>;
+export {loadUnwrapped,checkUnwrapped,runJob,counts};
+`);
+const resolved=example('printed-promise-resolve-also-adopts',base+resolve+equal+`
+type Resolved=Assert<Equal<typeof refusedAgain,Promise<Preview>>>;
+export {refusedAgain};
+`);
 const fixedJob=example('printed-renamed-worker',fixed+load+workerFn+repair+equal+`
 type Kept=Assert<Equal<Awaited<ReturnType<typeof loadPreview>>,Res<Preview,BadQty|NoStock>>>;
 export {counts,checkRepair,runJob,loadPreview,preview};
@@ -70,10 +80,6 @@ export {pendingInside,Res,availabilityAsync,parseQty};
 example('missing-ladder-check-is-an-error',types+replace(ladder,'  if (!qty.ok) return qty;\n','')
  .replace('availability(qty.value);','availability(qty.value); // Error TS2339')
  .replace('return ok({ quantity: qty.value, offer: offer.value.id });','return ok({ quantity: qty.value, offer: offer.value.id }); // Error TS2339'),[2339,2339]);
-const ignored=example('helper-can-discard-a-refusal',types+helperFn+`
-const ignored=andThen(parseQty('7'),n=>{availability(n);return ok('done');});
-export {ignored};
-`);
 example('old-method-name-no-longer-compiles',fixed+`
 preview('2').then((value:Preview)=>new Res(ok(value))); // Error TS2339
 `,[2339]);
@@ -98,7 +104,7 @@ class RejectingRes<T,E> implements PromiseLike<T> {
 async function realLoad(text:string):Promise<Preview> {return new RejectingRes(preview(text).result);}
 export {realLoad,runJob,counts};
 `);
-const wholeUnion=example('promise-compatible-whole-union',base+workerFn+`
+const wholeUnionBody=`
 class UnionThenable<T,E> implements PromiseLike<Result<T,E>> {
  constructor(readonly result:Result<T,E>) {}
  then<U=Result<T,E>,F=never>(
@@ -112,7 +118,12 @@ async function unionLoad(text:string):Promise<Result<Preview,BadQty|NoStock>> {
  return new UnionThenable(preview(text).result);
 }
 export {unionLoad,UnionThenable,runJob,counts,preview};
-`);
+`;
+const wholeUnion=example('promise-compatible-whole-union',base+workerFn+wholeUnionBody);
+const callbackChange=example('whole-union-cannot-keep-preview-callback',base+workerFn+wholeUnionBody+`
+new UnionThenable(preview('2').result).then((value:Preview)=>value.offer); // Error TS2345
+`,[2345]);
+assert(callbackChange.diagnostics[0].message.includes("Type 'Result<Preview, BadQty | NoStock>' is not assignable to type 'Preview'."));
 const omittedWrapper=example('plain-union-worker-closes-both',types+ladder+workerFn+`
 async function plainLoad(text:string):Promise<Result<Preview,BadQty|NoStock>> {return plainPreview(text);}
 export {plainLoad,runJob,counts};
@@ -129,22 +140,9 @@ const flatAnnotation=example('async-map-needs-different-return-type',fixed+async
 const wrong:Res<Offer,BadQty|NoStock>=pendingInside; // Error TS2322
 `,[2322]);
 assert(flatAnnotation.diagnostics[0].message.includes("Property 'id' is missing in type 'Promise<Result<Offer, NoStock>>'"));
-const asyncArray=example('async-flatmap-is-still-promises',`
-const mapped=[2,7].map(async n=>n+1);
-const flattened=[2,7].flatMap(async n=>n+1);
-const wrongMap:number[]=mapped; // Error TS2322
-const wrongFlat:number[]=flattened; // Error TS2322
-`,[2322,2322]);
-const analogies=example('fixture-array-await-and-optional-chain',`
-const mapped=[2,7].map(async n=>n+1);
-const flattened=[2,7].flatMap(async n=>n+1);
-function city(user:{address?:{city:string}}|null|undefined){return user?.address?.city;}
-export {mapped,flattened,city};
-`);
-assert(manuscript.includes('`user?.address?.city`'));
 assert(manuscript.includes('six callers'),'Fictional caller census remains on the page');
 function capture(program){const output=[],log=console.log;let module;
- try{console.log=(...args)=>output.push(args);delete require.cache[program.file];module=require(program.file);}
+ try{console.log=(...args)=>output.push(args);delete require.cache[require.resolve(program.file)];module=require(program.file);}
  finally{console.log=log;}return {module,output};}
 async function captureCall(fn){const output=[],log=console.log;
  try{console.log=(...args)=>output.push(args);await fn();}finally{console.log=log;}return output;}
@@ -195,6 +193,22 @@ async function main(){
   // Pending is established by the finite printed branch, not by a wall-clock timeout:
   // Res.then ignores the rejection callback and does not call success on a refusal.
  });
+ await group('printed-unwrapped-refusal',async()=>{
+  const a=capture(unwrapped).module;
+  assert.deepEqual(await captureCall(()=>a.checkUnwrapped()),[[JSON.stringify(expected[1])]]);
+  assert.deepEqual(a.counts,{started:1,closed:1,failed:0});
+ });
+ await group('unwrap-keeps-success-and-both-refusals-and-closes-jobs',async()=>{
+  const a=capture(unwrapped).module;
+  assert.deepEqual(await a.runJob(()=>a.loadUnwrapped('2')),expected[0]);
+  assert.deepEqual(await a.runJob(()=>a.loadUnwrapped('7')),expected[1]);
+  assert.deepEqual(a.counts,{started:2,closed:2,failed:0});
+  assert.deepEqual(await a.runJob(()=>a.loadUnwrapped('x')),expected[2]);
+  assert.deepEqual(a.counts,{started:3,closed:3,failed:0});
+ });
+ await group('promise-resolve-of-original-class-still-pends',async()=>{
+  await staysPending(capture(resolved).module.refusedAgain);
+ });
  const repaired=capture(fixedJob).module;
  await group('printed-repair-output-and-worker-counters',async()=>{
   const output=await captureCall(()=>repaired.checkRepair());
@@ -203,6 +217,7 @@ async function main(){
  });
  await group('rename-retains-both-domain-refusals-and-wrapper',async()=>{
   for(const [i,s] of ['2','7','x'].entries())assert.deepEqual((await repaired.loadPreview(s)).result,expected[i]);
+  assert.deepEqual((await Promise.resolve(repaired.preview('7'))).result,expected[1]);
   assert.equal('then' in repaired.preview('2'),false);
   assert.equal(typeof repaired.preview('2').andThen,'function');
  });
@@ -231,7 +246,6 @@ async function main(){
   assert.deepEqual(await a.runJob(()=>a.plainLoad('7')),expected[1]);
   assert.deepEqual(a.counts,{started:2,closed:2,failed:0});
  });
- await group('helper-does-not-force-result-consumption',()=>assert.deepEqual(capture(ignored).module.ignored,{ok:true,value:'done'}));
  await group('printed-async-map-starts-work-but-outer-await-does-not-await-field',async()=>{
   const a=capture(pending).module;
   assert(a.pendingInside.result.ok);assert(a.pendingInside.result.value instanceof Promise);
@@ -244,16 +258,6 @@ async function main(){
  await group('explicit-async-ladder-keeps-one-result-layer',async()=>{
   const a=capture(asyncLadder).module;
   for(const [i,s] of ['2','7','x'].entries())assert.deepEqual(await a.asyncPreview(s),expected[i]);
- });
- await group('async-flatmap-does-not-replace-promise-all',async()=>{
-  const a=capture(analogies).module;
-  assert(a.mapped.every(p=>p instanceof Promise));assert(a.flattened.every(p=>p instanceof Promise));
-  assert.deepEqual(await Promise.all(a.mapped),[3,8]);assert.deepEqual(await Promise.all(a.flattened),[3,8]);
- });
- await group('optional-chain-propagates-only-nullish-absence',()=>{
-  const {city}=capture(analogies).module;
-  assert.equal(city(undefined),undefined);assert.equal(city(null),undefined);assert.equal(city({}),undefined);
-  assert.equal(city({address:{city:''}}),'');assert.equal(city({address:{city:'Haifa'}}),'Haifa');
  });
  console.log(`Chapter 23: TypeScript ${version}; ${fences.length} fences, ${cases} compiler cases, ${groups} runtime groups. PASS.\nFixtures: ${scratch}`);
 }

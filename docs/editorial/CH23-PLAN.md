@@ -213,10 +213,10 @@ scene they'd retell):
 
 - [x] Codex challenges this plan: is the decision honestly opinionated, does the incident earn its
   place, and which ending. Disagreements are settled on evidence ([challenge](ch23/CODEX-PLAN-CHALLENGE.md)).
-- [x] Codex drafts and self-reviews ([record](CH23-REVIEW.md), [snapshot](ch23/DRAFT1-SNAPSHOT.json)).
+- [x] Codex drafts and self-reviews ([record](CH23-REVIEW.md), [draft 2 snapshot](ch23/DRAFT2-SNAPSHOT.json)).
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
-- [x] Draft 1 checks durable; full suite green (14 fences / 21 compiler cases / 19 runtime groups; book 400 / 532 / 253). Recheck any review revisions.
+- [x] Draft 2 checks durable; full suite green (15 fences / 21 compiler cases / 19 runtime groups; book 401 / 532 / 253). Recheck any review revisions.
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-27)
@@ -300,3 +300,11 @@ install and full suite at final review.
   should retell.
 - **Checks:** every fence goes in `checks/chapter23.cjs`. Run the full `npm run check`, freeze
   `ch23/DRAFT1-SNAPSHOT.json`, self-review in `CH23-REVIEW.md`, and commit locally.
+
+## Draft 2 after formal review (2026-10-27)
+
+The [first review](ch23/CLAUDE-REVIEW.md), committed as `858ecc5`, supersedes the original reader-case scope where noted here. Draft 2 keeps the protocol rule in the Principle but leaves resolving callbacks and the hang to the Turn. Optional chaining and its reader case (d) are cut. The unexercised Promise.all rule and its array-of-promises fixtures are cut too; the familiar array comparison remains about an array-returning step and one-level flattening. `onlyBadQty` is removed from the manuscript; a fixture still checks the error-union claim.
+
+The missing boundary repair now works on the page: return `preview(text).result`, preserving all six synchronous callers and closing both jobs. The class owner's reason to do more is demonstrated by direct `Promise.resolve(preview("7"))`, which still waits. The local Verdict stays with renaming because it repairs the class while preserving screen callback shapes and refusal propagation. The whole-Result thenable's changed callback parameter is explicit and checked. Sahar retains the real advantage of dropping the shell instead of withdrawing his proposal for lack of evidence.
+
+For the next Principle-only read, drop optional-chaining case (d). Replace the out-of-scope async-array case (b) with a step returning an array or Result: which operation keeps the intended single container? Case (a) should test recognition that the named method must follow the promise protocol, not demand the exact missing-callback trace now deliberately reserved for the Turn. Keep case (c), comparing an early-return function with its actual chained version. Ask when the full reader guessed the incident and whether the revised repair debate changes the apparent inevitability of the rename.

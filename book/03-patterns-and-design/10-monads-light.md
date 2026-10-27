@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "When a step can refuse, the next step needs a rule for that refusal. With `Result`, `map` runs a function on the successful value and wraps whatever it returns. If the function returns another Result, that gives you a Result inside a Result. `andThen` instead uses that returned Result directly. Both carry an earlier refusal onward without calling the function. Look at what the next function returns before choosing between them."
+**Prof. Eli Typeworth**: "Look at what the next step returns. A plain value belongs in `map`. Another Result belongs in `andThen`, which uses that Result directly instead of putting it inside a second one. For a step that returns an array, `map` keeps the extra array level and `flatMap` joins it. Before replacing early returns with a chaining helper, write both versions of the function you're changing. You may prefer the checks."
 
-"That can remove repeated checks, but the checks may already read well. Compare the actual callers before replacing them. Arrays have `flatMap` for steps that return arrays. Promise `then` lets its callback return a plain value or a promise or thenable to adopt. For an object with a callable `then`, adoption calls that method with resolve and reject callbacks. If neither is ever called, the promise stays pending. A success-only method that skips its callback on refusal cannot stand in for that protocol. And don't expect array `flatMap` to wait for promises: an array of promises needs `Promise.all` if you want all its values. If all you need is to stop property access on null or undefined, optional chaining already does that without an Option wrapper."
+"The lovely complication is promises. Their `then` does both jobs: it maps a plain return value and flattens a returned promise, including an object with a callable `then`. No registration required. You can join a language protocol just by choosing a method name. So a method named `then` belongs to the promise protocol, whatever you meant by it."
 
 ## The Debate
 
@@ -18,19 +18,19 @@
 
 **Guy**: "I'd like you to tell the worker."
 
-Guy has the preview result open beside the worker's counters. The application lets a customer ask whether a quantity is available. It returns an offer or a refusal; it doesn't reserve anything. Six existing screen callers use Linoy's synchronous preview function. The catalogue team has now added a batch of previews for saved customer quantities. Its job API requires an async entry point, so Linoy made one that returns the same object. She did not change the stock check. The existing screen callers still need their synchronous answer.
+Guy has the preview result open beside the worker's counters. The catalogue team runs a batch of availability previews for saved customer quantities. Its worker requires an async entry point. A preview can produce an offer or a refusal; either answer should close the job.
 
-The worker runs several kinds of job, some still written with ordinary early returns. It passes their return values back without interpreting them. A fulfilled preview, including a refusal, counts as completed. A rejected job increments its failure counter. In either case it must leave the in-flight count.
-
-**Guy**: "A quantity can be invalid too. That is still an answer for the customer. The failure counter is for work we couldn't complete, not every answer they won't like."
+**Guy**: "No stock isn't a broken job. Neither is an invalid quantity. The failure counter is for work we couldn't complete."
 
 **Linoy**: "The completion test passed."
 
-**Guy**: "For two items. Seven items never finishes."
+**Guy**: "For quantity two. Quantity seven never finishes."
 
-**Dafna Functor**: "Show the preview before the worker."
+**Dafna Functor**: "Where does the no-stock answer come from?"
 
-The stock snapshot has five items. These are the two checks the screens already use:
+**Linoy**: "The same check as the screens. There are six callers there, all synchronous. I only added an async entry point for the batch."
+
+The stock snapshot has five items. Checking it doesn't reserve anything:
 
 ```typescript
 type Result<T, E> =
@@ -80,7 +80,7 @@ class Res<T, E> {
 }
 ```
 
-**Guy**: "And this is what the screens call. The quantity belongs in the preview too."
+**Guy**: "The screen needs the quantity back with the offer. Show that part."
 
 ```typescript
 function preview(text: string): Res<Preview, BadQty | NoStock> {
@@ -102,7 +102,7 @@ console.log(JSON.stringify(preview("7").result));
 
 **Linoy**: "We can also find out why this one stopped returning."
 
-**Dafna**: "It returns here. I want to check which return you're expecting. What happens if you map `availability`?"
+**Dafna**: "Both screen calls have returned an answer. What happens if you map `availability` instead?"
 
 ```typescript
 const nested = new Res(parseQty("7")).map(availability);
@@ -113,29 +113,13 @@ console.log(JSON.stringify(nested.result));
 
 **Guy**: "The outside says yes."
 
-**Dafna**: "To parsing seven. Its value is the answer about stock. You asked `map` to put that answer inside a success."
+**Dafna**: "The outer success says the quantity parsed. Its value is the stock answer, which says no. You asked `map` to put that whole answer inside a success."
 
 **Linoy**: "Which is why the real caller uses `then`. `availability` gives me a Result, I put that in a `Res`, and `then` returns it. The errors become `BadQty | NoStock`. Neither gets hidden inside a successful value."
 
 **Dafna**: "And the inner `map` is right. Building `{ quantity, offer }` doesn't return another Result."
 
-**Guy**: "Can a caller forget the stock error when it writes its return type?"
-
-**Linoy**: "Not this caller. Try keeping only the parser's error."
-
-```typescript
-const onlyBadQty: Res<Preview, BadQty> = preview("7"); // Error TS2322
-```
-
-**Linoy**: "It says `NoStock` isn't assignable to `BadQty`. The successful type is the preview, and the error type still includes both ways we could have refused. That's part of what I wanted the class to preserve."
-
-**Sahar**: "The union can preserve that without being in a class."
-
-**Linoy**: "It can. I'm showing you what the current caller promises."
-
-**Sahar**: "So two functions with different return shapes need different operations. Why did you choose a name that already accepts both?"
-
-**Linoy**: "Because the six callers already knew promise chains. This looked like the synchronous version."
+**Linoy**: "I named the other method `then` because the people writing those six callers already knew promise chains. This looked like the synchronous version."
 
 She puts the two promise calls under the preview.
 
@@ -145,13 +129,7 @@ const alsoIncreased = Promise.resolve(2).then(n => Promise.resolve(n + 1));
 // Both are Promise<number>, fulfilling with 3.
 ```
 
-**Linoy**: "I could make `Res.then` accept both too—"
-
-**Dafna**: "Leave that for a moment. Your two calls here already produce the same shape. Your Result calls didn't."
-
-**Linoy**: "The promise adopts the one I return. My `map` puts it in the value."
-
-**Dafna**: "Exactly. It matters which thing you're chaining. With arrays you can see the extra level without opening a union."
+**Dafna**: "Both give you a number. `then` unwraps the returned promise for you. With arrays, the extra level stays until you ask to join it."
 
 ```typescript
 console.log(JSON.stringify([2, 7].map(n => [n, n])));
@@ -162,15 +140,9 @@ console.log(JSON.stringify([2, 7].flatMap(n => [n, n])));
 
 **Guy**: "Our preview has one offer or a refusal. That has four values."
 
-**Dafna**: "An array step can produce several values, or none. A Result step produces a success or carries an error. The shared part is using the next step's container instead of putting another layer around it. That's the chaining pattern people mean when they bring up monads here. The container still decides what happens."
+**Dafna**: "An array step can produce several values, or none. A Result carries one success or an error. But each gives us a way to wrap a value and a way to chain a step returning the same kind of container. That's a monad. `ok(value)` and `andThen` for the union; `[value]` and `flatMap` for arrays; `Promise.resolve(value)` and `then` for promises."
 
-**Sahar**: "And `user?.address?.city` already stops when the next address isn't there. I don't need an Option class just to read that property."
-
-**Dafna**: "Right. That syntax checks null or undefined. It doesn't unwrap a class, and an empty city string stays an empty string."
-
-Guy scrolls past the array calls to the background entry point.
-
-**Guy**: "Can we get back to the customer who isn't buying seven things?"
+**Guy**: "Then help me find where our answer went."
 
 ## The Turn
 
@@ -194,9 +166,9 @@ async function inspect() {
 }
 ```
 
-**Eli**: "The compiler would have caught this. `Awaited` has followed `then` to the successful `Preview`. It hasn't kept the `Res`."
+**Eli**: "The compiler would have caught this. `Awaited` reads the first parameter of your `then` callback as the promised value. That parameter is a `Preview`, so it hasn't kept the `Res`."
 
-**Guy**: "You added a caller that reads `.result`. Put my worker back."
+**Guy**: "You added a caller that reads `.result`. Put my worker back. It runs other kinds of jobs too. Their return values go back to whoever submitted them; the worker only handles completion and failure."
 
 ```typescript
 const counts = { started: 0, closed: 0, failed: 0 };
@@ -219,11 +191,11 @@ const refusedJob = runJob(() => loadPreview("7"));
 
 **Guy**: "That compiles. My completion test awaits `goodJob` and checks `closed`. It doesn't ask whether the returned value still has a wrapper."
 
-**Eli**: "Then I removed the part that let it through. Your worker accepts the return type it actually gets."
+**Eli**: "I added an expectation your worker doesn't have. `Promise<unknown>` accepts whatever value arrives."
 
 **Linoy**: "Wait. The promise is calling *my* `then`?"
 
-**Dafna**: "Yes. When the async function resolves with your object, [JavaScript gets its `then` property](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-createresolvingfunctions). It's callable. JavaScript calls it with a resolve function and a reject function."
+**Dafna**: "Yes. When the async function resolves with your object, JavaScript gets its `then` property. It's callable. JavaScript calls it with a resolve function and a reject function."
 
 **Linoy**: "And my method takes one function."
 
@@ -243,15 +215,56 @@ She follows the success branch with her cursor.
 
 There is no rejected job to count. `goodJob` has closed; `refusedJob` remains pending. Its `finally` is still waiting too.
 
-**Linoy**: "Then let it be a real thenable. Resolve the preview. Reject the refusal. Both branches finish."
+**Guy**: "Can I just unwrap it before returning? The screens don't have to change."
+
+```typescript
+async function loadUnwrapped(
+  text: string,
+): Promise<Result<Preview, BadQty | NoStock>> {
+  return preview(text).result;
+}
+
+async function checkUnwrapped() {
+  const refused = await runJob(() => loadUnwrapped("7"));
+  console.log(JSON.stringify(refused));
+  // {"ok":false,"error":{"kind":"noStock"}}
+}
+```
+
+**Linoy**: "That works. The worker gets the union, both jobs close, and neither is a worker failure."
+
+**Guy**: "One entry point. I'm happy to own that. I'll run quantity two as well. I want its successful value still inside the Result, not another test that only checks completion."
+
+**Dafna**: "Its return type changed too. The async caller gets `Result<Preview, ...>` now, not `Res<Preview, ...>`. It checks `.ok` directly."
+
+**Guy**: "That's fine for this new entry point. The screens still call `preview` and get the class. I'm not asking them to change how they read the answer."
+
+**Linoy**: "But I'm still giving everyone else a `Res` that says it's a promise. They don't even need an async function to find this."
+
+```typescript
+const refusedAgain = Promise.resolve(preview("7"));
+// Promise<Preview>; remains pending.
+```
+
+**Guy**: "The same method gets called."
+
+**Linoy**: "Yes. Unwrapping fixes your entry point. It leaves my class with a `then` that doesn't fulfill the promise contract. I want to fix that too."
+
+**Guy**: "The worker can ship with the unwrap. What are you proposing for the class?"
+
+**Linoy**: "Let it be a real thenable. Resolve the preview. Reject the refusal. Both branches finish."
 
 **Guy**: "They do. But this worker increments `failed` for a rejection. No stock is a completed preview, not a broken job. Your change makes seven items a worker failure. We would get two closed jobs and one failure instead of two closed jobs and none."
 
 **Linoy**: "I could resolve with the whole Result instead."
 
-**Dafna**: "You could. Then `await` would give the union, while your synchronous callers currently get the successful value passed into their next step. Which contract would the method named `then` have?"
+**Dafna**: "That also works. But your callback used to receive `T`. Now it receives `Result<T, E>`, including the refusal. A screen callback written as `(value: Preview) => ...` can't handle that parameter."
 
-**Linoy**: "The promise one. I'd need another name for the successful-value chain anyway."
+**Linoy**: "I'd be changing the screen chains as well."
+
+**Dafna**: "And their rule. The old method skips a callback on refusal. This one calls it with the refusal. Keeping the name won't keep those callers working."
+
+**Linoy**: "I'd need another name for the successful-value chain anyway."
 
 **Sahar**: "Or no method. Keep the union, write the functions. They can't accidentally become promise methods."
 
@@ -277,11 +290,15 @@ console.log(JSON.stringify(offered));
 
 **Sahar**: "Their chains become function calls."
 
-**Linoy**: "Including the places that carry the quantity into the final `map`, like this one. I have to rewrite those expressions. A rename changes the method and the references."
+**Linoy**: "Six expressions to rewrite, including the ones that carry the quantity into the final `map`. I'd rather rename the method to `andThen`. That preserves their callbacks, their error types and when each step runs. Nobody has to reconstruct the chain as nested function calls."
 
-**Sahar**: "Six isn't a reason to keep a defect. It is a reason to ask whether removing the class fixes anything the rename leaves broken. Here, I can't show that it does. I also wouldn't introduce the class into a new job just to remove two early returns."
+**Sahar**: "Removing the class also removes the extra shell. The union already tells a caller which answer it got."
 
-**Linoy**: "Nor would I make you nest the whole job inside callbacks. The screens already use these chains. That's the code I'm trying to repair."
+**Linoy**: "It does. I'm not claiming the class is necessary. Those callers use it already, and its operations work once the name stops inviting promises in. I can repair that API without replacing it."
+
+**Guy**: "I'd take that patch for the screens. It repairs the class as well as this entry point."
+
+**Sahar**: "Then leave the other jobs out of it. Two early returns don't need a new API."
 
 **Guy**: "For another job that needs those checks directly, I would still write this."
 
@@ -299,7 +316,7 @@ function plainPreview(text: string): Result<Preview, BadQty | NoStock> {
 
 **Guy**: "Twice. If I remove the first check, `qty.value` stops compiling. This isn't getting through on somebody remembering to be careful."
 
-**Dafna**: "The helper saves writing that branch. It doesn't force you to use every result. I could call `availability` inside a callback, ignore its answer, and return success. That would compile too. Leave his two checks."
+**Dafna**: "And both versions keep the same quantity available for the final preview. The helper saves a branch, but this caller doesn't have to squeeze the rest of its work into a callback."
 
 **Linoy**: "Fine. I'm renaming the method, not making every caller fluent."
 
@@ -307,9 +324,7 @@ function plainPreview(text: string): Result<Preview, BadQty | NoStock> {
 
 **Linoy**: "The promise would still find it. Deprecating the name doesn't stop JavaScript calling it. These six callers have to change with the class. I can check all of them in this patch."
 
-She changes `then` to `andThen` in `Res` and in the six callers, including `preview`. The method body stays the same. `loadPreview` still returns the class instance, but resolving its promise no longer finds a callable `then` on it.
-
-These are fresh jobs and fresh counters after the rename:
+Linoy renames the method and its callers. Guy resets the counters and runs both quantities through the original `loadPreview`, without his unwrap.
 
 ```typescript
 async function checkRepair() {
@@ -327,7 +342,7 @@ async function checkRepair() {
 
 ## The Verdict
 
-**Guy**: "Ship the rename with those checks. Both jobs close, and the refused preview doesn't count as a worker failure. Keep the class for the screen callers. The other jobs can keep their early returns."
+**Guy**: "Ship the rename with those checks. The unwrap worked, but I don't need it to protect this worker once the class is fixed. Both jobs close without turning no stock into a worker failure. The screens keep their chains, and the other jobs keep their early returns."
 
 **Linoy**: "I picked `then` so people could start chaining without learning another word. It bought six callers that knew how to read the expression. It also bought JavaScript a way to call it. I'll explain `andThen`."
 
@@ -346,4 +361,6 @@ const pendingInside = new Res(parseQty("2")).map(availabilityAsync);
 // Res<Promise<Result<Offer, NoStock>>, BadQty>
 ```
 
-**Dafna**: "That has already called `availabilityAsync`. Awaiting `pendingInside` after our rename gives you the same `Res`, with a promise still in its value. If the job needs the answer, await that step and inspect its Result, as in Guy's caller. Or write a helper whose return type is deliberately `Promise<Result<...>>`. `map` hasn't done that work for you."
+**Dafna**: "That has already called `availabilityAsync`. Awaiting `pendingInside` after our rename gives you the same `Res`, with a promise still in its value. If the job needs the answer, await `availabilityAsync` and inspect the Result it gives back. Or write a helper whose return type is deliberately `Promise<Result<...>>`. `map` hasn't done that work for you."
+
+The promise protocol used in the incident is specified in ECMAScript’s [resolving functions](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-createresolvingfunctions) and [thenable job](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-newpromiseresolvethenablejob).

@@ -1,6 +1,51 @@
-# Chapter 23 — draft 1 self-review
+# Chapter 23 — review record
 
-Status: **DRAFT 1 FROZEN; INDEPENDENT READERS AND CLAUDE REVIEW PENDING**. 2026-10-27.
+Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**. 2026-10-27.
+
+Current manuscript: [Still Waiting for No](../../book/03-patterns-and-design/10-monads-light.md).
+Current snapshot: [DRAFT2-SNAPSHOT.json](ch23/DRAFT2-SNAPSHOT.json).
+Review addressed: [Claude's first formal review](ch23/CLAUDE-REVIEW.md), `858ecc5`, plus its two verbatim reader reports. Those reports remain unchanged.
+
+## Draft 2 response
+
+1. **Principle and spoiled Turn:** accepted. The two paragraphs now give the return-shape rule and Eli's observation that promise `then` does both jobs. They name the protocol obligation without supplying resolve/reject or the pending-refusal trace. The warning winks and the deliberately deferred answer are removed. The reader may recognize `then` early, but its concrete failure is left to the scene.
+2. **Fact-sheet voice and scope:** accepted. Referents now name early returns, the helper and the function being changed. Promise.all and optional chaining are cut from the Principle and manuscript; optional-chaining reader case (d) is dropped. The plan's new note adapts case (b) to the remaining array/Result shape lesson. Arrays stay short.
+3. **Boundary unwrap:** accepted and independently reproduced before editing. `loadUnwrapped` returns the plain union, closes both jobs with no failures, and preserves success plus both refusals. Guy accepts the changed return type and keeps all six synchronous screen callers. Direct Promise.resolve of the old class remains pending, so Linoy argues for repairing her class as well. The Verdict remains the rename; unwrapping is a working local alternative, not a failed repair.
+4. **Strongest repairs:** accepted. Whole-Result fulfillment changes the callback input from T to Result<T,E> and calls it on refusal. The existing Preview callback is rejected with TS2345. Sahar's plain union removes an extra shell; he no longer declares his own argument defeated. Linoy argues that a rename preserves callback bodies, error types and execution conditions in the six existing chains. Both promise-compatible variants and plain removal remain tested.
+5. **Pacing and onboarding:** accepted. The narrator's setup is shorter; screen count and synchronous use come from Linoy, worker erasure and ownership from Guy. The isolated TS2322 detour is removed while the growing union stays in one line. The plain-helper/ladder comparison remains because it supplies the removal alternative and the local limit of the ruling.
+6. **Monad:** accepted. Dafna names wrapping and chaining through the same kind of container once, using the operations already on the page. No laws, libraries or generator tutorial were added.
+7. **Awaited:** accepted. Eli explains the callback parameter from which TypeScript obtains Preview. His overstatement still meets Guy's actual Promise<unknown> worker.
+8. **Line corrections:** accepted. Quantity two is unambiguous; the nonexistent in-flight counter wording is gone; the outer parsing success is a full sentence; Eli names the erased expectation; the unprompted ignored-failure rebuttal is cut; the Take explicitly says to await availabilityAsync rather than referring to a synchronous caller. Source links moved out of dialogue. Rename/reset narration is one action rather than a miniature change log.
+
+No substantive review finding was declined. The tested facts do not make the rename uniquely correct: Guy can fix the new entry point alone. The manuscript now makes the additional class repair an owned, argued decision, with the compatibility cost on the page.
+
+## Draft 2 self-review and reader questions
+
+The successful boundary alternative is the main improvement: it threatens the original ruling before Linoy defends the class repair. The renamed class still returns its wrapper through the worker; the boundary alternative intentionally returns the union. Neither is misrepresented as preserving the other's return shape.
+
+Remaining questions for the targeted reader: does the short arrays/monad exchange still delay the incident? Is the class owner's reason for repairing callable then persuasive after the smaller unwrap has worked? Does the explicit Result-versus-T callback distinction make the whole-Result concession understandable? When did the reader predict the bug, and did the discovery remain enjoyable? These are questions for the reader, not self-issued approvals.
+
+The Principle's first-read test must no longer demand a full resolving-callback trace or teach Promise.all/optional chaining. Those removals follow the review. Its rule is now choosing the operation from the next step's return shape, comparing real early returns with a chained version, and recognizing the protocol obligation of callable then.
+
+## Draft 2 validation
+
+Frozen manuscript: **2303 whitespace-delimited words; 15 TypeScript fences**.
+SHA-256: `492a89f430230dae9e0fe293fbf4623f27a00a305d901f98b06b9fc8e5621e02`.
+
+- `npm ci --offline`: exit 1, ENOTCACHED for the locked Zod tarball. Restored main's installation after a byte-identical lockfile check and verification of all 14 installed package versions; no dependency or registry changes. A clean install is still not claimed.
+- `node checks/chapter23.cjs`: exit 0, **15 fences / 21 compiler cases / 19 runtime groups**. The subsequent full run covers the exact frozen manuscript and validator.
+- `npm run check`: exit 0 on TS **7.0.2** / Node **22.23.4**, **401 fences / 532 compiler cases / 253 runtime groups**, plus two default cases and two searches. No manuscript or validator edits followed this run.
+- Logs and the install manifest remain untracked in `.probe/ch23-draft2-*`.
+
+Added durable cases cover the printed unwrap and its output, success and both refusals through the worker, direct Promise.resolve before and after rename, and the whole-union callback type change. Removed cases for the cut optional-chain, Promise.all and ignored-result tangents. The error-union regression remains as fixture evidence for the retained prose. Repeated fixture loads now clear Node's resolved module-cache path so counters reset on systems where the temporary path contains a symlink. Every fence is extracted and checked; pending adoption is observed without awaiting the never-settling promise.
+
+**Ready for the requested targeted recheck; no publication approval implied.** No push.
+
+---
+
+## Draft 1 self-review (historical)
+
+The following is the original author's assessment of draft 1, before the review identified the spoiled Turn and missing boundary repair. Its counts, snapshot and reader-pending statements describe that earlier handoff, not current status.
 
 Manuscript: [Still Waiting for No](../../book/03-patterns-and-design/10-monads-light.md).
 Settled plan: `5e8f91b`, [settlement](CH23-PLAN.md#settlement-after-codexs-challenge-2026-10-27).
