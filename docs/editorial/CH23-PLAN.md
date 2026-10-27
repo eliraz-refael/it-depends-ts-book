@@ -1,6 +1,6 @@
 # Chapter 23 — Monads, Lightly (working title)
 
-Status: **PROPOSED; AWAITING CODEX'S CHALLENGE**, 2026-10-27.
+Status: **PLAN SETTLED AFTER CODEX'S CHALLENGE; DRAFTING**, 2026-10-27. The settlement below governs where it differs from the original proposal.
 Branch: `codex/chapter-23-monads-light`, based on `origin/main` `045d30c`.
 File: `book/03-patterns-and-design/10-monads-light.md`. It closes Act III.
 
@@ -211,10 +211,92 @@ scene they'd retell):
 
 ## Completion
 
-- [ ] Codex challenges this plan: is the decision honestly opinionated, does the incident earn its
-  place, and which ending. Disagreements are settled on evidence.
+- [x] Codex challenges this plan: is the decision honestly opinionated, does the incident earn its
+  place, and which ending. Disagreements are settled on evidence ([challenge](ch23/CODEX-PLAN-CHALLENGE.md)).
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
 - [ ] Checks durable; full suite green.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-27)
+
+Codex's [challenge](ch23/CODEX-PLAN-CHALLENGE.md) (`a95de3a`) reproduced all six mechanisms (nine
+compiler programs plus runtime assertions). **Adopted:**
+- **A local Verdict.** The ladder, the helpers, the repaired class and the generator agree on every
+  input. The unchecked ladder's `qty.value` is TS2339, so "a forgotten check is easy to miss" is
+  false on this profile. A helper callback can also discard a refusal, so neither notation forces
+  every Result to be consumed. No competent owner is forced to pick one notation for the codebase,
+  so an open ending would be staged.
+- **The thenable incident stays, with both fairness corrections.**
+  - The runner's callback returns `Promise<unknown>` and counts completions only, so the success
+    test that passes is a completion test. Nobody claims a Result consumer used the wrapper.
+  - A precisely typed caller sees `number` and TS2339. Someone tries it on the page.
+  - The mechanism is promise *resolution* reading a callable `then` and calling it with resolving
+    callbacks, not a nominal check by `await`. The refusal branch never calls them.
+- **The advice is narrower:** don't name a success-only chaining method `then` unless you implement
+  the promise-compatible thenable protocol.
+- **The read-only availability-preview job** replaces declined cards and connection cleanup. It
+  parses a quantity, asks for an availability offer and returns a preview. The worker tracks
+  in-flight previews and must count successes and refusals as finished. No payment, reservation,
+  compensation, retry or transaction appears. Rename the probe's `reserve`/`res-2` to read-only
+  names in the manuscript.
+- **Codex's scene order** (§3): the counter discrepancy as the hook, then a working sync chain and
+  `map`'s nesting, then the familiar comparisons as short interruptions, then the async boundary
+  and the reveal, then the repair.
+- **The Ch14 callback is narrowed.** Reuse its union, and don't claim this chapter discharges its
+  transaction-specific deferral.
+- **The generator tutorial is cut,** including its diagnostic. The tiny driver leaves a suspended
+  body's `finally` unrun, which is a second control-flow lesson competing with the first. At most one
+  Take line acknowledges the straight-line benefit and the runner's responsibility. No printed
+  driver.
+- **The Principle's corrections** (§5):
+  - Promise `.then` takes a callback returning a plain value *or* a thenable, and adopts the latter.
+  - `flatMap` doesn't fix `Promise<User>[]`; `Promise.all` does.
+  - `map` with an async callback has already *started* the work; nobody awaits it.
+  - `?.` is conditional chaining on nullish values, not a wrapper.
+  - Name "monad" only after the reader recognises the step that returns a wrapper.
+  - The four reader cases take Codex's sharper expected answers.
+- **Cast: Eli, Guy, Dafna, Linoy and Sahar.** Liron rests after Ch22, and Gil and Daniel aren't
+  needed. Linoy owns the fluent class, competently, and gets the genuine surprise.
+
+**Changed by Claude:**
+
+1. **The repair is the argument.** With the generators cut and the notation contest dissolved, the
+   chapter needs a real disagreement, and the incident supplies one. Once the cause is known, the
+   room has three competent repairs, each with a cost that lands on someone:
+   - **Make it a real thenable** (Linoy's first instinct: "then let it be one"). On refusal it
+     calls `reject`, so `await` gives the value or throws. It's the obvious fix and it teaches the
+     protocol. Its cost is that every `await` turns the refusal back into a rejection. The worker
+     now counts refused previews as failures, which is the outcome its owner (Guy) had decided
+     against. **One exchange, not Ch14's argument:** Guy states what his worker does with a
+     rejection, and that ends it.
+   - **Drop the class for functions over the plain union** (Sahar's removal). It's honest, and it's
+     the shape Ch14 already uses. Its cost is every existing caller's fluent chain. Someone gives the
+     count, a small integer printed on the page.
+   - **Rename to `andThen`** (the local Verdict). Callers change mechanically, and the class stays
+     a valid existing API. Its cost is honest too: the familiar word is gone, and Linoy says what it
+     bought.
+
+   The `map`/`andThen` lesson happens *inside* this, on Linoy's class and the plain union, not as a
+   tour of four implementations.
+2. **Eli's bio supplies the second beat.** His smaller examples "can remove a requirement along with
+   the distracting detail". Let his tidy typed reproduction show TS2339 ("the compiler would have
+   caught this"), and let Guy put the worker back: `() => Promise<unknown>`. That is Codex's
+   fairness correction, played by the cast instead of narrated.
+3. **Ending.** It's a local Verdict, plus whatever the scenes earn about the helpers: use
+   `andThen` when the next step returns a Result, and keep the job's early returns where they read
+   fine. No staged dissent.
+
+**Install provenance.** `npm ci --offline` failed with ENOTCACHED for the locked Zod tarball, and
+Codex copied main's byte-identical installation and verified 14 versions. That's acceptable for
+probes. Before handoff, retry `npm ci --offline`. If it still fails, say so; I'll run the clean
+install and full suite at final review.
+
+**Drafting brief.**
+- **Length and shape:** 2,300–3,200 words. Principle (Eli), Debate, Turn, Verdict, and Takes only if
+  earned.
+- **Fun first:** the worker waiting for a refusal that has already happened is the scene readers
+  should retell.
+- **Checks:** every fence goes in `checks/chapter23.cjs`. Run the full `npm run check`, freeze
+  `ch23/DRAFT1-SNAPSHOT.json`, self-review in `CH23-REVIEW.md`, and commit locally.
