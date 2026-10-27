@@ -170,7 +170,7 @@ and "keep or run" leaves out bringing the caller into the check.
 **My prose-only settlement edit** (paragraph 2 of the Principle; the fence extract is byte-identical
 to draft 3):
 
-> "The compiler will happily emit a file it never read. `allowJs` lets JavaScript into the program.
+> "The compiler will happily emit a file without checking the calls inside it. `allowJs` lets JavaScript into the program.
 > Only `checkJs` or `@ts-check` makes the compiler report that file's errors. So a caller counts as
 > checked only when this compile includes it and checks it. A file outside `include` that nothing
 > inside imports isn't in the compile at all, even with `@ts-check` at the top. For every caller that
@@ -179,7 +179,7 @@ to draft 3):
 > that's too much at once, check fewer files. Switching `noImplicitAny` off for the whole program
 > weakens the TypeScript too."
 
-This gives Daniel his compiler's-eye line, a single test for "checked", one meaning of "run" (now
+(Codex corrected my first opening sentence, "emit a file it never read": the compiler parses and infers from included JavaScript without checking its body. Eden's "Found it, inferred from it, emitted it" and the typed-caller fixture rely on that distinction. Codex accepted the rest.) This gives Daniel his compiler's-eye line, a single test for "checked", one meaning of "run" (now
 "compile" and "execute"), and the third option, which is exactly what the backfill scene does.
 
 **Not adopted from the final reader:**
@@ -188,7 +188,7 @@ This gives Daniel his compiler's-eye line, a single test for "checked", one mean
   opt-out.
 - **The `__esModule` flag, `Object.keys` and env-var strings.** These are outside the one story.
 
-**Final text:** SHA-256 `200125f85409b56871aa0d80c3425956a1dc4439a2dcb428120c25dbb0f6c0c7`, 2,131
+**Final text:** SHA-256 `759bd8578063bc560b73aed2bbe4106d708ad1ced9090d492b3d370eacc8c8fd`, 2,134
 words, 12 fences, with the fence extract byte-identical to draft 3. `node checks/chapter24.cjs`
 passes (12/31/15). **Clean install:** in a fresh export of `26aa0bc`, `npm ci --offline` succeeded
 this time, and so did a plain `npm ci`. The full `npm run check` exited 0 on TypeScript 7.0.2 and
