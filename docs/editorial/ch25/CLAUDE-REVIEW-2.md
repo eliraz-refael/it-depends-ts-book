@@ -141,3 +141,69 @@ Codex revises to draft 3. Update the checks for:
 Run the full `npm run check`, freeze `ch25/DRAFT3-SNAPSHOT.json`, and commit locally with these
 records. Then I'll run a Principle-only reader on the revised Principle, and do my final diff
 review. No further full reader unless the changes reach beyond the lines above.
+
+## Final diff review (2026-10-28)
+
+Draft 3 (`f2ba5b07…`, `c6fe3c3`) addresses every finding above, and its 13 fences are
+byte-identical to draft 2.
+- **The emitted copy that predates the parser is Gil's.** "It was there before your change. I rebuilt
+  the old API: two emitted implementations, only one loaded. The type imports pulled money's source
+  into the compile, even though those imports disappear from the JavaScript. Your parser is the first
+  thing that loads that copy." The late count is "Two emitted from the start. One loaded until the
+  parser arrived, then two. This image ships one." The check asserts the copy in the opening state,
+  with module-body markers showing that only the built one executes.
+- **The state gaps are closed:**
+  - the fresh clone has the committed stamp and installed links;
+  - `allowImportingTsExtensions` is set in the dev base on the branch and removed on leaving it;
+  - the release copies into a fresh image layout;
+  - Gil states Node's restriction as Node documents it.
+- **The Principle decides:** "If they point to separate source and built copies, fix the import
+  instead of asserting them equal." Subpaths are "listed in its exports map".
+- **Trims:**
+  - l.184–186 is one line from Dima;
+  - the post-Turn repetition is gone;
+  - the Verdict holds only what's new (the copied-program test in the check command, and the source
+    check as its own command).
+- **Line-level:** fixed, including "only the import path", "the two declarations agreed" and Idan's new
+  light line.
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md) applied the rule correctly to all
+four cases and follow-ups,** checking (b)–(d) with the book's compiler and Node:
+- **(b)** is "clear. This is the most directly testable sentence in the Principle".
+- **The subpath follow-up** is clear: "'including subpaths' anticipates exactly this objection".
+- **The reference-free `-b` follow-up** is clear: "'told about' is exactly the rule".
+
+It found two real ambiguities, both prose:
+- **"Run what you're shipping"** could be read as running the linked workspace, which gives "a false
+  pass" in case (c).
+- **"Development can check source directly"** "sits uneasily next to 'instead of reaching into the
+  source directory'". A reader could take it as permission for the relative import the rule
+  forbids two sentences earlier.
+
+**My prose-only settlement edit** (the Principle; the fence extract is byte-identical to draft 3):
+- **Paragraph 1**, last sentence: "A green check against yesterday's `dist` doesn't tell you whether
+  today's package will accept the call." It was "an old declaration". The reader asked for "a
+  concrete noun, like 'yesterday's dist'".
+- **Paragraph 2**: "Development can check source through the package's own exports. For the build
+  you package and deploy, rebuild the dependencies and run what you're shipping, laid out the way it
+  will be installed."
+
+**Not adopted from the final reader:**
+- **Naming the `-p`/`-b` trap in the Principle.** "A build only follows the dependencies it has been
+  told about" solved the follow-up, and the commands are the scene's.
+- **How development checks source** (a condition, `paths`, references). "Through the package's own
+  exports" excludes the bypass, and the scene owns the condition.
+- **Collapsing paragraph 2 into one rule.** The three questions are the instrument, and every reader
+  solved every case with them.
+
+**Final text:** SHA-256 `cc5001001a8d1f4a6e130f7cb01c12604c47d2874db740ee8d217a401e160049`, 2,248
+words, 13 fences, with the fence extract byte-identical to draft 3. `node checks/chapter25.cjs`
+passes (13/29/16, plus 2 file-list queries). The full `npm run check` exits 0 on the settled text in
+the worktree, and again after a clean `npm ci` in a fresh export, on TypeScript 7.0.2 and Node
+22.23.4.
+
+**Approved.** The ending is a local Verdict:
+- export the parser and remove the relative imports into money's source;
+- keep a source-reading development check through the packages' exports;
+- the release builds over an explicit reference graph and runs the copied program as the image
+  installs it.

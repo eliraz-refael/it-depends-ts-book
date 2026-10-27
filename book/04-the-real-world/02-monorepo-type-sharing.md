@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Gilad Stacktrace**: "Before you trust a type shared between packages, ask three questions. Which declarations is this caller being checked against? Which implementation will its import load when you run it? What rebuilds that implementation when the source changes? A build only follows the dependencies it has been told about. A green check against an old declaration doesn't tell you whether today's package will accept the call."
+**Gilad Stacktrace**: "Before you trust a type shared between packages, ask three questions. Which declarations is this caller being checked against? Which implementation will its import load when you run it? What rebuilds that implementation when the source changes? A build only follows the dependencies it has been told about. A green check against yesterday's `dist` doesn't tell you whether today's package will accept the call."
 
-"Use the package's public exports, including subpaths listed in its exports map. If a type or function is missing, ask for an export instead of reaching into the source directory. When two types have the same name but won't assign, read the declarations in the error. If they point to separate source and built copies, fix the import instead of asserting them equal. Development can check source directly, but for the build you package and deploy, rebuild the dependencies and run what you're shipping. I want the failure on this laptop, not in the image someone wakes me up to fix."
+"Use the package's public exports, including subpaths listed in its exports map. If a type or function is missing, ask for an export instead of reaching into the source directory. When two types have the same name but won't assign, read the declarations in the error. If they point to separate source and built copies, fix the import instead of asserting them equal. Development can check source through the package's own exports. For the build you package and deploy, rebuild the dependencies and run what you're shipping, laid out the way it will be installed. I want the failure on this laptop, not in the image someone wakes me up to fix."
 
 ## The Debate
 

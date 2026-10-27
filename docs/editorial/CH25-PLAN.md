@@ -1,6 +1,6 @@
 # Chapter 25 — Monorepo Type Sharing (working title)
 
-Status: **PLAN SETTLED; DRAFT 1 BRIEFED**, 2026-10-27. The settlement at the end governs where it differs from the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-10-28. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/chapter-25-monorepo-type-sharing`, based on `origin/main` `caf7eba` (Ch24's merge).
 File: `book/04-the-real-world/02-monorepo-type-sharing.md`.
 
@@ -302,12 +302,12 @@ scene they'd retell):
 - [x] Codex challenges this plan: is the decision honestly opinionated, does the hook teach type
   sharing rather than trivia, how the second route got past TS5011, and which ending.
   Disagreements are settled on evidence ([challenge](ch25/CODEX-PLAN-CHALLENGE.md)).
-- [ ] Codex drafts and self-reviews.
-- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
-  diff review.
-- [ ] Checks durable; full suite green on the frozen manuscript.
-- [ ] Clean `npm ci` and full suite green at final review.
-- [ ] Ready for the author's review.
+- [x] Codex drafts and self-reviews ([record](CH25-REVIEW.md), [snapshot](ch25/DRAFT3-SNAPSHOT.json)).
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
+  diff review ([review 1](ch25/CLAUDE-REVIEW.md), [review 2 and final diff review](ch25/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-28)).
+- [x] Draft 3 checks durable; full suite green on the frozen manuscript (Ch25 13 / 29 / 16; book 426 / 593 / 285).
+- [x] Clean `npm ci` and full suite green at final review.
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-27)
 

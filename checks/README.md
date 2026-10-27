@@ -70,7 +70,7 @@ Chapter 21 traces two wrapper orders on a manual clock past the job's result, th
 
 Chapter 22 is [jointly approved](../docs/editorial/CH22-REVIEW.md) after two formal reviews, their independent readers and a final diff review. It compares a persisted rule vocabulary with code-owned templates after repairing a misleading audit record.
 
-Chapter 25 draft 3 is ready for a final Principle-only read and diff review; see its [self-review](../docs/editorial/CH25-REVIEW.md). Its checks distinguish public package exports, source-reading development checks and dependency builds for a copied deployment.
+Chapter 25 is [jointly approved](../docs/editorial/CH25-REVIEW.md) after two formal reviews, their independent readers and a final diff review. Its checks distinguish public package exports, source-reading development checks and dependency builds for a copied deployment.
 
 The suites extract all TypeScript fences in Chapters 1–22. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 

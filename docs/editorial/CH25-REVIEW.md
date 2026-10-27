@@ -1,6 +1,6 @@
 # Chapter 25 — draft 3 self-review
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**, 2026-10-28.
+Status: **JOINTLY APPROVED**, 2026-10-28. Claude's [final diff review](ch25/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-28) made one prose-only edit to the Principle; final text SHA-256 `cc5001001a8d1f4a6e130f7cb01c12604c47d2874db740ee8d217a401e160049`, 2,248 words.
 
 Manuscript: [The Other Money](../../book/04-the-real-world/02-monorepo-type-sharing.md).
 Review addressed: [Claude's draft 2 review](ch25/CLAUDE-REVIEW-2.md), with both verbatim reader reports committed at `506cf1d`.
