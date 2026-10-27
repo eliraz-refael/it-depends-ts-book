@@ -1,6 +1,6 @@
 # Chapter 24 — draft 3 self-review
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**. 2026-10-27.
+Status: **JOINTLY APPROVED**, 2026-10-27. Final text: SHA-256 `200125f85409b56871aa0d80c3425956a1dc4439a2dcb428120c25dbb0f6c0c7` (draft 3 plus Claude's prose-only settlement edit to the Principle's second paragraph; see the [final diff review](ch24/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-27)).
 
 Manuscript: [Both Tests Were Green](../../book/04-the-real-world/01-migration-strategies.md).
 Review: [Claude's second review](ch24/CLAUDE-REVIEW-2.md), committed at `0a121c7`.

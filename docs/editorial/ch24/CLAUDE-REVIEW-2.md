@@ -128,3 +128,75 @@ Codex revises to draft 3. Update the checks for the changed beats:
 Run the full `npm run check`, freeze `ch24/DRAFT3-SNAPSHOT.json`, and commit locally with these
 records. Then a Principle-only reader on the revised Principle, and my final diff review. No
 further full reader unless the changes reach beyond the lines above.
+
+## Final diff review (2026-10-27)
+
+Draft 3 (`7393297e…`, `26aa0bc`) addresses every finding above.
+- **The `.default` loophole is closed, and Oded gets the win.** "But my old `require` test still
+  fails. This wouldn't merge." / "Unless you change that test to read `.default` too." / "Which is
+  what I did the first time." The sitemap is the caller nobody updated. A new fixture pins both
+  states: the route alone fixed, with the old test red, and the test also rewritten, with both tests
+  green and the sitemap still throwing.
+- **The Turn isn't telegraphed.** Noam's "The count says nothing about the files we're not checking"
+  is gone. The sitemap is mentioned as an existing exception, and its `require` fence waits for
+  "And the sitemap?".
+- **The ending's scope and timeline are true.**
+  - Oded: "So I'm merging a checking change as well as a typed slugger."
+  - The money conversion is a branch check for the next PR.
+  - The Verdict opens with the earned rule: "A caller left on the exception list keeps its
+    interface in a conversion PR."
+  - There's one name for the list, and a build script copies the backfill.
+- **The Principle** says "what they get back from `require`", covers the unloaded `@ts-check` file
+  and narrows the checked files instead of the rules.
+- **Trims:**
+  - the late lecture is two lines;
+  - the `handle(42)` probe is tied to leaf-first's payoff ("The typed slugger gives its checked
+    JavaScript callers a signature too");
+  - the redundant route `@ts-check` and the restatements are gone.
+- **Line-level:** every item is fixed.
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md) applied the rule correctly to all
+four cases,** checking them with the book's compiler and Node:
+- **(a) named exports:** keep the callers' contract, or check or run them.
+- **(b) `export default` of a callable class:** not safe, "almost word for word the `slug` example".
+- **(c) the `checkJs` rollout:** narrow the files rather than turning off `noImplicitAny`.
+- **(d) the backfill:** "clear", with "high" confidence. The previous reader got this only by
+  inference.
+
+Its weak spot was paragraph 2, which "reads as six compressed facts". "Run" means a compile in one
+sentence and executing the caller two sentences later, "its contract" points at the wrong owner,
+and "keep or run" leaves out bringing the caller into the check.
+
+**My prose-only settlement edit** (paragraph 2 of the Principle; the fence extract is byte-identical
+to draft 3):
+
+> "The compiler will happily emit a file it never read. `allowJs` lets JavaScript into the program.
+> Only `checkJs` or `@ts-check` makes the compiler report that file's errors. So a caller counts as
+> checked only when this compile includes it and checks it. A file outside `include` that nothing
+> inside imports isn't in the compile at all, even with `@ts-check` at the top. For every caller that
+> isn't checked, keep the contract it relies on, bring it into the check, or execute its old call.
+> TypeScript 7 is strict by default, so the first JavaScript check can report untyped parameters. If
+> that's too much at once, check fewer files. Switching `noImplicitAny` off for the whole program
+> weakens the TypeScript too."
+
+This gives Daniel his compiler's-eye line, a single test for "checked", one meaning of "run" (now
+"compile" and "execute"), and the third option, which is exactly what the backfill scene does.
+
+**Not adopted from the final reader:**
+- **Showing `export =` in the Principle.** That's Oded's fix in the scene.
+- **How to narrow** (`@ts-nocheck`, per-file `@ts-check`, a separate tsconfig). The scene owns the
+  opt-out.
+- **The `__esModule` flag, `Object.keys` and env-var strings.** These are outside the one story.
+
+**Final text:** SHA-256 `200125f85409b56871aa0d80c3425956a1dc4439a2dcb428120c25dbb0f6c0c7`, 2,131
+words, 12 fences, with the fence extract byte-identical to draft 3. `node checks/chapter24.cjs`
+passes (12/31/15). **Clean install:** in a fresh export of `26aa0bc`, `npm ci --offline` succeeded
+this time, and so did a plain `npm ci`. The full `npm run check` exited 0 on TypeScript 7.0.2 and
+Node 22.23.4. The settlement edit touches prose only, and the full suite was rerun on the settled
+text in the worktree.
+
+**Approved.** The ending is a local Verdict:
+- convert the leaf with `export =`, keep the old `require` test and type the route;
+- keep global `checkJs` with owned exceptions;
+- in a conversion PR, a caller left on the exception list keeps its interface;
+- a script outside the program joins the check.

@@ -1,6 +1,6 @@
 # Chapter 24 — Migration Strategies (working title)
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**, 2026-10-27. The settlement below governs where it differs from the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-10-27. The settlement below governs where it differs from the original proposal.
 Branch: `codex/chapter-24-migration-strategies`, based on `origin/main` `14a6c88` (Ch23's merge).
 File: `book/04-the-real-world/01-migration-strategies.md`. It opens Act IV, The Real World.
 
@@ -230,11 +230,11 @@ scene they'd retell):
   strategy rather than trivia, and which ending. Disagreements are settled on evidence
   ([challenge](ch24/CODEX-PLAN-CHALLENGE.md)).
 - [x] Codex drafts and self-reviews ([record](CH24-REVIEW.md), [snapshot](ch24/DRAFT3-SNAPSHOT.json)).
-- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
-  diff review.
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
+  diff review ([review 1](ch24/CLAUDE-REVIEW.md), [review 2 and final diff review](ch24/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-27)).
 - [x] Draft 3 checks durable; full suite green on the frozen manuscript (Ch24 12 / 31 / 15; book 413 / 564 / 269). Recheck any further revisions.
-- [ ] Clean `npm ci` and full suite green at final review.
-- [ ] Ready for the author's review.
+- [x] Clean `npm ci` (offline and online) and full suite green at final review (Ch24 12/31/15).
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-27)
 

@@ -4,7 +4,7 @@
 
 **Daniel Compiler**: "A migration changes an implementation while its callers are still using it. Keep their contract—what they get back from `require`, what arguments they pass and what results they receive—or change and verify the callers too. If they expect `require("./slug")` to give them a function, a test rewritten to use a default import doesn't check that old call."
 
-"The emitter can write a file whose calls we never checked. `allowJs` admits JavaScript. `checkJs` or `@ts-check` asks for its errors. A file this run never loads gets no checking, even with `@ts-check` at the top. For a caller you aren't checking, keep its contract or run it. TypeScript 7's default strictness can expose untyped parameters when you start checking JavaScript. Narrow which files you check if you need to. Switching `noImplicitAny` off for the whole program weakens the TypeScript too."
+"The compiler will happily emit a file it never read. `allowJs` lets JavaScript into the program. Only `checkJs` or `@ts-check` makes the compiler report that file's errors. So a caller counts as checked only when this compile includes it and checks it. A file outside `include` that nothing inside imports isn't in the compile at all, even with `@ts-check` at the top. For every caller that isn't checked, keep the contract it relies on, bring it into the check, or execute its old call. TypeScript 7 is strict by default, so the first JavaScript check can report untyped parameters. If that's too much at once, check fewer files. Switching `noImplicitAny` off for the whole program weakens the TypeScript too."
 
 ## The Debate
 

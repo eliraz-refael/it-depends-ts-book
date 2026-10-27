@@ -34,7 +34,7 @@ Successful run on **2026-10-27**, TypeScript **7.0.2**, Node **22.23.4**:
 | Chapter 21 | 13 | 16 | 22 |
 | Chapter 22 | 12 | 17 | 17 |
 | Chapter 23 | 15 | 22 | 20 |
-| Chapter 24 (draft 3) | 12 | 31 | 15 |
+| Chapter 24 | 12 | 31 | 15 |
 | Total | **413** | **564** | **269** |
 
 Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Earlier chapter counts are TypeScript fences.
@@ -136,7 +136,7 @@ The suite extracts all 15 fences with unique prefix matching. Original and renam
 
 The original refusal remains pending because the printed method calls neither resolving callback on that branch. A bounded microtask drain observes the finite fixture; it is not a general timeout test or a wall-clock claim. The suite never awaits that pending job. Fixture-only PromiseLike implementations exercise both competent thenable proposals: reject a refusal, or fulfill with the whole union. Plain-union and explicit-async callers supply the same outputs without the class. The printed boundary unwrap is tested with both successful and refused jobs, including its plain-union return shape. Direct Promise.resolve still adopts the original class and preserves the renamed one. A negative case pins the incompatibility between a whole-Result fulfillment callback and the existing Preview callback. A correct whole-Result `then` plus a separate `andThen` also works: another fixture pins its chaining, skipped refusal callback, and the change from a declared promise of the class to an awaited union. Other fixtures pin both unchecked quantity accesses and the fact that awaiting an outer Result does not await its field. The six-screen census is stipulated fictional project context, not a repository search or an empirical adoption measurement. No actual stock service, catalogue scheduler, persistence system or generator runner is implemented.
 
-## Chapter 24 draft coverage
+## Chapter 24 coverage
 
 The suite extracts all 12 labelled fences, including the build configuration and JS/TS file bundles. Each migration state gets its own directory, explicit CommonJS package file, compiler configuration and emitted output. All established repository files are present from the start, including money, its label, the already-opted-out sitemap and the independent backfill. The printed include patterns admit source files and TypeScript tests; the backfill is not a root until explicitly added. Old JavaScript loading tests execute separately against the built artifact.
 
