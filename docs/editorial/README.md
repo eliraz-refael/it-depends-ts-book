@@ -22,7 +22,8 @@ The [master plan](../../PLAN.md) remains at the repository root.
 | 21 — Higher-order function patterns | [Plan](CH21-PLAN.md) | [Review](CH21-REVIEW.md) |
 | 22 — Configuration to function | [Plan](CH22-PLAN.md) | [Review](CH22-REVIEW.md) |
 | 23 — Monads, lightly | [Plan](CH23-PLAN.md) | [Review](CH23-REVIEW.md) |
-| 24 — Migration strategies | [Plan](CH24-PLAN.md) | [Jointly approved](CH24-REVIEW.md) |
+| 24 — Migration strategies | [Plan](CH24-PLAN.md) | [Review](CH24-REVIEW.md) |
+| 25 — Monorepo type sharing | [Plan](CH25-PLAN.md) | Planning |
 
 The [voice review](VOICE-REVIEW.md) covers the prologue and early chapters.
 The [Chapter 3 pilot](CH3-PILOT.md) records the author-approved calibration for
