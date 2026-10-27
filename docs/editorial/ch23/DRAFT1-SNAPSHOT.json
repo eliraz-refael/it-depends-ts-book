@@ -1,0 +1,90 @@
+{
+  "status": "draft 1 frozen; Claude review and independent readers pending",
+  "date": "2026-10-27",
+  "settled_plan_commit": "5e8f91b",
+  "path": "book/03-patterns-and-design/10-monads-light.md",
+  "sha256": "63db6fdf38460db3f3eae59c59988a7c51a4d3e1ce66241ced44413348c19b1c",
+  "manuscript_mtime_utc": "2026-10-27T08:41:52.388161+00:00",
+  "snapshot_recorded_utc": "2026-10-27T08:44:55.386520+00:00",
+  "words": 2332,
+  "typescript_fences": 14,
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "sha256": "a309af9a2262407e8f1e6728e75037fd976fbafd74f47957f7a07b19e00e6d00"
+    },
+    {
+      "ordinal": 2,
+      "sha256": "d35b9ab06b38a2f8da796595fb6f3aa40e8f3c9243d78f1fd55c0ec496bd3a63"
+    },
+    {
+      "ordinal": 3,
+      "sha256": "4602aa8fe3baee8c1fcb9e5ebc3c676f04afe89a4cb056d27f3b17219a04b502"
+    },
+    {
+      "ordinal": 4,
+      "sha256": "e6cdf9981fb1ac632654b8e214d319ef3dcb6c70ab6754c2e6cc664312652134"
+    },
+    {
+      "ordinal": 5,
+      "sha256": "abaa1aec14d4e430d5a8190a76c5f004dc4f5f00a5f7347abac7f2aba571cac3"
+    },
+    {
+      "ordinal": 6,
+      "sha256": "5204092d3a7d86a3003443b9dd678687bef7798006e20cbff8a94fdb0bc5a198"
+    },
+    {
+      "ordinal": 7,
+      "sha256": "0f353146c44ff3a9c2276eac185113c8c1da71257cf97fb726cfcb2aa71a1111"
+    },
+    {
+      "ordinal": 8,
+      "sha256": "e4d13de0289c31d8afe937b7fa062c264dda464bc05c89fb0125268ed2c5b2fe"
+    },
+    {
+      "ordinal": 9,
+      "sha256": "5a02fac3c264b51bebcdbceff1c4ec7d7edcf2b0e599c28e2ea48629f0e16e58"
+    },
+    {
+      "ordinal": 10,
+      "sha256": "77c303e2db95e7c154bff7557bb5b717bfb074ebc6a7ab7063846e7329ae74cf"
+    },
+    {
+      "ordinal": 11,
+      "sha256": "df4dafd40c79d019422118ff955ffad00c076bb68d1ab8751827fd91a135bbf4"
+    },
+    {
+      "ordinal": 12,
+      "sha256": "0cc57e9ec902ad82a5618ef18047c761a874f697117b330eee6579752c1db3c5"
+    },
+    {
+      "ordinal": 13,
+      "sha256": "187c54831bf7dd24c933d09c11ed8613d3cdb82c0dfc1563d05ea711c80c7f45"
+    },
+    {
+      "ordinal": 14,
+      "sha256": "4a0bd7e11e9958d224a6628803d27f025e1d13569155d6525d9832b162f5acdc"
+    }
+  ],
+  "validator_sha256": "0c4ad3402551d00770dec074f56621f3ac0d030a1717560962498c8301c4f95c",
+  "typescript": "7.0.2",
+  "node": "v22.23.4",
+  "validation": {
+    "install": "npm ci --offline: exit 1, ENOTCACHED; verified main installation copied after byte-identical lockfile and 14 package-version checks",
+    "full_suite": "npm run check: exit 0; before final one-clause thenable definition clarification; unchanged fences and validator, no exact final-prose-hash claim",
+    "targeted_suite": "node checks/chapter23.cjs: exit 0 on frozen draft 1",
+    "chapter_counts": {
+      "fences": 14,
+      "compiler_cases": 21,
+      "runtime_groups": 19
+    },
+    "book_counts": {
+      "fences": 400,
+      "compiler_cases": 532,
+      "runtime_groups": 253,
+      "default_cases": 2,
+      "searches": 2
+    }
+  }
+}

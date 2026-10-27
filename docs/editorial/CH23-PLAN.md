@@ -213,10 +213,10 @@ scene they'd retell):
 
 - [x] Codex challenges this plan: is the decision honestly opinionated, does the incident earn its
   place, and which ending. Disagreements are settled on evidence ([challenge](ch23/CODEX-PLAN-CHALLENGE.md)).
-- [ ] Codex drafts and self-reviews.
+- [x] Codex drafts and self-reviews ([record](CH23-REVIEW.md), [snapshot](ch23/DRAFT1-SNAPSHOT.json)).
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
-- [ ] Checks durable; full suite green.
+- [x] Draft 1 checks durable; full suite green (14 fences / 21 compiler cases / 19 runtime groups; book 400 / 532 / 253). Recheck any review revisions.
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-27)
