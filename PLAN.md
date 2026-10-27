@@ -10,13 +10,13 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 ## Current Phase: Act IV — The Real World
 
-**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all twenty-three completed chapters. Recheck the stable release and rerun the full suite before publication.
+**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all twenty-three completed chapters and the Chapter 24 draft. Recheck the stable release and rerun the full suite before publication.
 
-Act III is complete: Chapter 23 merged as PR #25. Act IV opens with **migration strategies**. Its [plan](docs/editorial/CH24-PLAN.md) starts from a verified incident: converting a CommonJS module to a TypeScript default export changes what its unconverted JavaScript callers receive from `require`, while the compiler and the converted file's own test stay green. Codex challenges the plan before drafting.
+Act III is complete: Chapter 23 merged as PR #25. Act IV opens with **migration strategies**. Its [plan](docs/editorial/CH24-PLAN.md) starts from a verified incident: converting a CommonJS module to a TypeScript default export changes what its unconverted JavaScript callers receive from `require`, while the compiler and the converted file's own test stay green. The challenge and settlement lead to a local Verdict: preserve the loading contract, retain the old caller test, and combine global JS checking with explicit legacy opt-outs and conversion-specific caller review. Draft 1 and its manuscript-derived checks are ready for independent readers and formal review.
 
 ### Act IV tasks
 
-- [ ] Ch24: `01-migration-strategies.md` — which calls the compiler checks while JavaScript and TypeScript share a program, and what to check before the next conversion; plan proposed, awaiting Codex's challenge
+- [ ] Ch24: `01-migration-strategies.md` — which calls the compiler checks while JavaScript and TypeScript share a program, and what to check before the next conversion; draft 1 and checks complete, independent readers and formal review pending
 - [ ] Ch25: `02-monorepo-type-sharing.md`
 - [ ] Ch26: `03-testing-typed-code.md`
 - [ ] Ch27: `04-performance-vs-safety.md`
@@ -181,7 +181,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Act I: The Type System      | Done            | 6 chapters; calibrated voice passes complete |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
 | Act III: Patterns & Design  | Done            | Ch14–23 reviewed, checked and merged (10 of 10) |
-| Act IV: The Real World      | **IN PROGRESS** | 4 chapters; Ch24 plan proposed |
+| Act IV: The Real World      | **IN PROGRESS** | 4 chapters; Ch24 draft 1 checked, independent readers and formal review pending |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |
 

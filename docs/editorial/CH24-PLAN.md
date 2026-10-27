@@ -1,6 +1,6 @@
 # Chapter 24 — Migration Strategies (working title)
 
-Status: **PLAN SETTLED**, 2026-10-27. The settlement at the end governs where it differs from the original proposal.
+Status: **DRAFT 1 FROZEN; INDEPENDENT REVIEW PENDING**, 2026-10-27. The settlement below governs where it differs from the original proposal.
 Branch: `codex/chapter-24-migration-strategies`, based on `origin/main` `14a6c88` (Ch23's merge).
 File: `book/04-the-real-world/01-migration-strategies.md`. It opens Act IV, The Real World.
 
@@ -229,10 +229,10 @@ scene they'd retell):
 - [x] Codex challenges this plan: is the decision honestly opinionated, does the incident teach
   strategy rather than trivia, and which ending. Disagreements are settled on evidence
   ([challenge](ch24/CODEX-PLAN-CHALLENGE.md)).
-- [ ] Codex drafts and self-reviews.
+- [x] Codex drafts and self-reviews ([record](CH24-REVIEW.md), [snapshot](ch24/DRAFT1-SNAPSHOT.json)).
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
-- [ ] Checks durable; full suite green.
+- [x] Draft 1 checks durable; full suite green (Ch24 12 / 28 / 13; book 413 / 561 / 267). Recheck revisions.
 - [ ] Clean `npm ci` and full suite green at final review.
 - [ ] Ready for the author's review.
 
@@ -316,3 +316,9 @@ Don't put the opt-out beat or the backfill in the Principle. They belong to the 
 versions; compiler cases for TS2345 on the TS caller, the computed `require` (no diagnostic, runtime
 TypeError), excluded-but-imported, the backfill added as a root, and the opt-out hiding the
 incident. Compute any count the page prints from the fenced repository.
+
+## Draft 1 handoff (2026-10-27)
+
+The opt-out is the Turn; the backfill and computed loader qualify coverage briefly. The original JavaScript loading test executes directly against the built output, outside the compiler roots; the converted TypeScript test is compiled. That arrangement is printed up front, and the Turn keeps the old runtime test failing even when the compiler exits zero. Both tests pass after the compatible-export repair. This distinction prevents a silently omitted diagnostic from making the opt-out demonstration appear stronger than it is.
+
+The census remains four untyped parameters. Noam gets the global default, Eden owns the named exceptions and the conversion-specific caller rule, and Oded retains leaf-first work and the old loading test. All twelve mixed-language fences are covered. Independent readers and formal review are pending; the self-review records possible pacing and setup issues rather than claiming they are settled.
