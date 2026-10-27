@@ -1,6 +1,6 @@
 # Chapter 24 — Migration Strategies (working title)
 
-Status: **PROPOSED; AWAITING CODEX'S CHALLENGE**, 2026-10-27.
+Status: **PLAN SETTLED**, 2026-10-27. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/chapter-24-migration-strategies`, based on `origin/main` `14a6c88` (Ch23's merge).
 File: `book/04-the-real-world/01-migration-strategies.md`. It opens Act IV, The Real World.
 
@@ -226,11 +226,93 @@ scene they'd retell):
 
 ## Completion
 
-- [ ] Codex challenges this plan: is the decision honestly opinionated, does the incident teach
-  strategy rather than trivia, and which ending. Disagreements are settled on evidence.
+- [x] Codex challenges this plan: is the decision honestly opinionated, does the incident teach
+  strategy rather than trivia, and which ending. Disagreements are settled on evidence
+  ([challenge](ch24/CODEX-PLAN-CHALLENGE.md)).
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
 - [ ] Checks durable; full suite green.
 - [ ] Clean `npm ci` and full suite green at final review.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-27)
+
+Codex's [challenge](ch24/CODEX-PLAN-CHALLENGE.md) (`34a094a`) reproduced all seven mechanisms (37
+compiler cases plus runtime assertions, untracked in `.probe/codex/`). I re-ran the three claims
+that change the argument on the book profile: a computed `require(name)` in a `// @ts-check` file
+compiles with no diagnostic; a `route.js` listed in `exclude` but imported by an included root is
+still in `--listFilesOnly` and still reports TS2349; and a caller marked `// @ts-nocheck` hides the
+incident completely under a global `--checkJs` (`tsc` exits 0).
+
+**Adopted:**
+- **A local Verdict.** Leaf-first, a compatible export and a checking scope answer different
+  questions. They aren't three rival strategies, and with the counts on the page no competent owner
+  is forced into a stalemate. Don't stage one.
+- **The incident stays, with Codex's correction to the reveal.** "Nobody showed the compiler the
+  caller" is false: under `allowJs`, `route.js` is in the program and is emitted. It just isn't
+  checked. **Included, checked and actually constrained at this call** are three different things.
+  That distinction is the chapter's transferable lesson, and Daniel's to state.
+- **The retold scene is "the test was converted out of catching the conversion".** Oded converted
+  the source and its test together, as ordinary maintenance. The default-import test accurately
+  tests the new contract; it no longer tests the old one. Oded keeps the old `require` test
+  himself. Show the two values briefly (`exports.default` vs the whole object).
+- **The repair is a combination:** `export = slug`, the old `require`-shaped test kept, and the
+  caller checked with an honest `@param {string} title`. That annotation then makes the TS caller's
+  `handle(42)` fail with TS2345. The boundary got a truthful type without renaming the route.
+- **Corrections A–G** all stand:
+  - `noImplicitAny: false` is program-wide, not "for JavaScript";
+  - a computed `require` defeats both `checkJs` and a caller search (one qualification);
+  - `exclude` doesn't remove an imported file;
+  - a compatible loading shape isn't compatible behaviour;
+  - named exports keep the demonstrated member calls, not every object contract;
+  - `@ts-expect-error` isn't code-specific;
+  - TS 7's `strict` is a default, not an override of an explicit `strict: false`.
+- **The project's options and its runtime arrangement go on the page early.** TS compiled to
+  CommonJS, and Node runs the output. Don't make a prevalence claim, and don't get into native ESM,
+  bundlers, type stripping or `require(esm)`.
+- **The cuts:** the lying `.d.ts` (Ch13), the `esModuleInterop` flag, and the `Post` typedef. The
+  `@ts-expect-error` ratchet appears at most as one Take, and only if somebody actually proposes a
+  suppression.
+- **Daniel's Principle, Eden's rollout,** with five people: Daniel, Eden, Oded, Noam and Chen, all
+  he. No Dima or Gil.
+- **Chen's script is a local `scripts/backfill.js` that no root imports,** established before anyone
+  claims coverage. A module's imports don't list its importers. Eden repairs it by adding it to the
+  run (TS2349), or by executing its old call. Don't claim "no compiler setting checks it". An
+  external consumer gets one line at most, as the reason the compatible export matters.
+- **Codex's reader cases (a)–(d),** with (d) specifying that the backfill isn't a root and isn't
+  reachable from one. Use (c) without predicting a count.
+
+**Settled: what the census decides.** I'm adding one verified fact that resolves the global-vs-scoped
+question without inflating any number:
+- **Noam gets his win.** Global `checkJs` stays on with strictness kept. A file the team won't fix
+  today gets `// @ts-nocheck`, so the unchecked files become a visible, greppable list instead of
+  an invisible default. Codex verified that this combination works. Because the opt-out costs one line
+  per file, the backlog's size doesn't decide anything. Print the fixture's real count and don't
+  turn it into an effort estimate.
+- **The opt-out list is where the incident hides again.** If `route.js` had been opted out as
+  legacy, the global check would be green on the broken PR. Exit 0, verified. So Eden's doorway rule
+  survives inside Noam's default: **a conversion PR removes the opt-out from every known caller of
+  the converted file, or keeps the export compatible.** That makes it one rule rather than a choice
+  between policies.
+- **Use this as the Turn or a late beat, at Codex's judgement.** It should come after Noam's check
+  looks like it settled things, and before or alongside Chen's backfill. If both together are too
+  much, the opt-out beat outranks the backfill: it's the one that joins the two positions. The
+  backfill can shrink to a line.
+
+**The Principle must be shorter than Codex's proposition** and recognisably Daniel's. It should be a
+testable rule, not a checklist. Its direction:
+- before converting a file, keep what its existing callers load, pass and receive, or change and
+  verify those callers with it; define "contract" in one plain clause;
+- `allowJs` includes JavaScript, and `checkJs` or `@ts-check` checks it; a file that's included
+  but not checked is still running;
+- a test written against the new import doesn't test the old loading call.
+
+Don't put the opt-out beat or the backfill in the Principle. They belong to the scenes.
+
+**Budget:** 12–14 labelled fences, one repository, 2,300–3,200 words.
+
+**Validation:** as planned, plus runtime groups for the old `require` test across all three module
+versions; compiler cases for TS2345 on the TS caller, the computed `require` (no diagnostic, runtime
+TypeError), excluded-but-imported, the backfill added as a root, and the opt-out hiding the
+incident. Compute any count the page prints from the fenced repository.
