@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Gilad Stacktrace**: "Before you trust a type shared between packages, ask three questions. Which declarations is this caller being checked against? Which implementation will its import load when you run it? What builds that implementation from the source you just checked? A green check against an old declaration doesn't tell you whether today's package will accept the call."
+**Gilad Stacktrace**: "Before you trust a type shared between packages, ask three questions. Which declarations is this caller being checked against? Which implementation will its import load when you run it? What rebuilds that implementation when the source changes? A build only follows the dependencies it has been told about. A green check against an old declaration doesn't tell you whether today's package will accept the call."
 
-"Use the package's public exports. If a helper is missing, add an export instead of reaching into its source directory. When two types have the same name but won't assign, read the declarations in the error before you assert them equal. You may be looking at two definitions. Development can check source while a release uses built declarations, but the release still needs to build its dependencies and run the code it will ship. Sharing a name doesn't arrange any of that."
+"Use the package's public exports, including its deliberate public subpaths. If a type or function is missing, ask for an export instead of reaching into the source directory. When two types have the same name but won't assign, read the declarations in the error before you assert them equal. Development can check source directly. For the build you package and deploy, rebuild the dependencies and run what you're shipping. I want the failure on this laptop, not in the image someone wakes me up to fix."
 
 ## The Debate
 
@@ -14,7 +14,9 @@
 
 **Idan**: "The shipping charge. The request says a thousand cents, the cart says five hundred. The quote should say fifteen dollars."
 
-The shop keeps its money code, cart and API in three packages. Each package is an ES module: its manifest says `"type": "module"`. Workspace links under `node_modules/@shop` point to the package directories. Node runs the API's emitted JavaScript. Quotes also print a generated release tag, so support can identify the build that produced them.
+The shop keeps its money code, cart and API in three packages. The repository root and all three packages have `"type": "module"` in their manifests. Workspace links under `node_modules/@shop` point to the package directories.
+
+**Dima**: "We run the API's emitted JavaScript. The release job copies that output and the dependencies into an image. The workspace links stay here."
 
 Money's public manifest currently looks like this. Cart has the same export mapping, with the name `@shop/cart`.
 
@@ -63,7 +65,7 @@ console.log(buildId, new Money(1000).plus(shipping()).format());
 // release-42 $15.00
 ```
 
-**Idan**: "That works. The request value is unknown, so I used the parser money already has. It hadn't needed a caller outside its package before."
+**Idan**: "That works. The request value is unknown, so I used the parser money already has. Until today, only money called it."
 
 ```typescript
 // packages/money/src/parse.ts
@@ -82,7 +84,7 @@ export function parseMoney(input: unknown): Money | undefined {
 
 **Dima**: "The exports map doesn't offer that package subpath. A relative filesystem path goes around the map. What did the API include?"
 
-The API also compiles a generated release stamp from the repository root. Its existing `rootDir` covers that file; Idan hasn't widened it for this change.
+**Idan**: "The generated release stamp as well as src. Support wants the build tag on each quote. That's why rootDir already reaches the repository root."
 
 **apps/api/tsconfig.json**
 
@@ -119,17 +121,11 @@ console.log(buildId, amount.plus(shipping()).format());
 
 **Gil Benchmark**: "Both declarations have that text. Look at the paths."
 
-He opens cart's generated declaration. Its shipping result imports Money from `@shop/money`, which leads to `money/dist/index.d.ts`. The parser imports its adjacent source index. The API is checking both declarations.
+He opens cart's generated declaration. Its shipping result imports Money from `@shop/money`, which leads to `money/dist/index.d.ts`. The parser imports its adjacent source index. He leaves both files open.
 
-**Idan**: "We can export the parser. I'm still asking why these two amounts can't be added. The fields haven't changed."
+**Idan**: "We can export the parser. I'm still asking why these two amounts can't be added. The fields haven't changed. If it's only the spelling, forcing the call should still give fifteen. I'll try it here before I change the export."
 
-**Dima**: "I'm not asking you to parse it twice. Leave the input alone. Follow what the parser returns."
-
-**Idan**: "That's what I did. It rejects strings, fractions and negative amounts. A thousand gets through and becomes a Money. If that promise is wrong, I want to fix the parser."
-
-**Linoy**: "If it's only the spelling, forcing the call should still give fifteen. Try it here, before we change the export."
-
-On her laptop she replaces the addition. `NonNullable` removes the parser's undefined case from the type; it changes nothing in the running program.
+She asserts shipping's result to the parser's successful return type. The parser can also return undefined, so she removes that possibility with `NonNullable`.
 
 ```typescript
 // apps/api/src/main.ts — replace the console.log for this experiment
@@ -140,9 +136,9 @@ console.log(buildId, amount.plus(
 
 The API compiles. The run throws `TypeError: Cannot read private member #cents from an object whose class did not declare it`.
 
-**Gilad**: "Show me where."
+**Gilad**: "`apps/api/out/packages/money/src/index.js`, at `Money.plus`. That's inside the API's output."
 
-**Linoy**: "`apps/api/out/packages/money/src/index.js`. Inside `Money.plus`. Why is there a money package in the API's output?"
+**Linoy**: "Why is there a money package in the API's output?"
 
 **Dima**: "You imported its source. The API compiled that source too."
 
@@ -152,20 +148,26 @@ The API compiles. The run throws `TypeError: Cannot read private member #cents f
 
 **Gilad**: "And the assertion didn't put that class's private field into cart's object."
 
-**Linoy**: "All right. It wasn't only the spelling."
+**Idan**: "All right. It wasn't only the spelling."
 
-**Gil**: "The line item crosses the same two declarations without an error."
+**Gil**: "I found three relative imports into money's source in the API. Yours fetches the parser. The other two are types for order lines and packing slips. They were here before your change."
 
 ```typescript
-// apps/api/src/line-check.ts
+// apps/api/src/order-line.ts
 import type { Line } from "../../../packages/money/src/index.js";
 import { firstLine } from "@shop/cart";
-const line: Line = firstLine(); // Accepted.
+export const line: Line = firstLine(); // Accepted.
+
+// apps/api/src/packing.ts
+import type { Line } from "../../../packages/money/src/index.js";
+export type PackingLine = Pick<Line, "sku" | "quantity">;
 ```
 
-**Dima**: "That's valid. It has the required fields. The private member is why these Money declarations don't fit. Don't count that line as another bug."
+**Dima**: "Line has the required fields. That assignment is valid. The private member is why the two Money declarations don't fit."
 
-Gil closes the line-item experiment and removes its scratch file. Idan deletes the assertion and adds the missing public export.
+**Gil**: "I wanted to know how much we'd broken. I have three imports to change, but only one failing call. The others weren't evidence that the routes agreed."
+
+Idan deletes the assertion and adds the missing public export. Gil changes the two type-only imports to `@shop/money`, where Line is already public.
 
 ```typescript
 // packages/money/src/index.ts — add to the existing exports
@@ -175,25 +177,21 @@ export { parseMoney } from "./parse.js";
 import { parseMoney } from "@shop/money";
 ```
 
-After rebuilding the packages, the quote prints `release-42 $15.00`.
+After rebuilding money, cart and the API, the quote prints `release-42 $15.00`.
 
-**Idan**: "The parser comes from the package now. That is the object I wanted to pass on."
+**Idan**: "There. Parsed once, passed straight to plus."
 
 **Linoy**: "A public `@shop/money/parse` export would work too. It can re-export the same declaration. We don't have to put every helper in the root index."
 
 **Dima**: "Agreed. This one can join Money at the root."
 
-**Gilad**: "And if the next helper isn't exported?"
-
-**Idan**: "I ask for the export. Or keep that operation inside money. I don't add another path because my editor found the file."
-
-She follows the repaired call into the declaration. This time the parser result and cart's shipping result lead to the same Money. The error is gone without an assertion.
+**Idan**: "Next time I'll ask for the export before I believe the path my editor found."
 
 ### "Which build did you check?"
 
 **Linoy**: "Now edit `format`. Does checking the API see the edit, or does it see the last time you remembered to build money?"
 
-Idan needs an explicit currency label on the quote. She changes the formatter to require `"USD"`; it still formats the same cents, without converting them.
+**Idan**: "I need the quote to say USD anyway. Same cents, explicit label."
 
 ```typescript
 // packages/money/src/index.ts — replace Money.format
@@ -206,9 +204,11 @@ format(currency: "USD"): string {
 
 **Dima**: "Then the check command needs to build the dependencies."
 
-**Linoy**: "That was my question before we added a parameter."
+**Gil**: "I tried `tsc -b apps/api` too. Still green. Money's declaration hasn't changed."
 
-Money and cart already emit declarations from composite projects. Their package configs use `src` as `rootDir` and `dist` as `outDir`. Dima adds `"references": [{ "path": "../money" }]` to cart's config and adds both packages to the API's config. Gil tests the proposed graph in a copy, leaving their original tree's old outputs in place.
+**Dima**: "We haven't told it what to build first."
+
+Money and cart already emit declarations from composite projects, with `src` as `rootDir` and `dist` as `outDir`. Dima adds `"references": [{ "path": "../money" }]` to cart's config and puts both packages in the API's `references`.
 
 **The new references in apps/api/tsconfig.json**
 
@@ -219,23 +219,32 @@ Money and cart already emit declarations from composite projects. Their package 
 ]
 ```
 
-**Dima**: "The existing check command will run `tsc -b apps/api`. Money first, then cart, then the API. You won't have to remember three builds."
+He runs `tsc -b apps/api` again, in the same tree. This time it builds money, then cart, and reports TS2554 at the API's call: `Expected 1 arguments, but got 0.`
 
-**Gil**: "With those references it reports TS2554: `Expected 1 arguments, but got 0.` Without the edges, changing `-p` to `-b` still passed."
+**Idan**: "There it is. I was starting to feel redundant. I could delete my arguments and nobody would notice."
 
-**Dima**: "I'll own the graph. An import isn't a project reference. When we add a package dependency, this command needs the build edge too."
+She supplies the required argument.
 
-**Linoy**: "So it doesn't discover the packages from the imports?"
+```typescript
+// apps/api/src/main.ts — update the quote
+console.log(buildId, amount.plus(shipping()).format("USD"));
+```
 
-**Gil**: "I removed the edges and kept the imports. It checked the API against the old files again. Same command, no error."
+The dependency build passes, and the API prints `release-42 USD 15.00`.
 
-**Dima**: "The package name found something it could read. That doesn't ask the build to regenerate it. I'll put the references beside the dependencies in review. Otherwise I'm promising you a build order I never described."
+**Dima**: "I'll put that build behind the existing check command. And I'll own the graph. When we add a package dependency, the review needs its reference too. Otherwise I'm promising you a build order I never described."
 
-**Idan**: "That gets the release right. Do I have to generate declarations before I can check a change to the parser?"
+**Linoy**: "Why keep dist at all? We had two Moneys because one came from source and one from the build. Then the build was old. Node 22 can strip these types. Let the checker and the runtime both use source."
 
-**Linoy**: "No. Give the development checker a source branch. In both packages, not just money. Cart's own declarations can get stale too."
+**Dima**: "Through the public package name?"
 
-She replaces the export mapping in each manifest. The `@shop/source` branch comes first. The normal declaration and JavaScript branches remain.
+**Linoy**: "Yes. Money chooses the file. No application reaches into its directories."
+
+**Idan**: "And I can change the parser and check the caller without generating declarations first?"
+
+**Linoy**: "That's the first part. Give both packages a source condition for development. Then we'll try making source the runtime target as well."
+
+She changes the `exports` field in both manifests. The source condition comes before the existing declaration and JavaScript targets.
 
 **The exports field in both package manifests**
 
@@ -249,11 +258,9 @@ She replaces the export mapping in each manifest. The `@shop/source` branch come
 }
 ```
 
-**Linoy**: "The compiler chooses that branch when we give it the condition. Node won't choose it just because a tsconfig mentions it."
+**Dima**: "If money moves its source directory, who updates the applications?"
 
-**Dima**: "Are you putting a source path in every application? We just removed one."
-
-**Linoy**: "The import stays `@shop/money`. Money offers the source branch in its own manifest. The application asks for a condition; it doesn't need to know where money keeps its files. And cart offers it too, so we can check cart's edit in the same run."
+**Linoy**: "Nobody. They still import `@shop/money`. Money updates this entry. All the development checks ask for the same condition through a base config. Cart offers it too, so we're checking its source, not yesterday's description of it."
 
 **tsconfig.dev-base.json**
 
@@ -270,102 +277,66 @@ She replaces the export mapping in each manifest. The `@shop/source` branch come
 }
 ```
 
-**apps/api/tsconfig.dev.json**
+The API's `tsconfig.dev.json` contains `{"extends":"../../tsconfig.dev-base.json","include":["src"]}`. Gil runs `tsc -p apps/api/tsconfig.dev.json` on a fresh clone before any package build. It passes, reading money's and cart's source files. There are no outputs or incremental build files in that clone.
 
-```json
-{
-  "extends": "../../tsconfig.dev-base.json",
-  "include": ["src"]
-}
-```
+**Linoy**: "That's the dev check. Nothing to build before it. Now the runtime."
 
-Gil tries `tsc -p apps/api/tsconfig.dev.json` in a clean copy with no package outputs or incremental build metadata. It finds the missing currency argument.
+She makes one experimental branch in their working tree. In both manifests, `default` now points to `./src/index.ts`. She changes money's internal relative imports from `.js` to `.ts`, and enables `allowImportingTsExtensions` for this branch's noEmit check.
 
-**Gil**: "No `dist` to read. It lists money's source and cart's source. The error is on the API's old call."
+**Dima**: "You changed the imports as well?"
 
-**Dima**: "You removed the build metadata as well?"
+**Linoy**: "Node needs the actual .ts filenames when it runs the source. It doesn't do the compiler's .js-to-.ts lookup. The noEmit check allows those extensions. I'm not asking the release build to emit them."
 
-**Gil**: "Both. This copy has never built the packages."
+The source check passes. They run the API's already-emitted JavaScript, whose package imports still say `@shop/money` and `@shop/cart`. Node follows the new runtime targets into the linked source directories. The quote prints `release-42 USD 15.00`.
 
-**Linoy**: "That's the check I want while I'm changing the package and its caller together. I can make the parameter required and find the callers before I emit anything."
+**Linoy**: "One Money. The formatter we just edited. We can stop maintaining a second set of files for the application to read."
 
-**Idan**: "Good. That's the change I'm making."
-
-She supplies the required argument.
-
-```typescript
-// apps/api/src/main.ts — update the quote
-console.log(buildId, amount.plus(shipping()).format("USD"));
-```
-
-The development check passes, including in the clean copy. Linoy puts the shared dev base next to the release configuration.
-
-**Dima**: "Keep that check. The release command still builds."
-
-**Linoy**: "I haven't removed it. This config doesn't emit anything."
+**Idan**: "I'd like that. My parser isn't different depending on whether I remembered to build it."
 
 ## The Turn
 
-**Idan**: "Then why is the quote still showing a dollar sign? I just asked for USD."
+**Gilad**: "Which file will the image load?"
 
-In their original working tree, money's output is still the build from before the formatter edit. For a laptop experiment, Gil gives a copy of the API's original emitting config the source condition. He compiles the updated call and runs it against the linked packages. It prints `release-42 $15.00`, not `release-42 USD 15.00`.
+**Linoy**: "The same src/index.ts. The manifest goes with it."
 
-**Linoy**: "The check is right about the source. That isn't the formatter Node called."
+**Gilad**: "Then run the copy. We aren't shipping the link."
 
-**Gilad**: "Which file did it call?"
+Gil copies the API output with its package manifest and both package directories into the image's layout. Each dependency is now a real directory under `node_modules/@shop`. He runs the copied API entry point.
 
-**Gil**: "Money's default export target: `dist/index.js`. The old method ignores the extra argument. Nothing has built the new method here."
+Node refuses `node_modules/@shop/money/src/index.ts` with `ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`. No quote is printed.
 
-**Idan**: "So I asked the new signature a question and ran the old answer."
+**Idan**: "We didn't change the file. We moved it."
 
-**Dima**: "That's why the release check has work to do."
+**Linoy**: "Under node_modules. It won't strip types there?"
 
-**Linoy**: "Don't fix this by making my dev config read dist again. It found the missing argument when there was no dist at all."
+**Gil**: "Not on our Node 22.23.4. In the workspace, the link resolves to the package directory outside node_modules. In the image, the file really is under it. Same source, different loading rule."
 
-**Dima**: "I won't. The source check did its job. We haven't run the release command here yet."
+**Gilad**: "The path is part of the incident. Keep it in the report. Someone will try this from their checkout and close the ticket."
 
-He runs the dependency build in that working tree. The same call now prints `release-42 USD 15.00`.
+**Linoy**: "We could add a loader to the image."
 
-**Linoy**: "We could run source as well. Node can strip our types. Then there wouldn't be an old formatter to pick up."
+**Dima**: "We could. It would be another loading setup to test and maintain. We already have a working JavaScript build. Is removing dist worth changing how this image starts?"
 
-**Dima**: "Try what the deploy copies."
+**Linoy**: "For this quote? No. But I still want the source check."
 
-On a separate branch, Linoy points both packages' runtime exports at `src/index.ts`. She changes their internal relative imports to use `.ts` extensions, which native Node needs for those source files. The API's already-emitted entry point now runs the linked sources and prints `release-42 USD 15.00`.
+**Idan**: "That part worked before we touched the runtime target."
 
-**Linoy**: "There. The formatter I edited."
+They leave the experimental branch, restoring the `.js` imports and `default` targets in their working tree. The source condition and shared dev config remain.
 
-**Gil**: "Locally. The release job copies the dependencies. It doesn't retain these workspace links."
+**Dima**: "We'll package JavaScript. First, clean the output directories. The old relative-import build left a money copy in the API's out directory. Building again doesn't delete it."
 
-He takes the same API output and copies both package directories into a deployment folder's `node_modules/@shop`. Node refuses the first TypeScript dependency with `ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`.
+**Gil**: "And the incremental build files, so the clean outputs get rebuilt."
 
-**Idan**: "It ran the file a minute ago."
+They remove money's `dist`, cart's `dist`, the API's `out` and the build metadata, then run `tsc -b apps/api` through Dima's reference graph. The release job copies the fresh API output and its manifest, plus each dependency's manifest and `dist` into the image layout. The copied program prints `release-42 USD 15.00`.
 
-**Gil**: "Through a link to the package directory outside node_modules. The copied file really is under node_modules. On our Node 22.23.4, those aren't the same case."
+**Gil**: "Two Money implementations were emitted when we followed the relative import. This package-and-copy run ships one. The order-line imports are public too."
 
-**Linoy**: "Then keep the runtime target at dist. That doesn't stop the dev checker reading source."
-
-**Dima**: "Exactly. I'll build before packaging, and we'll run that copied output. I'm not asking you to type-check yesterday's parser."
-
-They restore the conditional exports. The development condition still selects source. The release build rebuilds the referenced packages, checks their consumers against the declarations and packages the JavaScript. The copied deployment prints `release-42 USD 15.00`.
-
-**Gil**: "No package source directories in that deployment. Both amounts use the packaged Money."
-
-**Gilad**: "Which green check lets this ship?"
-
-**Dima**: "The existing check command, after it builds the reference graph and runs the copied program. The development command gets a separate name. Passing it won't skip the release check."
-
-**Linoy**: "And I can run that development command on a fresh checkout."
-
-**Dima**: "You just did. I want that test kept too."
-
-**Idan**: "And the parser is still the public one. I don't have to reconstruct a Money after parsing it."
+**Idan**: "The total hasn't changed. We have spent quite a while agreeing on fifteen dollars."
 
 ## The Verdict
 
-**Dima**: "Export the parser and remove the relative import. Keep Linoy's dev check, shared through the base config. The existing release check gets the reference graph and builds before we copy anything. That copied program is the one we run before shipping. I'll maintain the build edges with the package dependencies."
+**Dima**: "The existing check command gets the dependency build and the copied-program test. I'll review the references with the package dependencies. A green dev check won't skip that work."
 
-**Linoy**: "And the dev check is allowed to work without dist. Don't make it call the release build first just to make the commands look alike."
+**Linoy**: "And the source check stays a separate command, using the shared base. No release build smuggled into it."
 
-**Dima**: "It stays separate."
-
-**Idan**: "Then I can send the quote."
+**Idan**: "The parser export goes in with the import fixes. Then I can send the quote."

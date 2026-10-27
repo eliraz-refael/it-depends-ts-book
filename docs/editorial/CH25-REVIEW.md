@@ -1,3 +1,60 @@
+# Chapter 25 — draft 2 self-review
+
+Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**, 2026-10-28.
+
+Manuscript: [The Other Money](../../book/04-the-real-world/02-monorepo-type-sharing.md).
+Review addressed: [Claude's draft 1 review](ch25/CLAUDE-REVIEW.md), with the two verbatim reader reports committed at `ca3c2df`.
+Snapshot: [DRAFT2-SNAPSHOT.json](ch25/DRAFT2-SNAPSHOT.json).
+
+## Response to the review
+
+1. **Four state gaps — accepted and fixed.** The page now states that the repository root, as well as all three packages, has type:module. The validator extracts that setting from the page instead of silently choosing it. A regression removes it, verifies compiler acceptance and reproduces the opening SyntaxError. The stale -p and reference-free -b checks both run before adding references. Dima adds the graph to the actual repository, rebuilds, sees the missing argument, and rebuilds the corrected call. The image repair explicitly removes package and API outputs plus incremental metadata before building and copying. The validator preserves the earlier source-copy output until this cleanup, then asserts its absence from the image.
+2. **The second half and Turn — accepted.** The release copy step is planted before the working example. Linoy proposes source for both type checking and runtime to address the chapter's two demonstrated problems. Her source dev check works, and her raw-source runtime wins through the workspace links before the copied image refuses it. Gilad asks which file the image loads. The narrative uses one evolving working tree, one fresh-checkout demonstration and one reversible experimental branch. The branch changes files in place in the validator; returning restores those files while retaining the current formatter and real reference graph.
+3. **Stale-default Turn — cut.** I did not retain the emitting-config experiment. The earlier stale-declaration check earns the build graph without making someone run a configuration solely to stage a second stale result. The linked-versus-copied deployment supplies the actual surprise. The old “new signature / old answer” line goes with the removed scene, despite its good wording.
+4. **Fairness and ownership — accepted.** Idan now owns the “only the spelling” assertion experiment. Linoy keeps her successful source check and loses only the runtime target for this image. Adding a loader gets a short hearing; Dima declines changing the image's loading setup when its existing JavaScript build already works. No particular loader or library is claimed to have been tested. Dima owns the references and check command, rather than mediating away the stale result.
+5. **Gil's count / Gilad's role — accepted.** Two existing structural imports, for order lines and packing slips, are present in the initial program. Alongside the parser import, they give Gil three paths to repair but only one failing call. Line's assignment remains valid. The suite pins that census, the two emitted Money implementations, the surviving stale output after ordinary rebuilds, and the one implementation actually copied after cleanup. Gilad reads the executing frame and insists that the report retain the image path; he no longer only supplies questions.
+6. **Principle — accepted.** It explicitly includes supported public subpaths, names type or function instead of helper, makes dependency knowledge part of the build rule, and defines the relevant build as what is packaged and deployed. The ambiguous closer is gone. The three questions, “before you assert them equal” and the green-check line remain. Gilad's final sentence concerns getting the failure on the laptop rather than a future wake-up, without teaching the Node restriction early.
+7. **Pacing and line fixes — applied.** The dev config extender is inline JSON, leaving one fewer fence. The fresh-checkout result is shown once and claimed once. The undefined/NonNullable explanation is tied to Idan's assertion, the stamp gets its reason in her answer, and currency wording is hers rather than a narrator disclaimer. Removed the unprompted parse-twice defense, scratch-file deletion, old graph-copy bookkeeping, ambiguous pre-parameter reply and repeated pre-Verdict agreement. The raw-source branch enables allowImportingTsExtensions for its noEmit check and uses the already-emitted API, so it makes no false release-build claim. The public parser repair now explicitly rebuilds the API as well as its dependencies. The Verdict assigns the release gate, dev command and import change to three speakers.
+
+## Self-review and remaining reading risks
+
+The local Verdict remains the agreed combination. Source-reading development and built release are compatible; the image's loader behavior limits only the attempted runtime shortcut. A public subpath is still a supported repair. Structural compatibility is not counted as a bug or as evidence of one declaration. The assertions remain a laptop hypothesis test, never the accepted repair.
+
+**Provisional self-assessment:** character consistency, technical accuracy in the stated fixtures, fairness, code quality and overall flow pass my own review. Fun is improved by the continued argument over avoiding dist, Idan's complaint about the missing argument and the unchanged fifteen dollars, and Gilad's expectation that someone will fail to reproduce the incident from a checkout. These are not fresh-reader results. Claude owns the next Principle-only read and targeted recheck.
+
+The dense section is still references → source condition → shared config. It is shorter and follows competing wants, but the recheck should say whether it still feels like a setup manual. The return from the raw-source branch and clean image build has necessary state narration; ask whether the reader can follow it without mentally retaining extra repositories. The short loader alternative is an owned local decision, not proof that built JavaScript is the universal choice.
+
+The revised draft is **2259 whitespace-delimited words**, below draft 1's 2,440 and the original 2,400-word lower target after the requested cuts. I left the tighter story intact rather than replace the repeated dev-check assurances with filler. There are **13 fences: 8 TypeScript and 5 JSON**, plus the extracted inline dev extender and root module setting.
+
+No version-skew scene, timing claim, new Take or network-boundary guarantee was added. Ch16's deferred schema-sharing/version-skew topic remains outside this chapter's scope. The plan settlement is unchanged.
+
+## Principle-only self-test (not an isolated read)
+
+- **Public export / subpath:** use a supported export; a deliberate parse subpath is explicitly allowed, rather than condemned as another spelling. A structural assignment by itself does not answer which declaration or implementation was selected.
+- **Same-named nominal types:** inspect the declarations before asserting equality. The rule does not predict a native private-slot crash for every unique-symbol brand.
+- **Executable artifact:** run the packaged build. A linked run does not establish the copied image; the general instruction is on the page before the Node-specific reason is shown. Development may still read source directly.
+- **Freshness:** a green check of the old declaration is not evidence about a new incompatible caller. The build must know its dependencies; merely changing a command without giving it that knowledge does not satisfy the rule. The concrete -p/-b distinction is taught in the debate.
+
+## Validation and freeze
+
+Manuscript SHA-256: `ac37182be7a111e3a6b9ee3a791ed7a3a612fe4a235363fb33330f99839ba770`.
+Validator SHA-256: `1c3e9a3eedb439830fef7c7623a402308ef67c5f26c7cf6f885035c561f05b84`.
+
+- Targeted `node checks/chapter25.cjs`: **exit 0**, 13 fences / 29 compiler cases / 15 runtime groups plus two file-list queries, before the final self-review edits and added copied-image count assertion. The final full run below covers those changes.
+- `npm run check`: **exit 0 on the exact frozen manuscript and validator**, TypeScript **7.0.2**, Node **22.23.4**. Chapter 25: **13 / 29 / 15**, plus two file-list queries. Book: **426 fences / 593 compiler cases / 284 runtime groups**, plus two default cases and two existing source searches.
+- Used the same locked installation installed with npm ci --offline during the challenge. No new clean-export install claim. The fresh-checkout example is a compiler-fixture state, not an npm install test.
+- Final full-suite log: untracked `.probe/ch25-draft2-final-full-check.log`; hash recorded in the snapshot. The earlier targeted and full logs remain untracked. Review and reader files from `ca3c2df` are unchanged.
+
+The validator's narrative sequence is one repository. Counterfactual controls have separately named repositories and do not establish the narrative's freshness claims. The only fresh-checkout demonstration copies inputs alone; no output or incremental metadata can acquire misleading timestamps. The public subpath, alias, public-field, TS-private, same-declaration and implicit-root controls remain. All printed outputs and errors are pinned. Package manifests accompany the API and dependencies in both image layouts. There is no actual container runtime or third-party loader in the fixture: it executes Node against the image's filesystem layout.
+
+**Ready for the requested Principle-only read and targeted recheck. Local commit only; no push.**
+
+---
+
+## Historical draft 1 record
+
+The following assessment describes draft 1 and is superseded by the revision above. Its pending-review status was resolved by the findings in `ca3c2df`; its original fixtures did not expose the root-manifest omission or the narrative state gaps.
+
 # Chapter 25 — draft 1 self-review
 
 Status: **DRAFT 1 FROZEN; INDEPENDENT REVIEW PENDING**, 2026-10-27.
