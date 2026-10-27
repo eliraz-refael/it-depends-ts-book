@@ -12,11 +12,11 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 **Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all twenty-three completed chapters and the Chapter 24 draft. Recheck the stable release and rerun the full suite before publication.
 
-Act III is complete: Chapter 23 merged as PR #25. Act IV opens with **migration strategies**. Its [plan](docs/editorial/CH24-PLAN.md) starts from a verified incident: converting a CommonJS module to a TypeScript default export changes what its unconverted JavaScript callers receive from `require`, while the compiler and the converted file's own test stay green. The challenge and settlement lead to a local Verdict: preserve the loading contract, retain the old caller test, and combine global JS checking with explicit legacy opt-outs and conversion-specific caller review. Draft 2 addresses the first independent review: an already-opted-out sitemap tests the checking default honestly, and the diagnostic census includes the full repository. Targeted recheck pending.
+Act III is complete: Chapter 23 merged as PR #25. Act IV opens with **migration strategies**. Its [plan](docs/editorial/CH24-PLAN.md) starts from a verified incident: converting a CommonJS module to a TypeScript default export changes what its unconverted JavaScript callers receive from `require`, while the compiler and the converted file's own test stay green. The challenge and settlement lead to a local Verdict: preserve the loading contract, retain the old caller test, and combine global JS checking with explicit legacy opt-outs and conversion-specific caller review. Draft 3 addresses the targeted review: the retained require test gets its win, the experiment distinguishes rewriting that test from preserving it, and the checking rollout and next-PR money branch are explicit. Final Principle-only read and diff review pending.
 
 ### Act IV tasks
 
-- [ ] Ch24: `01-migration-strategies.md` — which calls the compiler checks while JavaScript and TypeScript share a program, and what to check before the next conversion; draft 2 and checks complete, targeted recheck pending
+- [ ] Ch24: `01-migration-strategies.md` — which calls the compiler checks while JavaScript and TypeScript share a program, and what to check before the next conversion; draft 3 and checks complete, final Principle-only read and diff review pending
 - [ ] Ch25: `02-monorepo-type-sharing.md`
 - [ ] Ch26: `03-testing-typed-code.md`
 - [ ] Ch27: `04-performance-vs-safety.md`
@@ -181,7 +181,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Act I: The Type System      | Done            | 6 chapters; calibrated voice passes complete |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
 | Act III: Patterns & Design  | Done            | Ch14–23 reviewed, checked and merged (10 of 10) |
-| Act IV: The Real World      | **IN PROGRESS** | 4 chapters; Ch24 draft 2 checked, targeted recheck pending |
+| Act IV: The Real World      | **IN PROGRESS** | 4 chapters; Ch24 draft 3 checked, final review pending |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |
 

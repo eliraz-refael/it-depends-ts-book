@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Daniel Compiler**: "A migration changes an implementation while its callers are still using it. Keep their contract—what they load, pass and receive—or change and verify the callers too. If they load a function with `require('./slug')`, a test rewritten to use a default import doesn't check that old call."
+**Daniel Compiler**: "A migration changes an implementation while its callers are still using it. Keep their contract—what they get back from `require`, what arguments they pass and what results they receive—or change and verify the callers too. If they expect `require("./slug")` to give them a function, a test rewritten to use a default import doesn't check that old call."
 
-"With `allowJs`, the compiler can emit a JavaScript caller without checking the call inside it. Ask for JavaScript errors with `checkJs` or `@ts-check`. A caller this run doesn't check supplies no compiler evidence. Keep its contract or run it. TypeScript 7's default strictness can expose untyped parameters when you start checking JavaScript. Don't silence those by switching `noImplicitAny` off for the whole program, including the TypeScript."
+"The emitter can write a file whose calls we never checked. `allowJs` admits JavaScript. `checkJs` or `@ts-check` asks for its errors. A file this run never loads gets no checking, even with `@ts-check` at the top. For a caller you aren't checking, keep its contract or run it. TypeScript 7's default strictness can expose untyped parameters when you start checking JavaScript. Narrow which files you check if you need to. Switching `noImplicitAny` off for the whole program weakens the TypeScript too."
 
 ## The Debate
 
@@ -16,7 +16,7 @@
 
 **Eden**: "The route can't get far enough to ask it."
 
-Eden opens the storefront's build configuration. They are eight months into the migration.
+Eden opens the storefront's build configuration. The team is eight months into the migration.
 
 **Eden**: "The package still says `"type": "commonjs"`. Node runs what's in `dist`. We haven't changed that."
 
@@ -111,7 +111,7 @@ He restores the old JavaScript test as `tests/slug.require.test.js`, alongside t
 
 **Oded**: "That stays. I don't want this depending on the next person remembering which kind of import we argued about."
 
-**Eden**: "We can change the route to `require('./slug').default`. That works too. But then we have to change everyone who loads this function. You were adding types to the slugger, not changing its callers."
+**Eden**: "We can change the route to `require("./slug").default`. That works too. But then we have to change everyone who loads this function. You were adding types to the slugger, not changing its callers."
 
 **Oded**: "Then I want `export = slug`. Keep handing them the function."
 
@@ -127,7 +127,7 @@ Both tests pass. The route returns `/products/green-chair` again. The emit ends 
 
 **Oded**: "And my new default import still works?"
 
-**Daniel**: "In this build, yes. From the test, `import slug = require('../src/slug')` works too. The function becoming TypeScript didn't require it to become a default-exported property."
+**Daniel**: "In this build, yes. From the test, `import slug = require("../src/slug")` works too. The function becoming TypeScript didn't require it to become a default-exported property."
 
 **Noam**: "We repaired the loading call. Why didn't the compiler tell us about the broken one?"
 
@@ -141,9 +141,9 @@ Noam changes `checkJs` to true and tries the failed default-export version again
 
 **Noam**: "There. Before deployment. I want this on for JavaScript too."
 
-**Oded**: "You have more errors below it."
+**Oded**: "You have more errors."
 
-Noam opens the two older helpers named in the errors:
+Noam opens the two older helpers named in the errors.
 
 ```javascript
 // src/lookup.js
@@ -196,25 +196,13 @@ console.log(price(1250));
 
 **Eden**: "And the existing exceptions need a next step. Lookup's owner can confirm its IDs separately. Sum needs its callers examined before we write a contract for it. Neither belongs to the slugger."
 
-Eden records `lookup.js` and `sum.js` on the migration list with their owners. Each gets `// @ts-nocheck`. Oded adds `/** @param {number} cents */` above `price` in `money.js`.
+Eden records `lookup.js` and `sum.js` on the exception list with their owners. Each gets `// @ts-nocheck`. Oded adds `/** @param {number} cents */` above `price` in `money.js`.
 
 **Eden**: "The sitemap is already on the exception list. The catalogue team left it opted out while they replace its footer callback. Their PR owns that work."
 
-```javascript
-// src/sitemap.js
-// @ts-nocheck
-const slug = require("./slug");
-module.exports = function sitemap(titles, footer) {
-  return titles.map(title => "/products/" + slug(title)).join("\n")
-    + "\n" + footer();
-};
-```
-
-**Noam**: "That's why it didn't add parameter errors to my five. The count says nothing about the files we're not checking."
-
 Eden links the catalogue team's work beside the two new exceptions. Global `checkJs` stays on.
 
-**Chen**: "One probe before you annotate the route. Does a TypeScript caller know title has to be a string?"
+**Chen**: "Does the route give its callers a string requirement yet?"
 
 ```typescript
 // src/caller.ts — before the route's parameter is annotated
@@ -228,7 +216,6 @@ const url: string = handle(42);
 
 ```javascript
 // src/route.js
-// @ts-check
 const slug = require("./slug");
 /** @param {string} title */
 module.exports = function handle(title) {
@@ -240,43 +227,53 @@ The same `handle(42)` now reports TS2345: `Argument of type 'number' is not assi
 
 **Oded**: "A useful type for its caller, and the route is still JavaScript."
 
-**Eden**: "Yes. The local `@ts-check` is redundant with our global setting. I'm leaving it to mark this file as checked."
+**Eden**: "The typed slugger gives its checked JavaScript callers a signature too. You don't have to convert them all to benefit from starting with the leaf."
 
-Chen removes the probe. Both loading tests and `handle('Green Chair')` pass. The compiler is green too.
+Chen removes the probe. Both tests pass, `handle("Green Chair")` returns the product URL, and the compiler is green too.
 
 ## The Turn
 
 **Chen**: "Would this setup have caught Oded's original PR? Put the default export back for a minute. This is an experiment, not the version we're merging."
 
-Oded restores `export default` on the slugger in a scratch branch. The route stays checked. The sitemap keeps the opt-out it had before this PR.
-
-**Noam**: "TS2349 at the route. The check caught it."
+Oded restores `export default` on the slugger in a scratch branch. The route stays checked. The sitemap keeps the opt-out it had before this PR. The route reports TS2349 again.
 
 **Chen**: "And the sitemap?"
 
+```javascript
+// src/sitemap.js
+// @ts-nocheck
+const slug = require("./slug");
+module.exports = function sitemap(titles, footer) {
+  return titles.map(title => "/products/" + slug(title)).join("\n")
+    + "\n" + footer();
+};
+```
+
 **Noam**: "No diagnostic there. We haven't asked for one."
 
-Chen runs the files emitted by that failed check, in the scratch build. The route throws `TypeError: slug is not a function`. So does the sitemap, before it reaches its footer callback. The old loading test fails as well.
+Chen runs the files emitted by that failed check, in the scratch build. The route throws `TypeError: slug is not a function`. So does the sitemap, before it reaches its footer callback. The old `require` test fails as well.
 
 **Oded**: "The route error would stop this PR."
 
 **Chen**: "Yes. Now suppose you fixed the route by reading `.default`, as Eden suggested."
 
-**Oded**: "The compiler would be happy. The sitemap would still try to call the object."
+**Oded**: "The compiler would be happy. But my old `require` test still fails. This wouldn't merge."
 
-**Noam**: "And its old opt-out wouldn't be a new change for me to review. My default catches the route. It doesn't account for this other caller."
+**Chen**: "Unless you change that test to read `.default` too."
 
-**Eden**: "Keep global checking. In a conversion PR, take each known caller off the exception list or keep the interface it uses. Our route can be checked today. The sitemap needs the callable export until its team moves it."
+**Oded**: "Which is what I did the first time. I updated the test's call and left the real caller behind."
+
+**Noam**: "Now the route and both tests would agree. Nobody updated the sitemap, and its old opt-out wouldn't be a new change for me to review."
+
+**Eden**: "The catalogue team isn't changing its call in this PR. Give it the function it still expects."
 
 **Oded**: "I'd rather leave their footer work alone. Restore `export =`?"
 
 **Eden**: "Restore it, then call the sitemap again."
 
-The route returns its product URL. The sitemap returns that same URL followed by the footer. Both loading tests pass.
+The route returns its product URL. The sitemap returns that same URL followed by the footer. Both tests pass.
 
-**Noam**: "And no adding an opt-out to a checked caller because the conversion broke it. That would turn my list into a way to merge failures."
-
-**Oded**: "The route stays checked. The sitemap keeps its existing comment and its existing call."
+**Noam**: "And no adding an opt-out to a checked caller because the conversion broke it. That would turn the exception list into a way to merge failures."
 
 **Chen**: "We still haven't checked the backfill. It isn't in this compiler run."
 
@@ -289,29 +286,23 @@ console.log("/products/" + slug(" Green Chair "));
 // /products/green-chair
 ```
 
-**Eden**: "The build copies it, but the compiler includes `src` and TypeScript tests, not these scripts. None of those files imports it. Add the script to the check and run its emitted call as well."
+**Eden**: "A build script copies it into `dist/scripts`, but the compiler includes `src` and TypeScript tests, not these scripts. None of those files imports it. Add the script to the check and run its emitted call as well."
 
 With the broken default export, including the backfill reports TS2349. With `export =`, it compiles and prints the URL.
 
-**Chen**: "So importing the slugger doesn't tell the compiler who else imports the slugger."
-
-**Daniel**: "Correct. And a filename missing from `include` isn't proof that it stayed out. Another file can import it in. This script really was outside the program."
-
-**Noam**: "Search the loading calls, then check what the run actually includes."
-
 **Chen**: "A literal search won't find a loader that puts the filename in a variable."
 
-**Daniel**: "And `require(name)` can give you `any` even in checked JavaScript. A checked file doesn't mean every call in it is constrained. Run that loading path or keep what it expects."
+**Daniel**: "And `require(name)` can give you `any` even in checked JavaScript. Run that call. For the others, inspect the program's file list: imports can bring in files missing from `include`."
 
-**Oded**: "Our backfill is a literal call. We've found it, checked it and run it. Can I have my one-function PR back?"
+**Oded**: "So I'm merging a checking change as well as a typed slugger."
 
-**Eden**: "Yes. Keep its scope. I don't want an export-style cleanup hidden in the next one either."
+**Noam**: "Yes. The global setting, the annotations and the two new exceptions go with this fix. The money conversion can wait."
 
-Oded returns to `money.js`, with its newly annotated `cents` parameter.
+Before opening that next PR, Oded tries the money conversion on a separate branch, starting from their repaired build.
 
 **Oded**: "Does everything have to become `export =` now?"
 
-**Eden**: "That caller gets a member already. Keep that member."
+**Eden**: "`price-label.js` already reads a `price` member. Keep that member."
 
 ```typescript
 // src/money.ts
@@ -324,12 +315,10 @@ The unchanged `price-label.js` passes the global check and still prints `12.5`.
 
 **Noam**: "For that caller, the named export keeps the access it uses. Don't turn this into a rule about every object someone could export."
 
-**Oded**: "Then that label is the call I keep when I convert money."
-
 ## The Verdict
 
-**Eden**: "Merge `export =`, both loading tests and the annotated route. Add the backfill to the check and the build, so copying it isn't how it reaches `dist` any more. I'll keep the exception list with its owners. The catalogue team keeps the sitemap until its footer work is done."
+**Eden**: "A caller left on the exception list keeps its interface in a conversion PR. Here that's the sitemap, so merge `export =`, both tests and the annotated route, with the checking changes we've just tried. Add the backfill to the compiler's inputs and stop copying it separately. I'll maintain the exception list with its owners. The catalogue team keeps the footer work."
 
-**Noam**: "Global `checkJs` and strictness stay on. Leave the money conversion for its own PR. Its parameter annotation can stay in this one."
+**Noam**: "Strictness stays on. Money stays JavaScript with its parameter annotation until Oded's next PR."
 
 **Oded**: "And the old test stays old on purpose."

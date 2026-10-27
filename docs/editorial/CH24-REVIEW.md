@@ -1,6 +1,45 @@
-# Chapter 24 — draft 2 self-review
+# Chapter 24 — draft 3 self-review
 
-Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**. 2026-10-27.
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**. 2026-10-27.
+
+Manuscript: [Both Tests Were Green](../../book/04-the-real-world/01-migration-strategies.md).
+Review: [Claude's second review](ch24/CLAUDE-REVIEW-2.md), committed at `0a121c7`.
+Snapshot: [DRAFT3-SNAPSHOT.json](ch24/DRAFT3-SNAPSHOT.json).
+
+## Local revisions
+
+1. **The retained test's win:** Oded now objects that fixing only the route with .default still leaves his old require test red. Chen has to change that test as well for both tests to pass. Oded connects that move to his original mistake; Noam identifies the sitemap as the caller nobody changed. The scene no longer implies the PR would merge with the kept test failing. A new fixture executes the rewritten test and converted TS test successfully against the same artifact that still breaks the sitemap; the existing fixture keeps asserting that the unchanged test fails.
+2. **Turn placement:** Eden still names the sitemap's existing exception and unrelated owner before the experiment. Its require fence moves to Chen's question in the Turn. Removed Noam's anticipatory statement about the census and the stagey spoken TS2349 line. The fixture census still includes the sitemap from the beginning.
+3. **Scope and timeline:** Oded explicitly notices that this PR now includes the checking rollout. Noam accepts that scope: global checking, annotations and two new exceptions merge with the slug repair. Money's conversion is explicitly a separate-branch check for the next PR. The current-PR fixture retains annotated money.js. The Verdict names the earned rule for callers left on the exception list, assigns its ownership, and puts the backfill into the compiler instead of the separate copy step. The story consistently calls it the exception list. Eden identifies the build script that copies the backfill into dist/scripts.
+4. **Principle:** require's return value replaces vague loading language. Daniel opens paragraph two with what the emitter can do without checking calls. A file the run never loads gets no checking even with @ts-check; a new pair of regressions pins absence and inclusion. The alternative to disabling noImplicitAny is narrowing which files are checked. No opt-out or backfill implementation appears in the Principle.
+5. **Trims and continuity:** the late coverage lecture becomes two lines. The numeric probe has a shorter question and a concrete link to a typed leaf benefiting checked JS callers; a negative JS caller fixture pins the signature claim. Removed the redundant route @ts-check comment and its spoken justification. Dropped the repeated route/sitemap outcome, search instruction and final money promise. Fixed the team antecedent, error ordering, test vocabulary, code-string quotes, call-return wording and price-label referent. The hook and inspect.js reveal are intact.
+
+## Self-assessment and handoff
+
+The Principle still answers the four intended cases in my own self-test: preserve member/callable contracts, don't change a test's loading operation and count that as old-caller evidence, limit checking scope instead of weakening program-wide noImplicitAny, and account for scripts the compiler never loads. This is not a fresh-reader result. Claude owns the final isolated Principle read and diff review.
+
+The revised argument gives Oded both repairs that actually work: compatible exports and a retained test that blocks the break. Noam's checking default also works. The remaining missed caller appears only under an explicitly changed test, not a false claim about their complete pipeline. The local Verdict combines these protections; no split is staged.
+
+The late file-coverage exchange remains the densest passage, but is now two short turns. The money coda is marked as a transfer exercise on another branch. No new full reader is requested. Length is **2093 whitespace-delimited words**, shorter after the requested cuts; no material was added to reach the original planning target.
+
+## Validation and freeze
+
+Manuscript SHA-256: `7393297e8b690da3a8b71ab05baed5606266f6ef51703dcf409588c0d1944ff4`.
+Validator SHA-256: `5b0ba08cb9591b0dd4145570e359994b50176e72bcb28a886adfa325c11f1108`.
+
+- Targeted `node checks/chapter24.cjs`: **exit 0**, 12 fences / 31 compiler cases / 15 runtime groups.
+- Full `npm run check`: **exit 0** on the exact frozen manuscript and validator, TS **7.0.2**, Node **v22.23.4**. Whole book: **413 fences / 564 compiler cases / 269 runtime groups**, plus two default cases and two searches.
+- All 12 fences remain covered. The sitemap fence only moves; the route fence loses the now-redundant @ts-check comment. Other fence contents are unchanged from draft 2.
+- Additional cases pin the JS caller's TS2345, the rewritten require test, and @ts-check on an unloaded versus included backfill. The money branch uses the full repaired repository, and the current-PR state explicitly retains money.js.
+- Installed dependencies reused; no clean-install claim. Logs remain untracked in `.probe/ch24-draft3-targeted.log` and `.probe/ch24-draft3-full-check.log`; the full log hash is in the snapshot. Claude's records at `0a121c7` are unchanged.
+
+**Ready for final Principle-only read and diff review. Local commit only; no push.** Earlier self-reviews follow as historical records.
+
+---
+
+# Historical draft 2 self-review
+
+Historical status: draft 2 was reviewed at `0a121c7`. The draft 3 record above supersedes this earlier assessment.
 
 Manuscript: [Both Tests Were Green](../../book/04-the-real-world/01-migration-strategies.md).
 Review: [Claude's draft-1 findings](ch24/CLAUDE-REVIEW.md), committed at `30fa282`.

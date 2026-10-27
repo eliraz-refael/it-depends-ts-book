@@ -1,6 +1,6 @@
 # Chapter 24 — Migration Strategies (working title)
 
-Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**, 2026-10-27. The settlement below governs where it differs from the original proposal.
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**, 2026-10-27. The settlement below governs where it differs from the original proposal.
 Branch: `codex/chapter-24-migration-strategies`, based on `origin/main` `14a6c88` (Ch23's merge).
 File: `book/04-the-real-world/01-migration-strategies.md`. It opens Act IV, The Real World.
 
@@ -229,10 +229,10 @@ scene they'd retell):
 - [x] Codex challenges this plan: is the decision honestly opinionated, does the incident teach
   strategy rather than trivia, and which ending. Disagreements are settled on evidence
   ([challenge](ch24/CODEX-PLAN-CHALLENGE.md)).
-- [x] Codex drafts and self-reviews ([record](CH24-REVIEW.md), [snapshot](ch24/DRAFT2-SNAPSHOT.json)).
+- [x] Codex drafts and self-reviews ([record](CH24-REVIEW.md), [snapshot](ch24/DRAFT3-SNAPSHOT.json)).
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
-- [x] Draft 2 checks durable; full suite green on the frozen manuscript (Ch24 12 / 27 / 14; book 413 / 560 / 268). Recheck any further revisions.
+- [x] Draft 3 checks durable; full suite green on the frozen manuscript (Ch24 12 / 31 / 15; book 413 / 564 / 269). Recheck any further revisions.
 - [ ] Clean `npm ci` and full suite green at final review.
 - [ ] Ready for the author's review.
 
@@ -331,3 +331,12 @@ The [draft-1 review](ch24/CLAUDE-REVIEW.md), committed at `30fa282`, replaces th
 Money and its label exist throughout. Its cents parameter is the fifth TS7006; Oded adds its JSDoc annotation before the later green runs. The validator now derives every migration state from the full established repository. The shortened numeric-call probe distinguishes an accepted call from a green program. Oded proposes the compatible export, Daniel's Principle names the implementation/caller contract and missing compiler evidence, and the Verdict assigns concrete work instead of repeating the rule.
 
 Draft 2: 12 fences / 27 compiler cases / 14 runtime groups; whole book 413 / 560 / 268. Snapshot: [DRAFT2-SNAPSHOT.json](ch24/DRAFT2-SNAPSHOT.json). The first review and both initial readers are complete; the revised Principle and Turn await Claude's targeted recheck. Draft 1's counts and original proposal above are historical.
+
+
+## Draft 3 after the targeted review (2026-10-27)
+
+The [second review](ch24/CLAUDE-REVIEW-2.md), committed at `0a121c7`, calls for local edits only. Oded now objects that the retained require test still fails after a route-only .default repair. Chen's hypothetical also rewrites that test; only then do both tests agree while the sitemap remains broken. The validator executes both states. The existing sitemap exception is planted earlier, but its fence waits for the Turn.
+
+The current PR explicitly merges the compatible slug export, global checking, parameter annotations and new exceptions. The money.ts conversion is a separate branch check for the next PR, not part of this merge. The Verdict names the earned rule for callers left on the exception list. The Principle covers unloaded files even with @ts-check and narrowing the checked scope instead of weakening noImplicitAny program-wide. The late coverage exchange is two lines, and the numeric probe now links to the typed leaf's benefit for checked JS callers.
+
+Draft 3: 12 fences / 31 compiler cases / 15 runtime groups; whole book 413 / 564 / 269. Snapshot: [DRAFT3-SNAPSHOT.json](ch24/DRAFT3-SNAPSHOT.json). A final Principle-only reader and diff review remain; no new full reader is requested.
