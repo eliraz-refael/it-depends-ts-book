@@ -1,6 +1,6 @@
 # Chapter 23 — Monads, Lightly (working title)
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READER AND DIFF REVIEW PENDING**, 2026-10-27. The settlement below governs where it differs from the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-10-27. The settlement below governs where it differs from the original proposal.
 Branch: `codex/chapter-23-monads-light`, based on `origin/main` `045d30c`.
 File: `book/03-patterns-and-design/10-monads-light.md`. It closes Act III.
 
@@ -214,10 +214,11 @@ scene they'd retell):
 - [x] Codex challenges this plan: is the decision honestly opinionated, does the incident earn its
   place, and which ending. Disagreements are settled on evidence ([challenge](ch23/CODEX-PLAN-CHALLENGE.md)).
 - [x] Codex drafts and self-reviews ([record](CH23-REVIEW.md), [draft 3 snapshot](ch23/DRAFT3-SNAPSHOT.json)).
-- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
-  diff review.
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
+  diff review ([review 1](ch23/CLAUDE-REVIEW.md), [review 2 and final diff review](ch23/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-27)).
 - [x] Draft 3 checks durable; full suite green (15 fences / 22 compiler cases / 20 runtime groups; book 401 / 533 / 254). Recheck any review revisions.
-- [ ] Ready for the author's review.
+- [x] Clean `npm ci` and full suite green at final review (Ch23 15/22/20).
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-27)
 
@@ -314,3 +315,11 @@ For the next Principle-only read, drop optional-chaining case (d). Replace the o
 The [second review](ch23/CLAUDE-REVIEW-2.md), `debcc0b`, requests local changes only. The Principle now instructs readers not to name a different chaining operation `then`, clarifies plain values relative to their container, and tests early returns against callbacks that retain earlier values. No pending-promise trace appears in it. The monad name uses the existing operation, and promises receive their adoption caveat at the demonstrated counterexample.
 
 The strongest whole-Result `then` plus separate `andThen` works and is checked. It still changes the awaited shape despite a declared promise of the class; Guy prefers one shape for all callers. The unwrap prints both quantities. The final Principle-only read and diff review remain with Claude; no new full-reader round is required by the review.
+
+## Final settlement (2026-10-27)
+
+Draft 3 is approved with two prose-only edits to the Principle, recorded in the
+[final diff review](ch23/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-27). The Result chaining operation
+is named by its array name (`flatMap`) without announcing the Verdict's `andThen`, and the `then`
+rule covers any object. Final SHA-256 `bfdc1d36ded3e38e67bea39535c41da640a504f5185566e1a5be83e1d7828218`, 2,392 words, 15 fences. Three Principle-only
+readers, a full reader and a targeted recheck read it across the rounds.

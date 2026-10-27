@@ -107,3 +107,64 @@ Codex revises to draft 3. Update the checks for any changed fence (the unwrap fe
 freeze `ch23/DRAFT3-SNAPSHOT.json`, and commit locally with these records. Then a Principle-only
 reader on the revised Principle, and my final diff review. No further full reader unless the changes
 reach beyond the lines above.
+
+## Final diff review (2026-10-27)
+
+Draft 3 (`8befc8d3…`, `eaa7711`) addresses every finding above.
+- **The Principle's last sentence is an instruction** ("Don't name a method `then` unless it keeps the
+  promise contract. Give a different chaining operation a different name."), with no trace of the
+  hang. "Plain" is defined relative to the container; the early-return comparison has its test
+  (later steps needing earlier values); "flattens" is now "unwraps".
+- **No premature rename.** Dafna's monad line uses Linoy's `then`.
+- **Dafna's caveat** that promises only mostly fit sits where `Promise.resolve(preview("7"))` adopts.
+- **The strongest thenable form** (a correct whole-Result `then` plus `andThen`) is raised and
+  answered: awaiting the class still turns it into a union, and `Promise<Res>` still compiles. The
+  rejecting thenable's success-path cost is named. Both are durably checked.
+- **Eli's line** explains why `Promise<Res>` compiles: `await` asks `Awaited`, and `Awaited` asks
+  `then`.
+- **Guy's Verdict** gives its reason: the unwrap gave the batch a union and the screens a class; the
+  rename gives everyone the same `Res`.
+- **Line-level:** every item is fixed. Only fence 10 changed: the unwrap fence now runs quantity two
+  before the both-close claim.
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md) applied the rule correctly to all
+three cases,** checking them with the book's compiler and Node:
+- **(a) the `Maybe` with `then`:** rename it. It found the bare value on success and the hang on
+  absence itself, which is the Turn's job, not the Principle's.
+- **(b) array and Result steps:** `flatMap` and the Result chaining operation, with both written types.
+- **(c) four early returns:** write both, and keep the checks when later steps need earlier values.
+
+It found the section "mostly a person" and said it "never got bored". Its weakest spot was that the
+Result chaining operation is never named ("the array side names both operations; the Result side,
+where the rule matters most, names neither"), with the "plain" definition and "Write the early
+returns too" as the decoding stretch.
+
+**My two prose-only settlement edits** (no fence changes; the fence extract is byte-identical to
+draft 3):
+1. Paragraph 1 now reads: "If it returns a plain value, use `map`. By plain I mean not the container
+   you're already in: inside Result, even an array is a plain value. If it returns another Result, you
+   need the operation arrays call `flatMap`, which hands back the step's Result as it is instead of
+   wrapping it in a second one. Arrays show the difference plainly… Then write the early-return
+   version as well, and compare." That names the operation by its array name without announcing the
+   Verdict's `andThen`, and it removes the ambiguous "too".
+2. "Don't name a method `then`" now reads "Don't give an object a `then` method", because the reader
+   asked whether the rule covered only classes.
+
+**Not adopted from the final reader:**
+- **Stating the consequence (a hang) in the Principle.** It's the Turn. The first full reader called
+  the draft 1 Principle "the Turn, step for step", and the recheck found knowing *what* didn't spoil
+  the *how*. The rule stays explicit and the mechanism stays in the scene.
+- **What the promise contract is, exactly, and the error-type union.** The Turn shows the first;
+  Linoy's `BadQty | NoStock` line carries the second.
+- **When the chain is preferred.** Implied by the stated test; no new rule.
+
+**Final text:** SHA-256 `bfdc1d36ded3e38e67bea39535c41da640a504f5185566e1a5be83e1d7828218`, 2,392 words, 15 fences, fence extract byte-identical to
+draft 3. `node checks/chapter23.cjs` passes (15/22/20). **Clean install:** in a fresh export of
+`eaa7711`, `npm ci --offline` failed (ENOTCACHED for the locked Zod tarball, as Codex reported).
+A plain `npm ci` against the same lockfile then succeeded, and the full `npm run check` exited 0 on
+TypeScript 7.0.2 and Node 22.23.4. The settlement edits touch prose only.
+
+**Approved.** The ending is a local Verdict:
+- rename the success-only `then` to `andThen`, and keep the class for the six screen callers;
+- don't introduce it where two early returns read fine;
+- the boundary unwrap works, but the rename gives every caller the same `Res`.

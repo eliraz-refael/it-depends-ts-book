@@ -33,12 +33,12 @@ Successful run on **2026-10-27**, TypeScript **7.0.2**, Node **22.23.4**:
 | Chapter 20 | 15 | 21 | 18 |
 | Chapter 21 | 13 | 16 | 22 |
 | Chapter 22 | 12 | 17 | 17 |
-| Chapter 23 (draft 3) | 15 | 22 | 20 |
+| Chapter 23 | 15 | 22 | 20 |
 | Total | **401** | **533** | **254** |
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
 
-The Chapter 23 draft 3 handoff retried `npm ci --offline`; it failed with ENOTCACHED for the locked Zod tarball. This run used the main checkout's installation after verifying a byte-identical lockfile and all 14 installed package versions. It is not evidence of a clean offline install. The full suite passed on the frozen draft 3 manuscript and validator.
+At Chapter 23's final review, `npm ci --offline` failed with ENOTCACHED for the locked Zod tarball in a fresh export. A plain `npm ci` against the same lockfile succeeded, and the full suite passed there on TypeScript 7.0.2 and Node 22.23.4. Chapter 23 is [jointly approved](../docs/editorial/CH23-REVIEW.md); its final edits touch Principle prose only.
 
 The original TS7 migration review is settled. Claude independently reran that suite in the workspace and a fresh install; both runs passed with 199 fences, 230 compiler cases, and 29 runtime groups. The subsequent Chapter 10 reader-onboarding repair added a caller checked before the SDK upgrade, after the breaking upgrade, and after the overload repair. Its runtime checks cover success, a synchronous throw, and a rejected promise. Claude also independently reran that expanded suite: 200 fences, 233 compiler cases, and 30 runtime groups. See [the Chapter 10 review](../docs/editorial/CH10-REVIEW.md) for its separate comprehension review. Chapter 11 adds the builder and function checks described below; its review is recorded separately in [CH11-REVIEW.md](../docs/editorial/CH11-REVIEW.md).
 
@@ -127,7 +127,7 @@ Historical feature dates and earlier reviews' TS5 results remain historical evid
 
 Sources: [TypeScript 7 release and CLI/API transition](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/), [native compiler changes](https://github.com/microsoft/typescript-go/blob/main/CHANGES.md), [TypeScript performance guidance](https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections). The compiler and installed dependency declarations are the executable evidence for the version-specific checks.
 
-## Chapter 23 draft coverage
+## Chapter 23 coverage
 
 The suite extracts all 15 fences with unique prefix matching. Original and renamed classes compile in separate programs. The repaired programs change only the printed method name and its call site, and reset worker counters before running the printed repair. Checks pin every displayed output, the quoted TS2339 diagnostic and an error-union regression, nested/flat/async inferred types, both domain refusals, preservation of the successful quantity, skipped continuations and all worker counts. `Awaited` loses the original class and preserves the renamed one. The deprecated-alias regression reopens adoption.
 

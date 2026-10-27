@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Before admiring the chain, look at what its next step returns. A plain value belongs in `map`. By plain, I mean not another Result when we're working in Result. An array counts as a plain value there. Another Result needs a chaining operation that uses it directly, instead of putting it inside a second one. Arrays do the same: `map` keeps an extra array level and `flatMap` joins it. Write the early returns too. If later steps need earlier values, you may find those checks easier to follow than callbacks nested to keep the values available."
+**Prof. Eli Typeworth**: "Before admiring the chain, look at what its next step returns. If it returns a plain value, use `map`. By plain I mean not the container you're already in: inside Result, even an array is a plain value. If it returns another Result, you need the operation arrays call `flatMap`, which hands back the step's Result as it is instead of wrapping it in a second one. Arrays show the difference plainly: `map` keeps an extra array level and `flatMap` joins it. Then write the early-return version as well, and compare. If later steps need earlier values, you may find those checks easier to follow than callbacks nested to keep the values available."
 
-"The lovely complication is promises. Their `then` does both jobs: it maps a plain return value and unwraps a returned promise, including an object with a callable `then`. No registration required. You can join a language protocol just by choosing a method name. Don't name a method `then` unless it keeps the promise contract. Give a different chaining operation a different name."
+"The lovely complication is promises. Their `then` does both jobs: it maps a plain return value and unwraps a returned promise, including an object with a callable `then`. No registration required. You can join a language protocol just by choosing a method name. Don't give an object a `then` method unless it keeps the promise contract. Give a different chaining operation a different name."
 
 ## The Debate
 

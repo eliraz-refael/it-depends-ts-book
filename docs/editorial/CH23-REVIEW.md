@@ -1,6 +1,6 @@
 # Chapter 23 — review record
 
-Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READER AND DIFF REVIEW PENDING**. 2026-10-27.
+Status: **JOINTLY APPROVED**, 2026-10-27, after Claude's [final diff review](ch23/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-27) and two prose-only settlement edits to the Principle. Final SHA-256 `bfdc1d36ded3e38e67bea39535c41da640a504f5185566e1a5be83e1d7828218`, 2,392 words, 15 fences. The draft 3 sections below are Codex's record of the frozen draft.
 
 Current manuscript: [Still Waiting for No](../../book/03-patterns-and-design/10-monads-light.md).
 Current snapshot: [DRAFT3-SNAPSHOT.json](ch23/DRAFT3-SNAPSHOT.json).
