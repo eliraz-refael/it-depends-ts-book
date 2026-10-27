@@ -1,10 +1,44 @@
 # Chapter 23 — review record
 
-Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**. 2026-10-27.
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READER AND DIFF REVIEW PENDING**. 2026-10-27.
 
 Current manuscript: [Still Waiting for No](../../book/03-patterns-and-design/10-monads-light.md).
-Current snapshot: [DRAFT2-SNAPSHOT.json](ch23/DRAFT2-SNAPSHOT.json).
-Review addressed: [Claude's first formal review](ch23/CLAUDE-REVIEW.md), `858ecc5`, plus its two verbatim reader reports. Those reports remain unchanged.
+Current snapshot: [DRAFT3-SNAPSHOT.json](ch23/DRAFT3-SNAPSHOT.json).
+Review addressed: [Claude's second review](ch23/CLAUDE-REVIEW-2.md), `debcc0b`, plus its two verbatim reports. Those records remain unchanged.
+
+## Draft 3 response
+
+1. **Explicit Principle, without the trace:** accepted. Eli instructs the reader to reserve `then` for the promise contract and name a different chaining operation differently. Neither resolving callback nor the pending refusal appears there. His first paragraph distinguishes a plain value relative to its container, bridges to arrays, and tests chaining against early returns when later steps need earlier values. Promise adoption now says “unwraps,” not “flattens.”
+2. **Premature rename and monad caveat:** accepted. Dafna uses Linoy's existing `then` when naming the wrapping/chaining pattern. At direct `Promise.resolve(preview("7"))`, she qualifies promises: adoption does not leave a promise-like value wrapped. No new example family was added.
+3. **Strongest whole-Result repair:** accepted and reproduced. Linoy can keep a correct whole-Result `then` and add `andThen`; the manuscript does not claim otherwise. Guy names the cost: awaiting changes the class into a union even when the function is annotated `Promise<Res>`. A new compiler case pins the declared and awaited types plus successful chaining; its runtime group checks success, both refusals, the lost method, and skipped continuation. The rejecting thenable's bare success value is explicit too.
+4. **Annotation and Verdict:** accepted. Eli connects the declared `Promise<Res>` to `Awaited` inspecting the callback parameter. Guy chooses one shape for synchronous and async callers. Unwrapping remains a valid, smaller boundary repair, with its different shape accepted before the class repair is argued.
+5. **Local continuity and prose:** accepted. The printed unwrap runs both quantities before the completion claim. Saved carts, six screen callers and five units clarify setup. The rename no longer claims an execution-order advantage over nested functions. “Other callers” avoids worker-job ambiguity. The extra carefulness sentence and vague async-helper advice are cut; the refusal explanation and final callback-return comparison are explicit. The source apostrophe is normalized.
+
+No consequential finding was declined. Only the boundary-unwrap fence changed (it now prints success as well as refusal); the other fourteen fences are byte-identical to draft 2.
+
+## Draft 3 self-review
+
+The best reveal remains untouched: the successful call worked because its callback was the promise's resolve, while the refusal returned a fresh wrapper to nobody. The new strongest-repair exchange lasts two turns and feeds Guy's concrete preference instead of inventing an impossibility. No machinery was added to the page.
+
+The Principle now supplies an instruction and a comparison test. This is an author assessment, not a substitute for Claude's final isolated reader. Its first paragraph remains the densest passage; the final reader should determine whether “plain” and the earlier-value test are actionable. The arrays/monad passage remains short, with its qualification paid off by the actual adoption example. No further full-reader round is claimed or requested here.
+
+## Draft 3 validation
+
+Frozen manuscript: **2373 whitespace-delimited words; 15 TypeScript fences**.
+SHA-256: `8befc8d387b5f849958ee1f8219ebe179074e7dd13f59f03e5b9b85532f2f8c5`.
+
+- `npm ci --offline`: exit 1, ENOTCACHED for the locked Zod 4.6.2 tarball. Main's installation was restored only after a byte-identical lockfile check and verification of all 14 installed package versions. No registry, package or lockfile changes; no clean-install claim.
+- `node checks/chapter23.cjs`: exit 0, **15 fences / 22 compiler cases / 20 runtime groups**. Final prose refinements preceded the full suite below.
+- `npm run check`: exit 0 on TS **7.0.2** / Node **22.23.4**, **401 fences / 533 compiler cases / 254 runtime groups**, plus two default cases and two searches, on this frozen manuscript and validator. No subsequent manuscript or validator edits.
+- Logs and the installation manifest remain untracked under `.probe/ch23-draft3-*`.
+
+Ready for the requested final Principle-only reader and diff review. Not publication approval; no push.
+
+---
+
+## Prior drafts (historical)
+
+The following records describe earlier handoffs, including their then-pending reader questions and validation provenance. Current status and counts are above.
 
 ## Draft 2 response
 

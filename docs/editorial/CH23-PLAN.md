@@ -1,6 +1,6 @@
 # Chapter 23 — Monads, Lightly (working title)
 
-Status: **PLAN SETTLED AFTER CODEX'S CHALLENGE; DRAFTING**, 2026-10-27. The settlement below governs where it differs from the original proposal.
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE READER AND DIFF REVIEW PENDING**, 2026-10-27. The settlement below governs where it differs from the original proposal.
 Branch: `codex/chapter-23-monads-light`, based on `origin/main` `045d30c`.
 File: `book/03-patterns-and-design/10-monads-light.md`. It closes Act III.
 
@@ -213,10 +213,10 @@ scene they'd retell):
 
 - [x] Codex challenges this plan: is the decision honestly opinionated, does the incident earn its
   place, and which ending. Disagreements are settled on evidence ([challenge](ch23/CODEX-PLAN-CHALLENGE.md)).
-- [x] Codex drafts and self-reviews ([record](CH23-REVIEW.md), [draft 2 snapshot](ch23/DRAFT2-SNAPSHOT.json)).
+- [x] Codex drafts and self-reviews ([record](CH23-REVIEW.md), [draft 3 snapshot](ch23/DRAFT3-SNAPSHOT.json)).
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
-- [x] Draft 2 checks durable; full suite green (15 fences / 21 compiler cases / 19 runtime groups; book 401 / 532 / 253). Recheck any review revisions.
+- [x] Draft 3 checks durable; full suite green (15 fences / 22 compiler cases / 20 runtime groups; book 401 / 533 / 254). Recheck any review revisions.
 - [ ] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-27)
@@ -308,3 +308,9 @@ The [first review](ch23/CLAUDE-REVIEW.md), committed as `858ecc5`, supersedes th
 The missing boundary repair now works on the page: return `preview(text).result`, preserving all six synchronous callers and closing both jobs. The class owner's reason to do more is demonstrated by direct `Promise.resolve(preview("7"))`, which still waits. The local Verdict stays with renaming because it repairs the class while preserving screen callback shapes and refusal propagation. The whole-Result thenable's changed callback parameter is explicit and checked. Sahar retains the real advantage of dropping the shell instead of withdrawing his proposal for lack of evidence.
 
 For the next Principle-only read, drop optional-chaining case (d). Replace the out-of-scope async-array case (b) with a step returning an array or Result: which operation keeps the intended single container? Case (a) should test recognition that the named method must follow the promise protocol, not demand the exact missing-callback trace now deliberately reserved for the Turn. Keep case (c), comparing an early-return function with its actual chained version. Ask when the full reader guessed the incident and whether the revised repair debate changes the apparent inevitability of the rename.
+
+## Draft 3 after targeted recheck (2026-10-27)
+
+The [second review](ch23/CLAUDE-REVIEW-2.md), `debcc0b`, requests local changes only. The Principle now instructs readers not to name a different chaining operation `then`, clarifies plain values relative to their container, and tests early returns against callbacks that retain earlier values. No pending-promise trace appears in it. The monad name uses the existing operation, and promises receive their adoption caveat at the demonstrated counterexample.
+
+The strongest whole-Result `then` plus separate `andThen` works and is checked. It still changes the awaited shape despite a declared promise of the class; Guy prefers one shape for all callers. The unwrap prints both quantities. The final Principle-only read and diff review remain with Claude; no new full-reader round is required by the review.

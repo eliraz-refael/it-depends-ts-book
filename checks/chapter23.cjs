@@ -124,6 +124,22 @@ const callbackChange=example('whole-union-cannot-keep-preview-callback',base+wor
 new UnionThenable(preview('2').result).then((value:Preview)=>value.offer); // Error TS2345
 `,[2345]);
 assert(callbackChange.diagnostics[0].message.includes("Type 'Result<Preview, BadQty | NoStock>' is not assignable to type 'Preview'."));
+// The strongest whole-Result repair retains a separate successful-value chain.
+const bothMethodsBody=replace(wholeUnionBody,' constructor(readonly result:Result<T,E>) {}',` constructor(readonly result:Result<T,E>) {}
+ andThen<U,F>(step:(value:T)=>UnionThenable<U,F>):UnionThenable<U,E|F> {
+  return this.result.ok?step(this.result.value):new UnionThenable<U,E|F>(this.result);
+ }`);
+const bothMethods=example('whole-result-then-plus-andthen-still-changes-awaited-shape',base+workerFn+bothMethodsBody+equal+`
+async function declaredClass(text:string):Promise<UnionThenable<Preview,BadQty|NoStock>> {
+ return new UnionThenable(preview(text).result);
+}
+type Declared=Assert<Equal<ReturnType<typeof declaredClass>,Promise<UnionThenable<Preview,BadQty|NoStock>>>>;
+type AwaitedShape=Assert<Equal<Awaited<ReturnType<typeof declaredClass>>,Result<Preview,BadQty|NoStock>>>;
+const chained=new UnionThenable(parseQty('2')).andThen(n=>
+ new UnionThenable(availability(n)).andThen(offer=>new UnionThenable(ok({quantity:n,offer:offer.id}))));
+type Chain=Assert<Equal<typeof chained,UnionThenable<Preview,BadQty|NoStock>>>;
+export {declaredClass,chained};
+`);
 const omittedWrapper=example('plain-union-worker-closes-both',types+ladder+workerFn+`
 async function plainLoad(text:string):Promise<Result<Preview,BadQty|NoStock>> {return plainPreview(text);}
 export {plainLoad,runJob,counts};
@@ -193,10 +209,10 @@ async function main(){
   // Pending is established by the finite printed branch, not by a wall-clock timeout:
   // Res.then ignores the rejection callback and does not call success on a refusal.
  });
- await group('printed-unwrapped-refusal',async()=>{
+ await group('printed-unwrapped-success-and-refusal',async()=>{
   const a=capture(unwrapped).module;
-  assert.deepEqual(await captureCall(()=>a.checkUnwrapped()),[[JSON.stringify(expected[1])]]);
-  assert.deepEqual(a.counts,{started:1,closed:1,failed:0});
+  assert.deepEqual(await captureCall(()=>a.checkUnwrapped()),[[JSON.stringify(expected[0])],[JSON.stringify(expected[1])]]);
+  assert.deepEqual(a.counts,{started:2,closed:2,failed:0});
  });
  await group('unwrap-keeps-success-and-both-refusals-and-closes-jobs',async()=>{
   const a=capture(unwrapped).module;
@@ -239,6 +255,19 @@ async function main(){
   let seen;
   await new a.UnionThenable(a.preview('7').result).then(result=>{seen=result;});
   assert.deepEqual(seen,expected[1]);
+ });
+ await group('correct-then-plus-andthen-keeps-chains-but-await-removes-class',async()=>{
+  const a=capture(bothMethods).module;
+  assert.deepEqual(a.chained.result,expected[0]);
+  assert.equal(typeof a.chained.andThen,'function');
+  for(const [i,s] of ['2','7','x'].entries()){
+   const result=await a.declaredClass(s);
+   assert.deepEqual(result,expected[i]);assert.equal('andThen' in result,false);
+  }
+  let calls=0;
+  const refusal=new a.UnionThenable(expected[1]);
+  assert.strictEqual(refusal.andThen(()=>{calls++;return a.chained;}).result,expected[1]);
+  assert.equal(calls,0);
  });
  await group('removing-class-is-also-a-working-repair',async()=>{
   const a=capture(omittedWrapper).module;
