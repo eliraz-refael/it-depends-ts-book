@@ -1,6 +1,6 @@
 # Chapter 25 — Monorepo Type Sharing (working title)
 
-Status: **PLAN WRITTEN; AWAITING CODEX'S CHALLENGE**, 2026-10-27.
+Status: **PLAN SETTLED; DRAFT 1 BRIEFED**, 2026-10-27. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/chapter-25-monorepo-type-sharing`, based on `origin/main` `caf7eba` (Ch24's merge).
 File: `book/04-the-real-world/02-monorepo-type-sharing.md`.
 
@@ -299,12 +299,117 @@ scene they'd retell):
 
 ## Completion
 
-- [ ] Codex challenges this plan: is the decision honestly opinionated, does the hook teach type
+- [x] Codex challenges this plan: is the decision honestly opinionated, does the hook teach type
   sharing rather than trivia, how the second route got past TS5011, and which ending.
-  Disagreements are settled on evidence.
+  Disagreements are settled on evidence ([challenge](ch25/CODEX-PLAN-CHALLENGE.md)).
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
 - [ ] Checks durable; full suite green on the frozen manuscript.
 - [ ] Clean `npm ci` and full suite green at final review.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-27)
+
+Codex's [challenge](ch25/CODEX-PLAN-CHALLENGE.md) (`f6dbb02`) reproduced the eight mechanisms and
+added controls: 78 checked invocations in `.probe/codex/probe.cjs` and `ending.cjs`, untracked. I
+re-ran both runners (all assertions pass). I also independently re-ran the three claims that change
+the argument:
+- **`tsc -b` with the reference edge removed** stays green (exit 0) after money's `format` gains a
+  required parameter.
+- **A generated `release.ts` outside `src`** gives the API `rootDir: "../.."` for its own reasons.
+  The relative import into money's source then reports TS2741, not TS5011.
+- **The asserted run's stack** names only the API's emitted copy of money
+  (`out3/packages/money/src/index.js` at `Money.plus`) and the API entry point. It doesn't name
+  `money/dist`.
+
+**Adopted:**
+- **A local Verdict, on the combination.** The copied deployment needs executable built
+  JavaScript. It doesn't need every development check to read built declarations. The page decides
+  three things separately:
+  - **The public API:** export `parseMoney` from the package, at the root or at a deliberate public
+    subpath. Remove the bypass.
+  - **The development check:** Linoy may keep a source-reading, `noEmit` check, with the condition
+    offered by **both** money and cart and shared through a base config.
+  - **The release check:** `tsc -b` over an explicit reference graph, behind the repository's
+    existing check command. It's what packaging and the copied deployment use.
+
+  Nobody is forced into a stalemate, and nobody is a strawman. Don't stage a split.
+- **The Principle is corrected before drafting.** Three overclaims go:
+  - "The compiler identifies a type by the file." Structural types and public-field classes cross
+    two declarations legitimately. Identity matters only for private members and `unique symbol`
+    keys.
+  - "Two spellings are two identities." A relative import of `dist`, or a public `parse` subpath,
+    reaches the same declaration.
+  - "Every program must resolve it the same way." Different conditions in dev and release compose
+    when each program is consistent and the release runs the built code.
+
+  **New direction, for Gilad in two short paragraphs:** before you trust a shared type, know
+  1. which declarations this consumer checks;
+  2. which implementation its import will load when it runs;
+  3. what makes that implementation current with those declarations.
+
+  Then the operational rules:
+  - use the package's public exports, don't route around them for an unexported helper;
+  - when two same-named types won't assign, read their declarations before you assert;
+  - a check that read yesterday's declarations didn't check today's source.
+
+  **No flag catalogue, private-member theory or copy failure in his opening.** "Entrance" goes.
+  The Principle-only readers will test whether the three questions are concrete enough without it.
+- **The second route is natural.** The API already compiles a generated release stamp
+  (`generated/release.ts`, `buildId`), so its `rootDir` is `../..` before the incident. Idan's
+  parser import is real: `packages/money/src/parse.ts` exists and builds, but the package doesn't
+  export it. Show the stamp in one clause plus the labelled import and config. TS5011 gets no fence.
+- **The stack trace names the executing copy, not both definitions.** Gilad asks for the trace, it
+  points at the API's own `out/packages/money/src/index.js`, and Gil finds the other implementation
+  (cart's, from `money/dist`). The compiler's message has the two declarations, and the trace and
+  the output tree have the two implementations.
+- **Before the failure, establish what the addition is for** (Idan's parsed amount plus cart's
+  shipping charge) and what a correct total looks like. Idan's parser really did produce the
+  `Money` its declaration promises. The surprise is that another part of the application produced a
+  different one. The double assertion is someone testing "it's only the spelling", on a laptop, not
+  anyone's proposed repair.
+- **`Line` gets one exchange:** a clean compile isn't proof that two imports reached the same
+  declaration. It isn't a bug either, because that assignment is valid. Gil counts emitted copies,
+  not "types that crossed silently".
+- **Each proposal gets its strongest repair.**
+  - **Dima:** `tsc -b` sits behind the existing check command, so nobody has to remember a special
+    command. His real cost is maintaining the reference graph.
+  - **Neither gets a magic command.** `-b` without the edge is stale too (verified above).
+  - **Linoy:** gets her source check working before anything tests raw source at runtime. Don't
+    repeat "Linoy trusts a clever feature, then withdraws it".
+  - **Raw source in Node:** works in the linked workspace, then fails in the copied deployment.
+    That defeats raw source as *this* deployment's runtime, not source-reading checks.
+- **Exit codes are pinned with their configuration.** The book profile's `noEmitOnError: true`
+  gives exit 1 for TS5011 and for a failing reference build. With `noEmitOnError: false` they're 2.
+  Never print an exit status without the setting that produced it.
+- **Cast:** Gilad (Principle), Idan, Dima, Linoy and Gil. Five people. Sahar is cut, and Idan or
+  Dima asks why `parseMoney` wasn't exported.
+- **Ch16's version-skew beat is cut.** It's a deploy-timing mechanism across a network boundary, and
+  this chapter is in-process identity and build freshness. Ch16 deferred "monorepo schema sharing"
+  to here. This chapter doesn't discharge that, and the record says so: shared source types don't
+  replace parsing at a network boundary. Don't imply they do.
+- **Principle-only reader cases:** Codex's four revised cases (challenge §6), with their follow-ups:
+  - the public `parse` subpath must not be rejected as "a second spelling";
+  - dev may read source types if the release builds and tests the JavaScript;
+  - switching to `-b` without the edge isn't enough.
+
+**Candidate Turn (Codex decides, with evidence).** Codex's own control: under the source
+condition, a new-currency call to `format` checks, while the stale default implementation still
+prints the old `$15.00`. That's the Principle's third question, live on the page. Linoy's check is
+right about the source, and the code that runs hasn't been built from it. It's also why her check
+and Dima's release build are a pair, not rivals. If it's used, it must not undo Linoy's win. It
+shows what her check is *for*.
+
+**Not adopted:**
+- **Printing every control** (TS-private vs `#private`, the paths alias that unifies types while
+  the runtime still splits, the public-field class). These stay in validation, or get one answer
+  if a character raises them.
+
+**Scope for draft 1:**
+- one repository: money, cart, the API and the generated stamp;
+- labelled fences for the package manifests and the two tsconfigs that matter (dev and release);
+- 2,400–3,200 words.
+
+`checks/chapter25.cjs` builds the fixtures from the fences. The workspace links are created with
+`fs.symlinkSync`. Outputs and incremental metadata are kept consistent: a clean state removes both.
