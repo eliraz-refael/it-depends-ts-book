@@ -1,3 +1,41 @@
+# Chapter 25 — draft 3 self-review
+
+Status: **DRAFT 3 FROZEN; FINAL PRINCIPLE-ONLY READ AND DIFF REVIEW PENDING**, 2026-10-28.
+
+Manuscript: [The Other Money](../../book/04-the-real-world/02-monorepo-type-sharing.md).
+Review addressed: [Claude's draft 2 review](ch25/CLAUDE-REVIEW-2.md), with both verbatim reader reports committed at `506cf1d`.
+Snapshot: [DRAFT3-SNAPSHOT.json](ch25/DRAFT3-SNAPSHOT.json).
+
+## Response to the second review
+
+1. **Emitted before the parser, loaded by the parser — fixed.** Gil rebuilt the opening state and claims the count: the existing type-only imports already pull money's source into the program and cause its emission. The parser first loads that copy; cart loads the built implementation. The last count now distinguishes emitted, loaded and shipped. The opening fixture asserts both emitted files exist, temporarily marks execution of each module body, and observes only the built module loading. It restores both emitted files in a finally block before the next narrative state. The native-private-slot failure continues to pin the executing source copy; the final fresh image contains one implementation.
+2. **Clone, branch and deployment states — explicit and checked.** Gil states that the release stamp is committed and the install has provided workspace links. The inputs-only clone checks the stamp's contents and resolves both links to their package directories. Linoy puts allowImportingTsExtensions in the experimental dev base; leaving the branch explicitly removes it. The fixture verifies the flag and restores all edited inputs byte-for-byte. Both image-copy operations require a new, nonexistent destination; the final prose specifies a fresh image layout.
+3. **Node's rule — stated as documented behaviour.** Gil no longer makes it sound like a version accident. The primary source is [Node's type-stripping-in-dependencies documentation](https://nodejs.org/docs/latest-v22.x/api/typescript.html#type-stripping-in-dependencies), checked on 2026-10-28. The actual runtime remains pinned to Node 22.23.4. No new claim is made about a loader or future runtime. The image may contain build metadata and retains an unused source condition: the manuscript does not promise otherwise.
+4. **Principle — a decision after reading the declarations.** Separate source/built declarations behind the nonassignability lead to fixing the import, not asserting equality. This is deliberately narrower than saying all different paths imply different identities: the existing same-declaration/two-spellings control still passes. Public subpaths are defined by the exports map. The development-source sentence is joined to the release-build rule. The three questions and Gilad's laptop/image line remain. Final independent Principle-only testing is pending.
+5. **Pacing and voice — local trims.** The opening deployment fact is narration rather than Dima answering nobody. Gil owns the measured count and fresh-clone evidence; Dima owns the graph and release test. The subpath exchange is one line, the post-Turn source-check repetition is removed, and the Verdict adds the copied-program test and separate source-check command without repeating the graph decision. Idan gets one light response to losing a build command. Import-path wording, the NonNullable narration and the rootDir explanation are corrected.
+
+## Self-review and limits
+
+The code fences are all byte-identical to draft 2 (13: eight TypeScript, five JSON); no argument, repair or cast changed. Linoy still wins in the linked workspace before the copy fails, and keeps her source check. The runtime-source setup is still the densest stretch, but Gil's measurement and Linoy's concrete branch changes replace the two consecutive manual paragraphs. The output cleanup remains a short procedure because removing stale emitted files is essential to the final count; further compressing it would recreate the state gap. No extra mechanism or Take was added.
+
+The Principle remains two paragraphs with three diagnostic questions, not a single maxim. Its declaration rule now gives an action without teaching the later mechanism. Claude owns the final Principle-only read and diff review; this record does not claim approval.
+
+## Validation on draft 3
+
+- `node checks/chapter25.cjs`: **exit 0**, TypeScript **7.0.2**, Node **22.23.4**; **13 fences / 29 compiler cases / 16 runtime groups**, plus two file-list queries.
+- `npm run check`: **exit 0 on this frozen manuscript and validator**; book **426 fences / 593 compiler cases / 285 runtime groups**, plus two default cases and two existing source searches.
+- The first targeted attempt stopped at the added workspace-link assertion because macOS exposes /var and /private/var aliases. Comparing both sides by realpath fixes that fixture assertion. The subsequent targeted and full runs pass.
+- Same locked installation as draft 2; no new clean-install or container-runtime claim. The fresh clone is a compiler-fixture state. Module execution markers are test-only and removed before the story continues.
+- Logs remain untracked: `.probe/ch25-draft3-targeted.log` and `.probe/ch25-draft3-full-check.log`. The snapshot records the final full-log hash and manuscript/validator hashes. Claude's review and reader reports at `506cf1d` are unchanged.
+
+**Ready for final review. Local commit only; no push.**
+
+---
+
+## Historical draft 2 record
+
+The following describes draft 2 and is superseded by the revision above. Its pending recheck was completed in `506cf1d`; the earlier count did not distinguish the opening emitted copy from module execution.
+
 # Chapter 25 — draft 2 self-review
 
 Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**, 2026-10-28.

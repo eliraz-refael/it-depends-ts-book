@@ -1,0 +1,107 @@
+{
+  "status": "draft 3 frozen; final Principle-only read and diff review pending",
+  "date": "2026-10-28",
+  "settled_plan_commit": "c6867ba",
+  "review_commit": "506cf1d",
+  "path": "book/04-the-real-world/02-monorepo-type-sharing.md",
+  "sha256": "f2ba5b07c703a6502b75910e10a2cd8b6d307424dccb47c25d8ad193f40d218b",
+  "manuscript_mtime_utc": "2026-10-27T22:14:39.491483+00:00",
+  "words": 2238,
+  "code_fences": 13,
+  "fences_by_language": {
+    "typescript": 8,
+    "json": 5
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "json",
+      "sha256": "5b68d127a9dacf50a232632ae5cf912a06f05ae865aaaf930f209e9b235ea5ba"
+    },
+    {
+      "ordinal": 2,
+      "language": "typescript",
+      "sha256": "fc55bb2e5a5c4c8db6438678a4cf693dbfea1c2dde11cf853ccc5552bcef3e0c"
+    },
+    {
+      "ordinal": 3,
+      "language": "typescript",
+      "sha256": "259a8524f81685c5ae2b9dde165f9008872f026affa064bffffa2a4ba55c4b74"
+    },
+    {
+      "ordinal": 4,
+      "language": "json",
+      "sha256": "b5a65f517280557e4a090b9429762953846a4e385182c1d15e0a6404e1a5cdd2"
+    },
+    {
+      "ordinal": 5,
+      "language": "typescript",
+      "sha256": "f88fa3928c240bb14a34d88763c82704923ece5545ea90c557480f6bb0838f0e"
+    },
+    {
+      "ordinal": 6,
+      "language": "typescript",
+      "sha256": "a37f2034ede7a4f09558efeca42d4cd338d4179afe528ea0c57c4e5eeec49c51"
+    },
+    {
+      "ordinal": 7,
+      "language": "typescript",
+      "sha256": "b99af47a718b36cb24073090ad8dd6997758b66029da670de897d258817acdd2"
+    },
+    {
+      "ordinal": 8,
+      "language": "typescript",
+      "sha256": "2945a5a133fa5f30d7ab0ea8ead2225dd482f27ed09a198da874e1e9b964ee5f"
+    },
+    {
+      "ordinal": 9,
+      "language": "typescript",
+      "sha256": "e71681c43ac65ad971755e0e043f833f4537705c87c40092e9e412f07aa7ea20"
+    },
+    {
+      "ordinal": 10,
+      "language": "json",
+      "sha256": "eb8e161600bbe30d1a8bf4b41a4df1b51e1afd0fd9ea77fce4b1409c6d184862"
+    },
+    {
+      "ordinal": 11,
+      "language": "typescript",
+      "sha256": "fbd81b273130d86035c50124d2ed9a10941ec6b58c9b290ca0ce53369e2a825a"
+    },
+    {
+      "ordinal": 12,
+      "language": "json",
+      "sha256": "62bc395c67f4d306754412e298d58653def52ce5eed1e112bf86a495a70db23a"
+    },
+    {
+      "ordinal": 13,
+      "language": "json",
+      "sha256": "5d7a7ae1563e0405328b00bda797bffcc16dfbc0b19a9368dd102079c4376b6c"
+    }
+  ],
+  "validator_sha256": "75ea8350af65e5f6543591e0884384696237a7d9cddd9c7d53dda0562d974189",
+  "typescript": "7.0.2",
+  "node": "v22.23.4",
+  "validation": {
+    "installation": "Same locked installation installed with npm ci --offline during the challenge. No new clean-export claim.",
+    "targeted_suite": "Exit 0 on this frozen manuscript and validator: 13/29/16, plus two file-list queries.",
+    "full_suite": "npm run check: exit 0 on this exact frozen manuscript and validator.",
+    "chapter_counts": {
+      "fences": 13,
+      "compiler_cases": 29,
+      "runtime_groups": 16,
+      "file_list_queries": 2
+    },
+    "book_counts": {
+      "fences": 426,
+      "compiler_cases": 593,
+      "runtime_groups": 285,
+      "default_cases": 2,
+      "searches": 2
+    },
+    "full_suite_manuscript_sha256": "f2ba5b07c703a6502b75910e10a2cd8b6d307424dccb47c25d8ad193f40d218b",
+    "full_suite_log_sha256": "eda653c9a66f0f88ca119bb77aabb840db2e4eb8cf34102ec2f9451f0b66bdfe"
+  },
+  "fixture_provenance": "One evolving repository; opening module-body markers distinguish emitted copies from executed modules and are restored before the parser change. Fresh-checkout inputs include the committed stamp and installed workspace links. Experimental inputs are restored byte-for-byte. Each deployment starts in a nonexistent image directory. Counterfactual controls remain separate."
+}

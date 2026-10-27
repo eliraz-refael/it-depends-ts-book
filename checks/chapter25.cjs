@@ -136,6 +136,18 @@ for(const name of ['money','cart']) {
 config(story,'apps/api/tsconfig.json',apiConfig);
 check('story-working-stamped-quote',story,'apps/api');
 run('story-working-total',story,'release-42 $15.00');
+// Type-only source imports already emit a second Money. Observe module execution separately.
+const openingCopies=['apps/api/out/packages/money/src/index.js','packages/money/dist/index.js'];
+assert.deepEqual(moneyImplementations(story),openingCopies);
+const openingBodies=Object.fromEntries(openingCopies.map(f=>[f,read(story,f)]));
+try {
+ for(const [file,body] of Object.entries(openingBodies)) {
+  write(story,file,`(globalThis.__ch25LoadedMoney ??= []).push(${JSON.stringify(file)});\n`+body);
+ }
+ run('opening-emits-two-loads-only-built-Money',story,
+  'release-42 $15.00\n["packages/money/dist/index.js"]',
+  ['--input-type=module','-e','await import("./apps/api/out/apps/api/src/main.js"); console.log(JSON.stringify(globalThis.__ch25LoadedMoney));']);
+} finally { installFiles(story,openingBodies); }
 // This seed is only for counterfactual controls, never for narrative freshness claims.
 const seed=clone('control-seed',story);
 installFiles(story,incident);
@@ -185,6 +197,9 @@ check('story-source-dev-check',story,'apps/api/tsconfig.dev.json');
 const fresh=path.join(scratch,'fresh-checkout');
 fs.cpSync(story,fresh,{recursive:true,filter:p=> !['node_modules','dist','out'].includes(path.basename(p))&&!p.endsWith('.tsbuildinfo')});
 links(fresh);
+assert(text.includes('The release stamp is committed.'));
+assert.equal(read(fresh,'generated/release.ts'),initial['generated/release.ts']);
+for(const p of ['money','cart']) assert.equal(fs.realpathSync(path.join(fresh,'node_modules/@shop',p)),fs.realpathSync(path.join(fresh,'packages',p)));
 assert.equal(moneyImplementations(fresh).length,0);
 for(const p of ['money','cart']) assert(!fs.existsSync(path.join(fresh,'packages',p,'dist')));
 check('fresh-checkout-source-check-before-any-build',fresh,'apps/api/tsconfig.dev.json');
@@ -196,10 +211,13 @@ const saved=Object.fromEntries(branchFiles.map(f=>[f,read(story,f)]));
 for(const p of ['money','cart']) write(story,`packages/${p}/package.json`,{...manifest,name:'@shop/'+p,exports:{'.':{...conditional['.'],default:'./src/index.ts'}}});
 for(const f of [money,'packages/money/src/parse.ts']) write(story,f,read(story,f).replaceAll('./parse.js','./parse.ts').replaceAll('./index.js','./index.ts'));
 config(story,'tsconfig.dev-base.json',{...devBase,compilerOptions:{...devBase.compilerOptions,allowImportingTsExtensions:true}});
+assert(text.includes('`allowImportingTsExtensions` goes in the dev base on this branch'));
+assert.equal(JSON.parse(read(story,'tsconfig.dev-base.json')).compilerOptions.allowImportingTsExtensions,true);
 check('story-raw-branch-noEmit-with-ts-extensions',story,'apps/api/tsconfig.dev.json');
 run('story-linked-source-runtime-wins',story,'release-42 USD 15.00');
 function deployment(name,from,source) {
- const r=path.join(scratch,name); write(r,'package.json',read(from,'apps/api/package.json'));
+ const r=path.join(scratch,name); assert(!fs.existsSync(r),'Each image uses a fresh layout');
+ write(r,'package.json',read(from,'apps/api/package.json'));
  fs.cpSync(path.join(from,'apps/api/out'),path.join(r,'api-out'),{recursive:true});
  for(const p of ['money','cart']) {
   const dest=`node_modules/@shop/${p}`;
@@ -216,6 +234,9 @@ const refusal=fails('story-image-refuses-type-stripping',sourceDeploy,'ERR_UNSUP
 assert.equal(refusal.stdout,''); assert(refusal.output.includes('node_modules/@shop/money/src/index.ts'));
 // Return from the branch; runtime defaults and internal imports are restored, not the old source.
 installFiles(story,saved);
+assert(text.includes('removing `allowImportingTsExtensions` from the dev base'));
+for(const [file,body] of Object.entries(saved)) assert.equal(read(story,file),body);
+assert.equal(JSON.parse(read(story,'tsconfig.dev-base.json')).compilerOptions.allowImportingTsExtensions,undefined);
 assert.equal(read(story,money),currentMoney);
 assert.equal(moneyImplementations(story).length,2,'old API source-copy output still exists before cleanup');
 clean(story);
@@ -225,6 +246,7 @@ assert.deepEqual(moneyImplementations(story),['packages/money/dist/index.js']);
 assert(!fs.existsSync(path.join(story,'apps/api/out/packages')));
 const builtFiles=list('release-check-file-list',story,'apps/api');
 for(const p of ['money','cart']) assert(builtFiles.includes(`/packages/${p}/dist/index.d.ts`));
+assert(text.includes('into a fresh image layout'));
 const builtDeploy=deployment('story-clean-built-image',story,false);
 run('story-copied-built-release',builtDeploy,'release-42 USD 15.00',['api-out/apps/api/src/main.js']);
 for(const p of ['money','cart']) assert(!fs.existsSync(path.join(builtDeploy,`node_modules/@shop/${p}/src`)));
