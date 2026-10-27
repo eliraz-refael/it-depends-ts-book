@@ -34,8 +34,8 @@ Successful run on **2026-10-27**, TypeScript **7.0.2**, Node **22.23.4**:
 | Chapter 21 | 13 | 16 | 22 |
 | Chapter 22 | 12 | 17 | 17 |
 | Chapter 23 | 15 | 22 | 20 |
-| Chapter 24 (draft 1) | 12 | 28 | 13 |
-| Total | **413** | **561** | **267** |
+| Chapter 24 (draft 2) | 12 | 27 | 14 |
+| Total | **413** | **560** | **268** |
 
 Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Earlier chapter counts are TypeScript fences.
 
@@ -138,11 +138,11 @@ The original refusal remains pending because the printed method calls neither re
 
 ## Chapter 24 draft coverage
 
-The suite extracts all 12 labelled fences, including the build configuration and the JS/TS file bundles. Each migration state gets its own directory, explicit CommonJS package file, compiler configuration and emitted output. The printed include patterns admit source files and TypeScript tests; old JavaScript loading tests execute separately against the built artifact. That separation is checked: opting out the route makes the compiler green while the old runtime test still fails.
+The suite extracts all 12 labelled fences, including the build configuration and JS/TS file bundles. Each migration state gets its own directory, explicit CommonJS package file, compiler configuration and emitted output. All established repository files are present from the start, including money, its label, the already-opted-out sitemap and the independent backfill. The printed include patterns admit source files and TypeScript tests; the backfill is not a root until explicitly added. Old JavaScript loading tests execute separately against the built artifact.
 
-The original, default-export and export-equals versions run the old loading call. The converted test, default and import-equals consumers, object/member inspection, route, backfill and named-member example have runtime assertions. Diagnostics are compared by source file, line and code; the quoted messages are checked against the manuscript. The four-parameter census is computed from the three shown JS files with strict omitted, exercising TS7's default rather than supplying strict explicitly.
+The five-parameter census is computed from that complete repository with strict omitted, exercising TS7's default. It includes money's cents parameter; the sitemap's existing opt-out adds no diagnostics. The later money JSDoc annotation comes from the prose. In the Turn's explicit experiment, the checked route produces TS2349 while the opted-out sitemap says nothing. The printed configuration permits emit despite that error (compiler exit 2); both runtime calls fail, and the sitemap never reaches its unrelated footer callback. Reading .default fixes only the route: the compiler is green, but the sitemap and old loading test still fail. The compatible export repairs both callers and passes both loading tests.
 
-Regressions cover an unannotated JS route exposing an any parameter to a TS caller, the JSDoc repair rejecting that caller, global checking with explicit legacy opt-outs, removing the route's opt-out, the computed-require hole, program-wide noImplicitAny relaxation, and an explicit strict:false configuration. An imported route remains checked despite exclude; the independent backfill stays out until added as a root. The build's copying of that uncompiled script is reproduced separately from compiling it. These are fixture counts and stipulated fictional callers, not a real storefront census or an effort estimate. No web server, bundler or migration tool is implemented.
+The original, converted and compatible programs, default and import-equals consumers, object/member inspection, backfill and named-member example have runtime assertions. Diagnostics are compared by source file, line and code; quoted messages and printed outputs are checked against the manuscript. Regressions cover the unannotated route exposing any to a TS caller, JSDoc rejecting 42, removing the sitemap's opt-out, computed require, program-wide noImplicitAny relaxation and explicit strict:false. The runtime failure of the numeric probe remains a fixture-only regression; the shortened prose claims only its compiler behavior. An imported route remains checked despite exclude. Copying the uncompiled backfill is reproduced separately from compiling it, and the later money conversion is checked in the complete repaired repository. These are fixture counts and stipulated fictional callers, not an empirical storefront census or effort estimate. No web server, bundler or migration tool is implemented.
 
 ## Updating the baseline
 

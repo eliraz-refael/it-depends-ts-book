@@ -1,6 +1,6 @@
 # Chapter 24 — Migration Strategies (working title)
 
-Status: **DRAFT 1 FROZEN; INDEPENDENT REVIEW PENDING**, 2026-10-27. The settlement below governs where it differs from the original proposal.
+Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**, 2026-10-27. The settlement below governs where it differs from the original proposal.
 Branch: `codex/chapter-24-migration-strategies`, based on `origin/main` `14a6c88` (Ch23's merge).
 File: `book/04-the-real-world/01-migration-strategies.md`. It opens Act IV, The Real World.
 
@@ -229,10 +229,10 @@ scene they'd retell):
 - [x] Codex challenges this plan: is the decision honestly opinionated, does the incident teach
   strategy rather than trivia, and which ending. Disagreements are settled on evidence
   ([challenge](ch24/CODEX-PLAN-CHALLENGE.md)).
-- [x] Codex drafts and self-reviews ([record](CH24-REVIEW.md), [snapshot](ch24/DRAFT1-SNAPSHOT.json)).
+- [x] Codex drafts and self-reviews ([record](CH24-REVIEW.md), [snapshot](ch24/DRAFT2-SNAPSHOT.json)).
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
-- [x] Draft 1 checks durable; full suite green (Ch24 12 / 28 / 13; book 413 / 561 / 267). Recheck revisions.
+- [x] Draft 2 checks durable; full suite green on the frozen manuscript (Ch24 12 / 27 / 14; book 413 / 560 / 268). Recheck any further revisions.
 - [ ] Clean `npm ci` and full suite green at final review.
 - [ ] Ready for the author's review.
 
@@ -322,3 +322,12 @@ incident. Compute any count the page prints from the fenced repository.
 The opt-out is the Turn; the backfill and computed loader qualify coverage briefly. The original JavaScript loading test executes directly against the built output, outside the compiler roots; the converted TypeScript test is compiled. That arrangement is printed up front, and the Turn keeps the old runtime test failing even when the compiler exits zero. Both tests pass after the compatible-export repair. This distinction prevents a silently omitted diagnostic from making the opt-out demonstration appear stronger than it is.
 
 The census remains four untyped parameters. Noam gets the global default, Eden owns the named exceptions and the conversion-specific caller rule, and Oded retains leaf-first work and the old loading test. All twelve mixed-language fences are covered. Independent readers and formal review are pending; the self-review records possible pacing and setup issues rather than claiming they are settled.
+
+
+## Draft 2 after the first review (2026-10-27)
+
+The [draft-1 review](ch24/CLAUDE-REVIEW.md), committed at `30fa282`, replaces the original route-opt-out Turn. The route remains checked. A legacy sitemap, already opted out for unrelated footer work, exists before the conversion. Chen explicitly reapplies the broken export in scratch: the route reports TS2349 and the sitemap reports nothing, while both runtime calls fail. Repairing only the route to read .default makes the compiler green but leaves the sitemap broken. Export-equals repairs both without taking over the catalogue team's work. Noam's checking default keeps its demonstrated win.
+
+Money and its label exist throughout. Its cents parameter is the fifth TS7006; Oded adds its JSDoc annotation before the later green runs. The validator now derives every migration state from the full established repository. The shortened numeric-call probe distinguishes an accepted call from a green program. Oded proposes the compatible export, Daniel's Principle names the implementation/caller contract and missing compiler evidence, and the Verdict assigns concrete work instead of repeating the rule.
+
+Draft 2: 12 fences / 27 compiler cases / 14 runtime groups; whole book 413 / 560 / 268. Snapshot: [DRAFT2-SNAPSHOT.json](ch24/DRAFT2-SNAPSHOT.json). The first review and both initial readers are complete; the revised Principle and Turn await Claude's targeted recheck. Draft 1's counts and original proposal above are historical.

@@ -1,6 +1,48 @@
-# Chapter 24 — draft 1 self-review
+# Chapter 24 — draft 2 self-review
 
-Status: **DRAFT 1 FROZEN; INDEPENDENT READERS AND FORMAL REVIEW PENDING**. 2026-10-27.
+Status: **DRAFT 2 FROZEN; TARGETED RECHECK PENDING**. 2026-10-27.
+
+Manuscript: [Both Tests Were Green](../../book/04-the-real-world/01-migration-strategies.md).
+Review: [Claude's draft-1 findings](ch24/CLAUDE-REVIEW.md), committed at `30fa282`.
+Snapshot: [DRAFT2-SNAPSHOT.json](ch24/DRAFT2-SNAPSHOT.json).
+
+## Response to the review
+
+1. **The Turn's fairness — accepted.** The old draft applied an opt-out that Noam's own rule prohibited. The route now stays checked. The catalogue team's sitemap was already opted out for unrelated footer work when the conversion began, and Eden names that ownership before the experiment. Chen explicitly asks for the broken export in scratch. TS2349 catches the route; no diagnostic comes from the sitemap. Both calls fail. The additional `.default` repair gives the strongest counterargument its result: fix the checked route, get a green compiler, still break the legacy caller. Restoring export-equals fixes both. Noam keeps his default, without accepting the misuse of it.
+2. **The census — accepted; validation gap fixed.** Draft 1 omitted money from the early fixture states even though the story placed it in src already. All established files now exist in every migration state, including money, its label, the already-opted-out sitemap and the independent backfill. The global census really is five TS7006 diagnostics plus TS2349 for the broken export. After the compatible export, five remain. Oded adds the cents JSDoc before later green runs. The backfill is physically present but outside the printed roots until the inclusion repair.
+3. **The numeric probe — accepted.** It now asks one question: does a TS caller receive a string requirement? The call is accepted while the unannotated JS definition still errors. JSDoc gives TS2345 without converting the route. Removed the implied second production defect, runtime digression, previous-build narration and muddy exchange about a green typed caller. The numeric runtime failure remains only as a validator regression.
+4. **Principle — accepted, with the factual narrowing already agreed in discovery.** It names implementation and callers, gives a concrete require/import example, connects missing caller checks to missing compiler evidence, and names program-wide noImplicitAny relaxation. Daniel says the compiler can emit without checking the call; he does not say it never reads the file, since it still infers from JavaScript. Two paragraphs; no opt-out or backfill prediction.
+5. **Oded's repair — accepted.** Oded proposes export-equals himself after Eden's working `.default` alternative. He chooses to preserve the callers instead of asking an expert to supply the syntax.
+6. **Repetition and Verdict — accepted.** Cut the repeated leaf-first aphorisms, scope assurances and opt-out maxims. The Verdict merges the compatible export, both tests, annotated route and cents parameter; puts the backfill in the check/build; assigns Eden the exception list; leaves the sitemap with its existing owner and money's conversion to its own PR.
+7. **Line fixes — applied.** 500s, Eden's build setup, a lighter backfill plant, one emitted-module explanation, plain PR wording, test-relative import-equals path, opening the parameter errors, no unsolicited strict:false rebuttal, resolved dangling references and no dialogue semicolons. The failed scratch check emits with exit **2**, which the validator pins; no green-build claim covers that run.
+
+## Self-review of the revised scenes
+
+- **Principle:** my own application gives the expected answers for named-member migration, a callable module becoming a default export, JS checking under TS7's strict default and an independent caller outside the run. This is a self-test, not an isolated reader. Claude owns the fresh Principle-only read.
+- **Argument:** Noam gets a detected break and his preferred default. Eden's limit survives a competent `.default` repair, not a deliberate violation of Noam's policy. The legacy caller can keep working without its unrelated footer migration being pulled into this PR. Global checking and caller review solve different parts of the same incident.
+- **Voice:** Oded still wants his small PR back, proposes its compatible implementation and retains the old test. Noam makes exceptions visible. Eden assigns actual ownership. Chen tests a claim with an existing caller. Daniel explains the compiler without deciding the rollout. All five retain their established pronouns.
+- **Fun:** the opening and the discovery that Oded converted his test out of catching the conversion remain. The new scratch experiment is short enough to follow without a second printed route definition. The numeric diversion no longer interrupts it with another runtime failure.
+- **Remaining reading risks:** the first build/test arrangement still asks for careful reading; the exception-list discussion is the longest policy exchange; backfill and computed require still qualify the late part of the story. The targeted recheck should judge whether the shorter numeric beat and concrete sitemap make the Turn easier to follow. I have not commissioned another reader.
+- **Length:** 2154 whitespace-delimited words, down from 2306. This is below the original 2300-word drafting target after the requested cuts, within the writing guide's 2000–4000 range. I left the shorter story intact rather than restore repetition to reach the planning target.
+
+## Validation and freeze
+
+Manuscript SHA-256: `1405bfd28b28e1abdb0b0abef0d0e4695137f0a5f0d3b216de9088001859aef0`.
+Validator SHA-256: `aa597c4c8dc29b3059d25242ee1b7f7bf2cb7fe9194b2e6f231034dda9424d56`.
+
+- `node checks/chapter24.cjs`: exit 0, **12 fences / 27 compiler cases / 14 runtime groups**; final repository-state addition covered by the full run.
+- `npm run check`: **exit 0** on the exact frozen manuscript and validator, TS **7.0.2** / Node **v22.23.4**. Whole book: **413 fences / 560 compiler cases / 268 runtime groups**, plus two default cases and two searches.
+- All 12 fences are extracted. The old opted-out route fence is replaced by sitemap; the unchanged money fence moves before the census. No other existing fence content changes. The suite checks full repository states, the failed-check emit, both broken callers, the footer never being reached, `.default` fixing only the route, and the compatible export repairing both. It verifies the old/new loading tests separately from compiler success.
+- Used the supplied installed dependencies. No fresh-install claim; final clean-install review remains pending.
+- Full run log: untracked `.probe/ch24-draft2-full-check.log`; its hash is in the snapshot. Review records from `30fa282` are unchanged. No push.
+
+**Ready for Claude's targeted recheck.** The original self-review is retained below as history, including the now-corrected claims.
+
+---
+
+# Historical draft 1 self-review
+
+Historical status: draft 1 was reviewed at `30fa282`. The assessment and counts below describe that earlier snapshot; the draft 2 record above supersedes them.
 
 Manuscript: [Both Tests Were Green](../../book/04-the-real-world/01-migration-strategies.md).
 Settlement: `5c53b4e`, [plan](CH24-PLAN.md#settlement-after-codexs-challenge-2026-10-27).
