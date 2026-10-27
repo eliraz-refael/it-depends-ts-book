@@ -1,0 +1,99 @@
+{
+  "status": "draft 1 frozen; independent readers and formal review pending",
+  "date": "2026-10-27",
+  "settled_plan_commit": "5c53b4e",
+  "path": "book/04-the-real-world/01-migration-strategies.md",
+  "sha256": "20a5238652216cb2bb041fb28b4ef9dd598a4182ad5389483523b90b43c9654e",
+  "manuscript_mtime_utc": "2026-10-27T14:15:30.117121+00:00",
+  "words": 2306,
+  "code_fences": 12,
+  "fences_by_language": {
+    "json": 1,
+    "javascript": 7,
+    "typescript": 4
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "json",
+      "sha256": "51e69fb7200cbcf7fbaa39afe8f58a94eb44108fcb498a3e21952933be3c8ad6"
+    },
+    {
+      "ordinal": 2,
+      "language": "javascript",
+      "sha256": "71df6e622a5b813c96b79b13f22075f362119915f89f43662d9188b95577066b"
+    },
+    {
+      "ordinal": 3,
+      "language": "typescript",
+      "sha256": "acd44ab87486ac31e92486e9c62df52b6b3140f5a116d1c2e214a00631406b5e"
+    },
+    {
+      "ordinal": 4,
+      "language": "javascript",
+      "sha256": "2a0b5d84ca98771d0a98446222b29332e3cf2bec4fea8e35e0ccbc71d67ef9de"
+    },
+    {
+      "ordinal": 5,
+      "language": "typescript",
+      "sha256": "ce16c9e3f1156f526cce925324bbcc0fd093cd90f7404f93210eaee3b605cef7"
+    },
+    {
+      "ordinal": 6,
+      "language": "javascript",
+      "sha256": "850f2ad6a2f98f9af6fa2e00e15b9d3cd1b11cfc9d0130115f4159c40303e9d6"
+    },
+    {
+      "ordinal": 7,
+      "language": "typescript",
+      "sha256": "eea43e2e507bca20512666678c2f7e2753154ae3b9d84a0ca5da9e960f71b46d"
+    },
+    {
+      "ordinal": 8,
+      "language": "javascript",
+      "sha256": "f5d4aa794a1071e0fb34170d17e7343411d5a47451ea56d5d6dc6d737ca2e710"
+    },
+    {
+      "ordinal": 9,
+      "language": "javascript",
+      "sha256": "01df83612fb330c39dc347858f565bc4e9bddeb6141d95c30ebd930d28eff88b"
+    },
+    {
+      "ordinal": 10,
+      "language": "javascript",
+      "sha256": "c4fe7f1a705648c8af40393d5ca11c8f4a0c80a445921472a811555ab3168ec0"
+    },
+    {
+      "ordinal": 11,
+      "language": "javascript",
+      "sha256": "a0c0223b17496e14e6acd536581c67328386a77697354db0e5117e51fa4ee6d7"
+    },
+    {
+      "ordinal": 12,
+      "language": "typescript",
+      "sha256": "0ecb0366ef80d207cd930b5c93f714ce9c37d3e2438beef3313cf0f1d997a395"
+    }
+  ],
+  "validator_sha256": "2b4415862b6205dcbe656972053f23f20be528d206d2140ebef56aba9b3a0dcd",
+  "typescript": "7.0.2",
+  "node": "v22.23.4",
+  "validation": {
+    "installation": "Used the already-installed dependencies supplied with the worktree; no fresh npm ci or clean-install claim for this draft.",
+    "targeted_suite": "Final node checks/chapter24.cjs: exit 0, 12 fences / 28 compiler cases / 13 runtime groups, on frozen manuscript and validator.",
+    "full_suite": "npm run check: exit 0 before one prose correction naming TypeScript tests as compiler roots alongside src. All fences and validator byte-identical; final targeted rerun covers frozen prose.",
+    "chapter_counts": {
+      "fences": 12,
+      "compiler_cases": 28,
+      "runtime_groups": 13
+    },
+    "book_counts": {
+      "fences": 413,
+      "compiler_cases": 561,
+      "runtime_groups": 267,
+      "default_cases": 2,
+      "searches": 2
+    },
+    "full_suite_manuscript_sha256": "f4e6709ac7bf4548df3bdcb05b0c7589c90d257c845ac34c51c1f001ebab57e8"
+  }
+}

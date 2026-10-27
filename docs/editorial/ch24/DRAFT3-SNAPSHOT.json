@@ -1,0 +1,101 @@
+{
+  "status": "draft 3 frozen; final Principle-only read and diff review pending",
+  "date": "2026-10-27",
+  "settled_plan_commit": "5c53b4e",
+  "review_commit": "0a121c7",
+  "path": "book/04-the-real-world/01-migration-strategies.md",
+  "sha256": "7393297e8b690da3a8b71ab05baed5606266f6ef51703dcf409588c0d1944ff4",
+  "manuscript_mtime_utc": "2026-10-27T14:52:50.172368+00:00",
+  "words": 2093,
+  "code_fences": 12,
+  "fences_by_language": {
+    "json": 1,
+    "javascript": 7,
+    "typescript": 4
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "json",
+      "sha256": "51e69fb7200cbcf7fbaa39afe8f58a94eb44108fcb498a3e21952933be3c8ad6"
+    },
+    {
+      "ordinal": 2,
+      "language": "javascript",
+      "sha256": "71df6e622a5b813c96b79b13f22075f362119915f89f43662d9188b95577066b"
+    },
+    {
+      "ordinal": 3,
+      "language": "typescript",
+      "sha256": "acd44ab87486ac31e92486e9c62df52b6b3140f5a116d1c2e214a00631406b5e"
+    },
+    {
+      "ordinal": 4,
+      "language": "javascript",
+      "sha256": "2a0b5d84ca98771d0a98446222b29332e3cf2bec4fea8e35e0ccbc71d67ef9de"
+    },
+    {
+      "ordinal": 5,
+      "language": "typescript",
+      "sha256": "ce16c9e3f1156f526cce925324bbcc0fd093cd90f7404f93210eaee3b605cef7"
+    },
+    {
+      "ordinal": 6,
+      "language": "javascript",
+      "sha256": "850f2ad6a2f98f9af6fa2e00e15b9d3cd1b11cfc9d0130115f4159c40303e9d6"
+    },
+    {
+      "ordinal": 7,
+      "language": "javascript",
+      "sha256": "a0c0223b17496e14e6acd536581c67328386a77697354db0e5117e51fa4ee6d7"
+    },
+    {
+      "ordinal": 8,
+      "language": "typescript",
+      "sha256": "eea43e2e507bca20512666678c2f7e2753154ae3b9d84a0ca5da9e960f71b46d"
+    },
+    {
+      "ordinal": 9,
+      "language": "javascript",
+      "sha256": "64bca9f0a70708010fa83012a06e4f0b0c84a617b1c518b5100b9b9492f1b885"
+    },
+    {
+      "ordinal": 10,
+      "language": "javascript",
+      "sha256": "919893fdd5f57c32c91d796e88ad94dcd71ce51798a45d028f989dec8deac50a"
+    },
+    {
+      "ordinal": 11,
+      "language": "javascript",
+      "sha256": "c4fe7f1a705648c8af40393d5ca11c8f4a0c80a445921472a811555ab3168ec0"
+    },
+    {
+      "ordinal": 12,
+      "language": "typescript",
+      "sha256": "0ecb0366ef80d207cd930b5c93f714ce9c37d3e2438beef3313cf0f1d997a395"
+    }
+  ],
+  "validator_sha256": "5b0ba08cb9591b0dd4145570e359994b50176e72bcb28a886adfa325c11f1108",
+  "typescript": "7.0.2",
+  "node": "v22.23.4",
+  "validation": {
+    "installation": "Used the dependencies already installed in the supplied worktree; no clean-install claim.",
+    "targeted_suite": "node checks/chapter24.cjs: exit 0 on this exact manuscript and validator, 12/31/15.",
+    "full_suite": "npm run check: exit 0 on this exact manuscript and validator, including Chapter 24 at 12/31/15.",
+    "chapter_counts": {
+      "fences": 12,
+      "compiler_cases": 31,
+      "runtime_groups": 15
+    },
+    "book_counts": {
+      "fences": 413,
+      "compiler_cases": 564,
+      "runtime_groups": 269,
+      "default_cases": 2,
+      "searches": 2
+    },
+    "full_suite_manuscript_sha256": "7393297e8b690da3a8b71ab05baed5606266f6ef51703dcf409588c0d1944ff4",
+    "full_suite_log_sha256": "477088f214b6aa1b0bab4205a1a46c458cc8ff48b199762692ccf6ead3a58458"
+  }
+}

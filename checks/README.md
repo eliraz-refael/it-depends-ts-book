@@ -15,7 +15,7 @@ npm run check
 
 Successful run on **2026-10-27**, TypeScript **7.0.2**, Node **22.23.4**:
 
-| Suite | TypeScript fences | Compiler cases | Runtime scenario groups |
+| Suite | Code fences | Compiler cases | Runtime scenario groups |
 | --- | ---: | ---: | ---: |
 | Chapters 1–6 | 110 | 116 | 8 |
 | Chapters 7–8 | 50 | 52 | 8 |
@@ -34,7 +34,10 @@ Successful run on **2026-10-27**, TypeScript **7.0.2**, Node **22.23.4**:
 | Chapter 21 | 13 | 16 | 22 |
 | Chapter 22 | 12 | 17 | 17 |
 | Chapter 23 | 15 | 22 | 20 |
-| Total | **401** | **533** | **254** |
+| Chapter 24 | 12 | 31 | 15 |
+| Total | **413** | **564** | **269** |
+
+Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Earlier chapter counts are TypeScript fences.
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
 
@@ -132,6 +135,14 @@ Sources: [TypeScript 7 release and CLI/API transition](https://devblogs.microsof
 The suite extracts all 15 fences with unique prefix matching. Original and renamed classes compile in separate programs. The repaired programs change only the printed method name and its call site, and reset worker counters before running the printed repair. Checks pin every displayed output, the quoted TS2339 diagnostic and an error-union regression, nested/flat/async inferred types, both domain refusals, preservation of the successful quantity, skipped continuations and all worker counts. `Awaited` loses the original class and preserves the renamed one. The deprecated-alias regression reopens adoption.
 
 The original refusal remains pending because the printed method calls neither resolving callback on that branch. A bounded microtask drain observes the finite fixture; it is not a general timeout test or a wall-clock claim. The suite never awaits that pending job. Fixture-only PromiseLike implementations exercise both competent thenable proposals: reject a refusal, or fulfill with the whole union. Plain-union and explicit-async callers supply the same outputs without the class. The printed boundary unwrap is tested with both successful and refused jobs, including its plain-union return shape. Direct Promise.resolve still adopts the original class and preserves the renamed one. A negative case pins the incompatibility between a whole-Result fulfillment callback and the existing Preview callback. A correct whole-Result `then` plus a separate `andThen` also works: another fixture pins its chaining, skipped refusal callback, and the change from a declared promise of the class to an awaited union. Other fixtures pin both unchecked quantity accesses and the fact that awaiting an outer Result does not await its field. The six-screen census is stipulated fictional project context, not a repository search or an empirical adoption measurement. No actual stock service, catalogue scheduler, persistence system or generator runner is implemented.
+
+## Chapter 24 coverage
+
+The suite extracts all 12 labelled fences, including the build configuration and JS/TS file bundles. Each migration state gets its own directory, explicit CommonJS package file, compiler configuration and emitted output. All established repository files are present from the start, including money, its label, the already-opted-out sitemap and the independent backfill. The printed include patterns admit source files and TypeScript tests; the backfill is not a root until explicitly added. Old JavaScript loading tests execute separately against the built artifact.
+
+The five-parameter census is computed from that complete repository with strict omitted, exercising TS7's default. It includes money's cents parameter; the sitemap's existing opt-out adds no diagnostics. The later money JSDoc annotation comes from the prose. In the Turn's explicit experiment, the checked route produces TS2349 while the opted-out sitemap says nothing. The printed configuration permits emit despite that error (compiler exit 2); both runtime calls fail, and the sitemap never reaches its unrelated footer callback. Reading .default fixes only the route: the compiler is green, but the sitemap and old require test still fail. A separate regression rewrites that retained test to read .default too: both tests then pass, while the unchanged sitemap still fails. The compatible export repairs both callers without rewriting the old test.
+
+The original, converted and compatible programs, default and import-equals consumers, object/member inspection, backfill and named-member example have runtime assertions. Diagnostics are compared by source file, line and code; quoted messages and printed outputs are checked against the manuscript. Regressions cover the unannotated route exposing any to a TS caller, JSDoc rejecting 42, removing the sitemap's opt-out, computed require, program-wide noImplicitAny relaxation and explicit strict:false. The runtime failure of the numeric probe remains a fixture-only regression; the shortened prose claims only its compiler behavior. A typed leaf rejects a numeric argument even from a checked JavaScript caller. An imported route remains checked despite exclude; @ts-check in the independent backfill has no effect until that file joins the program. Copying the uncompiled backfill is reproduced separately from compiling it. The money conversion runs as a separate next-PR state derived from the complete repaired repository; the slug-PR state still contains annotated money.js. These are fixture counts and stipulated fictional callers, not an empirical storefront census or effort estimate. No web server, bundler or migration tool is implemented.
 
 ## Updating the baseline
 
