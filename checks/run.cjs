@@ -5,7 +5,7 @@ const {version} = require("./compiler.cjs");
 
 assert.equal(version, require("../package.json").devDependencies.typescript,
   "Run npm ci to install the book's pinned TypeScript version");
-for (const script of ["baseline", "chapters1-6", "chapters7-8", "chapter9", "chapter10", "chapter11", "chapter12", "chapter13", "chapter14", "chapter15", "chapter16", "chapter17", "chapter18", "chapter19", "chapter20", "chapter21", "chapter22", "chapter23", "chapter24", "chapter25"]) {
+for (const script of ["baseline", "chapters1-6", "chapters7-8", "chapter9", "chapter10", "chapter11", "chapter12", "chapter13", "chapter14", "chapter15", "chapter16", "chapter17", "chapter18", "chapter19", "chapter20", "chapter21", "chapter22", "chapter23", "chapter24", "chapter25", "chapter26"]) {
   const result = spawnSync(process.execPath, [path.join(__dirname, script + ".cjs")],
     {stdio: "inherit", cwd: path.resolve(__dirname, "..")});
   if (result.error) throw result.error;

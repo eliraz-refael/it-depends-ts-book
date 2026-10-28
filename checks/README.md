@@ -36,11 +36,12 @@ Successful run on **2026-10-28**, TypeScript **7.0.2**, Node **22.23.4**:
 | Chapter 23 | 15 | 22 | 20 |
 | Chapter 24 | 12 | 31 | 15 |
 | Chapter 25 | 13 | 29 | 16 |
-| Total | **426** | **593** | **285** |
+| Chapter 26 | 16 | 68 | 14 |
+| Total | **442** | **661** | **299** |
 
-Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Chapter 25 includes eight TypeScript and five JSON fences. Earlier chapter counts are TypeScript fences.
+Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Chapter 25 includes eight TypeScript and five JSON fences. Chapter 26 includes fourteen TypeScript and two JSON fences. Earlier chapter counts are TypeScript fences.
 
-Chapter 25 also verifies two compiler file-list queries, separately from its compiler-case count.
+Chapter 25 also verifies two compiler file-list queries; Chapter 26 verifies three. These are separate from the compiler-case counts.
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
 
@@ -149,6 +150,17 @@ The suite extracts all 12 labelled fences, including the build configuration and
 The five-parameter census is computed from that complete repository with strict omitted, exercising TS7's default. It includes money's cents parameter; the sitemap's existing opt-out adds no diagnostics. The later money JSDoc annotation comes from the prose. In the Turn's explicit experiment, the checked route produces TS2349 while the opted-out sitemap says nothing. The printed configuration permits emit despite that error (compiler exit 2); both runtime calls fail, and the sitemap never reaches its unrelated footer callback. Reading .default fixes only the route: the compiler is green, but the sitemap and old require test still fail. A separate regression rewrites that retained test to read .default too: both tests then pass, while the unchanged sitemap still fails. The compatible export repairs both callers without rewriting the old test.
 
 The original, converted and compatible programs, default and import-equals consumers, object/member inspection, backfill and named-member example have runtime assertions. Diagnostics are compared by source file, line and code; quoted messages and printed outputs are checked against the manuscript. Regressions cover the unannotated route exposing any to a TS caller, JSDoc rejecting 42, removing the sitemap's opt-out, computed require, program-wide noImplicitAny relaxation and explicit strict:false. The runtime failure of the numeric probe remains a fixture-only regression; the shortened prose claims only its compiler behavior. A typed leaf rejects a numeric argument even from a checked JavaScript caller. An imported route remains checked despite exclude; @ts-check in the independent backfill has no effect until that file joins the program. Copying the uncompiled backfill is reproduced separately from compiling it. The money conversion runs as a separate next-PR state derived from the complete repaired repository; the slug-PR state still contains annotated money.js. These are fixture counts and stipulated fictional callers, not an empirical storefront census or effort estimate. No web server, bundler or migration tool is implemented.
+
+## Chapter 26 coverage
+
+The suite extracts all 16 fences, the root ESM setting, and the described temporary logging into one evolving review repository. It reproduces the original pre-currency test, the stale fixture under the Paid-only signature, and the PR whose wider parameter changes the suppressed reason. All four printed directive occurrences have their unsuppressed diagnostic code, source location and reason asserted; every exposure restores the directive and recompiles. The valid Draft reports TS2741 against Paid; the final Paid-or-PreOrder signature instead reports TS2345 with a preorder-status mismatch. Required-field evolution fails outside the directive. Paid and pre-order positive calls, the widened-parameter regression and their restored states are checked separately.
+
+The admin paid-card caller is present from the start. The orderRow helper really infers an intersection from Object.assign and a flat object from the replacement literal. Positive assignment alone accepts any; whole-result equality and negative usage catch that regression independently. Flattening preserves the demonstrated caller, field use and assignment but fails the whole-result comparison. Runtime probes compare the row value and exact card output before and after the refactor. The retained exact status assertion survives both representations and rejects any and widening; the final file drops the redundant negative status assignment after demonstrating it as an alternative. Widening also rejects the admin caller and positive assignment. Readonly observability, optional-property flag changes, mutual assignability and a not-any assertion remain validation-only controls. An annotated JSON.parse implementation passes an exact type assertion with a wrong value but fails its runtime assertion; the correct value restores both checks.
+
+Runtime tests are TypeScript and use only node:test's test and node:assert/strict. The temporary fixture has an explicit node_modules symlink to the locked repository installation; file lists assert that @types/node/index.d.ts is selected. The installed declarations are 26.5.1 and the exercised runtime is Node 22.23.4. Without the route, a types:[] control reports TS2591; with the page's types:[node] setting it instead stops at TS2688 for the missing requested library. Adding the route restores that same configuration. The distinction stays off the page.
+
+Node execution demonstrates the forbidden call recording o2 in an in-memory fake. Default discovery executes test/ship.types.ts. After the move to type-tests/, execution markers verify that both the explicit runtime command and default discovery leave it unexecuted. The original include omits the moved file and permits its false assertion; the repaired include reaches it, then separate signature mutation verifies the real test. Explicit Node execution erases the false assertion and passes. A separate import control shows that an include glob cannot prevent an imported file from joining the program. Compiler membership and Node declaration resolution are checked with three file-list queries. Final source and configuration assertions prevent temporary mutations from leaking into the restored repository. No courier, external storage or production service is exercised, and no timing claim is made.
+
 
 ## Updating the baseline
 
