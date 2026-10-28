@@ -1,6 +1,6 @@
 # Chapter 26 — Testing Typed Code (working title)
 
-Status: **PROPOSED, AWAITING CODEX'S CHALLENGE**, 2026-10-28.
+Status: **PLAN SETTLED**, 2026-10-28. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/chapter-26-testing-typed-code`, based on `origin/main` `4ac925a` (Ch25's merge, PR #27).
 File: `book/04-the-real-world/03-testing-typed-code.md`.
 
@@ -246,12 +246,160 @@ scene they'd retell):
 
 ## Completion
 
-- [ ] Codex challenges this plan: is the decision opinionated, does the hook teach testing typed code
+- [x] Codex challenges this plan: is the decision opinionated, does the hook teach testing typed code
   rather than trivia, are two holes too many, and which ending. Disagreements are settled on
-  evidence.
+  evidence ([challenge](ch26/CODEX-PLAN-CHALLENGE.md)).
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
 - [ ] Final draft's checks durable, and the full suite green on the frozen manuscript.
 - [ ] Clean `npm ci` and full suite green at final review.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-28)
+
+Codex's [challenge](ch26/CODEX-PLAN-CHALLENGE.md) (`da1f63b`) reproduced the six mechanisms with
+controls: 66 checked invocations in `.probe/codex/probe.cjs`, untracked, all passing. I
+independently re-ran the five claims that change the argument, on TS 7.0.2 and Node 22.23.4:
+- **Negative usage catches `any`.** `// @ts-expect-error` above `result.big.push("oops")`, on an
+  inferred `groupBy` result, compiles with `Record<K, T[]>` and gives TS2578 when the return is
+  `any`.
+- **Node's default `node --test` discovery runs `test/ship.types.ts`.** A marker in the file prints,
+  and the run passes.
+- **`@types/node` 26.5.1 is installed**, transitively, per `package-lock.json`.
+- **Ch10's Principle isn't Eden's.** He opens the scene. My plan's precedent was wrong.
+- **The book profile sets `exactOptionalPropertyTypes: true`** (`checks/compiler.cjs`).
+
+**Adopted:**
+- **A local Verdict, on a corrected choice.** "Exact vs usage" was a false opposition. My plan said
+  usage tests can't catch `any`, and they can, through a forbidden operation on the inferred
+  result. The ruling:
+  - **`ship`'s contract gets usage tests:**
+    - positive calls for a paid order and a pre-order;
+    - a negative call with a valid `Draft` built outside the directive.
+  - **A helper whose inferred result is actually promised to its callers** gets a small set of
+    exact inferred-result assertions, where that states the promise more clearly than example
+    operations. Don't snapshot every exported signature.
+  - **Every new, changed or moved test is shown to catch its regression.** Break the claim it
+    names, run the real check, see it red, restore it, see it green.
+  - **Runtime tests stay for returned values and effects.**
+- **The hook's history is accurate, which keeps Noam competent.** There are three states, and the
+  check models all three:
+  1. **Before `currency`:** the inline fixture was complete, and widening would have given TS2578.
+     The test worked when Noam wrote it.
+  2. **`currency` became required (March):** the inline fixture went stale, and the directive hid
+     that. With `ship(Paid)` the suppressed error was still the status mismatch.
+  3. **Oded's widening** switched the suppressed error to the missing `currency`, and the suite
+     stayed green.
+
+  **Cut "That test hasn't been about `ship` since March."** Eden can say the fixture has been
+  stale since March, and that this PR is the first time it mattered.
+- **Diagnostics as the compiler gives them.** With the valid `Draft` fixture and `ship(Paid)`, the
+  unsuppressed error is **TS2741** (`paidAt` missing), not the status error. Don't promise the
+  human reason as the compiler's reason.
+- **The Principle's directive rule:** "construct a valid value outside the suppression, and put only
+  the forbidden operation under the directive". Not "exactly one way to be wrong": `Draft` differs
+  from `Paid` in two ways.
+- **Oded's shortcut is a mistake he admits.** `Order` visibly includes `Draft`. He supplies the
+  positive pre-order test and the `Paid | PreOrder` fix. Without the positive test, `ship(Paid)`
+  passes the negative test and fails the feature.
+- **Mechanism 3 on the page is the intersection only.** `Equal` fails on `A & B` vs the flattened
+  object while the tested operations pass. That's Sahar's complaint.
+  - **Readonly and optional properties move to validation.** Both are observable to callers
+    (TS2540, and TS2375 under `exactOptionalPropertyTypes`, which the book profile sets).
+  - **"Every caller still compiles"** needs a defined set of callers, so name them.
+  - **No "twelve tests"** unless twelve tests belong to the scenario and the check computes them.
+    One failing assertion beside a still-valid caller is enough.
+- **The three ways a passing type test misleads:** the wrong reason (mechanism 1), too weak an
+  assertion (mechanism 2), and a file the check never compiles (mechanism 4). Mechanism 3 is the
+  opposite cost: an exact comparison that fails on a change nobody depends on.
+- **The Turn comes from the team's own repair.** Codex's verified sequence (`turn-*`):
+  1. The negative call lives in `test/ship.test.ts`, which `include: ["src", "test/**/*.test.ts"]`
+     reaches.
+  2. The team notices that running a negative call executes it (mechanism 5). They move the
+     compile-only checks to `type-tests/ship.types.ts`, outside the runtime test directory.
+  3. They apply their new rule to the moved file. A deliberately false assertion stays green.
+  4. `--listFilesOnly` confirms the file is missing. They add `"type-tests/**/*.ts"` to the printed
+     `include`, and the false assertion gives TS2344.
+  5. They remove the false assertion and widen `ship` again. The real negative test gives TS2578.
+     They restore `Paid | PreOrder`, and it's green.
+
+  The two red runs do different jobs. The false assertion proves the command reaches the file. The
+  mutation proves the test catches its claim. Say so once, in a character's words.
+- **Mechanism 5 has bounds:**
+  - **The "shipment" is a record in the test's in-memory fake.** No real dispatch, no incident, and
+    no implication that unit tests sent customers' orders.
+  - **The filename isn't protection.** `test/ship.types.ts` still runs. If anyone proposes the rename,
+    it fails.
+  - **The omitted file must not be imported by an included file.** An import reaches it regardless
+    of `include`.
+- **Cut "the only way to find this".** `--listFilesOnly` finds it too. Breaking it on purpose is the
+  habit that makes you look.
+- **Mechanism 6 leaves the page.** The "narrowed `include`" history was built on my false
+  package claim. An existing `*.test.ts` convention, plus a new compile-only directory, is enough.
+- **The boundary beat covers typed implementations.** A function annotated `User[]` that returns
+  `JSON.parse(raw)` passes an exact `ReturnType` test and fails a runtime test with
+  `[{"id":"wrong"}]`. One line, calling back to Ch7's lying overload. No new parsing discussion.
+- **The Principle owner is Sahar.** "Which caller's claim does this test protect, and what happens
+  if we break it?" is his removal habit turned on tests.
+  - **The opening teaches the operations,** in two short paragraphs with one plain definition of
+    each testing style. A usage test checks whether a concrete call or operation is accepted or
+    rejected. An exact-result test compares an inferred type with a stated one.
+  - **Its anchor:** break the claim this test names, and run the command you trust.
+  - **No `Equal` mechanics in the opening,** and Codex's five points aren't to be pasted as
+    bullets.
+- **The cast is five people:**
+  - **Sahar:** the Principle. He raises the intersection objection, then accepts an inferred-result
+    assertion once he's shown the promise it protects.
+  - **Eden:** the historical diagnosis (removing the directive) and the file and `include` repair.
+  - **Noam:** wrote the tests, knows his test should be red, and runs the old mutation and the new
+    one. He accepts the negative-usage counterexample.
+  - **Oded:** the PR, the admission, the positive pre-order test, and the proposal to separate the
+    compile-only calls from the runner.
+  - **Guy:** owns the explicitly promised interface ("which input/output relationships must future
+    changes preserve?"). He accepts that exact representation is a stronger promise than the one
+    he means. One concrete inference assertion must earn his defence. He isn't a second Noam.
+
+  **Cut Eli and Chen.**
+- **The promised-inference helper must have a job in the shop** before anyone argues about its
+  type. Codex picks it. It needs:
+  - a caller in another part of the shop that relies on its inferred result;
+  - a natural refactor that flattens an intersection without changing behaviour.
+
+  If none is natural, the exact-result beat shrinks to one exchange. `groupBy` is fine only if it's
+  given that job.
+- **The Principle-only reader cases are Codex's four revised cases** (challenge §7), with their
+  follow-ups and expected answers:
+  - (a) the transfer brand;
+  - (b) `parseUsers` and `any`, with the annotated follow-up;
+  - (c) a bounded caller contract against a flattened intersection, with the readonly follow-up;
+  - (d) the new file, the two commands, and `test/ship.types.ts`.
+
+**Validation decision:**
+- **The page's runtime tests are TypeScript** (`test/ship.test.ts`), because that's what readers
+  write. The page's tsconfig shows `"types": ["node"]`.
+- **The check gives the temporary fixture an explicit resolution route** to the repository's
+  `@types/node` (a symlink or `typeRoots`), and asserts the file list.
+- **A control without the route** reproduces TS2591, and it stays in validation.
+- **Only APIs that exist in both Node 22 and `@types/node` 26** (`node:test`'s `test`, and
+  `node:assert/strict`). The 26-vs-22 mismatch goes in the records, not on the page.
+- **Every directive on the page:** the check compiles the file with the directive removed and
+  asserts the reason and location the page claims. It runs the named regression separately.
+- **Positive calls** for paid orders and pre-orders.
+- **Compiler file membership and runtime file selection** are both asserted, with a restored-green
+  control after each deliberate failure.
+- **Any count the page prints** is computed by the check.
+
+**Not adopted:**
+- **Codex's `.mjs` runtime harness.** It's sound, and needs no Node declarations. But a TypeScript
+  book's reader writes `.ts` tests, and the dependency is already installed. The check provides the
+  route instead.
+- **A not-any helper** (`0 extends (1 & T)`). It stays in validation, as Codex suggested.
+
+**Scope for draft 1:**
+- one repository: orders, `ship`, the promised-inference helper and its caller, `test/` and
+  `type-tests/`;
+- labelled fences, including the tsconfig `include` before and after;
+- 2,300–3,000 words.
+
+`checks/chapter26.cjs` builds the fixtures from the fences, in the page's sequence of states.
