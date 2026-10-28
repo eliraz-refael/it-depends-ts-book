@@ -1,0 +1,111 @@
+{
+  "status": "draft 1 frozen; independent readers and formal review pending",
+  "date": "2026-10-27",
+  "settled_plan_commit": "c6867ba",
+  "base_commit": "da6c0e2",
+  "path": "book/04-the-real-world/02-monorepo-type-sharing.md",
+  "sha256": "55addc78b24b8b442ad51d519c6ce589bf404b916683feb3a2c06157cba9f505",
+  "manuscript_mtime_utc": "2026-10-27T21:35:20.581301+00:00",
+  "words": 2440,
+  "code_fences": 14,
+  "fences_by_language": {
+    "typescript": 8,
+    "json": 6
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "json",
+      "sha256": "5b68d127a9dacf50a232632ae5cf912a06f05ae865aaaf930f209e9b235ea5ba"
+    },
+    {
+      "ordinal": 2,
+      "language": "typescript",
+      "sha256": "fc55bb2e5a5c4c8db6438678a4cf693dbfea1c2dde11cf853ccc5552bcef3e0c"
+    },
+    {
+      "ordinal": 3,
+      "language": "typescript",
+      "sha256": "259a8524f81685c5ae2b9dde165f9008872f026affa064bffffa2a4ba55c4b74"
+    },
+    {
+      "ordinal": 4,
+      "language": "json",
+      "sha256": "b5a65f517280557e4a090b9429762953846a4e385182c1d15e0a6404e1a5cdd2"
+    },
+    {
+      "ordinal": 5,
+      "language": "typescript",
+      "sha256": "f88fa3928c240bb14a34d88763c82704923ece5545ea90c557480f6bb0838f0e"
+    },
+    {
+      "ordinal": 6,
+      "language": "typescript",
+      "sha256": "a37f2034ede7a4f09558efeca42d4cd338d4179afe528ea0c57c4e5eeec49c51"
+    },
+    {
+      "ordinal": 7,
+      "language": "typescript",
+      "sha256": "907b7d63b967a75aa47cadad7005cac7f708ce4a5d2597a7326899e794eceea5"
+    },
+    {
+      "ordinal": 8,
+      "language": "typescript",
+      "sha256": "2945a5a133fa5f30d7ab0ea8ead2225dd482f27ed09a198da874e1e9b964ee5f"
+    },
+    {
+      "ordinal": 9,
+      "language": "typescript",
+      "sha256": "e71681c43ac65ad971755e0e043f833f4537705c87c40092e9e412f07aa7ea20"
+    },
+    {
+      "ordinal": 10,
+      "language": "json",
+      "sha256": "eb8e161600bbe30d1a8bf4b41a4df1b51e1afd0fd9ea77fce4b1409c6d184862"
+    },
+    {
+      "ordinal": 11,
+      "language": "json",
+      "sha256": "62bc395c67f4d306754412e298d58653def52ce5eed1e112bf86a495a70db23a"
+    },
+    {
+      "ordinal": 12,
+      "language": "json",
+      "sha256": "5d7a7ae1563e0405328b00bda797bffcc16dfbc0b19a9368dd102079c4376b6c"
+    },
+    {
+      "ordinal": 13,
+      "language": "json",
+      "sha256": "978a3fa5db734ed4e5cd54855c49c5c0ac9eef774ba9aa87017c2517eb8ee70d"
+    },
+    {
+      "ordinal": 14,
+      "language": "typescript",
+      "sha256": "fbd81b273130d86035c50124d2ed9a10941ec6b58c9b290ca0ce53369e2a825a"
+    }
+  ],
+  "validator_sha256": "2db7568b1053b1e224254ef6ef3933a651f377cc719357878e3f925d6114135f",
+  "typescript": "7.0.2",
+  "node": "v22.23.4",
+  "validation": {
+    "installation": "npm ci --offline succeeded in this worktree during the challenge; same locked installation used for draft 1. No new clean-export claim.",
+    "targeted_suite": "exit 0; 14/31/16 plus two file-list queries before final prose-only edits, fences and validator unchanged.",
+    "full_suite": "npm run check: exit 0 on this exact manuscript and validator.",
+    "chapter_counts": {
+      "fences": 14,
+      "compiler_cases": 31,
+      "runtime_groups": 16,
+      "file_list_queries": 2
+    },
+    "book_counts": {
+      "fences": 427,
+      "compiler_cases": 595,
+      "runtime_groups": 285,
+      "default_cases": 2,
+      "searches": 2
+    },
+    "full_suite_manuscript_sha256": "55addc78b24b8b442ad51d519c6ce589bf404b916683feb3a2c06157cba9f505",
+    "full_suite_log_sha256": "89667a9db31e5b66f39e92966dbf416346858ec3119de80c719a37002a6af4ea"
+  }
+}
