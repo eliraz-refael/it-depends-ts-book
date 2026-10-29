@@ -34,13 +34,14 @@ const negative=files(block('// test/ship.test.ts — temporarily replace the Row
 const flatReturn=files(block('// src/order-row.ts — replace the return'))[rowFile].trim();
 const statusAssertion=files(block('// test/ship.test.ts — replace the Row'))[tests];
 const runtime=files(block('// test/ship.test.ts — runtime tests after the split'))[tests];
+const intermediate=files(block('// test/ship.types.ts — draft excerpt'))['test/ship.types.ts'];
 const globMatch=manuscript.match(/`node --test "(test\/\*\*\/\*\.test\.ts)"`/);assert(globMatch,'Printed runtime glob');
 const runtimeGlob=globMatch[1];
 const compileOnly=files(block('// type-tests/ship.types.ts\n'))[typesFile];
 const falseAssertion=files(block('// type-tests/ship.types.ts — temporary'))[typesFile];
 const fixedInclude=JSON.parse(block('{\n  "include"'));
 assert.equal((manuscript.match(/^```/gm)||[]).length,fences.length*2,'Every fence has a language and is extracted');
-assert.equal(used.size,fences.length,'Every printed fence is extracted');assert.equal(fences.length,16);
+assert.equal(used.size,fences.length,'Every printed fence is extracted');assert.equal(fences.length,17);
 assert(fences.every(f=>['typescript','json'].includes(f.language)));
 const rootMode=manuscript.match(/root package has `([^`]+)`/);assert(rootMode);
 const manifest=JSON.parse('{'+rootMode[1]+'}');assert.deepEqual(manifest,{type:'module'});
@@ -50,7 +51,7 @@ function directiveId(prefix,operation) {
  const lines=fences[i].body.split('\n'),j=lines.findIndex(l=>l.includes(operation));
  assert(lines[j-1].includes('@ts-expect-error'));return `${i}:${j-1}`;
 }
-const ids={inline:directiveId('// test/ship.test.ts — before','ship({'),draft:directiveId('// test/ship.test.ts — replace the draft','ship(draft)'),row:directiveId('// test/ship.test.ts — temporarily replace the Row assertion','const wrong'),finalDraft:directiveId('// type-tests/ship.types.ts\n','ship(draft)')};
+const ids={inline:directiveId('// test/ship.test.ts — before','ship({'),draft:directiveId('// test/ship.test.ts — replace the draft','ship(draft)'),row:directiveId('// test/ship.test.ts — temporarily replace the Row assertion','const wrong'),intermediate:directiveId('// test/ship.types.ts — draft excerpt','ship(draft)'),finalDraft:directiveId('// type-tests/ship.types.ts\n','ship(draft)')};
 const scratch=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'ts-book-ch26-')));
 const story=path.join(scratch,'story'), results=[];
 const executable=path.join(repo,'node_modules/.bin/tsc');
@@ -155,13 +156,11 @@ write(story,rowFile,anyRow(initialRow));check('any-passes-assignment-and-admin')
 write(story,'test-support/types.ts',comparison['test-support/types.ts']);
 write(story,tests,read(story,tests)+'import type { Equal, Expect } from "../test-support/types.ts";\n'+comparison[tests]);
 check('exact-result-catches-any',[at(tests,'type Row',2344,falseType)]);
-write(story,rowFile,initialRow);check('exact-result-restored');
+// Keep any while changing assertion styles, then restore inference once.
 write(story,tests,replace(read(story,tests),comparison[tests],'')+negative);
-check('negative-result-usage');
-expose('negative-result-paid-not-draft',tests,'const wrong',[at(tests,'const wrong',2322,"Type '\"paid\"' is not assignable to type '\"draft\"'.")],ids.row);
-write(story,rowFile,anyRow(initialRow));
 check('negative-result-catches-any',[at(tests,"@ts-expect-error: a paid",2578,unused)]);
 write(story,rowFile,initialRow);check('negative-result-restored');
+expose('negative-result-paid-not-draft',tests,'const wrong',[at(tests,'const wrong',2322,"Type '\"paid\"' is not assignable to type '\"draft\"'.")],ids.row);
 // The alternative is temporary: remove wrong and its directive before restoring Row.
 write(story,tests,replace(read(story,tests),negative,comparison[tests]));check('whole-result-assertion-restored');
 write(story,rowFile,flatRow);check('flattening-breaks-whole-equality',[at(tests,'type Row',2344,falseType)]);
@@ -175,9 +174,6 @@ write(story,rowFile,flatRow);check('status-assertion-after-flattening');
 const selectedTests=read(story,tests);assert(!selectedTests.includes('const wrong'));
 write(story,rowFile,anyRow(flatRow));check('status-alone-catches-any',[at(tests,'type Status',2344,falseType)]);
 write(story,rowFile,flatRow);check('status-alone-restored');
-write(story,rowFile,replace(flatRow,'status: S) {','status: S): { id: string; status: Order["status"] } {'));
-check('status-widening-breaks-contract',[at(tests,'type Status',2344,falseType),at(tests,'const expected',2322,"Types of property 'status' are incompatible."),at('src/admin.ts','return renderPaid',2345,'Types of property \'status\' are incompatible.')]);
-write(story,rowFile,flatRow);write(story,tests,selectedTests);check('status-widening-restored');
 // The page's temporary logging is derived from its described location, then removed byte-for-byte.
 assert(manuscript.includes('clears `shipped` immediately before `ship(draft)`'));
 write(story,tests,replace(selectedTests,'  // @ts-expect-error: can\'t ship a draft','  shipped.length = 0;\n  // @ts-expect-error: can\'t ship a draft').replace('  ship(draft);','  ship(draft);\n  console.log("shipped:", shipped);'));
@@ -193,13 +189,19 @@ const runtimeNames=[...runtime.matchAll(/test\("([^"]+)"/g)].map(m=>m[1]).sort()
 assert.equal(runtimeNames.length,3);
 write(story,tests,runtime);
 // Narrated move: the reset and log travel with the draft call after removing its callback.
-const loggedTypes=replace(replace(replace(compileOnly,'import { ship, type Draft }','import { ship, shipped, type Draft }'),"// @ts-expect-error: can't ship a draft","shipped.length = 0;\n// @ts-expect-error: can't ship a draft"),'ship(draft);','ship(draft);\nconsole.log("shipped:", shipped);');
+const helperImports=compileOnly.split('\n').filter(l=>l.startsWith('import ')&&!l.includes('../src/orders.ts')).join('\n');
+const loggedTypes=intermediate+helperImports+'\n'+compileOnly.slice(compileOnly.indexOf('const row ='));
+assert(loggedTypes.includes('shipped.length = 0;'));assert(loggedTypes.includes('console.log("shipped:", shipped);'));
 const marker='\nconsole.log("TYPE_FILE_EXECUTED");\n'; // Validation-only execution marker.
 write(story,'test/ship.types.ts',loggedTypes+marker);
 list('types-suffix-already-omitted',[tests],['test/ship.types.ts']);
 run('types-suffix-under-test-still-executes',['--test'],['test/ship.types.ts','TYPE_FILE_EXECUTED',"# shipped: [ 'o2' ]"],['not ok']);
 // Control for the convention eventually chosen in the Verdict, even inside test/.
 run('runtime-glob-excludes-types-suffix',['--test',runtimeGlob],runtimeNames,['TYPE_FILE_EXECUTED','ship.types.ts','not ok']);
+// Validation-only inclusion exposes the new excerpt's directive; restore the story's omission.
+config(story,{...printedConfig,include:[...printedConfig.include,'test/ship.types.ts']});
+expose('intermediate-draft-reason','test/ship.types.ts','ship(draft)',[at('test/ship.types.ts','ship(draft)',2345,"Type '\"draft\"' is not assignable to type '\"preorder\"'.")],ids.intermediate);
+config(story,printedConfig);check('intermediate-inclusion-control-restored');
 fs.mkdirSync(path.join(story,'type-tests'));fs.renameSync(path.join(story,'test/ship.types.ts'),path.join(story,typesFile));
 write(story,typesFile,compileOnly); // Remove the narrated reset/log after the move.
 write(story,typesFile,compileOnly+marker); // Instrument selection independently of the page's logging.
@@ -214,6 +216,10 @@ write(story,typesFile,compileOnly);check('false-assertion-removed');
 write(story,orders,replace(finalOrders,'ship(order: Paid | PreOrder)','ship(order: Order)'));
 check('moved-real-regression-red',[at(typesFile,"@ts-expect-error: can't",2578,unused)]);
 write(story,orders,finalOrders);check('moved-real-regression-restored');
+// Retest the other moved promise; Status alone fails while expected and admin still compile.
+write(story,rowFile,anyRow(flatRow));
+check('moved-row-any-regression',[at(typesFile,'type Status',2344,falseType)]);
+write(story,rowFile,flatRow);check('moved-row-any-restored');
 write(story,typesFile,compileOnly+falseAssertion);
 run('Node-erases-false-assertion',['--test',typesFile],['type-tests/ship.types.ts'],['not ok']);
 write(story,typesFile,compileOnly);check('Node-demonstration-restored');
@@ -239,6 +245,11 @@ run('final-runtime-glob',['--test',runtimeGlob],runtimeNames,['not ok','ship.typ
 expose('final-draft-reason',typesFile,'ship(draft)',[at(typesFile,'ship(draft)',2345,"Type '\"draft\"' is not assignable to type '\"preorder\"'.")],ids.finalDraft);
 assert.deepEqual([...coveredDirectives].sort(),directiveIds.sort(),'Every printed directive has an exposed diagnostic');
 // Extra regression controls preserve and restore the final repository exactly.
+// Widening is not Status's unique contribution: expected and admin catch it too.
+write(story,rowFile,replace(flatRow,'status: S) {','status: S): { id: string; status: Order["status"] } {'));
+check('validation-only-widening-has-three-catches',[at(typesFile,'type Status',2344,falseType),at(typesFile,'const expected',2322,"Types of property 'status' are incompatible."),at('src/admin.ts','return renderPaid',2345,'Types of property \'status\' are incompatible.')]);
+write(story,rowFile,flatRow);check('status-widening-restored');
+
 write(story,orders,replace(finalOrders,'status: "draft"; currency: string','status: "draft"; currency: string; region: string'));
 check('new-Draft-field-outside-suppression',[at(typesFile,'const draft',2741,"Property 'region' is missing")]);
 write(story,orders,finalOrders);check('new-Draft-field-restored');

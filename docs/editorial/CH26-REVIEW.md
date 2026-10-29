@@ -1,3 +1,39 @@
+# Chapter 26 — draft 3 self-review
+
+Status: **DRAFT 3 FROZEN; PRINCIPLE-ONLY AND FINAL DIFF REVIEW PENDING**, 2026-10-29. Claude's revised Principle-only read and final diff review are pending. This is Codex's self-review.
+
+Manuscript: [It Can't Be Green](../../book/04-the-real-world/03-testing-typed-code.md).
+Review addressed: [Claude's second review](ch26/CLAUDE-REVIEW-2.md), committed with both verbatim reports at `0024de3`.
+Snapshot: [DRAFT3-SNAPSHOT.json](ch26/DRAFT3-SNAPSHOT.json).
+
+## Response to the review
+
+1. **The Turn now retests both moved promises.** Noam asks “And the row?” after the shipping regression is restored. Adding `: any` to orderRow produces TS2344 at Status in type-tests/ship.types.ts, and removing it restores green. The check asserts exactly that one diagnostic in the complete repository, so expected and admin still compile. The earlier Status line now claims this additional protection against any and acceptance of both return forms. Widening stays in validation only, with all three diagnostics asserted; it is not presented as Status's unique contribution.
+2. **The Principle gives requirements and stakes.** Promise is defined once as what callers may rely on. Exact comparisons fix representation too, with a plain explanation of representation and a reason to choose which parts to compare. “Differences” is gone. The planted-error/mutation distinction remains, and the add/change/move requirement ends paragraph one. Paragraph two requires a forbidden call to be otherwise valid, gives two remedies for any in the same sentence as the assignment trap, requires every type-test file to participate, and states that runtime-selected code under the directive still executes. Neither a directory nor a discovery rule appears. Runtime assertions follow from the distinction between a type promise and its implementation.
+3. **The intermediate state is printed and executed.** The draft excerpt includes its import, complete fixture, reset, directive, call and exact log statement. The validator extracts it unchanged, appends the moved helper checks, and runs default discovery. It records o2. Validation temporarily includes this otherwise omitted file to expose the new directive's TS2345 status mismatch, restores the directive to green, then restores the original compiler omission. Both final files remain printed in full.
+4. **The history and experiments are easier to follow.** Noam and Eden reconstruct the pre-March source and tests in an exchange; there is no new historical fence. Both variants and both fixtures lose currency, and PreOrder is explicitly absent. The Paid-only probe and directive restoration move into Noam's speech, and Oded now says “set.” During the assertion comparison, any stays in place as Noam replaces Row with the forbidden assignment, then comes off once. This removes one full on/off round without weakening either demonstration. The check follows that order.
+5. **Local voice and state fixes stay local.** Guy owns the card and explains why he would resist adding a cast. Sahar asks for evidence the card can use. Noam is named when replacing Row; Guy and Noam are named in the ampersand joke. The admin-output line specifies importing paidCard in a Node -e command and logging its result, with Row temporarily removed for the compiler check. Eden speaks at the documentation link. Noam reports Status's results, Oded introduces the runtime file, and Eden speaks the added-test experiment. Noam's Verdict line is reduced to next time. The opening, “It shipped,” refresh callback and closing beat remain.
+
+## Self-review
+
+For the four settled cases: the forbidden-call rule rejects a missing destination as an independent error; changing the sign of an unbranded amount does not repair that call. The any sentence now supplies both the negative-operation and exact-comparison remedies, while the final sentence still denies that a return annotation proves runtime contents. Representation is explicitly part of what an exact comparison fixes; a harmless flattening need not be a promise, while a forbidden write can be. The file rule requires compiler inclusion and identifies the consequence of runtime selection without pre-teaching the directory mistake. These are my applications, not isolated-reader results.
+
+The Principle is still two paragraphs, and it must carry several independent requirements. The revision connects each with its consequence rather than adding the scenes' procedure. Whether it now sounds spoken is the remaining reading question for the Principle-only reader. The helper sequence is shorter, and the new move regression closes a real omission rather than adding another lesson. Scope remains the review's named lines and their validation.
+
+## Validation and freeze
+
+The targeted check passed on TypeScript **7.0.2** / Node **22.23.4**: **17 fences / 74 compiler cases / 18 runtime groups / 5 file-list queries / 5 directive occurrences**. The final forbidden-call wording was clarified afterwards; fences and validator were unchanged. The full run below covers that final wording. The same locked installation is used; no new clean-install claim is made. checks/run.cjs already runs Chapter 26 and is unchanged.
+
+The full `npm run check` passed: **443 fences / 667 compiler cases / 303 runtime groups**, plus two compiler-default cases, two source searches and seven file-list queries. The final manuscript, validator and suite runner match their hashes recorded before execution. Coverage is updated in checks/README.md.
+
+Draft 3 is **2522 words**, including code; the two Principle paragraphs total **183 words** including the attribution (draft 2: 171). Manuscript SHA-256: `0817c7342b526800d82f0d4782d375f5ae71911e3c918ba9a41d4254aa5250ab`. [DRAFT3-SNAPSHOT.json](ch26/DRAFT3-SNAPSHOT.json) records the fence hashes, tool versions, input hashes and full-run evidence. The log remains untracked at `.probe/codex/draft3/full-check.log`. The plan, earlier snapshots, Claude's reviews and all reader reports are unchanged. This local draft awaits the requested Principle-only reader and final diff review.
+
+---
+
+## Historical draft 2 record
+
+The record below describes draft 2. Its reader recheck and formal review were completed in `0024de3`; draft 3 above addresses those findings.
+
 # Chapter 26 — draft 2 self-review
 
 Status: **DRAFT 2 FROZEN; PRINCIPLE-ONLY AND TARGETED RECHECK PENDING**, 2026-10-29. Revised Principle-only reading and targeted full-chapter recheck are pending; this is Codex's self-review, not their result.

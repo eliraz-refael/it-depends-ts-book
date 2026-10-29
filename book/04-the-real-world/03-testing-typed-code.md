@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Sahar Firstclass**: "A usage test checks whether a particular call or operation is accepted or rejected. An exact-result test compares an inferred type with a stated expected type. Write the promise down before choosing which differences to test. Before you trust either test, change the code so that promise is false and run the type check CI actually runs. See the test fail, undo the change, and see it pass. Do that when you add a test, change it, or move it. An error planted anywhere in the file can show that the compiler checks the file; breaking the promise shows whether the test protects it. Those are different questions."
+**Sahar Firstclass**: "Write down the promise: what callers are allowed to rely on. Usage tests check accepted and rejected operations; exact-result tests compare inferred types with expected types. They fix representation too—how the type is written—so compare only the parts where that matters. Change the code so the promise is false, then run CI's type check. See the test fail, undo the change, and see it pass. A planted error shows that the compiler checks the file; breaking the promise shows whether the test protects it. Those are different questions. Do both when you add, change or move a test."
 
-"Start with a call that compiles outside `@ts-expect-error`. Under the directive, introduce only the intended violation; every other argument and field must remain valid. A test that only assigns the result passes when the result is `any`. Check which files each compiler and runtime command selects. A type test can check a function's promise without proving that its body keeps it."
+"A forbidden call must be valid apart from the violation you're testing, because any unrelated error can satisfy the directive. If the result could be `any`, test a forbidden operation or compare it exactly; assignment alone accepts it. Include every type-test file in the type check, and account for runtime selection: code under `@ts-expect-error` still runs if a runtime command selects it. We need runtime assertions too, because a type test can check a function's promise without proving that its body keeps it."
 
 ## The Debate
 
@@ -107,7 +107,15 @@ With `ship(order: Paid)`, the inline call reports TS2322: `Type '"draft"' is not
 
 **Eden**: "And currency after it. The description didn't change because nobody asked the compiler to check the description."
 
-Noam restores the directive and checks the history. Currency became required in March. When he wrote the test, that inline object had every Draft field. He temporarily restores both source and tests to their pre-March state: neither Draft nor Paid has `currency`, the paid fixture has no currency field, and the inline draft test is exactly as he wrote it. He then widens `ship` from Paid to the old `Draft | Paid` union: TS2578, `Unused '@ts-expect-error' directive.` The test caught the change then.
+Noam restores the directive and opens the history.
+
+**Noam**: "Currency arrived in March. Before that, my inline object had every Draft field."
+
+**Eden**: "Restore the source and tests from then. Both variants, both fixtures."
+
+**Noam**: "Done: neither Draft nor Paid has `currency`, the paid fixture has no currency field, and the inline draft is back as I wrote it. No PreOrder yet. Now widen Paid to the old `Draft | Paid` union."
+
+TS2578: `Unused '@ts-expect-error' directive.`
 
 **Noam**: "I did see it fail."
 
@@ -136,11 +144,11 @@ Now the check reports TS2578. Noam turns the screen towards Oded.
 
 **Eden**: "The fixture has its own check now. Add another required Draft field, and its declaration fails outside the directive."
 
-For one temporary probe, Noam changes only the parameter back to Paid. The repaired test passes. With its directive temporarily removed, this version reports TS2741: `Property 'paidAt' is missing in type 'Draft' but required in type 'Paid'.`
+**Noam**: "One probe. Paid-only parameter: green. Remove the directive… TS2741:" `Property 'paidAt' is missing in type 'Draft' but required in type 'Paid'.`
 
-**Noam**: "Missing paidAt this time. Still a valid Draft being refused."
+**Noam**: "Missing paidAt this time. Still a valid Draft being refused. Comment back, green."
 
-**Oded**: "Probe finished? Paid-only doesn't do my feature. Let me add the call we actually want and leave the parameter at `Paid | PreOrder`."
+**Oded**: "Probe finished? Paid-only doesn't do my feature. Let me add the call we actually want and set the parameter to `Paid | PreOrder`."
 
 ```typescript
 // src/orders.ts — replace ship
@@ -182,7 +190,7 @@ export function paidCard(id: string): string {
 }
 ```
 
-**Guy**: "A paid input must keep the paid status in the result. If the helper widens that to all order statuses, the card can't use it."
+**Guy**: "I own that card. A paid input must keep the paid status in the result; I don't want a cast in my caller every time someone tidies this helper."
 
 **Noam** adds a test to the existing file:
 
@@ -192,7 +200,7 @@ const row = orderRow("o1", "paid");
 const expected: { id: string; status: "paid" } = row;
 ```
 
-**Sahar**: "The card needs a paid row. Would this assignment notice if the helper stopped telling us anything and returned `any`?"
+**Sahar**: "The card needs evidence that the row is paid. This assignment would also accept `any`. Try it before we count it as a test."
 
 For this experiment, Noam adds `: any` to the helper's return. The assignment and the admin caller both compile.
 
@@ -209,13 +217,13 @@ export type Expect<T extends true> = T;
 type Row = Expect<Equal<typeof row, { id: string } & { status: "paid" }>>;
 ```
 
-This `Equal` distinguishes `any` from the expected type. With the `any` return it reports TS2344: `Type 'false' does not satisfy the constraint 'true'.` Noam removes the return annotation, restoring the inferred intersection. The assertion passes.
+TS2344: `Type 'false' does not satisfy the constraint 'true'.`
 
-**Noam**: "The assignment missed it. Exact comparison caught it."
+**Noam**: "The assignment missed it. This `Equal` distinguishes `any` from the expected type."
 
 **Sahar**: "Before we keep that comparison, try the other half of the card's promise. A paid row mustn't become a draft row."
 
-For this experiment only, he replaces the Row assertion with:
+Noam leaves `: any` in place and temporarily replaces Row with:
 
 ```typescript
 // test/ship.test.ts — temporarily replace the Row assertion
@@ -223,13 +231,13 @@ For this experiment only, he replaces the Row assertion with:
 const wrong: "draft" = row.status;
 ```
 
-The ordinary helper passes. Noam repeats the `any` mutation. Now the directive is unused: TS2578.
+TS2578: the directive is unused. Noam removes `: any`; the test passes with the ordinary inferred return.
 
 **Noam**: "All right. That catches it too."
 
 **Guy**: "Keep the comparison for now. It tells me the result I promised without making me read a deliberately wrong assignment."
 
-The experiment ends: Noam removes `: any` and the entire `wrong` assignment with its directive, then restores Row. The helper still uses `Object.assign`. Sahar points at it.
+Noam removes the entire `wrong` assignment with its directive and restores Row. Green. The helper still uses `Object.assign`. Sahar points at it.
 
 **Sahar**: "Why are we assembling two objects to get two fields?"
 
@@ -242,9 +250,9 @@ The experiment ends: Noam removes `: any` and the entire `wrong` assignment with
 return { id, status };
 ```
 
-Row fails with TS2344. Noam checks the admin caller separately: it still compiles and prints `Paid order o1`.
+Row fails with TS2344. Noam checks the admin caller with Row temporarily removed, then imports `paidCard` in a Node `-e` command and logs `paidCard("o1")`: `Paid order o1`. He restores Row.
 
-**Oded**: "I let drafts ship and got green. An ampersand left his hover and he got red."
+**Oded**: "I let drafts ship and got green. An ampersand left Guy's hover and Noam got red."
 
 **Guy**: "The comparison is stricter than the caller. The card reads the id; our test reads the status and assigns to the card's input type. All of that still works."
 
@@ -257,7 +265,7 @@ Row fails with TS2344. Noam checks the admin caller separately: it still compile
 type Status = Expect<Equal<typeof row.status, "paid">>;
 ```
 
-Noam checks Status against both return forms, then against `any` and a widened status. It accepts both forms and rejects both regressions. He leaves the flattened helper in place, with `expected` and Status as its tests.
+**Noam**: "Status passes with either return form. Put `: any` back: TS2344 here, while `expected` and the card still compile. That's what this adds. Annotation off, green. Leaving the flat return."
 
 **Noam**: "A function annotated `User[]` can return `JSON.parse(raw)` and pass an exact return-type test. Run it, and you get whatever the string held. These tests believe the annotation."
 
@@ -279,15 +287,29 @@ Inside that callback, he clears `shipped` immediately before `ship(draft)` and l
 
 **Oded**: "No courier. Just the fake's array. But our test of the forbidden call is making the forbidden call."
 
-Eden opens [Node's explanation of type stripping](https://nodejs.org/docs/latest-v22.x/api/typescript.html#type-stripping).
+**Eden**: "The comment objects to the call's type. It doesn't cancel the call." He opens [Node's explanation of type stripping](https://nodejs.org/docs/latest-v22.x/api/typescript.html#type-stripping).
 
 **Oded**: "I'll take the compile-only bits out of the runtime file."
 
-He moves the draft fixture and call, `row`, `expected` and Status, with their imports, into `test/ship.types.ts`. The draft call loses its `test(...)` wrapper; he keeps the recorder reset before it and the log immediately after it for this run. He adds Guy's card test beside the two shipment tests. Plain `node --test` still executes the compile-only file and records the draft.
+He moves the draft fixture and call, `row`, `expected` and Status, with their imports, into `test/ship.types.ts`. Without the callback wrapper, the draft part is:
+
+```typescript
+// test/ship.types.ts — draft excerpt; helper checks follow
+import { ship, shipped, type Draft } from "../src/orders.ts";
+const draft: Draft = { id: "o2", status: "draft", currency: "USD" };
+shipped.length = 0;
+// @ts-expect-error: can't ship a draft
+ship(draft);
+console.log("shipped:", shipped);
+```
+
+He adds Guy's card test beside the two shipment tests and runs plain `node --test`.
+
+**Oded**: "Still `o2`. It ran `test/ship.types.ts`."
 
 **Eden**: "The test directory gets discovered too. The suffix isn't an instruction to leave it alone. Put these under `type-tests`."
 
-Oded moves the file to `type-tests/ship.types.ts`, removes the temporary reset and logging, and uses `node --test test/ship.test.ts` while they finish the split. Here is the complete runtime file, including Guy's new card assertion:
+**Oded**: "Moved to `type-tests/ship.types.ts`. Reset and log removed. Running `node --test test/ship.test.ts` while we finish. Here's the whole runtime file:"
 
 ```typescript
 // test/ship.test.ts — runtime tests after the split
@@ -315,7 +337,7 @@ test("renders the paid card", () => {
 });
 ```
 
-The compile-only file contains the complete Draft fixture and the two checks of the helper's promise:
+**Noam**: "And everything we moved:"
 
 ```typescript
 // type-tests/ship.types.ts
@@ -376,6 +398,10 @@ The file list now contains both test files. The deliberately false assertion giv
 
 Oded temporarily changes the parameter to Order. TS2578 points at the draft directive in the new file. He restores `Paid | PreOrder`. Green.
 
+**Noam**: "And the row?"
+
+Oded adds `: any` to `orderRow` again. TS2344 points at Status in `type-tests/ship.types.ts`; `expected` and the admin caller still compile. He removes the annotation. Green.
+
 With the false assertion temporarily back, they also try `node --test type-tests/ship.types.ts`. It passes: Node erases the assertion. Noam removes it again.
 
 ## The Verdict
@@ -384,9 +410,11 @@ With the false assertion temporarily back, they also try `node --test type-tests
 
 **Oded**: "Use the convention: `node --test "test/**/*.test.ts"`. I'll put that in CI."
 
-Eden adds a temporary failing card test in `test/admin.test.ts`. The single-file command stays green. The glob runs the new test and fails. He corrects its expected card text, sees both runtime files pass, then removes the temporary test.
+Eden adds a temporary failing card test in `test/admin.test.ts`.
 
-**Noam**: "Next added or moved type test: show that the compiler reaches it, then that breaking its promise makes it fail. Check what both commands select before calling it done."
+**Eden**: "Single file: green. Glob: it runs the new test and fails. Correct the expected text: both files pass. Now I'll remove the temporary test."
+
+**Noam**: "Next time, show me the reds before you send me the green."
 
 **Oded**: "Before moving it twice. Noted."
 
