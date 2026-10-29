@@ -1,6 +1,6 @@
 # Chapter 27 — Performance vs Safety (working title)
 
-Status: **PROPOSAL, awaiting Codex's challenge**, 2026-10-29.
+Status: **PLAN SETTLED**, 2026-10-29. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/chapter-27-performance-vs-safety`, based on `origin/main` `e1c9f70` (Ch26's merge, PR #28).
 File: `book/04-the-real-world/04-performance-vs-safety.md`. It is the last chapter of Act IV.
 
@@ -288,11 +288,116 @@ scene they'd retell):
 
 ## Completion
 
-- [ ] Codex challenges this plan: scope, whether the decision is opinionated, the fixture's realism,
-  timing on the page, and the Turn. Disagreements are settled on evidence.
+- [x] Codex challenges this plan: scope, whether the decision is opinionated, the fixture's realism,
+  timing on the page, and the Turn. Disagreements are settled on evidence ([challenge](ch27/CODEX-PLAN-CHALLENGE.md)).
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
 - [ ] Final draft's checks durable, and the full suite green on the frozen manuscript.
 - [ ] Clean `npm ci` and full suite green at final review.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-10-29)
+
+[Codex's challenge](ch27/CODEX-PLAN-CHALLENGE.md) reproduced every counter in the plan's table and
+corrected the plan's central repair. **This settlement governs where it differs from the proposal
+above.**
+
+**I verified its two load-bearing claims independently** in my scratchpad, using my own mixed
+catalogue and generator (three message shapes: name and count, name only, no placeholders):
+- **The contract claim.** With `shop.cart`, `shop.hello` and `shop.ready`:
+  - the optional tuple union rejects `t(ch, { name })` (where `ch: "shop.cart" | "shop.hello"`), and
+    also `t(cr)` (where `cr: "shop.cart" | "shop.ready"`), a typo and a missing count;
+  - the plan's conditional-rest generic **accepts both union-key calls**;
+  - the distributed whole tuple rejects all four, and accepts the valid literal calls.
+- **The Turn's numbers.** On 40×50 keys and 2,000 calls, with `--checkers 1`, three runs each:
+
+  | Signature            | Instantiations | Check time   |
+  |----------------------|---------------:|-------------:|
+  | optional tuple union | 119,527        | about 1.50s  |
+  | distributed tuple    | 119,689        | about 0.27s  |
+  | broken generic       | 88,655         | about 0.10s  |
+
+  The counters were identical across runs. Codex's figures differ slightly because its fixture
+  differs. The ordering is the same: the repair has *more* instantiations and checks about five
+  times faster.
+
+**Settled:**
+1. **Scope:** compile-time checking is the core. Erasure gets one early beat: Oded's faster version
+   and the safe one emit identical JavaScript, so "faster" means the check, not the app. Ch16 owns
+   runtime validation, and gets one line at most if someone conflates the two. Don't make the
+   erasure beat the Turn.
+2. **The catalogue is mixed,** with at least one placeholder-free message. Linoy's original
+   signature is the *optional* tuple union, which really buys optional arity and correlated tuple
+   forwarding. Her type bought something, and the page shows what.
+3. **The hook is a compile-time complaint, measured.** Oded's PR makes `t` take `key: string,
+   params?: Record<string, string>`. The check really gets faster.
+   - **What the PR gives up, from the implemented `t`:** `t("shop.crat", …)` prints `shop.crat`, and
+     a missing count prints `Hello A, {count} items`.
+   - **No editor-latency claim.** Nobody on the page says the editor lags because of `t`, unless the
+     page measures it, and it can't.
+4. **Measurement one part at a time.** Gil isolates:
+   - key enumeration;
+   - dependent params;
+   - the call formulation.
+
+   Each of these is labelled as a counterfactual, not as an additive bill. "Key checking is free"
+   is dropped: say what the probe shows. The `string` baseline must not still compute `Key`.
+5. **The tempting generic fails one real caller.** Noam's caller passes a union-valued key (for
+   example, a function returning `"shop.cart" | "shop.hello"`), and the generic accepts params for
+   the wrong message. It's one beat, with a Ch9 callback at most. Don't reteach distribution.
+6. **The Turn is the distributed whole tuple, the working repair, showing more instantiations and
+   much less check time.** The team stops treating one counter as the bill. Gil doesn't declare a
+   measurement sufficient beforehand, so nobody looks foolish. The trace attributes the union's cost
+   to relation work against the large `Args` union.
+   - Resolve the trace's types through the legend. Don't hard-code type IDs or sampled event counts,
+     and don't claim "2,000 comparisons per call".
+   - The precomputed ParamMap counterexample (fewer instantiations, slower) stays in validation, or
+     one line if Linoy proposes code generation. There's no generator subplot.
+7. **The Verdict is local:**
+   - Take the distributed tuple.
+   - Keep key, placeholder and arity checks, and the runtime body.
+   - Record the workload and the caller set the speedup preserves.
+   - A later proposal to remove a check still needs a measured benefit, the mistakes it newly
+     accepts, and what catches them or which risk is accepted.
+
+   It isn't open. The evidence decides this case.
+8. **Timing on the page and in the check.**
+   - **The page:** repeated, untraced check times on the named generated fixture, with their
+     provenance: the compiler, the profile, `--checkers 1`, the number of runs, and that they're
+     medians. Round honestly. The shop is fictional, and the page claims nothing about real projects
+     or about TypeScript 7 versus earlier compilers.
+   - **The check:** it asserts generation, key, call and distinct-key counts, diagnostics, accepted
+     calls, emit identity, and exact counters under a pinned configuration (`--checkers 1`, the book
+     profile, pinned sources). It records times as evidence and **never** fails on them.
+   - **`checks/README.md`** documents rebaselining the counters on a compiler upgrade.
+   - **The printed counters come from the same profile the check asserts.**
+9. **Principle:** Daniel, with Codex's direction in §7:
+   - name which performance is claimed;
+   - a fixed workload and configuration, changing one suspected part, with time measured
+     repeatedly; counters explain work and don't convert to seconds, and a trace locates it;
+   - write down the accepted calls and forbidden combinations that must survive, because rejecting
+     the same typo isn't enough;
+   - if you remove a check, state what newly gets through and what catches it, or the risk you
+     accept.
+
+   It's stated as requirements with their stakes, not a flag list. No "fixed across machines", and
+   no blanket "safety costs only check time".
+10. **The reader cases** are Codex's four (§7): the uncontrolled 30% route PR, the brand's runtime
+    allegation, the faster emitter that fails a forwarded caller, and the two-million-instantiation
+    count mistaken for a budget. Each has its follow-up.
+11. **Cast:** Daniel, Gil, Oded, Noam and Linoy, five in all. Gil designs the comparisons; Daniel
+    explains what the compiler output does and doesn't establish. Noam is not data-ignorant.
+
+**Fun guardrails, because this subject can drown in tables:**
+- **At most two count tables on the page,** each small. Diagnostics are trimmed to the lines that
+  matter. Never print the 2,000-entry catalogue: show three messages and say how the fixture is
+  generated (the generator can be a short fence).
+- **The scenes readers should retell:**
+  - Oded's faster `t` printing `Hello A, {count} items` to a customer;
+  - "same 387 bytes";
+  - the fast generic letting Noam's caller through;
+  - the repair that "does more work" and finishes five times sooner.
+- Length 2,300–3,000 words.
+
+**Not adopted:** nothing material. The singleton-key overload stays out, as Codex recommends.
