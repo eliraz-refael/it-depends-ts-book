@@ -25,7 +25,7 @@ The [master plan](../../PLAN.md) remains at the repository root.
 | 24 — Migration strategies | [Plan](CH24-PLAN.md) | [Review](CH24-REVIEW.md) |
 | 25 — Monorepo type sharing | [Plan](CH25-PLAN.md) | [Review](CH25-REVIEW.md) |
 | 26 — Testing typed code | [Plan](CH26-PLAN.md) | [Review](CH26-REVIEW.md) |
-| 27 — Performance vs safety | [Plan](CH27-PLAN.md) | Planning |
+| 27 — Performance vs safety | [Plan](CH27-PLAN.md) | [Draft 1 self-review](CH27-REVIEW.md) |
 
 The [voice review](VOICE-REVIEW.md) covers the prologue and early chapters.
 The [Chapter 3 pilot](CH3-PILOT.md) records the author-approved calibration for

@@ -10,7 +10,7 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 ## Current Phase: Act IV — The Real World
 
-**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all twenty-four completed chapters. Recheck the stable release and rerun the full suite before publication.
+**Compiler baseline:** TypeScript **7.0.2**, with locked example dependencies. Run `npm ci` and `npm run check`; [coverage and upgrade procedure](checks/README.md) apply to all drafted chapters. Recheck the stable release and rerun the full suite before publication.
 
 Act III is complete: Chapter 23 merged as PR #25. Act IV opens with **migration strategies**. Its [plan](docs/editorial/CH24-PLAN.md) starts from a verified incident: converting a CommonJS module to a TypeScript default export changes what its unconverted JavaScript callers receive from `require`, while the compiler and the converted file's own test stay green. The challenge and settlement lead to a local Verdict: preserve the loading contract, retain the old caller test, and combine global JS checking with explicit legacy opt-outs and conversion-specific caller review. Draft 3 addresses the targeted review: the retained require test gets its win, the experiment distinguishes rewriting that test from preserving it, and the checking rollout and next-PR money branch are explicit. Three Principle-only reads, a full read, a targeted recheck and two formal reviews later, it is [jointly approved](docs/editorial/CH24-REVIEW.md) and merged as PR #26.
 
@@ -18,12 +18,14 @@ Chapter 25, **monorepo type sharing**, is [jointly approved](docs/editorial/CH25
 
 Chapter 26, **testing typed code**, is [jointly approved](docs/editorial/CH26-REVIEW.md) and merged as PR #28. Its [plan](docs/editorial/CH26-PLAN.md) starts from a verified review incident: a `@ts-expect-error` test stays green after `ship` is widened to accept drafts, because the directive is now suppressing a stale fixture's missing field. Codex's challenge corrected the choice (usage tests can catch `any`) and settled a local Verdict: usage tests with valid fixtures for `ship`, an exact assertion only for the status callers rely on, and every added or moved test shown red, both for file coverage and for its promise, under the commands CI runs. Three Principle-only reads, a full read, a targeted recheck and two formal reviews later, the final diff review made one prose-only Principle edit.
 
+Chapter 27, **performance vs safety**, has draft 1 and a [self-review](docs/editorial/CH27-REVIEW.md), following the [settled plan](docs/editorial/CH27-PLAN.md#settlement-after-codexs-challenge-2026-10-29). It reaches a local Verdict on a distributed tuple signature that preserves the translation callers while reducing measured checking time. The repair has more instantiations, which makes the counter/time distinction the Turn. The check pins the book profile and one checker, verifies caller behavior and emit identity, and records timings without asserting them. Independent readers and Claude's formal review are pending.
+
 ### Act IV tasks
 
 - [x] Ch24: `01-migration-strategies.md` — which calls the compiler checks while JavaScript and TypeScript share a program, and what to check before the next conversion; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #26
 - [x] Ch25: `02-monorepo-type-sharing.md` — public package contracts, source-reading dev checks and current release artifacts; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #27
 - [x] Ch26: `03-testing-typed-code.md` — type tests that can fail, exact versus usage assertions, and the files the check compiles; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #28
-- [ ] Ch27: `04-performance-vs-safety.md`
+- [ ] Ch27: `04-performance-vs-safety.md` — draft 1 and self-review written; independent readers and formal review pending
 
 ### Completed Act III work
 
