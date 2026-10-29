@@ -30,10 +30,12 @@ const permitted=files(block('// src/orders.ts — replace ship'));
 const helpers=files(block('// src/order-row.ts\n'));
 const assignment=files(block('// test/ship.test.ts — import orderRow'))[tests];
 const comparison=files(block('// test-support/types.ts'));
-const negative=files(block('// test/ship.test.ts — add after row'))[tests];
+const negative=files(block('// test/ship.test.ts — temporarily replace the Row assertion'))[tests];
 const flatReturn=files(block('// src/order-row.ts — replace the return'))[rowFile].trim();
 const statusAssertion=files(block('// test/ship.test.ts — replace the Row'))[tests];
-const cardTest=files(block('// test/ship.test.ts — also import paidCard'))[tests];
+const runtime=files(block('// test/ship.test.ts — runtime tests after the split'))[tests];
+const globMatch=manuscript.match(/`node --test "(test\/\*\*\/\*\.test\.ts)"`/);assert(globMatch,'Printed runtime glob');
+const runtimeGlob=globMatch[1];
 const compileOnly=files(block('// type-tests/ship.types.ts\n'))[typesFile];
 const falseAssertion=files(block('// type-tests/ship.types.ts — temporary'))[typesFile];
 const fixedInclude=JSON.parse(block('{\n  "include"'));
@@ -48,7 +50,7 @@ function directiveId(prefix,operation) {
  const lines=fences[i].body.split('\n'),j=lines.findIndex(l=>l.includes(operation));
  assert(lines[j-1].includes('@ts-expect-error'));return `${i}:${j-1}`;
 }
-const ids={inline:directiveId('// test/ship.test.ts — before','ship({'),draft:directiveId('// test/ship.test.ts — replace the draft','ship(draft)'),row:directiveId('// test/ship.test.ts — add after row','const wrong'),finalDraft:directiveId('// type-tests/ship.types.ts\n','ship(draft)')};
+const ids={inline:directiveId('// test/ship.test.ts — before','ship({'),draft:directiveId('// test/ship.test.ts — replace the draft','ship(draft)'),row:directiveId('// test/ship.test.ts — temporarily replace the Row assertion','const wrong'),finalDraft:directiveId('// type-tests/ship.types.ts\n','ship(draft)')};
 const scratch=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'ts-book-ch26-')));
 const story=path.join(scratch,'story'), results=[];
 const executable=path.join(repo,'node_modules/.bin/tsc');
@@ -84,6 +86,8 @@ function expose(name,file,operation,expected,id) {
  check(name+'-restored');
 }
 function run(name,args=['--test',tests],needles=[],absent=[],status=0,root=story) {
+ // Pin TAP for machine assertions; the narrated logging demonstration explicitly selects spec.
+ if(args.includes('--test') && !args.some(a=>a.startsWith('--test-reporter')))args=[args[0],'--test-reporter=tap',...args.slice(1)];
  const output=command(name,root,process.execPath,args,status);
  for(const s of needles)assert(output.includes(s),name+' missing '+s+'\n'+output);
  for(const s of absent)assert(!output.includes(s),name+' unexpected '+s+'\n'+output);
@@ -121,12 +125,16 @@ expose('PR-missing-currency',tests,'ship({',[at(tests,'ship({',2345,currency)],i
 write(story,orders,guardedPr);check('old-signature-still-green');
 expose('old-signature-status',tests,'ship({',[at(tests,'ship({',2322,statusError)],ids.inline);
 // Historical state predates both currency and this PR; the paid fixture loses its old field too.
-write(story,orders,baseOrders.replaceAll('; currency: string',''));
-write(story,tests,replace(baseTests,', currency: "USD"',''));
+assert(manuscript.includes('neither Draft nor Paid has `currency`'));
+assert(manuscript.includes('the paid fixture has no currency field'));
+const historicalOrders=baseOrders.replaceAll('; currency: string','');
+const historicalTests=replace(baseTests,', currency: "USD"','');
+assert(!historicalOrders.includes('currency'));assert(!historicalTests.includes('currency'));
+write(story,orders,historicalOrders);write(story,tests,historicalTests);
 check('history-original-test');
 write(story,orders,replace(read(story,orders),'ship(order: Paid)','ship(order: Order)'));
 check('history-original-catches-widening',[at(tests,'@ts-expect-error',2578,unused)]);
-write(story,orders,baseOrders.replaceAll('; currency: string',''));check('history-restored');
+write(story,orders,historicalOrders);check('history-restored');
 write(story,orders,prOrders);write(story,tests,baseTests);check('return-to-current-PR');
 write(story,tests,replace(baseTests,oldDraftBlock,validDraft));
 check('valid-draft-exposes-widening',[at(tests,'@ts-expect-error',2578,unused)]);
@@ -154,7 +162,8 @@ expose('negative-result-paid-not-draft',tests,'const wrong',[at(tests,'const wro
 write(story,rowFile,anyRow(initialRow));
 check('negative-result-catches-any',[at(tests,"@ts-expect-error: a paid",2578,unused)]);
 write(story,rowFile,initialRow);check('negative-result-restored');
-write(story,tests,read(story,tests)+comparison[tests]);check('both-result-tests-restored');
+// The alternative is temporary: remove wrong and its directive before restoring Row.
+write(story,tests,replace(read(story,tests),negative,comparison[tests]));check('whole-result-assertion-restored');
 write(story,rowFile,flatRow);check('flattening-breaks-whole-equality',[at(tests,'type Row',2344,falseType)]);
 const withWhole=read(story,tests);write(story,tests,replace(withWhole,comparison[tests],''));
 check('flattened-admin-and-usage-still-compile');
@@ -162,29 +171,39 @@ assert.equal(run('flattened-admin-runtime',['--input-type=module','-e',cardProbe
 write(story,tests,replace(withWhole,comparison[tests],statusAssertion));check('assert-promised-status');
 write(story,rowFile,initialRow);check('status-assertion-before-flattening');
 write(story,rowFile,flatRow);check('status-assertion-after-flattening');
-// Independently mutate inference with the negative test removed to expose the equality's contribution.
-const bothTests=read(story,tests);write(story,tests,replace(bothTests,negative,''));
+// The alternative usage assertion has already been removed; these regressions exercise Status.
+const selectedTests=read(story,tests);assert(!selectedTests.includes('const wrong'));
 write(story,rowFile,anyRow(flatRow));check('status-alone-catches-any',[at(tests,'type Status',2344,falseType)]);
 write(story,rowFile,flatRow);check('status-alone-restored');
 write(story,rowFile,replace(flatRow,'status: S) {','status: S): { id: string; status: Order["status"] } {'));
 check('status-widening-breaks-contract',[at(tests,'type Status',2344,falseType),at(tests,'const expected',2322,"Types of property 'status' are incompatible."),at('src/admin.ts','return renderPaid',2345,'Types of property \'status\' are incompatible.')]);
-const selectedTests=replace(bothTests,negative,'');
 write(story,rowFile,flatRow);write(story,tests,selectedTests);check('status-widening-restored');
 // The page's temporary logging is derived from its described location, then removed byte-for-byte.
 assert(manuscript.includes('clears `shipped` immediately before `ship(draft)`'));
 write(story,tests,replace(selectedTests,'  // @ts-expect-error: can\'t ship a draft','  shipped.length = 0;\n  // @ts-expect-error: can\'t ship a draft').replace('  ship(draft);','  ship(draft);\n  console.log("shipped:", shipped);'));
 check('logged-negative-still-type-checks');
-run('negative-call-executes',undefined,["shipped: [ 'o2' ]"],['not ok']);
+const recorded=run('negative-call-executes',['--test','--test-reporter=spec',tests],["shipped: [ 'o2' ]"]);
+assert(recorded.split(/\r?\n/).includes("shipped: [ 'o2' ]"),'Exact printed spec-reporter line');
 write(story,tests,selectedTests);check('logging-removed');
-// Move all compile-only expressions; runtime retains its two positive calls and gains the card test.
-const runtime=replace(replace(baseTests,oldDraftBlock,''),'type Paid, type Draft','type Paid, type PreOrder')+permitted[tests]+'import { paidCard } from "../src/admin.ts";\n'+cardTest;
+// The complete final runtime fence is authoritative; retain both original test bodies.
+assert(runtime.includes(baseTests.slice(baseTests.indexOf('test("ships a paid order"'),baseTests.indexOf('test("can\'t ship a draft"')).trim()));
+assert(runtime.includes(permitted[tests].slice(permitted[tests].indexOf('test(')).trim()));
+assert(!runtime.includes('@ts-expect-error'));assert(!runtime.includes('orderRow'));
+const runtimeNames=[...runtime.matchAll(/test\("([^"]+)"/g)].map(m=>m[1]).sort();
+assert.equal(runtimeNames.length,3);
 write(story,tests,runtime);
-const logCalls='\nimport { shipped } from "../src/orders.ts";\nconsole.log("TYPE_FILE_EXECUTED");\nconsole.log("shipped:", shipped);\n';
-write(story,'test/ship.types.ts',compileOnly+logCalls);
-run('types-suffix-under-test-still-executes',['--test'],['test/ship.types.ts','TYPE_FILE_EXECUTED',"shipped: [ 'o2' ]"],['not ok']);
+// Narrated move: the reset and log travel with the draft call after removing its callback.
+const loggedTypes=replace(replace(replace(compileOnly,'import { ship, type Draft }','import { ship, shipped, type Draft }'),"// @ts-expect-error: can't ship a draft","shipped.length = 0;\n// @ts-expect-error: can't ship a draft"),'ship(draft);','ship(draft);\nconsole.log("shipped:", shipped);');
+const marker='\nconsole.log("TYPE_FILE_EXECUTED");\n'; // Validation-only execution marker.
+write(story,'test/ship.types.ts',loggedTypes+marker);
+list('types-suffix-already-omitted',[tests],['test/ship.types.ts']);
+run('types-suffix-under-test-still-executes',['--test'],['test/ship.types.ts','TYPE_FILE_EXECUTED',"# shipped: [ 'o2' ]"],['not ok']);
+// Control for the convention eventually chosen in the Verdict, even inside test/.
+run('runtime-glob-excludes-types-suffix',['--test',runtimeGlob],runtimeNames,['TYPE_FILE_EXECUTED','ship.types.ts','not ok']);
 fs.mkdirSync(path.join(story,'type-tests'));fs.renameSync(path.join(story,'test/ship.types.ts'),path.join(story,typesFile));
-// Check both the actual explicit command and default discovery, including accidental imports.
-run('outside-test-explicit-runtime',['--test',tests],['renders the paid card'],['TYPE_FILE_EXECUTED','shipped:','not ok']);
+write(story,typesFile,compileOnly); // Remove the narrated reset/log after the move.
+write(story,typesFile,compileOnly+marker); // Instrument selection independently of the page's logging.
+run('outside-test-provisional-single-file',['--test',tests],['renders the paid card'],['TYPE_FILE_EXECUTED','shipped:','not ok']);
 run('outside-test-default-discovery',['--test'],['renders the paid card'],['TYPE_FILE_EXECUTED','ship.types.ts','not ok']);
 write(story,typesFile,compileOnly+falseAssertion);check('moved-false-assertion-invisible');
 list('omitted-type-file',[tests],[typesFile]);
@@ -198,7 +217,25 @@ write(story,orders,finalOrders);check('moved-real-regression-restored');
 write(story,typesFile,compileOnly+falseAssertion);
 run('Node-erases-false-assertion',['--test',typesFile],['type-tests/ship.types.ts'],['not ok']);
 write(story,typesFile,compileOnly);check('Node-demonstration-restored');
-run('final-runtime-command',undefined,['ships a paid order','ships a pre-order','renders the paid card'],['not ok','ship.types.ts',"can't ship a draft"]);
+// Verdict: the provisional single-file command misses an added, failing runtime test.
+const addedTest='test/admin.test.ts';
+const runtimeImports=runtime.split('\n').filter(l=>l.startsWith('import ') && (l.includes('node:')||l.includes('../src/admin.ts'))).join('\n');
+const addedBody=replace(replace(replace(runtime.slice(runtime.indexOf('test("renders the paid card"')),'renders the paid card','new runtime card'),'paidCard("o1")','paidCard("o4")'),'Paid order o1','Paid order o4');
+const addedGood=runtimeImports+'\n'+addedBody;
+write(story,addedTest,replace(addedGood,'"Paid order o4"','"Wrong card"'));
+write(story,typesFile,compileOnly+marker);
+check('added-runtime-test-compiles');
+list('added-runtime-test-in-compiler',[tests,addedTest,typesFile],[]);
+function selectedNames(output){return [...output.matchAll(/^# Subtest: (.*)$/gm)].map(m=>m[1]).sort();}
+const missed=run('single-file-misses-added-failure',['--test',tests],runtimeNames,['new runtime card','TYPE_FILE_EXECUTED','not ok']);
+assert.deepEqual(selectedNames(missed),runtimeNames);
+const selected=run('glob-catches-added-failure',['--test',runtimeGlob],['new runtime card','not ok'],['TYPE_FILE_EXECUTED','ship.types.ts'],1);
+assert.deepEqual(selectedNames(selected),[...runtimeNames,'new runtime card'].sort());
+write(story,addedTest,addedGood);check('added-runtime-test-corrected');
+const allPass=run('glob-runs-both-runtime-files',['--test',runtimeGlob],['new runtime card'],['TYPE_FILE_EXECUTED','ship.types.ts','not ok']);
+assert.deepEqual(selectedNames(allPass),[...runtimeNames,'new runtime card'].sort());
+fs.unlinkSync(path.join(story,addedTest));write(story,typesFile,compileOnly);check('runtime-discovery-control-restored');
+run('final-runtime-glob',['--test',runtimeGlob],runtimeNames,['not ok','ship.types.ts',"can't ship a draft"]);
 expose('final-draft-reason',typesFile,'ship(draft)',[at(typesFile,'ship(draft)',2345,"Type '\"draft\"' is not assignable to type '\"preorder\"'.")],ids.finalDraft);
 assert.deepEqual([...coveredDirectives].sort(),directiveIds.sort(),'Every printed directive has an exposed diagnostic');
 // Extra regression controls preserve and restore the final repository exactly.

@@ -1,3 +1,48 @@
+# Chapter 26 — draft 2 self-review
+
+Status: **DRAFT 2 FROZEN; PRINCIPLE-ONLY AND TARGETED RECHECK PENDING**, 2026-10-29. Revised Principle-only reading and targeted full-chapter recheck are pending; this is Codex's self-review, not their result.
+
+Manuscript: [It Can't Be Green](../../book/04-the-real-world/03-testing-typed-code.md).
+Review addressed: [Claude's draft 1 review](ch26/CLAUDE-REVIEW.md), committed with both verbatim reader reports at `1ac14be`.
+Snapshot: [DRAFT2-SNAPSHOT.json](ch26/DRAFT2-SNAPSHOT.json).
+
+## Response to the review
+
+1. **Repository states are explicit.** All three opening replies now have speakers. The historical probe restores both source and tests: Draft and Paid have no currency field, the paid fixture loses it too, and the original inline draft fixture is restored. The check asserts that neither historical source nor historical tests contain currency before applying the old widening. The Paid-only experiment is labelled temporary, and Oded's next line chooses the permanent Paid | PreOrder parameter.
+2. **The helper experiment has one fewer carried state.** The forbidden status assignment explicitly replaces Row for one experiment. At its end, Noam removes both the any annotation and that entire assignment/directive, then restores Row. The forbidden assignment no longer survives into the flattening scene. Guy chooses the flat return, and the prose states that Noam leaves it in place after testing the narrower Status assertion. Guy explains why `expected` remains: it preserves the positive check of the card's input fields even if the caller later moves. The ampersand joke now concerns the inferred hover, not source code that never contained an ampersand.
+3. **The split is reconstructible.** The page names the expressions and imports moved into test/ship.types.ts, the removed callback wrapper, and the temporary recorder reset/log that accompany the draft call. Guy asks to *add* the runtime card assertion, and Oded adds it before the discovery experiment. After moving the compile-only file to type-tests/, he removes the reset/log. The complete runtime file, including imports, both order fixtures and all three runtime tests, replaces the old partial addition fence. The validator extracts that final file directly and checks that the original positive test bodies survive.
+4. **The runtime command's new hole is closed.** The single-file command is provisional. Eden challenges it in the Verdict, and Oded chooses `node --test "test/**/*.test.ts"` for CI. An added failing card test in test/admin.test.ts is missed by the single-file command and caught by the glob. Correcting its expected text makes both runtime files pass; removing the temporary test restores the final repository. The check compares the actual TAP test names, not just exit status, and asserts that compile-only execution markers remain absent. It also tests the glob against the earlier test/ship.types.ts location, where default discovery executes that file.
+5. **The earlier compiler omission is acknowledged once.** Eden points out at the Turn that test/ship.types.ts was already unchecked before the second move. A new file-list query verifies that state, while the new runtime-test query verifies inclusion of the added admin test. The original omitted-file, repaired-include and Node-declaration membership queries remain. There are now five file-list queries in this chapter.
+6. **The Principle keeps its first paragraph's distinction and shortens the second.** It names the CI type check, says to change code so a written promise becomes false, and consistently uses “promise.” Paragraph two starts from an unsuppressed call that compiles, then requires every other argument and field to stay valid when introducing the intended violation. It states what an assignment test accepts and gives the runner rule a check: inspect which files each compiler/runtime command selects. The explanation of the runtime call and the remedies for any stay in the scenes. The last sentence about a body keeping its type promise remains.
+7. **Narration and voices are tightened.** Oded speaks between the opening test and PR fences; Noam identifies the commands, and the config follows Eden's first diagnostic instruction. Eden gets an experience-based line about inherited suppression comments without retelling the billing incident. Sahar's prompts concern the card's promise and whether the comparison earns its place. The post-repair results move into Oded's response, the Equal explanation loses the redundant Expect tutorial, and Guy owns the caller comparison. The “It shipped” explanation is reduced to the documentation link after the demonstrated effect. The Turn loses Eden's recap and Sahar's tagline.
+8. **The Verdict advances the decision.** It introduces the runtime glob and demonstrates its coverage, then states the team's procedure for the next added or moved type test. It does not re-decide the helper or shipping signature. The “I was finished” closing beat remains. Noam's JSON.parse observation is self-contained; it no longer requires the reader to recall Ch7. The displayed shipment line is explicitly from the spec reporter, and the checker pins that reporter for the assertion. Other runner checks use explicit TAP.
+
+## Self-review and remaining reading questions
+
+The substantive ruling is unchanged: usage tests protect the shipping input, the paid-status assertion protects the helper's chosen inference promise, and runtime assertions check actual records and text. Both exact comparison and negative usage still demonstrate detection of any independently. The counterexample is not weakened merely because the team chooses one assertion for the final file. Every printed directive still has its exposed diagnostic checked at the source line, and every deliberately broken narrative state has a restoration.
+
+The revised forbidden-call instruction rejects case (a)'s missing destination before introducing the unbranded-amount change. Replacing a negative unbranded number with a positive one does not fix that missing field or establish the brand. For case (b), assignment alone still admits any, while an explicit User[] annotation still needs runtime verification. The first paragraph now makes the written promise the basis for case (c)'s chosen distinctions; readonly still needs a check of the prohibited write rather than a conclusion from mutual assignment. Case (d) now gets an explicit selection check for both commands without disclosing Node's discovery rule in the Principle. These are my applications, not a substitute for the requested isolated reader.
+
+The complete runtime fence costs space but eliminates the earlier import/fixture reconstruction exercise. The helper remains the densest section: it still needs the assignment, two competing assertions and the flattening counterexample to make the local choice fair. The removed carried `wrong` assignment should make that sequence easier to follow; the targeted reader should verify that it does. The runtime glob adds one small experiment to the Verdict because otherwise its coverage would be another untested assurance. The retold “It shipped” scene and the refresh callback are preserved.
+
+The historical probe, the optional-flag and readonly controls, the typed JSON.parse runtime boundary, and the no-route Node declaration controls remain. In the latter, types:[] produces TS2591; the printed types:[node] configuration instead stops at TS2688 until the explicit dependency route is supplied. The installed @types/node is still 26.5.1 and the runtime exercised is still Node 22.23.4; the chapter uses only node:test's test and node:assert/strict.
+
+## Validation and freeze
+
+The targeted check passed: **16 fences / 71 compiler cases / 18 runtime groups / 5 file-list queries / 4 printed directive occurrences**. Final prose-only clarifications then moved Oded's admission ahead of the PR fence and stated when the card runtime test is added; the full run covers the final manuscript. The same locked installation is used; no new clean-install claim is made. The plan, draft 1 snapshot, Claude's review and both reader reports are unchanged.
+
+The full `npm run check` passed on TypeScript **7.0.2** / Node **22.23.4**: **442 fences / 664 compiler cases / 303 runtime groups**, plus two compiler-default cases, two source searches and seven file-list queries. The final manuscript, validator and suite-runner hashes match the inputs recorded before that run. Coverage is updated in checks/README.md; checks/run.cjs already includes Chapter 26 and is unchanged.
+
+Draft 2 is **2514 words**, counting the complete Markdown including code. The Principle's second paragraph is **61 words**, down from 110; its first retains the two distinct compiler checks. The frozen manuscript SHA-256 is `38e3e1fa1676d20171f8adab10064377fccb6bc7ba543136fed9d5ada21da291`. [DRAFT2-SNAPSHOT.json](ch26/DRAFT2-SNAPSHOT.json) records the fence hashes, tool versions, coverage and validation-log hashes. The full log remains untracked at `.probe/codex/draft2/full-check.log`.
+
+This is a local draft for Claude's revised Principle-only read and targeted recheck. The helper's density remains the main reading question; no independent approval is claimed.
+
+---
+
+## Historical draft 1 record
+
+The record below describes draft 1. Its pending review was completed in `1ac14be`; draft 2 above addresses those findings.
+
 # Chapter 26 — draft 1 self-review
 
 Status: **DRAFT 1 FROZEN; INDEPENDENT REVIEW PENDING**, 2026-10-28. Independent readers and Claude's formal review are pending. This is Codex's own assessment, not an isolated read or approval.
