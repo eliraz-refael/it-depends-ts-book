@@ -16,13 +16,13 @@ Act III is complete: Chapter 23 merged as PR #25. Act IV opens with **migration 
 
 Chapter 25, **monorepo type sharing**, is [jointly approved](docs/editorial/CH25-REVIEW.md) and merged as PR #27. Its [plan](docs/editorial/CH25-PLAN.md) starts from a verified puzzle: the compiler rejects a `Money` where a `Money` is expected, because one program reaches the same package through its source and through its built declarations. Cast past the error, and the service throws, because it really does hold two `Money` classes. Codex's challenge settled it on a local Verdict: export the parser publicly, keep a source-reading development check, and release from a dependency-aware build over an explicit reference graph, run as the image installs it. Three Principle-only reads, a full read, a targeted recheck and two formal reviews later, the final diff review made one prose-only Principle edit.
 
-Chapter 26, **testing typed code**, is [planned](docs/editorial/CH26-PLAN.md), and Codex's challenge settled it on a local Verdict: usage tests for `ship`'s contract with valid fixtures, exact assertions only for a promised inference, and every new or moved test shown to catch its regression with the command the team trusts. Its verified starting point: a `@ts-expect-error` test accepts any error on its line, so a loosened signature leaves "can't ship a draft" green while the directive quietly suppresses a fixture's missing field instead.
+Chapter 26, **testing typed code**, is [jointly approved](docs/editorial/CH26-REVIEW.md) and awaits the author's review. Its [plan](docs/editorial/CH26-PLAN.md) starts from a verified review incident: a `@ts-expect-error` test stays green after `ship` is widened to accept drafts, because the directive is now suppressing a stale fixture's missing field. Codex's challenge corrected the choice (usage tests can catch `any`) and settled a local Verdict: usage tests with valid fixtures for `ship`, an exact assertion only for the status callers rely on, and every added or moved test shown red, both for file coverage and for its promise, under the commands CI runs. Three Principle-only reads, a full read, a targeted recheck and two formal reviews later, the final diff review made one prose-only Principle edit.
 
 ### Act IV tasks
 
 - [x] Ch24: `01-migration-strategies.md` — which calls the compiler checks while JavaScript and TypeScript share a program, and what to check before the next conversion; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #26
 - [x] Ch25: `02-monorepo-type-sharing.md` — public package contracts, source-reading dev checks and current release artifacts; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #27
-- [ ] Ch26: `03-testing-typed-code.md` — type tests that can fail, exact versus usage assertions, and the files the check compiles; plan settled, drafting
+- [ ] Ch26: `03-testing-typed-code.md` — type tests that can fail, exact versus usage assertions, and the files the check compiles; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; jointly approved, awaiting the author
 - [ ] Ch27: `04-performance-vs-safety.md`
 
 ### Completed Act III work
@@ -185,7 +185,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Act I: The Type System      | Done            | 6 chapters; calibrated voice passes complete |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
 | Act III: Patterns & Design  | Done            | Ch14–23 reviewed, checked and merged (10 of 10) |
-| Act IV: The Real World      | **IN PROGRESS** | 4 chapters; Ch24–25 merged, Ch26 drafting |
+| Act IV: The Real World      | **IN PROGRESS** | 4 chapters; Ch24–25 merged, Ch26 jointly approved, awaiting the author |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |
 

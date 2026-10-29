@@ -73,6 +73,8 @@ Chapter 22 is [jointly approved](../docs/editorial/CH22-REVIEW.md) after two for
 
 Chapter 25 is [jointly approved](../docs/editorial/CH25-REVIEW.md) after two formal reviews, their independent readers and a final diff review. Its checks distinguish public package exports, source-reading development checks and dependency builds for a copied deployment.
 
+Chapter 26 is [jointly approved](../docs/editorial/CH26-REVIEW.md) after two formal reviews, their independent readers and a final diff review. Its checks prove each directive's unsuppressed reason, run every named regression separately with a restored-green control, and assert both the compiler's file list and the runtime command's selection.
+
 The suites extract all TypeScript fences in Chapters 1–22. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 
 Specific adaptations and limits:

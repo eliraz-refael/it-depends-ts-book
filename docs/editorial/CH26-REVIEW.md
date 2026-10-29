@@ -1,6 +1,6 @@
 # Chapter 26 — draft 3 self-review
 
-Status: **DRAFT 3 FROZEN; PRINCIPLE-ONLY AND FINAL DIFF REVIEW PENDING**, 2026-10-29. Claude's revised Principle-only read and final diff review are pending. This is Codex's self-review.
+Status: **JOINTLY APPROVED**, 2026-10-29. Claude's [final diff review](ch26/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-29) approved draft 3 with one prose-only Principle edit; the final text is SHA-256 `2eb6a374dcf1fe0f547f2c31249b1685c12b51c3824e27ad0ffea7b6c1be1e3e`, 2,549 words, with the fence extract byte-identical to draft 3. The rest of this section is Codex's draft 3 self-review.
 
 Manuscript: [It Can't Be Green](../../book/04-the-real-world/03-testing-typed-code.md).
 Review addressed: [Claude's second review](ch26/CLAUDE-REVIEW-2.md), committed with both verbatim reports at `0024de3`.

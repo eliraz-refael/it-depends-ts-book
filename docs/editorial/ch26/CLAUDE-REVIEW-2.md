@@ -136,3 +136,71 @@ Codex revises to draft 3. Update the checks for:
 Run the full `npm run check`, freeze `ch26/DRAFT3-SNAPSHOT.json`, and commit locally with these
 records. Then I'll run a Principle-only reader on the revised Principle, and do my final diff
 review. No further full reader unless the changes reach beyond the lines above.
+
+## Final diff review (2026-10-29)
+
+Draft 3 (`0817c734…`, `da6c372`) addresses every finding above.
+- **The chapter keeps its own move rule.** After the shipping mutation, Noam asks "And the row?".
+  Oded's `: any` gives TS2344 at Status in `type-tests/ship.types.ts`, while `expected` and the card
+  still compile, and removing it restores green. Status's claim is now what the check shows: it
+  accepts either return form and catches `any`. Widening stays in validation.
+- **The Principle states requirements with their stakes.** "Promise" is defined once ("what callers
+  are allowed to rely on"). The `any` sentence carries its remedy, and the runtime clause says what
+  goes wrong. Neither `test/` nor Node's discovery is named.
+- **The narration is in speech:**
+  - l.110's history is an exchange between Noam and Eden;
+  - the intermediate `test/ship.types.ts` is a fence, which the check extracts and runs;
+  - Eden speaks at the link and in the Verdict's demonstration;
+  - Noam's Verdict line is "Next time, show me the reds before you send me the green."
+- **Slips fixed:** "set" at l.143, Noam named at l.218, Guy and Noam named in the ampersand line,
+  and the card printed through a Node `-e` command.
+- **Guy** owns the card and says why ("I don't want a cast in my caller every time someone tidies
+  this helper").
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md) applied the rule correctly to all
+four cases and follow-ups,** with fixtures for each. Three cases were rated Clear.
+- **(a)** is Clear: the forbidden-call sentence "matches the case".
+- **(b)'s follow-up** is "the best sentence in the Principle. It answers exactly this question."
+- **(c) and (d)'s runtime half** needed inference.
+
+It found two real problems, both in prose:
+- **"They fix representation too—how the type is written—so compare only the parts where that
+  matters"** has two ambiguous antecedents. Worse, "compare only the parts" reads as permission to
+  fall back on bare assignment for the rest, which the next paragraph forbids ("assignment alone
+  accepts it").
+- **"Account for runtime selection"** is "a mood rather than an action".
+
+**My prose-only settlement edit** (the Principle; the fence extract is byte-identical to draft 3):
+- **Paragraph 1:** "An exact comparison also fixes how the type is written, such as an intersection
+  or a single object type. Use it for the parts callers rely on, and check the rest through the
+  operations callers perform." "Operations callers perform" closes the bare-assignment gap without
+  a second rule.
+- **Paragraph 2:**
+  - "A forbidden call under `@ts-expect-error` must be valid…", which names the directive before
+    "the directive";
+  - "check which files your runtime command picks up: code under `@ts-expect-error` still runs if
+    that command selects it";
+  - "Keep runtime assertions for values and effects, because…", replacing "We need runtime
+    assertions too".
+
+**Not adopted from the final reader:**
+- **Naming `readonly` and optional properties in the Principle.** Both are observable to callers and
+  stay in validation, per the settlement. "The operations callers perform" covers them.
+- **Naming Node's discovery globs.** It would spoil "It shipped". The requirement plus its stake is
+  enough, and the reader solved (d)'s follow-up from it.
+- **Naming an `Equal` helper or a framework in the Principle.** The scene owns the helper. No
+  framework claims.
+
+**Final text:** SHA-256 `2eb6a374dcf1fe0f547f2c31249b1685c12b51c3824e27ad0ffea7b6c1be1e3e`, 2,549
+words, 17 fences, with the fence extract byte-identical to draft 3. `node checks/chapter26.cjs`
+passes (17 / 74 / 18, plus 5 file-list queries). The full `npm run check` exits 0 on the settled
+text in the worktree, and again after a clean `npm ci` in a fresh export, on TypeScript 7.0.2 and
+Node 22.23.4.
+
+**Approved.** The ending is a local Verdict:
+- `ship`'s contract is usage tests: paid and pre-order accepted, and a valid `Draft` refused;
+- `orderRow` keeps the paid-status assertion and the caller's positive check, not the intersection;
+- compile-only tests live where the type check includes them and the runtime glob doesn't select
+  them;
+- every added or moved test is shown red twice (the file is checked, and the promise is protected)
+  before it's called green.

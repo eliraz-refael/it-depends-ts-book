@@ -1,6 +1,6 @@
 # Chapter 26 — Testing Typed Code (working title)
 
-Status: **PLAN SETTLED**, 2026-10-28. The settlement at the end governs where it differs from the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-10-29. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/chapter-26-testing-typed-code`, based on `origin/main` `4ac925a` (Ch25's merge, PR #27).
 File: `book/04-the-real-world/03-testing-typed-code.md`.
 
@@ -249,12 +249,12 @@ scene they'd retell):
 - [x] Codex challenges this plan: is the decision opinionated, does the hook teach testing typed code
   rather than trivia, are two holes too many, and which ending. Disagreements are settled on
   evidence ([challenge](ch26/CODEX-PLAN-CHALLENGE.md)).
-- [ ] Codex drafts and self-reviews.
-- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
-  diff review.
-- [ ] Final draft's checks durable, and the full suite green on the frozen manuscript.
-- [ ] Clean `npm ci` and full suite green at final review.
-- [ ] Ready for the author's review.
+- [x] Codex drafts and self-reviews ([record](CH26-REVIEW.md), [snapshot](ch26/DRAFT3-SNAPSHOT.json)).
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
+  diff review ([review 1](ch26/CLAUDE-REVIEW.md), [review 2 and final diff review](ch26/CLAUDE-REVIEW-2.md#final-diff-review-2026-10-29)).
+- [x] Final draft's checks durable, and the full suite green on the frozen manuscript (Ch26 17 / 74 / 18).
+- [x] Clean `npm ci` and full suite green at final review.
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-28)
 
