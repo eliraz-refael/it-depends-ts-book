@@ -13,7 +13,7 @@ npm run check
 
 ## Coverage
 
-Successful run on **2026-10-28**, TypeScript **7.0.2**, Node **22.23.4**:
+Successful run on **2026-10-29**, TypeScript **7.0.2**, Node **22.23.4**:
 
 | Suite | Code fences | Compiler cases | Runtime scenario groups |
 | --- | ---: | ---: | ---: |
@@ -36,11 +36,12 @@ Successful run on **2026-10-28**, TypeScript **7.0.2**, Node **22.23.4**:
 | Chapter 23 | 15 | 22 | 20 |
 | Chapter 24 | 12 | 31 | 15 |
 | Chapter 25 | 13 | 29 | 16 |
-| Total | **426** | **593** | **285** |
+| Chapter 26 | 17 | 74 | 18 |
+| Total | **443** | **667** | **303** |
 
-Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Chapter 25 includes eight TypeScript and five JSON fences. Earlier chapter counts are TypeScript fences.
+Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Chapter 25 includes eight TypeScript and five JSON fences. Chapter 26 includes fifteen TypeScript and two JSON fences. Earlier chapter counts are TypeScript fences.
 
-Chapter 25 also verifies two compiler file-list queries, separately from its compiler-case count.
+Chapter 25 also verifies two compiler file-list queries; Chapter 26 verifies five. These are separate from the compiler-case counts.
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
 
@@ -71,6 +72,8 @@ Chapter 21 traces two wrapper orders on a manual clock past the job's result, th
 Chapter 22 is [jointly approved](../docs/editorial/CH22-REVIEW.md) after two formal reviews, their independent readers and a final diff review. It compares a persisted rule vocabulary with code-owned templates after repairing a misleading audit record.
 
 Chapter 25 is [jointly approved](../docs/editorial/CH25-REVIEW.md) after two formal reviews, their independent readers and a final diff review. Its checks distinguish public package exports, source-reading development checks and dependency builds for a copied deployment.
+
+Chapter 26 is [jointly approved](../docs/editorial/CH26-REVIEW.md) after two formal reviews, their independent readers and a final diff review. Its checks prove each directive's unsuppressed reason, run every named regression separately with a restored-green control, and assert both the compiler's file list and the runtime command's selection.
 
 The suites extract all TypeScript fences in Chapters 1–22. They supply declarations or earlier examples where context is needed, and compile alternatives separately. Assertions cover successful compilation, intentional diagnostics, and selected inferred types. Runtime checks execute emitted JavaScript for selected claims; coverage of a fence does not mean every possible input or prose claim has a test.
 
@@ -149,6 +152,17 @@ The suite extracts all 12 labelled fences, including the build configuration and
 The five-parameter census is computed from that complete repository with strict omitted, exercising TS7's default. It includes money's cents parameter; the sitemap's existing opt-out adds no diagnostics. The later money JSDoc annotation comes from the prose. In the Turn's explicit experiment, the checked route produces TS2349 while the opted-out sitemap says nothing. The printed configuration permits emit despite that error (compiler exit 2); both runtime calls fail, and the sitemap never reaches its unrelated footer callback. Reading .default fixes only the route: the compiler is green, but the sitemap and old require test still fail. A separate regression rewrites that retained test to read .default too: both tests then pass, while the unchanged sitemap still fails. The compatible export repairs both callers without rewriting the old test.
 
 The original, converted and compatible programs, default and import-equals consumers, object/member inspection, backfill and named-member example have runtime assertions. Diagnostics are compared by source file, line and code; quoted messages and printed outputs are checked against the manuscript. Regressions cover the unannotated route exposing any to a TS caller, JSDoc rejecting 42, removing the sitemap's opt-out, computed require, program-wide noImplicitAny relaxation and explicit strict:false. The runtime failure of the numeric probe remains a fixture-only regression; the shortened prose claims only its compiler behavior. A typed leaf rejects a numeric argument even from a checked JavaScript caller. An imported route remains checked despite exclude; @ts-check in the independent backfill has no effect until that file joins the program. Copying the uncompiled backfill is reproduced separately from compiling it. The money conversion runs as a separate next-PR state derived from the complete repaired repository; the slug-PR state still contains annotated money.js. These are fixture counts and stipulated fictional callers, not an empirical storefront census or effort estimate. No web server, bundler or migration tool is implemented.
+
+## Chapter 26 coverage
+
+The suite extracts all 17 fences, the root ESM setting, and the described temporary callback logging into one evolving review repository. It explicitly restores the pre-March source and tests, with currency absent from both order variants and the paid fixture, and reproduces the original test, the stale fixture under the Paid-only signature, and the PR whose wider parameter changes the suppressed reason. All five printed directive occurrences have their unsuppressed diagnostic code, source location and reason asserted; every exposure restores the directive and recompiles. The valid Draft reports TS2741 against Paid; the final Paid-or-PreOrder signature instead reports TS2345 with a preorder-status mismatch. Required-field evolution fails outside the directive. Paid and pre-order positive calls, the widened-parameter regression and their restored states are checked separately.
+
+The admin paid-card caller is present from the start. The orderRow helper really infers an intersection from Object.assign and a flat object from the replacement literal. Positive assignment alone accepts any; whole-result equality and negative usage catch that regression independently. Flattening preserves the demonstrated caller, field use and assignment but fails the whole-result comparison. Runtime probes compare the row value and exact card output before and after the refactor. The retained exact status assertion survives both representations and uniquely rejects any among the three retained checks. The temporary negative status assignment also detects any; the annotation stays in place while switching assertion styles, then inference is restored once. That alternative assignment is removed before flattening. Widening remains a validation-only control and rejects Status, the admin caller and the positive assignment together. Readonly observability, optional-property flag changes, mutual assignability and a not-any assertion remain validation-only controls. An annotated JSON.parse implementation passes an exact type assertion with a wrong value but fails its runtime assertion; the correct value restores both checks.
+
+Runtime tests are TypeScript and use only node:test's test and node:assert/strict. The temporary fixture has an explicit node_modules symlink to the locked repository installation; file lists assert that @types/node/index.d.ts is selected. The installed declarations are 26.5.1 and the exercised runtime is Node 22.23.4. Without the route, a types:[] control reports TS2591; with the page's types:[node] setting it instead stops at TS2688 for the missing requested library. Adding the route restores that same configuration. The distinction stays off the page.
+
+Node execution demonstrates the forbidden call recording o2 in an in-memory fake; that printed console line is pinned to the spec reporter, while the other runner assertions explicitly use TAP. The intermediate test/ship.types.ts excerpt is extracted with its import, fixture, reset, directive and log; the moved helper checks follow it. Default discovery executes it and records o2. A file-list query confirms it was already omitted by the compiler; a temporary inclusion exposes the excerpt's directive, then restores that omission. After the move to type-tests/, execution markers verify that both the provisional single-file command and default discovery leave it unexecuted. The final runtime file is extracted in full from its fence, including imports and the three runtime tests. The runtime glob is extracted from the Verdict and passed as one literal argument to Node: it excludes the .types.ts file even under test/. A second, intentionally failing runtime file demonstrates that the single-file command stays green while the glob runs both files and fails; correcting the expected card text restores green, then the temporary file is removed. Both test names and absence of the compile-only execution marker are asserted. The original include omits the moved file and permits its false assertion; the repaired include reaches it, then separate shipping and row mutations retest both moved promises. The any return produces only TS2344 at Status in type-tests/ship.types.ts; expected and admin still compile. Each mutation is followed by a restored-green control. Explicit Node execution erases the false assertion and passes. A separate import control shows that an include glob cannot prevent an imported file from joining the program. Compiler membership and Node declaration resolution are checked with five file-list queries, including the added runtime test file. Final source and configuration assertions prevent temporary mutations from leaking into the restored repository. No courier, external storage or production service is exercised, and no timing claim is made.
+
 
 ## Updating the baseline
 

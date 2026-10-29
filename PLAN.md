@@ -14,13 +14,15 @@ This is a new open-source TypeScript book written in Markdown, structured as deb
 
 Act III is complete: Chapter 23 merged as PR #25. Act IV opens with **migration strategies**. Its [plan](docs/editorial/CH24-PLAN.md) starts from a verified incident: converting a CommonJS module to a TypeScript default export changes what its unconverted JavaScript callers receive from `require`, while the compiler and the converted file's own test stay green. The challenge and settlement lead to a local Verdict: preserve the loading contract, retain the old caller test, and combine global JS checking with explicit legacy opt-outs and conversion-specific caller review. Draft 3 addresses the targeted review: the retained require test gets its win, the experiment distinguishes rewriting that test from preserving it, and the checking rollout and next-PR money branch are explicit. Three Principle-only reads, a full read, a targeted recheck and two formal reviews later, it is [jointly approved](docs/editorial/CH24-REVIEW.md) and merged as PR #26.
 
-Chapter 25, **monorepo type sharing**, is [jointly approved](docs/editorial/CH25-REVIEW.md) and awaits the author's review. Its [plan](docs/editorial/CH25-PLAN.md) starts from a verified puzzle: the compiler rejects a `Money` where a `Money` is expected, because one program reaches the same package through its source and through its built declarations. Cast past the error, and the service throws, because it really does hold two `Money` classes. Codex's challenge settled it on a local Verdict: export the parser publicly, keep a source-reading development check, and release from a dependency-aware build over an explicit reference graph, run as the image installs it. Three Principle-only reads, a full read, a targeted recheck and two formal reviews later, the final diff review made one prose-only Principle edit.
+Chapter 25, **monorepo type sharing**, is [jointly approved](docs/editorial/CH25-REVIEW.md) and merged as PR #27. Its [plan](docs/editorial/CH25-PLAN.md) starts from a verified puzzle: the compiler rejects a `Money` where a `Money` is expected, because one program reaches the same package through its source and through its built declarations. Cast past the error, and the service throws, because it really does hold two `Money` classes. Codex's challenge settled it on a local Verdict: export the parser publicly, keep a source-reading development check, and release from a dependency-aware build over an explicit reference graph, run as the image installs it. Three Principle-only reads, a full read, a targeted recheck and two formal reviews later, the final diff review made one prose-only Principle edit.
+
+Chapter 26, **testing typed code**, is [jointly approved](docs/editorial/CH26-REVIEW.md) and awaits the author's review. Its [plan](docs/editorial/CH26-PLAN.md) starts from a verified review incident: a `@ts-expect-error` test stays green after `ship` is widened to accept drafts, because the directive is now suppressing a stale fixture's missing field. Codex's challenge corrected the choice (usage tests can catch `any`) and settled a local Verdict: usage tests with valid fixtures for `ship`, an exact assertion only for the status callers rely on, and every added or moved test shown red, both for file coverage and for its promise, under the commands CI runs. Three Principle-only reads, a full read, a targeted recheck and two formal reviews later, the final diff review made one prose-only Principle edit.
 
 ### Act IV tasks
 
 - [x] Ch24: `01-migration-strategies.md` — which calls the compiler checks while JavaScript and TypeScript share a program, and what to check before the next conversion; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #26
-- [ ] Ch25: `02-monorepo-type-sharing.md` — public package contracts, source-reading dev checks and current release artifacts; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; jointly approved, awaiting the author
-- [ ] Ch26: `03-testing-typed-code.md`
+- [x] Ch25: `02-monorepo-type-sharing.md` — public package contracts, source-reading dev checks and current release artifacts; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #27
+- [ ] Ch26: `03-testing-typed-code.md` — type tests that can fail, exact versus usage assertions, and the files the check compiles; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; jointly approved, awaiting the author
 - [ ] Ch27: `04-performance-vs-safety.md`
 
 ### Completed Act III work
@@ -183,7 +185,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Act I: The Type System      | Done            | 6 chapters; calibrated voice passes complete |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
 | Act III: Patterns & Design  | Done            | Ch14–23 reviewed, checked and merged (10 of 10) |
-| Act IV: The Real World      | **IN PROGRESS** | 4 chapters; Ch24 merged, Ch25 jointly approved, awaiting the author |
+| Act IV: The Real World      | **IN PROGRESS** | 4 chapters; Ch24–25 merged, Ch26 jointly approved, awaiting the author |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |
 

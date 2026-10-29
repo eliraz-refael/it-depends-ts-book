@@ -1,0 +1,134 @@
+{
+  "status": "draft 2 frozen; revised Principle-only read and targeted full-chapter recheck pending",
+  "date": "2026-10-29",
+  "settled_plan_commit": "f1e03c6",
+  "review_commit": "1ac14be",
+  "base_commit": "1ac14be40cc50fd8def1597f2f531b1a72ad8f2c",
+  "path": "book/04-the-real-world/03-testing-typed-code.md",
+  "sha256": "38e3e1fa1676d20171f8adab10064377fccb6bc7ba543136fed9d5ada21da291",
+  "manuscript_mtime_utc": "2026-10-29T11:37:27.365393+00:00",
+  "words": 2514,
+  "word_count_method": "Whitespace-delimited words in the complete Markdown, including code fences.",
+  "code_fences": 16,
+  "fences_by_language": {
+    "json": 2,
+    "typescript": 14
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "typescript",
+      "sha256": "6e8e6730fca17c9f33fd9aa5a3254fcaea8586c5adcef9ff29598f6c6f0cebe6"
+    },
+    {
+      "ordinal": 2,
+      "language": "typescript",
+      "sha256": "032a473c3e8f704f19f0f13c2d99bf83a4a9cea312b2a7c97d44a014ba95f9db"
+    },
+    {
+      "ordinal": 3,
+      "language": "typescript",
+      "sha256": "fcb641f9fb6bf7838ffb3f6fff513f9d0777d1b88138c8a8662407dee9f1021d"
+    },
+    {
+      "ordinal": 4,
+      "language": "json",
+      "sha256": "166157f4e23063043ef5e616639b3704876d0cef1b24fe4b8c0c8c44d98f0bd9"
+    },
+    {
+      "ordinal": 5,
+      "language": "typescript",
+      "sha256": "b4896f05b8ce8313d89435cad0ce74c801e49d7d73806d21ed2130e5010586d9"
+    },
+    {
+      "ordinal": 6,
+      "language": "typescript",
+      "sha256": "dd763666f85a9d3a028e7013f134f336cfa787af2e3e299e6ffbb0f72d1fa6fb"
+    },
+    {
+      "ordinal": 7,
+      "language": "typescript",
+      "sha256": "cfba41b6bed39ef9d9c8d919fc32d62f59bcecf6d057a1274cf3b204c82608ae"
+    },
+    {
+      "ordinal": 8,
+      "language": "typescript",
+      "sha256": "5c40a0d7b7850a5a85463ffc09da48dd8c9e26ee10dd035cb734ebdbd258630a"
+    },
+    {
+      "ordinal": 9,
+      "language": "typescript",
+      "sha256": "efb3c07fac3b301fb8f6cf7c763646f9ccbd10e71e0afd5913d8678058079af0"
+    },
+    {
+      "ordinal": 10,
+      "language": "typescript",
+      "sha256": "3a28faa33ded71bd73ee0fd73b750de3c272002ed1ad7f65a2c866896ea3975a"
+    },
+    {
+      "ordinal": 11,
+      "language": "typescript",
+      "sha256": "df7b1ff8e61680d6b7bb76eecfbf594d8b86fb34a7e876fff88a6f2231c8b9f8"
+    },
+    {
+      "ordinal": 12,
+      "language": "typescript",
+      "sha256": "5baed522e8e1bf8b02f016740451de3298d0d83322d5b815784a50aed9309dc5"
+    },
+    {
+      "ordinal": 13,
+      "language": "typescript",
+      "sha256": "7a7c09037b6f8859d24baeea1003a6f2a51007f4aafb90d0af9a768a1882ab1c"
+    },
+    {
+      "ordinal": 14,
+      "language": "typescript",
+      "sha256": "c7a4884de7078bfc8a397df55999495191f69d3e6957e761f3b000246fb645b5"
+    },
+    {
+      "ordinal": 15,
+      "language": "typescript",
+      "sha256": "85ec7777140baa75c9d5737868a3ea850a8be1942793b3fa8a3552946820f329"
+    },
+    {
+      "ordinal": 16,
+      "language": "json",
+      "sha256": "2272a7f2127de41bedc3977152ceb4e4a4bc65c0c6f3432ac49983167e05e8cb"
+    }
+  ],
+  "validator_sha256": "39b732898840f6df106f2b58f34ebad4d740dffeaecb6abe72e55ca0f9de6bc0",
+  "suite_runner_sha256": "5429cb6d8d967e66fc4798ac610ef482c6f75df64bbeaac1ed5cdf38a156c161",
+  "typescript": "7.0.2",
+  "node": "v22.23.4",
+  "node_declarations": "26.5.1 (existing transitive lockfile dependency)",
+  "validation": {
+    "installation": "Same locked installation used for draft 1. No new clean-install claim.",
+    "targeted_suite": "Exit 0 at 16 fences / 71 compiler cases / 18 runtime groups / 5 file-list queries / 4 directive occurrences. The full run also covers the final prose-only clarifications; fences and validator were unchanged.",
+    "full_suite": "npm run check: exit 0 on this exact manuscript, validator and suite runner; all input hashes verified unchanged after execution.",
+    "chapter_counts": {
+      "fences": 16,
+      "compiler_cases": 71,
+      "runtime_groups": 18,
+      "file_list_queries": 5,
+      "directive_occurrences": 4
+    },
+    "book_counts": {
+      "fences": 442,
+      "compiler_cases": 664,
+      "runtime_groups": 303,
+      "default_cases": 2,
+      "searches": 2,
+      "file_list_queries": 7
+    },
+    "full_suite_manuscript_sha256": "38e3e1fa1676d20171f8adab10064377fccb6bc7ba543136fed9d5ada21da291",
+    "full_suite_log": ".probe/codex/draft2/full-check.log",
+    "full_suite_log_sha256": "b1e5062fd3970e6225063b49561705a3dcd3c4d105558be47279ae26a55a6e37",
+    "chapter_results": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-ch26-hjB30n/RESULTS.json",
+    "chapter_results_sha256": "8333d546a3dbebf98e4ddcc22c72140bd08c6489ad1891f39ab81bbeb10670ce",
+    "runtime_pattern": "test/**/*.test.ts",
+    "runtime_selection_controls": "Glob runs both runtime files, catches the added failing test, and excludes the compile-only file; the single-file command misses the added test. Correcting the added assertion and then removing its file each restore green.",
+    "node_route": "Temporary fixture node_modules symlink to the repository installation; Node declaration membership asserted.",
+    "no_route_controls": "types:[] produces TS2591; the printed types:[node] configuration instead stops at TS2688. Adding the route restores the latter configuration."
+  }
+}
