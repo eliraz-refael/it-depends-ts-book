@@ -19,8 +19,11 @@ const generator=source('// tools/workload.mjs');
 const brokenSignature=source('// src/i18n.ts — candidate');
 const badSelection=source('// src/probe.ts — try');
 const distributedSignature=source('// src/i18n.ts — replace');
+const counterfactuals=source('// Counterfactual signatures');
+const alternatives=[...counterfactuals.matchAll(/^\/\/ (.+)\n([^\n]+)\n/gm)].map(m=>({label:m[1],code:m[2]+'\n'}));
+assert.equal(alternatives.length,4,'Four printed counterfactual alternatives');
 assert.equal((manuscript.match(/^```/gm)||[]).length,fences.length*2,'All fences are labelled and extracted');
-assert.equal(used.size,fences.length,'Every printed fence is used');assert.equal(fences.length,10);
+assert.equal(used.size,fences.length,'Every printed fence is used');assert.equal(fences.length,11);
 assert.deepEqual(options.compilerOptions,{...defaults,noEmit:true});
 assert.equal(manuscript.match(/root package has `([^`]+)`/)[1],'"type": "module"');
 const scratch=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'ts-book-ch27-'))),story=path.join(scratch,'story');
@@ -52,26 +55,34 @@ const paths=helpers.slice(0,helpers.indexOf('type At'));
 const key='type Key = Paths<typeof messages>;\n';
 const oldArgs=oldDeclarations.slice(oldDeclarations.indexOf('type Args'),oldDeclarations.indexOf('function t('));
 const oldSignature='function t(...args: Args): string;\n';
+assert.equal(alternatives[0].code,looseSignature,'Printed loose signature matches the PR');
+assert.equal(alternatives[3].code,oldSignature,'Printed original signature matches restored API');
+const tupleSplit=alternatives[2].code.indexOf('function t(');
+assert(tupleSplit>0);
 const signatures={
- bare:{helpers:'',signature:looseSignature},
- key:{helpers:paths+key,signature:'function t(key: Key, params?: Record<string, string>): string;\n'},
- untyped:{helpers:paths+key+'type Args = { [K in Key]: [key: K, params?: Record<string, string>] }[Key];\n',signature:oldSignature},
- union:{helpers:helpers+oldArgs,signature:oldSignature},
+ bare:{helpers:'',signature:alternatives[0].code},
+ key:{helpers:paths+key,signature:alternatives[1].code},
+ untyped:{helpers:paths+key+alternatives[2].code.slice(0,tupleSplit).trimEnd()+'\n',signature:alternatives[2].code.slice(tupleSplit)},
+ union:{helpers:helpers+oldArgs,signature:alternatives[3].code},
  broken:{helpers,signature:brokenSignature},
  distributed:{helpers,signature:distributedSignature},
 };
 function moduleFor(kind){const v=signatures[kind];return catalogue+v.helpers+v.signature+body;}
 const initialBanner=replace(banner,'t(...pending)','t(pending[0], pending[1])');
-const probeProject={extends:'./tsconfig.json',files:['src/i18n.ts','src/probe.ts'],include:[]};
+const probeFiles=JSON.parse(manuscript.match(/with `files: (\[[^`]+\])`/)[1]);
+const probeProject={extends:'./tsconfig.json',files:probeFiles,include:[]};
+assert.deepEqual(probeFiles,['src/i18n.ts','src/probe.ts']);assert(manuscript.includes('`include: []`'));
 write('package.json',{type:'module'});write('tsconfig.json',options);write('probe.json',probeProject);
 write('src/i18n.ts',loose);write('src/banner.ts',initialBanner);write('src/probe.ts',badLiteral);
 compile('PR-accepts-mistakes');
 compile('PR-emit',[],'tsconfig.json',['--noEmit','false','--rootDir','src','--outDir','dist','--removeComments','true']);
-run('PR-customer-output',['dist/probe.js'],'shop.crat\nHello A, {count} items');
+assert(manuscript.includes('Noam is reading the output of two deliberately broken calls he wrote'));
+assert(badLiteral.includes('console.log(t("shop.cart", { name: "A" }));'),'Opening output has its printed call');
+run('PR-review-probe-output',['dist/probe.js'],'shop.crat\nHello A, {count} items');
 const emittedLoose=read('dist/i18n.js');
-write('src/i18n.ts',moduleFor('union'));write('src/banner.ts',banner);
-compile('original-rejects-literal-mistakes',[error('src/probe.ts','shop.crat',2345,"Type '\"shop.crat\"' is not assignable to type '\"shop.hello\"'."),error('src/probe.ts','shop.cart',2345)]);
-remove('src/probe.ts');compile('original-restored');
+write('src/i18n.ts',moduleFor('union'));
+compile('original-rejects-literal-mistakes',[error('src/probe.ts','shop.crat',2345,"Type '\"shop.crat\"' is not assignable to type '\"shop.hello\"'."),error('src/probe.ts','shop.cart',2345),error('src/banner.ts','t(pending[0], pending[1])',2345)]);
+remove('src/probe.ts');write('src/banner.ts',banner);compile('original-restored');
 compile('original-emit',[],'tsconfig.json',['--noEmit','false','--rootDir','src','--outDir','dist','--removeComments','true']);
 assert.equal(read('dist/i18n.js'),emittedLoose,'Original and PR emit bytes');emitComparisons++;
 assert.equal(Buffer.byteLength(emittedLoose),Number(manuscript.match(/Same (\d+) bytes/)[1]),'Printed byte count');
@@ -107,7 +118,8 @@ list('benchmark-file-set','bench/tsconfig.json',['bench/case.ts'],['src/i18n.ts'
 function counters(stdout){const result={};for(const k of ['Symbols','Types','Instantiations']){const m=stdout.match(new RegExp('^'+k+':\\s+(\\d+)','m'));assert(m,'Missing '+k);result[k]=Number(m[1]);}return result;}
 function observe(kind,round,label=kind){write('bench/case.ts',benchSource(kind));const r=compile('benchmark-'+label+'-'+round,[],'bench/tsconfig.json',['--extendedDiagnostics']);const m=r.stdout.match(/^Check time:\s+([\d.]+)s/m);measurements.push({kind:label,round,counters:counters(r.stdout),checkSeconds:m?Number(m[1]):null});fs.writeFileSync(path.join(scratch,'MEASUREMENTS.json'),JSON.stringify(measurements,null,2));}
 const firstKinds=['bare','key','untyped','union'];
-for(let round=0;round<3;round++)for(const kind of [...firstKinds.slice(round),...firstKinds.slice(0,round)])observe(kind,round);
+const measuredKinds=[...firstKinds,'broken','distributed'];
+for(let round=0;round<3;round++)for(const kind of [...measuredKinds.slice(round),...measuredKinds.slice(0,round)])observe(kind,round);
 contract('key');contract('untyped');compile('counterfactual-controls-restored');
 // The tempting generic is checked against the real banner and the selected-key probe separately.
 write('src/i18n.ts',moduleFor('broken'));write('src/probe.ts',badSelection);
@@ -117,23 +129,76 @@ compile('broken-generic-probe-emit',[],'probe.json',['--noEmit','false','--rootD
 run('broken-generic-customer-output',['dist/probe.js'],'Hello A, {count} items');
 assert.equal(read('dist/i18n.js'),emittedLoose);emitComparisons++;
 remove('src/probe.ts');contract('broken');
-for(let round=0;round<3;round++)observe('broken',round);
+
 write('src/i18n.ts',moduleFor('distributed'));write('src/probe.ts',badSelection);
 compile('distributed-rejects-selected-key',[error('src/probe.ts','console.log',2345)]);
 remove('src/probe.ts');compile('distributed-restored');contract('distributed');compile('distributed-contract-controls-restored');
 fs.rmSync(path.join(story,'dist'),{recursive:true,force:true});
 compile('distributed-emit',[],'tsconfig.json',['--noEmit','false','--rootDir','src','--outDir','dist','--removeComments','true']);
 assert.equal(read('dist/i18n.js'),emittedLoose);emitComparisons++;
-for(let round=0;round<3;round++)for(const kind of (round%2?['distributed','union']:['union','distributed']))observe(kind,round,kind==='union'?'union-turn':kind);
+
 // Trace after untraced measurements. Inspect identities via the legend, never fixed IDs or sample counts.
 write('bench/case.ts',benchSource('union'));
 compile('trace-original-union',[],'bench/tsconfig.json',['--generateTrace','trace']);
 const legend=JSON.parse(read('trace/legend.json')),events=JSON.parse(read('trace/trace.json'));
 let unionFound=false;
-for(const entry of legend){const types=JSON.parse(fs.readFileSync(entry.typesPath,'utf8')),byId=new Map(types.map(t=>[t.id,t]));const args=types.filter(t=>t.symbolName==='Args'&&t.unionTypes?.length===2000);if(args.length)unionFound=true;for(const event of events.filter(e=>e.name==='structuredTypeRelatedTo'&&e.args?.checkerId===entry.checkerId)){const target=byId.get(event.args.targetId),source=byId.get(event.args.sourceId);assert(target&&source,'Trace relation identities resolve through legend');if(args.some(t=>t.id===target.id))traceEvidence.push({checkerId:entry.checkerId,sourceId:source.id,targetId:target.id,unionMembers:target.unionTypes.length,definition:target.firstDeclaration});}}
+for(const entry of legend){const types=JSON.parse(fs.readFileSync(entry.typesPath,'utf8')),byId=new Map(types.map(t=>[t.id,t]));const args=types.filter(t=>t.symbolName==='Args'&&t.unionTypes?.length===2000);if(args.length)unionFound=true;for(const event of events.filter(e=>e.name==='structuredTypeRelatedTo'&&e.args?.checkerId===entry.checkerId)){const target=byId.get(event.args.targetId),source=byId.get(event.args.sourceId);assert(target&&source,'Trace relation identities resolve through legend');if(args.some(t=>t.id===target.id||t.id===source.id))traceEvidence.push({checkerId:entry.checkerId,sourceId:source.id,targetId:target.id,sourceName:source.symbolName,targetName:target.symbolName,durationMicroseconds:event.dur,sourceUnionMembers:source.unionTypes?.length,targetUnionMembers:target.unionTypes?.length});}}
 assert(unionFound,'The trace type dump contains the large Args union');
 const expressions=events.filter(e=>e.name==='checkExpression'&&e.args?.path===path.join(story,'bench/case.ts')).map(e=>({pos:e.args.pos,end:e.args.end,source:read('bench/case.ts').slice(e.args.pos,e.args.end)}));
-fs.writeFileSync(path.join(scratch,'TRACE-EVIDENCE.json'),JSON.stringify({relations:traceEvidence,expressions,note:traceEvidence.length?'Sampled relations resolve to Args.':'No Args relation sampled in this run; the type definition still resolves. Events are not a census.'},null,2));
+const durations={};for(const e of events.filter(e=>e.ph==='X'&&typeof e.dur==='number')){const row=durations[e.name]??={events:0,summedMicroseconds:0};row.events++;row.summedMicroseconds+=e.dur;}
+fs.writeFileSync(path.join(scratch,'TRACE-EVIDENCE.json'),JSON.stringify({relations:traceEvidence,expressions,durations,note:'Duration sums may overlap. These events neither account for the full check nor establish its hot path.'},null,2));
+// CPU profiling is separate from timing. Format/readability assertions do not rank samples.
+compile('profile-original-union',[],'bench/tsconfig.json',['--pprofDir','profile']);
+const cpuProfiles=fs.readdirSync(path.join(story,'profile')).filter(f=>f.endsWith('-cpuprofile.pb.gz'));
+assert.equal(cpuProfiles.length,1,'One fresh CPU profile produced');
+const profilePath=path.join(story,'profile',cpuProfiles[0]);
+const profileBytes=require('node:zlib').gunzipSync(fs.readFileSync(profilePath));
+// Read the protobuf envelope even without Go. Profile.proto fields identify the sample schema.
+function protobufFields(buffer){
+ let offset=0;const fields=[];
+ function varint(){
+  let n=0,shift=0;
+  while(true){
+   assert(offset<buffer.length,'Truncated protobuf varint');
+   const b=buffer[offset++];n+=(b&127)*2**shift;
+   if(!(b&128))return n;
+   shift+=7;assert(shift<70,'Invalid protobuf varint');
+  }
+ }
+ while(offset<buffer.length){
+  const tag=varint(),wire=tag%8,field=Math.floor(tag/8);assert(field>0);
+  if(wire===0)varint();
+  else if(wire===1)offset+=8;
+  else if(wire===2){const length=varint();offset+=length;}
+  else if(wire===5)offset+=4;
+  else assert.fail('Unsupported profile protobuf wire type '+wire);
+  assert(offset<=buffer.length,'Truncated protobuf field');fields.push({field,wire});
+ }
+ return fields;
+}
+const profileFields=protobufFields(profileBytes);
+for(const field of [1,6])assert(profileFields.some(f=>f.field===field&&f.wire===2),'CPU profile schema field '+field);
+function pprofEvidence(executable,label){
+ const available=cp.spawnSync(executable,['version'],{encoding:'utf8'});
+ if(available.error?.code==='ENOENT'){const note=label+': SKIP pprof sample evidence — Go toolchain absent; CPU profile produced and protobuf envelope decoded.';console.log(note);return {skipped:true,note};}
+ if(available.error)throw available.error;
+ assert.equal(available.status,0,available.stderr);
+ const evidence={go:available.stdout.trim()};
+ for(const [name,args] of [['top',['-top','-cum']],['peek',['-peek','mapTypeEx']]]){
+  const r=command(label+'-'+name,executable,['tool','pprof',...args,profilePath]);
+  if(name==='peek'&&r.status===2&&r.stderr.includes('no matches found for regexp:')){
+   evidence[name]=r.stderr.trim(); // A function need not appear in a sample.
+  }else{assert.equal(r.status,0,r.stderr);evidence[name]=r.stdout;}
+ }
+ assert(/Type: cpu/.test(evidence.top)&&/Total samples =/.test(evidence.top),'Go reads the CPU profile');
+ evidence.mapTypeExRow=evidence.top.split('\n').find(l=>l.trimEnd().endsWith('checker.(*Checker).mapTypeEx'))??null;
+ evidence.note='Sample shares, hot-function presence and ordering are evidence only; never pass/fail conditions.';
+ return evidence;
+}
+const profileEvidence=pprofEvidence('go','CPU profile');
+const absentGoControl=pprofEvidence(path.join(scratch,'absent-go-toolchain'),'No-Go control');
+assert(absentGoControl.skipped,'Missing Go skips visibly');
+fs.writeFileSync(path.join(scratch,'PROFILE-EVIDENCE.json'),JSON.stringify({profilePath,protobufFields:profileFields,...profileEvidence,absentGoControl},null,2));
 write('bench/case.ts',benchSource('distributed'));compile('trace-counterfactual-restored',[],'bench/tsconfig.json');
 run('final-banner-values',['--input-type=module','-e',bannerProbe],'Hello A, 2 items\nHello A\nReady');
 // Extra caller controls, on the final signature, do not change the manuscript's final repository.
@@ -147,7 +212,7 @@ let map='type ParamMap = {\n';for(const fullKey of keys){const k=Number(fullKey.
 const precomputed=syntheticCatalogue+map+'declare '+brokenSignature.replaceAll('Params<At<typeof messages, K>>','ParamMap[K]')+workload.calls.join('\n')+'\nexport {};\n';
 for(let round=0;round<3;round++){write('bench/case.ts',precomputed);const r=compile('precomputed-control-'+round,[],'bench/tsconfig.json',['--extendedDiagnostics']);const time=r.stdout.match(/^Check time:\s+([\d.]+)s/m);measurements.push({kind:'precomputed',round,counters:counters(r.stdout),checkSeconds:time?Number(time[1]):null});}
 write('bench/case.ts',benchSource('distributed'));compile('precomputed-control-restored',[],'bench/tsconfig.json');
-const summaries={};for(const kind of [...firstKinds,'broken','union-turn','distributed','precomputed']){const rows=measurements.filter(m=>m.kind===kind);assert.equal(rows.length,3);for(const r of rows)assert.deepEqual(r.counters,rows[0].counters,kind+' counters repeat');const times=rows.map(r=>r.checkSeconds).filter(t=>t!==null).sort((a,b)=>a-b);summaries[kind]={...rows[0].counters,checkSeconds:rows.map(r=>r.checkSeconds),medianCheckSeconds:times.length?times[Math.floor(times.length/2)]:null};}
+const summaries={};for(const kind of [...measuredKinds,'precomputed']){const rows=measurements.filter(m=>m.kind===kind);assert.equal(rows.length,3);for(const r of rows)assert.deepEqual(r.counters,rows[0].counters,kind+' counters repeat');const times=rows.map(r=>r.checkSeconds).filter(t=>t!==null).sort((a,b)=>a-b);summaries[kind]={...rows[0].counters,checkSeconds:rows.map(r=>r.checkSeconds),medianCheckSeconds:times.length?times[Math.floor(times.length/2)]:null};}
 fs.writeFileSync(path.join(scratch,'MEASUREMENTS.json'),JSON.stringify(measurements,null,2));
 fs.writeFileSync(path.join(scratch,'COUNTERS-AND-TIMES.json'),JSON.stringify(summaries,null,2));
 // Filled from a reviewed record-counters run; the standard suite asserts every printed counter.
@@ -183,7 +248,14 @@ const expectedCounters = {
     "Instantiations": 118628
   }
 };
-if(!record){assert.deepEqual(summaries['union-turn'].Instantiations,summaries.union.Instantiations);for(const kind of [...firstKinds,'broken','union-turn','distributed'])assert.deepEqual(Object.fromEntries(['Symbols','Types','Instantiations'].map(k=>[k,summaries[kind][k]])),expectedCounters[kind==='union-turn'?'union':kind],kind+' pinned counters');const labels={bare:'string; no type helpers',key:'Key; loose params',untyped:'Tuple union; loose params',union:'Original optional tuples',distributed:'Distributed whole tuple'};for(const [kind,label]of Object.entries(labels)){const rows=manuscript.split('\n').filter(l=>l.startsWith('| '+label+' |'));assert(rows.length,kind+' printed row');for(const row of rows)assert.equal(Number(row.split('|')[2].trim().replaceAll(',','')),summaries[kind].Instantiations,kind+' printed count');}}
+if(!record){
+ for(const kind of measuredKinds)assert.deepEqual(Object.fromEntries(['Symbols','Types','Instantiations'].map(k=>[k,summaries[kind][k]])),expectedCounters[kind],kind+' pinned counters');
+ const labels=Object.fromEntries(firstKinds.map((kind,i)=>[kind,alternatives[i].label]));labels.distributed='Distributed whole tuple';
+ for(const [kind,label]of Object.entries(labels)){const rows=manuscript.split('\n').filter(l=>l.startsWith('| '+label+' |'));assert(rows.length,kind+' printed row');for(const row of rows)assert.equal(Number(row.split('|')[2].trim().replaceAll(',','')),summaries[kind].Instantiations,kind+' printed count');}
+ const baselineRows=manuscript.split('\n').filter(l=>l.startsWith("| Linoy's per-key tuples |"));assert.equal(baselineRows.length,2);assert.equal(baselineRows[0],baselineRows[1],'Both tables reuse the same observed baseline');
+ assert.equal(Number(manuscript.match(/([\d,]+) instantiations, a [\d.]+s median/)[1].replaceAll(',','')),summaries.broken.Instantiations,'Printed broken-generic counter');
+}
+
 assert.equal(read('src/i18n.ts'),moduleFor('distributed'));assert.equal(read('src/banner.ts'),banner);assert.equal(read('bench/case.ts'),benchSource('distributed'));assert(!fs.existsSync(path.join(story,'src/probe.ts')));assert(!fs.existsSync(path.join(story,'dist/probe.js')));assert.deepEqual(JSON.parse(read('tsconfig.json')),options);
 console.log(JSON.stringify({typescript:version,node:process.version,fences:fences.length,compilerCases:cases,runtimeGroups,fileListQueries:fileLists,emitComparisons,benchmarkRuns:measurements.length,countersRecorded:record,scratch,summaries},null,2));
 console.log(record?'Chapter 27: COUNTERS RECORDED (not a pinned-counter pass)':'Chapter 27: PASS');
