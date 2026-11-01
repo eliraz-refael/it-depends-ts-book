@@ -149,3 +149,74 @@ Codex revises to draft 3. Update the checks for:
 Run the full `npm run check`, freeze `ch27/DRAFT3-SNAPSHOT.json`, and commit locally. Then I'll run a
 Principle-only reader on the revised Principle, and do my final diff review. No further full reader
 unless the changes reach beyond the lines above.
+
+## Final diff review (2026-11-01)
+
+Draft 3 (`a67547c`) addresses every finding above.
+- **The logistics stretch is about half.** It's 391 → 212 words, and the prose outside fences 241
+  → 72. The bench config is one extracted inline value, and the case-file assembly one sentence.
+  Noam's distinct-key question and "Stop moving the furniture" now qualify the first table.
+- **The repair's speed is explained, and was verified first.** Codex profiled the distributed form
+  before writing Daniel's sentence: `mapTypeEx` went 920ms → 10ms, and on a rerun 1,100ms → 30ms.
+  A separate literal-key witness checks that `K` narrows to one key. Daniel's sentence is limited
+  to "these literal-key calls". The shares stay evidence, never asserted.
+- **Gil's denial is gone.** "Samples can't tell you that."
+- **Order and state:** the emit command precedes the first runtime output, and the TS2556 reason for
+  Oded's expanded banner is named. The l.84/99 echo is cut. The probe's output is attributed to
+  `node`. The trace figures are printed (about 0.2s against about 1.6s, from 0.182s / 1.578s
+  observed).
+- **The register slips are fixed:** "Same session as the first table", and "That's 7.0.2's checker.
+  Don't build on the name."
+
+`node checks/chapter27.cjs` passes on my run of draft 3.
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md) applied the rule correctly to all
+four cases and follow-ups,** with fixtures. No claim was contradicted.
+- Its (a) follow-up again shows "celebrating work you stopped doing" literally: a dropped file
+  produced almost the whole apparent win.
+- Its (c) fixture found the cheaper `emit` also *breaks* a previously legal spread (TS2556). That's
+  the chapter's own banner, in the reader's case.
+
+It found two real problems, both in prose:
+- **Paragraph 1 reads like "slide bullets read aloud".**
+  - "Checking or running?" is a fragment.
+  - "For annotation-only changes, compare emitted code before timing; validators need measuring"
+    joins two imperatives with different subjects. "Validators" could be misread as type-level.
+- **The rule says what newly compiles, but not what newly fails.** The chapter's own generic
+  candidate rejected the banner, and the reader's emitter did the same.
+
+**My prose-only settlement edit** (the Principle; the fence extract is byte-identical to draft 3):
+- **Paragraph 1:**
+  - "First say what you're speeding up: checking the program or running it."
+  - "If you only changed types, compare the emitted code before you time anything. A validator
+    really runs, so it needs its own measurement."
+  - "Change one thing, and repeat the timing…"
+  - "When they don't explain the time, profile the checker."
+- **Paragraph 2:**
+  - "…and check both lists."
+  - "A cheaper signature can still reject the typo, accept a different mistake and break a call that
+    used to work."
+  - "If you remove a constraint or a validator, name what catches those mistakes instead, or accept
+    the risk."
+
+It's 151 words including the heading and speaker tag, up from 107. It's spoken, and every sentence
+is still one the chapter enacts.
+
+**Not adopted from the final reader:**
+- **A decision rule for weighing seconds against lost checks.** As in review 2, "accept the risk"
+  and "Someone has to own the mistake" name who decides. A threshold would be invented.
+- **Naming the counters' flag or the profiler in the Principle.** The scene names them.
+- **`NoInfer` and memory.** Out of scope; Ch9 owns correlation.
+
+**Final text:** SHA-256 `63e9961a4c93966a8bc39d9d3257a48a8e31f7b1c8d8ba8899859c744badf1a3`, 2,384
+words, 10 fences, with the fence extract byte-identical to draft 3. The full `npm run check` exits 0
+on the settled text in the worktree, and again after a clean `npm ci` in a fresh export, on
+TypeScript 7.0.2 and Node 22.23.4.
+
+**Approved.** The ending is a local Verdict:
+- Oded's PR takes the distributed whole-tuple signature over the same body;
+- keys, placeholders and arity stay checked, and the existing banner caller is preserved;
+- the fixture and caller cases stay with the signature;
+- counters are pinned to the compiler and configuration, and times are recorded but never gate the
+  build;
+- any later removal of a check names what newly passes and who catches it, or accepts the risk.

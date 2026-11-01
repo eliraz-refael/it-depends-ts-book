@@ -1,6 +1,6 @@
 # Chapter 27 — Performance vs Safety (working title)
 
-Status: **PLAN SETTLED**, 2026-10-29. The settlement at the end governs where it differs from the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-11-01. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/chapter-27-performance-vs-safety`, based on `origin/main` `e1c9f70` (Ch26's merge, PR #28).
 File: `book/04-the-real-world/04-performance-vs-safety.md`. It is the last chapter of Act IV.
 
@@ -290,12 +290,12 @@ scene they'd retell):
 
 - [x] Codex challenges this plan: scope, whether the decision is opinionated, the fixture's realism,
   timing on the page, and the Turn. Disagreements are settled on evidence ([challenge](ch27/CODEX-PLAN-CHALLENGE.md)).
-- [ ] Codex drafts and self-reviews.
-- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
-  diff review.
-- [ ] Final draft's checks durable, and the full suite green on the frozen manuscript.
-- [ ] Clean `npm ci` and full suite green at final review.
-- [ ] Ready for the author's review.
+- [x] Codex drafts and self-reviews ([record](CH27-REVIEW.md), [snapshot](ch27/DRAFT3-SNAPSHOT.json)).
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
+  diff review ([review 1](ch27/CLAUDE-REVIEW.md), [review 2 and final diff review](ch27/CLAUDE-REVIEW-2.md#final-diff-review-2026-11-01)).
+- [x] Final draft's checks durable, and the full suite green on the frozen manuscript (Ch27 10 / 107 / 5).
+- [x] Clean `npm ci` and full suite green at final review.
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-10-29)
 

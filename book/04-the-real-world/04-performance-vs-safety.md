@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Daniel Compiler**: "Before trading a type constraint for speed, measure the saving and say what newly compiles. Checking or running? For annotation-only changes, compare emitted code before timing; validators need measuring. Change one thing; repeat with the same files, workload and options. Otherwise you're celebrating work you stopped doing. Counters aren't seconds. If they don't explain the time, profile."
+**Daniel Compiler**: "Before you trade a type constraint for speed, measure the saving and say what newly compiles. First say what you're speeding up: checking the program or running it. If you only changed types, compare the emitted code before you time anything. A validator really runs, so it needs its own measurement. Change one thing, and repeat the timing with the same files, workload and options. Otherwise you're celebrating work you stopped doing. Counters aren't seconds. When they don't explain the time, profile the checker."
 
-"List which calls must stay legal and which must stay forbidden. A cheaper signature can reject the typo and accept another mistake. Remove a constraint or validator, and name what catches mistakes instead—or accept the risk. Someone has to own the mistake that now compiles."
+"List which calls must stay legal and which must stay forbidden, and check both lists. A cheaper signature can still reject the typo, accept a different mistake and break a call that used to work. If you remove a constraint or a validator, name what catches those mistakes instead, or accept the risk. Someone has to own the mistake that now compiles."
 
 ## The Debate
 

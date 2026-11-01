@@ -18,14 +18,14 @@ Chapter 25, **monorepo type sharing**, is [jointly approved](docs/editorial/CH25
 
 Chapter 26, **testing typed code**, is [jointly approved](docs/editorial/CH26-REVIEW.md) and merged as PR #28. Its [plan](docs/editorial/CH26-PLAN.md) starts from a verified review incident: a `@ts-expect-error` test stays green after `ship` is widened to accept drafts, because the directive is now suppressing a stale fixture's missing field. Codex's challenge corrected the choice (usage tests can catch `any`) and settled a local Verdict: usage tests with valid fixtures for `ship`, an exact assertion only for the status callers rely on, and every added or moved test shown red, both for file coverage and for its promise, under the commands CI runs. Three Principle-only reads, a full read, a targeted recheck and two formal reviews later, the final diff review made one prose-only Principle edit.
 
-Chapter 27, **performance vs safety**, has draft 3 and a [self-review](docs/editorial/CH27-REVIEW.md), following the [settled plan](docs/editorial/CH27-PLAN.md#settlement-after-codexs-challenge-2026-10-29). It reaches a local Verdict on a distributed tuple signature that preserves the translation callers while reducing measured checking time. The repair has more instantiations, which makes the counter/time distinction the Turn. The check pins the book profile and one checker, verifies caller behavior and emit identity, and records timings without asserting them. Draft 1 readers reproduced the examples; the local revision repairs caller provenance and lets a CPU profile correct the trace interpretation. The second review led to a shorter setup and Principle, plus a profile comparison explaining why the repair avoids broad union work. A final Principle-only read and final diff review are pending.
+Chapter 27, **performance vs safety**, is [jointly approved](docs/editorial/CH27-REVIEW.md) and awaits the author's review. It follows the [settled plan](docs/editorial/CH27-PLAN.md#settlement-after-codexs-challenge-2026-10-29). It reaches a local Verdict on a distributed tuple signature that preserves the translation callers while reducing measured checking time. The repair has more instantiations, which makes the counter/time distinction the Turn. The check pins the book profile and one checker, verifies caller behavior and emit identity, and records timings without asserting them. Draft 1 readers reproduced the examples; the local revision repairs caller provenance and lets a CPU profile correct the trace interpretation. The second review led to a shorter setup and Principle, plus a profile comparison explaining why the repair avoids broad union work. Three Principle-only reads, a full read, a targeted recheck and two formal reviews later, the final diff review made one prose-only Principle edit.
 
 ### Act IV tasks
 
 - [x] Ch24: `01-migration-strategies.md` — which calls the compiler checks while JavaScript and TypeScript share a program, and what to check before the next conversion; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #26
 - [x] Ch25: `02-monorepo-type-sharing.md` — public package contracts, source-reading dev checks and current release artifacts; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #27
 - [x] Ch26: `03-testing-typed-code.md` — type tests that can fail, exact versus usage assertions, and the files the check compiles; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; merged as PR #28
-- [ ] Ch27: `04-performance-vs-safety.md` — draft 3 and self-review written; final Principle read and diff review pending
+- [ ] Ch27: `04-performance-vs-safety.md` — what a type costs the checker, counters versus time, and the callers a faster signature must keep; independent readers, targeted recheck and joint review complete; compiler/runtime checks pass; jointly approved, awaiting the author
 
 ### Completed Act III work
 
@@ -187,7 +187,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Act I: The Type System      | Done            | 6 chapters; calibrated voice passes complete |
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
 | Act III: Patterns & Design  | Done            | Ch14–23 reviewed, checked and merged (10 of 10) |
-| Act IV: The Real World      | **IN PROGRESS** | 4 chapters; Ch24–26 merged; Ch27 planning |
+| Act IV: The Real World      | **IN PROGRESS** | 4 chapters; Ch24–26 merged, Ch27 jointly approved, awaiting the author |
 | Bonus: AI & TypeScript      | Planned         | 3 chapters            |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |
 
