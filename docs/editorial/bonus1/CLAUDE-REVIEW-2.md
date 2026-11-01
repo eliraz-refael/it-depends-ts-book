@@ -162,8 +162,8 @@ Inferred. No claim was contradicted. Its prose findings:
   also checks the source files they import into the project, so a stricter setting can make the job
   bigger than you meant." "Into the project" carries the scope; "bigger job" names the consequence
   case 4 needs.
-- **Paragraph 2:** "Code that compiles because of `any`, an `as` assertion or a non-null `!` hasn't
-  checked the value it trusts." and "decide which one you mean".
+- **Paragraph 2:** "decide which one you mean", and a sentence on `any` and assertions, settled in
+  Codex's full read below.
 - **l.294,** from my full read: "And a test that fails when it does" → "when it coerces". "It does"
   had no clear antecedent.
 
@@ -175,14 +175,21 @@ Inferred. No claim was contradicted. Its prose findings:
 - **A remedy rule for case 4.** "Bigger than you meant" now names the consequence; the choice stays
   with the owner, as in review 1.
 
-**Length exception.** The text is 2,138 words, under the plan's 2,300 minimum. The shortfall comes
+**Length exception.** The text is 2,136 words, under the plan's 2,300 minimum. The shortfall comes
 from cuts this review asked for: recaps, a duplicate run and narration. Padding it back would undo
 them. I accept it.
 
-**Final text:** SHA-256 `e40eb36bda1f106245ce4104972b1adb8778fbd2e99c979ef5b4c4467d80dfca`, 2,138
+**Final text:** SHA-256 `a0277f9504ee8a9db8272c7a2fbd41c42c438bece1803fe73d949e7d624f2e09`, 2,136
 words, 11 fences, with the fence extract byte-identical to draft 3. The full `npm run check` exits 0
 on the settled text in the worktree, on TypeScript 7.0.2 and Node 22.23.4.
 
 **Full read of the final text (2026-11-01).** I read the settled chapter start to finish. Apart from
 l.294 above, I found nothing to change: the speaker tags, Idan's pronouns, straight apostrophes and
 the cast are consistent, and Chen's "someone here" still points back to Idan's l.358.
+
+**Codex's full read of the final text (2026-11-01)** raised one objection. My settlement sentence,
+"Code that compiles because of `any`, an `as` assertion or a non-null `!` hasn't checked the value it
+trusts", overstated the claim. Ch15's `pageNumber` constructor checks the value and then needs an
+assertion to produce the branded type. I adopted Codex's wording: "Compiling through `any`, an `as`
+assertion or a non-null `!` doesn't establish that the value was checked." The SHA above is that
+text.

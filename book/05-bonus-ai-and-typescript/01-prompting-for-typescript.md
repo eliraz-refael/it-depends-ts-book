@@ -4,7 +4,7 @@
 
 **Prof. Eli Typeworth**: "Before asking for code, put the decisions it must respect in its signature and in examples of success and rejection. Existing signatures and tests count. Send them with the project configuration and the command that runs the compiler and tests. Agree which files may change. The configuration also checks the source files they import into the project, so a stricter setting can make the job bigger than you meant."
 
-"Run that command against the returned implementation. Code that compiles because of `any`, an `as` assertion or a non-null `!` hasn't checked the value it trusts. Code without them can still do the wrong thing. If two implementations pass but disagree on behavior you need, decide which one you mean and put the difference in the examples before the next attempt. The checks enforce what you've expressed in them. Someone still has to own what you meant."
+"Run that command against the returned implementation. Compiling through `any`, an `as` assertion or a non-null `!` doesn't establish that the value was checked. Code without them can still do the wrong thing. If two implementations pass but disagree on behavior you need, decide which one you mean and put the difference in the examples before the next attempt. The checks enforce what you've expressed in them. Someone still has to own what you meant."
 
 ## The Debate
 
