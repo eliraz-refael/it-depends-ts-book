@@ -38,11 +38,12 @@ Successful run on **2026-11-01**, TypeScript **7.0.2**, Node **22.23.4**:
 | Chapter 25 | 13 | 29 | 16 |
 | Chapter 26 | 17 | 74 | 18 |
 | Chapter 27 | 10 | 107 | 5 |
-| Total | **453** | **774** | **308** |
+| Bonus 1 | 11 | 32 | 16 |
+| Total | **464** | **806** | **324** |
 
-Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Chapter 25 includes eight TypeScript and five JSON fences. Chapter 26 includes fifteen TypeScript and two JSON fences. Chapter 27 includes eight TypeScript, one JSON and one JavaScript fence, plus an extracted inline benchmark configuration. Earlier chapter counts are TypeScript fences.
+Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Chapter 25 includes eight TypeScript and five JSON fences. Chapter 26 includes fifteen TypeScript and two JSON fences. Chapter 27 includes eight TypeScript, one JSON and one JavaScript fence, plus an extracted inline benchmark configuration. Bonus 1 includes nine TypeScript and two JSON fences, plus three extracted requests. Earlier chapter counts are TypeScript fences.
 
-Chapter 25 also verifies two compiler file-list queries; Chapter 26 verifies five and Chapter 27 one. These are separate from the compiler-case counts.
+Chapter 25 also verifies two compiler file-list queries; Chapter 26 verifies five, Chapter 27 one and Bonus 1 one. These are separate from the compiler-case counts.
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
 
@@ -180,6 +181,18 @@ There are 21 untraced benchmark invocations in the 107 compiler cases: three per
 A separate traced compile resolves checker IDs through legend.json and type IDs through its referenced type files. The type dump must contain the 2,000-member Args union. Sampled relations and expression source positions are recorded in TRACE-EVIDENCE.json; their counts and durations are never asserted. Both source-Args and target-Args relations retain their durations. Complete events in the check/checkTypes categories are summed, and the benchmark checkSourceFile span is paired by process, thread, checker and source path. The observed seconds and the manuscript’s rounded seconds are recorded separately, with an overlap caveat. No duration, inequality or ratio is asserted. Final file/configuration assertions restore the distributed signature in both application and benchmark. No editor workload, real-project timing or earlier TypeScript compiler is measured.
 
 Separate `--pprofDir` compiles of the original and distributed fixtures must each produce a fresh CPU profile. The check decompresses each profile’s gzip data and reads its protobuf envelope, requiring the profile schema fields. With Go installed, `go tool pprof -top -cum` and `-peek mapTypeEx` must decode it; PROFILE-EVIDENCE.json records both reports and any matching cumulative rows. The comparison supports the explanation of the repair; its ordering is not a passing condition. Function presence, sample shares, sample counts, time, ordering and inferred hotspots are never assertions. If Go is absent, only that interpretation step is skipped, with a visible note; profile generation and envelope validation still run. A missing-executable control verifies this path on machines that have Go. Go is optional and no compiler source is downloaded by the check.
+
+## Bonus 1 coverage
+
+The suite extracts all eleven fences into one evolving ESM project. Its complete printed configuration preserves the book profile, with types:[node], noEmit and allowImportingTsExtensions for the stated TypeScript runtime setup. The temporary project has an explicit symlink to the repository's installed node_modules; the printed compiler and Node-declaration versions must match that installation. Its actual package.json command, `npm run check`, compiles the current project and selects the printed runtime test glob. Compiler invocations performed by that command count as compiler cases; its test runs count as runtime groups. Test names, exact failing names and pass/fail totals are asserted.
+
+The initial caller prints string 1001. The reset produces the quoted TS2322 at the returned JSON.parse; removing it restores the original compiler and runtime behavior, and restoring it restores the diagnostic. The probe is removed before the Result contract and initial two tests replace the old state. The coercing and strict implementations differ only at the extracted amount line. Both pass the same numeric tests under the same contract. SHA-256 checks protect the contract, acceptance tests, manifest, configuration and declaration before and after candidate runs. A deliberately changed owned file verifies the hash guard and is immediately restored.
+
+The coercing implementation is restored before the empty-amount probe, whose exact JSON output is asserted. At the Turn, only the owner's test file changes. The new text-amount test fails under coercion and passes under the strict implementation, while the numeric cases remain green. Separate runtime calls exercise both string values independently, because the printed loop stops on its first failed assertion. Three requests are extracted; the final request must name the actual files, command, scope and coercion decision. The final check runs the same manifest command with all five tests and the selected strict parser.
+
+The always-reject implementation runs separately: it fails exactly the two positive tests, while the three rejection tests pass when selected alone. Restoring the strict parser restores green. An always-true annotated predicate passes compilation but fails the three rejection groups; it too is restored. A file-list query verifies the final contract, parser, tests, reset and Node declarations, with no leftover probe.
+
+Validation-only controls cover the book's unmodified types:[] profile, the reset under that profile, noUncheckedIndexedAccess off/on and a checked empty-array branch, DOM Response.json remaining any, module-local versus explicit global augmentation, and imports bringing old source into a project whose include selects only generated files. Installed Zod/Express/Node declarations pass with and without the reset under skipLibCheck:false. Directly compiling Zod's shipped source passes without it, produces the five recorded TS2322/TS18046 diagnostics with it, then returns to green when removed. These source-compilation failures are not claims about ordinary consumers of its declarations. No real assistant is called, no model behavior or prompt-effectiveness rate is measured, and no timing threshold is asserted.
 
 ## Updating the baseline
 
