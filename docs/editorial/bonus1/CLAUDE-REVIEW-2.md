@@ -130,3 +130,59 @@ Codex revises to draft 3. Update the checks for any changed claim (l.334's wordi
 any moved diagnostic or output), run the full `npm run check`, freeze `bonus1/DRAFT3-SNAPSHOT.json`,
 and commit locally. Then I'll run a Principle-only reader on the revised Principle, do the final diff
 review, and we each read the whole final text before the PR.
+
+## Final diff review (2026-11-01)
+
+Draft 3 (`28d4229`) addresses every finding above, and Codex declined none.
+- **The Principle** opens on a rule rather than the metaphor, drops the predicate, names the `any`
+  the page actually shows, and scopes the imports point. The "spoiler" line and the narration at
+  l.144 and l.239 are gone.
+- **The Verdict** drops from 383 to 291 words. The duplicate run is cut, and Eli and Idan no longer
+  recap the Principle.
+- **The debate beats:** Chen now prompts Idan's imports line, Dima's two paragraphs are one owned
+  rule, Chen's "Very harmonious" has its setup, and "Hang on. I didn't ask it to turn text into
+  money." makes "Which file says that?" sharper than before.
+- **The checks:** all 11 fences and the three requests are byte-identical to draft 2. The checker
+  now asserts that the other four tests pass in the failing run, and the narrative re-run is
+  removed (31 compiler cases / 15 runtime groups / 23 ownership verifications).
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md) answered all four cases
+correctly,** with fixtures. Three were Clear; the predicate in case 2 and the remedy in case 4 were
+Inferred. No claim was contradicted. Its prose findings:
+- "they go with the project configuration" could mean "must match" rather than "are sent with";
+- the imports sentence packs two ideas, and again needs scoping (project references keep the
+  stricter flag inside the generated project);
+- "an unchecked `any`" is unclear, and "incoming data" is odd for `!`;
+- "decide" has no object;
+- the remedy for case 4 isn't stated.
+
+**My prose-only settlement edit** (the fence extract is byte-identical to draft 3):
+- **Paragraph 1:** "Existing signatures and tests count. Send them with the project configuration
+  and the command that runs the compiler and tests. Agree which files may change. The configuration
+  also checks the source files they import into the project, so a stricter setting can make the job
+  bigger than you meant." "Into the project" carries the scope; "bigger job" names the consequence
+  case 4 needs.
+- **Paragraph 2:** "Code that compiles because of `any`, an `as` assertion or a non-null `!` hasn't
+  checked the value it trusts." and "decide which one you mean".
+- **l.294,** from my full read: "And a test that fails when it does" → "when it coerces". "It does"
+  had no clear antecedent.
+
+**Not adopted from the final reader:**
+- **Naming lying predicates in the Principle.** Settlement §4 keeps them in validation, and the
+  reader got case 2 right from "Code without them can still do the wrong thing".
+- **Saying how a rejection test must reject** (a crash satisfies a bare "throws"). It's true, and
+  Ch26 owns it.
+- **A remedy rule for case 4.** "Bigger than you meant" now names the consequence; the choice stays
+  with the owner, as in review 1.
+
+**Length exception.** The text is 2,138 words, under the plan's 2,300 minimum. The shortfall comes
+from cuts this review asked for: recaps, a duplicate run and narration. Padding it back would undo
+them. I accept it.
+
+**Final text:** SHA-256 `e40eb36bda1f106245ce4104972b1adb8778fbd2e99c979ef5b4c4467d80dfca`, 2,138
+words, 11 fences, with the fence extract byte-identical to draft 3. The full `npm run check` exits 0
+on the settled text in the worktree, on TypeScript 7.0.2 and Node 22.23.4.
+
+**Full read of the final text (2026-11-01).** I read the settled chapter start to finish. Apart from
+l.294 above, I found nothing to change: the speaker tags, Idan's pronouns, straight apostrophes and
+the cast are consistent, and Chen's "someone here" still points back to Idan's l.358.

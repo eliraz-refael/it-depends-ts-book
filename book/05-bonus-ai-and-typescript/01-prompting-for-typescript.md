@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Before asking for code, put the decisions it must respect in its signature and in examples of success and rejection. Existing signatures and tests count; they go with the project configuration and the command that runs the compiler and tests. Agree which files may change, remembering that source files the implementation imports are checked under that same configuration."
+**Prof. Eli Typeworth**: "Before asking for code, put the decisions it must respect in its signature and in examples of success and rejection. Existing signatures and tests count. Send them with the project configuration and the command that runs the compiler and tests. Agree which files may change. The configuration also checks the source files they import into the project, so a stricter setting can make the job bigger than you meant."
 
-"Run that command against the returned implementation. An unchecked `any`, a type assertion with `as`, or a non-null assertion with `!` doesn't inspect incoming data. Code without them can still do the wrong thing. If two implementations pass but disagree on behavior you need, decide and put the difference in the examples before the next attempt. The checks enforce what you've expressed in them. Someone still has to own what you meant."
+"Run that command against the returned implementation. Code that compiles because of `any`, an `as` assertion or a non-null `!` hasn't checked the value it trusts. Code without them can still do the wrong thing. If two implementations pass but disagree on behavior you need, decide which one you mean and put the difference in the examples before the next attempt. The checks enforce what you've expressed in them. Someone still has to own what you meant."
 
 ## The Debate
 
@@ -291,7 +291,7 @@ Dima looks back at the request. "Checked fields. No casts. Run the check."
 
 **Dima**: "I could have written 'don't coerce strings' the first time."
 
-**Eli**: "Yes. And a test that fails when it does."
+**Eli**: "Yes. And a test that fails when it coerces."
 
 **Idan**: "Keep numeric zero too. A fix that rejects every falsy amount would catch the empty string and break zero."
 
