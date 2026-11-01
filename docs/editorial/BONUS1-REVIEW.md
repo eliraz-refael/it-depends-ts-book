@@ -1,3 +1,45 @@
+# Bonus 1 — draft 3 self-review
+
+Status: **DRAFT 3; final Principle-only read and diff review pending.**
+
+Manuscript: [Which File Says That?](../../book/05-bonus-ai-and-typescript/01-prompting-for-typescript.md).
+Review addressed: [Claude's second review](bonus1/CLAUDE-REVIEW-2.md), with both verbatim reader reports at `1be8447`.
+Snapshot: [DRAFT3-SNAPSHOT.json](bonus1/DRAFT3-SNAPSHOT.json). The draft 2 self-review is retained below; earlier snapshots and reader reports remain unchanged.
+
+## Response to the ranked findings
+
+1. **The Principle names the page's failure.** The predicate clause is cut. The rule now names unchecked any, an as type assertion and the non-null assertion !, then says plainly that code without them can still do the wrong thing. It does not conflate type assertions, non-null assertions, assertion functions or test assertions. The opening failure supplies any; Chen raises the hypothetical assertion; the two cast-free candidates supply the remaining limit.
+2. **The opening is a rule, not a metaphor.** It starts with the requirement to put decisions into the signature and success/rejection examples before asking for code. Paragraph 1 has three sentences and two imperatives. Existing signatures and tests explicitly count. The compiler-and-test command supplies a clear antecedent for “Run that command.” Disagreements go into the examples “before the next attempt,” with no ambiguous return direction. The semicolon hedge is gone. The Principle is 133 words, down from 146.
+3. **The imports point is scoped and prompted.** One Principle sentence ties permitted file changes to source imports checked under the same configuration. It does not claim to re-check implementations hidden behind declaration outputs. In the debate, Chen asks whether the reset changes every JSON.parse in the shop; Idan limits it to this program and its imported source, with the short Chapter 13 callback and overload link. No new helper subplot or extra compiler fixture was needed.
+4. **The Verdict loses the repeated run and agreement.** It is 291 words, down from 383. Dima retains his win on reusing existing signatures/tests, and Eli answers briefly. The explanation recap becomes “It did tell us 'normalizes'” / “And you read 'validates'. Read that bit next time.” The extra npm run check and Eli's limp line are cut. The deliberate-change discussion and closing ownership exchange remain, including the antecedent for “someone here.”
+5. **The debate beats have their setups.** The early “No casts isn't a certificate” spoiler is cut. Chen's “Very harmonious” now explicitly concerns a hypothetical answer that proposes both contract and code and passes. Eli's repeated ownership question is removed. Dima's first reaction to the zero-cent refund is an objection; his later combined turn recognizes “normalizes” and states the owned provider rule. The redundant defense of the hundred-cent test is cut; Idan's zero case still motivates protection against a falsy-value repair. Eli asks for a test that fails when coercion occurs, without the test-runner lecture.
+6. **Line fixes are literal.** The failing run now says “The other four pass,” including malformed input. The two code-explanation narration passages are trimmed to what they do and what passes. Dima's look back at the request is ordinary narration, not a bold speaker tag. JSON.parse and any in his speech use code formatting.
+
+I disagree with none of the review findings. The “Not adopted” items stay unchanged: Node declarations remain at 26.5.1, no negative-zero detour is added, the contract changes before the implementation, the final request stays saved rather than sent, and the owner chooses any remedy for imported-source failures. Every fence and all three request texts are byte-identical to draft 2.
+
+**Length exception:** the requested local cuts reduce the manuscript from 2,305 to **2,122 words**, below the original 2,300-word drafting minimum. I prioritized the later, specific cuts and did not add replacement material merely to restore that count. This is disclosed in the handoff rather than silently treating the earlier target as met.
+
+## Principle-only self-test
+
+- **Two passing implementations:** the first sentence puts the decisions in examples before commissioning, and a newly exposed disagreement must be recorded before the next attempt.
+- **A shortcut to green:** the rule names the any/assertion failure on the page and separately says their absence does not establish correct behavior. The predicate case can still be rejected through the required rejection example without teaching predicates in this Principle.
+- **Existing signature and tests:** reuse is explicit, with the same project configuration and compiler/test command. It is no longer an inference from “reuse what's already there.”
+- **Only the generated directory:** the source imported by the implementation shares its configuration. The permitted change scope must account for that; the rule does not prescribe a project-reference design or silently authorize changes to old files.
+
+These remain self-tests. The next isolated reader should assess whether the more direct rule resolves the remaining ambiguity without becoming a checklist. The chapter was reread from start to finish after the changes; its concrete Turn, confident fictional explanations and final ownership exchange remain intact.
+
+## Validation and freeze
+
+The targeted run passed on TypeScript 7.0.2 and Node 22.23.4. Coverage is now **11 fences / 31 compiler cases / 15 runtime groups / 1 file-list query / 23 ownership verifications**. Removing the duplicate narrative run removes one compiler invocation and one runtime group, plus its before/after ownership checks. The chosen implementation is still restored after independent value comparisons and tested green after each separate regression control.
+
+The checker explicitly compares the four passing test names in the coercing run with the expected names other than “rejects text amounts.” It retains the assertion's empty-string message and actual zero-cent result, TS2322's return-column check, fixed-contract comparisons, protected-file hashes, always-reject and predicate controls, reset removal/restoration, and dependency/import-scope controls. The saved request still makes no claim of another assistant response. Full-suite verification below includes the final passing-name assertion and final prose.
+
+`npm run check` completed with exit 0: **464 fences / 805 compiler cases / 323 runtime groups**, plus two compiler-default cases, two searches and nine file-list queries. The full run repeated all Bonus 1 controls and the explicit four-passing-tests assertion. Manuscript, validator, runner and shared compiler profile hashes were recorded before execution and verified unchanged afterwards.
+
+The frozen manuscript has **2,122 words** and 11 fences, all byte-identical to draft 2. SHA-256: `21b6a40fa3d09f4fe94674dcdef3cefd61d8f3ffceb3c9ec77fdc6ec892ba33f`. The snapshot records the word-count exception, unchanged fence hashes, removed duplicate run, passing test names, protected-file hashes and full-run evidence.
+
+---
+
 # Bonus 1 — draft 2 self-review
 
 Status: **DRAFT 2; revised Principle-only read and targeted recheck pending.**

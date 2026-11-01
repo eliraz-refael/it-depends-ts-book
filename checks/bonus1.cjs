@@ -88,6 +88,9 @@ remove(story,probe);write(story,testFile,finalTests);freeze();
 for(const file of owned.filter(f=>f!==testFile))assert.equal(acceptedHashes[file],firstOwned[file]);
 assert.notEqual(acceptedHashes[testFile],firstOwned[testFile]);
 const textFailure=suite('coercion-fails-owned-text-cases',finalTests,['rejects text amounts']);
+const otherPasses=[...textFailure.matchAll(/^ok \d+ - (.*)$/gm)].map(m=>m[1]);
+assert.deepEqual(otherPasses,testNames(finalTests).filter(name=>name!=='rejects text amounts'));
+assert.equal(otherPasses.length,4,'The other four tests pass, including malformed input');
 assert(addedTests.includes('for (const cents of ["", "100"])'),'Motivating empty string is first');
 assert(textFailure.includes('cents: ""'),'Failure identifies the empty-string input');
 assert(!textFailure.includes('cents: "100"'),'Failing loop stops before the second input');
@@ -98,7 +101,9 @@ function values(name,expected){const source='import {parseRefund} from "./src/pa
 const good=n=>({ok:true,value:{id:'r1',cents:n}}),bad={ok:false,error:'invalid amount'};
 values('strict-both-text-values-reject',[good(100),bad,bad,bad,good(0)]);
 write(story,parser,coercing);values('coercing-both-text-values-convert',[good(100),bad,good(100),good(0),good(0)]);
-write(story,parser,strict);suite('final-handoff-command',finalTests);
+// Restore the selected implementation after validation-only value comparisons.
+// The saved request is not sent; the page's five-test run already occurred above.
+write(story,parser,strict);
 const selected=read(story,parser),finalOwned={...acceptedHashes};
 // Check the ownership verifier itself, then restore before any candidate runs.
 write(story,contract,resultContract+'// unauthorized change\n');assert.throws(unchanged,/Owned files unchanged/);write(story,contract,resultContract);unchanged();

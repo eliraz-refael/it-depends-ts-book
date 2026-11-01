@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Don't leave a blank where the decision belongs. Before asking for code, put the behavior you want in the signature and in examples of success and rejection. Send the project's configuration and check command with them; reuse what's already there. Agree which files may change, but check their imports first: the configuration reaches that source too. A setting that breaks old code may make this a bigger job than you meant."
+**Prof. Eli Typeworth**: "Before asking for code, put the decisions it must respect in its signature and in examples of success and rejection. Existing signatures and tests count; they go with the project configuration and the command that runs the compiler and tests. Agree which files may change, remembering that source files the implementation imports are checked under that same configuration."
 
-"Run those checks against the answer. If two implementations pass but disagree on behavior you need, decide and put that difference in the examples before handing the work back. A type assertion (`as` or `!`) doesn't check incoming data. Neither does a predicate whose body never checks its claim; code without those shortcuts isn't necessarily correct. The checks enforce what you've expressed in them. Someone still has to own what you meant."
+"Run that command against the returned implementation. An unchecked `any`, a type assertion with `as`, or a non-null assertion with `!` doesn't inspect incoming data. Code without them can still do the wrong thing. If two implementations pass but disagree on behavior you need, decide and put the difference in the examples before the next attempt. The checks enforce what you've expressed in them. Someone still has to own what you meant."
 
 ## The Debate
 
@@ -52,7 +52,7 @@ Dima runs `./node_modules/.bin/tsc -p tsconfig.json`. It passes. `node src/probe
 
 **Idan**: "You know why it compiled."
 
-**Dima**: "JSON.parse handed it any. The return annotation didn't inspect the value. I know. I'm asking what to send next time so we don't have this conversation again."
+**Dima**: "`JSON.parse` handed it `any`. The return annotation didn't inspect the value. I know. I'm asking what to send next time so we don't have this conversation again."
 
 **Chen Override**: "You could send this conversation."
 
@@ -116,11 +116,13 @@ The same compiler command now reports **TS2322: Type 'unknown' is not assignable
 
 **Dima**: "Now that sentence in the explanation has some work to do."
 
-**Idan**: "This adds an overload to the global interface. Our [later signature](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#merging-interfaces) wins this call. It belongs to this program, including its imports, like the augmentation in Chapter 13."
+**Chen**: "Does that change every `JSON.parse` in the shop?"
+
+**Idan**: "Only in this program, including the source it imports, like Chapter 13's augmentation. Our [later overload](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#merging-interfaces) wins this call."
 
 **Chen**: "And if the answer just asserts Refund?"
 
-**Idan**: "It hasn't established the fields. We'll ask for checked construction and test the behavior. No casts isn't a certificate either."
+**Idan**: "It hasn't established the fields. We'll ask for checked construction and test the behavior."
 
 **Dima**: "Good. I don't want to spend the afternoon counting casts."
 
@@ -141,7 +143,7 @@ export type ParseRefund = (raw: string) => Result;
 
 **Dima**: "That's two cases. I can afford two cases."
 
-They write the first acceptance file. The assignment to `parse` checks the callable contract; the tests exercise values.
+They write the first acceptance file.
 
 ```typescript
 // test/refund.test.ts — initial owned tests
@@ -179,9 +181,7 @@ test("rejects a negative amount", () => {
 
 **Dima**: "Me, apparently."
 
-**Eli**: "You can use its proposal. But you have to decide whether that is the job you meant."
-
-**Chen**: "The answer agrees with itself. Very harmonious."
+**Chen**: "If it proposes both and the code passes, the answer agrees with itself. Very harmonious."
 
 **Dima**: "Fine. But I'm not going to specify every possible string before asking for a parser. That's a parser written in English."
 
@@ -236,7 +236,7 @@ She replaces one line in the same implementation:
 const cents = value.cents;
 ```
 
-The checks below it now narrow the unknown field to a number. `npm run check` passes again: same contract, same two tests, same project settings. They have two implementations that satisfy everything they've written so far.
+Dima runs `npm run check` again. Same contract, same two tests, same project settings. Both implementations pass.
 
 **Dima**: "So either one."
 
@@ -271,7 +271,7 @@ console.log(JSON.stringify(parseRefund('{"id":"r1","cents":""}')));
 
 **Idan**: "Number converted the empty string to zero. Zero passed every check after it."
 
-**Dima**: "The webhook sends numbers. If it sends text, I want to know, not turn it into money."
+**Dima**: "Hang on. I didn't ask it to turn text into money."
 
 **Eli**: "Which file says that?"
 
@@ -281,21 +281,17 @@ Dima opens the contract. `cents: number`. Then the test file. A hundred. Minus o
 
 **Eli**: "For the output. Both implementations produce one."
 
-**Dima** looks back at the request. "Checked fields. No casts. Run the check."
+Dima looks back at the request. "Checked fields. No casts. Run the check."
 
 **Chen**: "It built the value without casts. You ran the check."
 
-**Dima**: "And the explanation said normalizes. I read that as a spelling of validates."
-
-**Dima**: "The provider's contract requires numeric cents. I want a format violation rejected so we can report it to them. Converting the amount would hide it. That's our rule."
+**Dima**: "And the explanation said normalizes. I read that as a spelling of validates. The provider's contract requires numeric cents. I want a format violation rejected so we can report it to them. Converting the amount would hide it. That's our rule."
 
 **Idan**: "Then put that decision in the next request. With an example that distinguishes the answers."
 
 **Dima**: "I could have written 'don't coerce strings' the first time."
 
-**Eli**: "Yes. That's a requirement in prose. The test runner still needs something it can execute."
-
-**Chen**: "And the hundred-cent refund should keep working. It's the only one so far that refunds anything."
+**Eli**: "Yes. And a test that fails when it does."
 
 **Idan**: "Keep numeric zero too. A fix that rejects every falsy amount would catch the empty string and break zero."
 
@@ -331,7 +327,7 @@ test("rejects malformed input", () => {
 });
 ```
 
-Dima runs `npm run check` with the returned, coercing implementation. It compiles, but `rejects text amounts` fails on `""`: instead of the expected failure, it returns a success with zero cents. The numeric cases still pass. Replacing the amount line with `const cents = value.cents;` makes all five tests pass.
+Dima runs `npm run check` with the returned, coercing implementation. It compiles, but `rejects text amounts` fails on `""`: instead of the expected failure, it returns a success with zero cents. The other four pass. Replacing the amount line with `const cents = value.cents;` makes all five tests pass.
 
 **Dima**: "That line didn't get more intelligent. We finally asked it a different question."
 
@@ -355,23 +351,19 @@ Dima keeps the result contract, the five tests and the same project files. The s
 
 **Dima**: "Next time we already have a contract and tests, I'm attaching them. I'm not rewriting them to prove I take prompting seriously."
 
-**Eli**: "Agreed. Check whether they express the requirement. Add the missing decision, not a second copy of the project."
+**Eli**: "Then use them."
 
-**Dima**: "Also, I can ask for proposed cases. I don't have to invent every input alone."
+**Dima**: "And I'm still asking for proposed cases."
 
-**Idan**: "Of course. But when the proposed case says an empty amount is zero, someone here has to decide whether that's our rule."
+**Idan**: "Fine. Someone here still decides what the answers should be."
 
-Dima runs `npm run check` against the selected file again, with the owned files unchanged. All five tests pass.
+**Dima**: "It did tell us 'normalizes'."
 
-**Dima**: "So the explanation stays useful. It called out normalization. I just didn't stop to ask what that meant."
-
-**Idan**: "Yes. Read it. Ask it to explain a choice you don't understand. Then put the choice you accept somewhere the next implementation has to face it."
+**Idan**: "And you read 'validates'. Read that bit next time."
 
 **Chen**: "What if the next task discovers that one of our expected answers is wrong?"
 
 **Dima**: "Then we change the requirement deliberately. We don't keep a bad test forever. But 'this implementation fails it' isn't, by itself, a reason to change it. That's why the request says to report conflicts."
-
-**Eli**: "Then it knows when to ask you."
 
 **Chen**: "Who owns 'someone here'?"
 
