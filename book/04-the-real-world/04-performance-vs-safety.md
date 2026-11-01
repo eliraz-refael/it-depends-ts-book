@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Daniel Compiler**: "Before you trade a type constraint for speed, measure the saving and say what newly compiles. Are you speeding up checking or running? Compare repeated times with the same workload, file list and options, changing one suspected part. Otherwise you may be celebrating work you stopped doing. Compiler counters describe work; they aren't a price list in seconds. When they don't explain the time, use a trace or CPU profile to investigate where it went."
+**Daniel Compiler**: "Before trading a type constraint for speed, measure the saving and say what newly compiles. Checking or running? For annotation-only changes, compare emitted code before timing; validators need measuring. Change one thing; repeat with the same files, workload and options. Otherwise you're celebrating work you stopped doing. Counters aren't seconds. If they don't explain the time, profile."
 
-"Write down the calls that must stay legal and the combinations that must stay forbidden. Rejecting the same typo doesn't prove both survived. Comparing emitted code can clear an erased annotation of runtime cost; a validator that runs needs its own measurement. Whether you remove a type constraint or runtime validation, show what now gets through. Name what catches it instead, or accept that risk explicitly. Someone has to own the mistake that now compiles."
+"List which calls must stay legal and which must stay forbidden. A cheaper signature can reject the typo and accept another mistake. Remove a constraint or validator, and name what catches mistakes instead—or accept the risk. Someone has to own the mistake that now compiles."
 
 ## The Debate
 
@@ -39,7 +39,7 @@ console.log(t("shop.crat", { name: "A", count: "2" }));
 console.log(t("shop.cart", { name: "A" }));
 ```
 
-On Node 22.23.4, `node dist/probe.js` prints `shop.crat`, then `Hello A, {count} items`.
+Gil emits with `tsc -p tsconfig.json --checkers 1 --noEmit false --rootDir src --outDir dist --removeComments true`, using the shared options below. On Node 22.23.4, `node dist/probe.js` prints `shop.crat`, then `Hello A, {count} items`.
 
 **Oded**: "Yes. I removed those checks. I'm not arguing that misspelling cart is a feature. I'm asking whether we need to compute the parameters from every message while checking every caller."
 
@@ -75,13 +75,13 @@ function t(...args: Args): string;
 
 **Linoy**: "Then measure the larger catalogue. Don't remove the feature and tell me the feature was implemented badly."
 
-Both probe calls get TS2345. So does the banner’s `t(pending[0], pending[1])`, which Oded expanded from a tuple spread to fit his loose signature. The typo message ends by comparing `shop.crat` with `shop.hello`.
+Both probe calls get TS2345. So does the banner’s `t(pending[0], pending[1])`, which Oded expanded because `t(...pending)` gets TS2556 under his loose signature. The typo message ends by comparing `shop.crat` with `shop.hello`.
 
 **Oded**: "It would be nice if the error suggested cart."
 
 **Linoy**: "Agreed. But it won't let you send crat."
 
-They remove the probe. Linoy restores the banner's `t(...pending)`: this caller picks the whole message, then passes it on.
+They remove the probe. Linoy restores the banner's `t(...pending)`.
 
 ```typescript
 // src/banner.ts
@@ -110,30 +110,22 @@ export const ready = t("shop.ready");
 
 ### "Which part?"
 
-**Gil**: "The ordinary command is `tsc -p tsconfig.json --checkers 1`. To emit, add `--noEmit false --rootDir src --outDir dist --removeComments true`. Here are the shared options."
+**Gil**: "TypeScript 7.0.2. One checker, these options."
 
 **tsconfig.json**
 
 ```json
 {
   "compilerOptions": {
-    "strict": true,
-    "exactOptionalPropertyTypes": true,
-    "target": "ES2022",
-    "module": "Node16",
-    "moduleResolution": "Node16",
-    "types": [],
-    "skipLibCheck": true,
-    "noEmitOnError": true,
-    "noEmit": true
+    "strict": true, "exactOptionalPropertyTypes": true,
+    "target": "ES2022", "module": "Node16", "moduleResolution": "Node16",
+    "types": [], "skipLibCheck": true, "noEmitOnError": true, "noEmit": true
   },
   "include": ["src"]
 }
 ```
 
-**Gil**: "TypeScript 7.0.2. One checker. These options. Keep them attached to the numbers. Changing the libraries or the number of checkers changes what we're counting."
-
-**Oded**: "And the workload is attached. I generated it. Forty sections, fifty keys each. Three message shapes. Two thousand valid calls, cycling over two hundred distinct keys. This is generated work, not a real shop’s build time."
+**Oded**: "Synthetic catalogue: two thousand keys, two thousand calls."
 
 ```javascript
 // tools/workload.mjs
@@ -154,27 +146,9 @@ export function workload() {
 }
 ```
 
-**Noam**: "Two hundred keys used, two thousand available. That matters for a type that builds something for every key."
+`bench/case.ts` contains the catalogue as `const messages = … as const;` on one line, required helpers, the signature with `declare`, calls and `export {};`. Its config, `bench/tsconfig.json`, is `{"extends":"../tsconfig.json","files":["case.ts"],"include":[]}`.
 
-**Gil**: "Yes. We're keeping both counts."
-
-**Oded**: "Does that cover every way someone might call this?"
-
-**Gil**: "No. It gives us a repeatable workload. Changing the catalogue, the number of calls or which keys they use is another experiment. We can run those next. For this comparison, stop moving the furniture."
-
-**Gil**: "In `bench/case.ts`: the catalogue on one line as `const messages = … as const;`, only the needed helpers, the selected signature with `declare`, then the calls and `export {};`. We’re measuring checking. This config keeps the small application out."
-
-**bench/tsconfig.json**
-
-```json
-{
-  "extends": "../tsconfig.json",
-  "files": ["case.ts"],
-  "include": []
-}
-```
-
-**Gil**: "`tsc -p bench/tsconfig.json --checkers 1 --extendedDiagnostics`. Three runs per version, serially, rotating the order. One measurement session for all the comparisons; no tracing or profiling while timing. These are the medians from this fixture on this machine."
+**Gil**: "Add `--extendedDiagnostics` to `tsc -p bench/tsconfig.json --checkers 1`: three runs, serially, rotating order, no tracing or profiling while timing. These are medians."
 
 Gil lays out four alternatives, one at a time, with only the helpers each needs. The string baseline doesn't compute Key; the last row uses Linoy's Args above.
 
@@ -185,7 +159,8 @@ function t(key: string, params?: Record<string, string>): string;
 // Key; loose optional params
 function t(key: Key, params?: Record<string, string>): string;
 // Tuple union; loose optional params
-type Args = { [K in Key]: [key: K, params?: Record<string, string>] }[Key]; function t(...args: Args): string;
+type Args = { [K in Key]: [key: K, params?: Record<string, string>] }[Key];
+function t(...args: Args): string;
 // Linoy's per-key tuples
 function t(...args: Args): string;
 ```
@@ -196,6 +171,10 @@ function t(...args: Args): string;
 | Key; loose optional params | 13,189 | 0.016s |
 | Tuple union; loose optional params | 39,641 | 1.013s |
 | Linoy's per-key tuples | 118,255 | 1.481s |
+
+**Noam**: "But only two hundred distinct keys called."
+
+**Gil**: "Yes. Change that and it's another experiment. Stop moving the furniture."
 
 **Oded**: "So the difference I measured exists."
 
@@ -239,7 +218,7 @@ function messageFor(hasItems: boolean): "shop.cart" | "shop.hello" {
 console.log(t(messageFor(true), { name: "A" }));
 ```
 
-The full project gets TS2556 at the unchanged banner’s tuple spread. They give the probe a separate file list: `probe.json` extends the root config, with `files: ["src/i18n.ts", "src/probe.ts"]` and `include: []`. Checking and emitting with `-p probe.json` succeeds and prints `Hello A, {count} items`.
+The full project gets TS2556 at the unchanged banner’s tuple spread. They give the probe a separate file list: `probe.json` extends the root config, with `files: ["src/i18n.ts", "src/probe.ts"]` and `include: []`. Checking and emitting with `-p probe.json` succeeds. Running `node dist/probe.js` prints `Hello A, {count} items`.
 
 **Noam**: "It lets my broken replacement through and rejects the caller I already had."
 
@@ -270,7 +249,7 @@ Noam's separate-key probe gets TS2345. The original pending-tuple banner compile
 
 ## The Turn
 
-Gil adds the distributed signature’s results. The baseline and both tables come from the same measurement session; Linoy’s row is reused.
+**Gil**: "Same session as the first table. I’m reusing Linoy’s row."
 
 | Signature | Instantiations | Median check time |
 |---|---:|---:|
@@ -291,25 +270,29 @@ She follows a relation event’s checker ID through `legend.json` to its type fi
 
 **Linoy**: "There’s Args. My guess is we’re spending the time relating arguments to that union."
 
-**Gil**: "Look at the durations. Those events don’t account for the slow check. Finding Args isn’t finding the cost."
+**Gil**: "About 0.2 seconds in the recorded check events, against about 1.6 for checking the file. Finding Args isn’t finding the cost."
 
 **Linoy**: "Then CPU samples. `tsc -p bench/tsconfig.json --checkers 1 --pprofDir profile`. With a Go toolchain installed, `go tool pprof -top -cum profile/*-cpuprofile.pb.gz`."
 
 The cumulative profile puts a large share of samples under [mapTypeEx](https://github.com/microsoft/typescript-go/blob/2bd066d87f5bafd315be9f40889d0a60b9e58e0b/internal/checker/checker.go#L25473-L25508). Linoy uses `-peek mapTypeEx` to inspect its callers and callees: contextual typing above it, union construction below.
 
-**Daniel**: "That function walks a union’s members, applies an operation and, when the results change, builds a union from them. It’s a TypeScript 7.0.2 checker internal; the name and implementation may change."
+**Daniel**: "That function walks a union’s members, applies an operation and, when the results change, builds a union from them. That’s 7.0.2’s checker. Don’t build on the name."
 
 **Linoy**: "So I found Args and blamed the relation. This points to walking and rebuilding unions while working out the types expected for the arguments. My guess was too narrow."
 
 **Oded**: "Two thousand comparisons every call?"
 
-**Gil**: "No. Samples locate work; they don’t count every visit or identify every union. We have a better explanation for this run, not a new universal price list."
+**Gil**: "Samples can’t tell you that. They locate work; they don’t count every visit or identify every union."
+
+Linoy switches the fixture to the distributed signature and profiles it into a fresh directory. The time sampled under the same function drops sharply.
+
+**Daniel**: "For these literal-key calls, inference gives K one key, so the checker gets one tuple to type the arguments against instead of the entire catalogue. That removes the broad union work we just saw dominating the old profile."
 
 **Noam**: "I was going to ask why the number got bigger. I still want that in the result."
 
 **Gil**: "It stays. So do the times. Someone comparing the next version should have both."
 
-Linoy restores the distributed signature in the fixture. Oded reruns the small banner: `Hello A, 2 items` when it has items, `Hello A` otherwise, and `Ready` for the placeholder-free call.
+Oded reruns the small banner: `Hello A, 2 items` when it has items, `Hello A` otherwise, and `Ready` for the placeholder-free call.
 
 **Oded**: "Count made it all the way to the customer this time."
 

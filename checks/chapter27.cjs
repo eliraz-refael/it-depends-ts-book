@@ -14,21 +14,24 @@ const badLiteral=source('// src/probe.ts — temporary');
 const oldDeclarations=source('// src/i18n.ts — restore');
 const banner=source('// src/banner.ts');
 const options=JSON.parse(block('{\n  "compilerOptions"'));
-const benchOptions=JSON.parse(block('{\n  "extends"'));
+const benchOptions=JSON.parse(manuscript.match(/Its config, `bench\/tsconfig\.json`, is `([^`]+)`/)[1]);
 const generator=source('// tools/workload.mjs');
 const brokenSignature=source('// src/i18n.ts — candidate');
 const badSelection=source('// src/probe.ts — try');
 const distributedSignature=source('// src/i18n.ts — replace');
 const counterfactuals=source('// Counterfactual signatures');
-const alternatives=[...counterfactuals.matchAll(/^\/\/ (.+)\n([^\n]+)\n/gm)].map(m=>({label:m[1],code:m[2]+'\n'}));
+const alternatives=counterfactuals.split(/^\/\/ /m).slice(1).map(part=>{const newline=part.indexOf('\n');return {label:part.slice(0,newline),code:part.slice(newline+1).trimEnd()+'\n'};});
 assert.equal(alternatives.length,4,'Four printed counterfactual alternatives');
 assert.equal((manuscript.match(/^```/gm)||[]).length,fences.length*2,'All fences are labelled and extracted');
-assert.equal(used.size,fences.length,'Every printed fence is used');assert.equal(fences.length,11);
+assert.equal(used.size,fences.length,'Every printed fence is used');assert.equal(fences.length,10);
 assert.deepEqual(options.compilerOptions,{...defaults,noEmit:true});
 assert.equal(manuscript.match(/root package has `([^`]+)`/)[1],'"type": "module"');
 const scratch=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'ts-book-ch27-'))),story=path.join(scratch,'story');
 const results=[],measurements=[],traceEvidence=[];let cases=0,runtimeGroups=0,fileLists=0,emitComparisons=0;
 const tsc=path.join(repo,'node_modules/.bin/tsc');
+const emitFlags=manuscript.match(/Gil emits with `tsc -p tsconfig.json --checkers 1 ([^`]+)`/)[1].split(' ');
+assert.deepEqual(emitFlags,['--noEmit','false','--rootDir','src','--outDir','dist','--removeComments','true']);
+assert(manuscript.indexOf('Gil emits with')<manuscript.indexOf('On Node 22.23.4'),'Emit command precedes the output');
 const record=process.argv.includes('--record-counters');
 assert(process.argv.slice(2).every(a=>a==='--record-counters'),'Only --record-counters is supported');
 function write(f,s){const p=path.join(story,f);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof s==='string'?s:JSON.stringify(s,null,2));}
@@ -75,15 +78,18 @@ assert.deepEqual(probeFiles,['src/i18n.ts','src/probe.ts']);assert(manuscript.in
 write('package.json',{type:'module'});write('tsconfig.json',options);write('probe.json',probeProject);
 write('src/i18n.ts',loose);write('src/banner.ts',initialBanner);write('src/probe.ts',badLiteral);
 compile('PR-accepts-mistakes');
-compile('PR-emit',[],'tsconfig.json',['--noEmit','false','--rootDir','src','--outDir','dist','--removeComments','true']);
+compile('PR-emit',[],'tsconfig.json',emitFlags);
 assert(manuscript.includes('Noam is reading the output of two deliberately broken calls he wrote'));
 assert(badLiteral.includes('console.log(t("shop.cart", { name: "A" }));'),'Opening output has its printed call');
 run('PR-review-probe-output',['dist/probe.js'],'shop.crat\nHello A, {count} items');
 const emittedLoose=read('dist/i18n.js');
+write('src/banner.ts',banner);
+compile('PR-original-spread-rejected',[error('src/banner.ts','t(...pending)',2556)]);
+write('src/banner.ts',initialBanner);compile('PR-expanded-caller-restored');
 write('src/i18n.ts',moduleFor('union'));
 compile('original-rejects-literal-mistakes',[error('src/probe.ts','shop.crat',2345,"Type '\"shop.crat\"' is not assignable to type '\"shop.hello\"'."),error('src/probe.ts','shop.cart',2345),error('src/banner.ts','t(pending[0], pending[1])',2345)]);
 remove('src/probe.ts');write('src/banner.ts',banner);compile('original-restored');
-compile('original-emit',[],'tsconfig.json',['--noEmit','false','--rootDir','src','--outDir','dist','--removeComments','true']);
+compile('original-emit',[],'tsconfig.json',emitFlags);
 assert.equal(read('dist/i18n.js'),emittedLoose,'Original and PR emit bytes');emitComparisons++;
 assert.equal(Buffer.byteLength(emittedLoose),Number(manuscript.match(/Same (\d+) bytes/)[1]),'Printed byte count');
 const bannerProbe='import {banner,ready} from "./dist/banner.js"; console.log(banner(true)); console.log(banner(false)); console.log(ready);';
@@ -125,7 +131,7 @@ contract('key');contract('untyped');compile('counterfactual-controls-restored');
 write('src/i18n.ts',moduleFor('broken'));write('src/probe.ts',badSelection);
 compile('broken-generic-full-caller-set',[error('src/banner.ts','t(...pending)',2556)]);
 compile('broken-generic-selected-probe',[],'probe.json');
-compile('broken-generic-probe-emit',[],'probe.json',['--noEmit','false','--rootDir','src','--outDir','dist','--removeComments','true']);
+compile('broken-generic-probe-emit',[],'probe.json',emitFlags);
 run('broken-generic-customer-output',['dist/probe.js'],'Hello A, {count} items');
 assert.equal(read('dist/i18n.js'),emittedLoose);emitComparisons++;
 remove('src/probe.ts');contract('broken');
@@ -134,25 +140,31 @@ write('src/i18n.ts',moduleFor('distributed'));write('src/probe.ts',badSelection)
 compile('distributed-rejects-selected-key',[error('src/probe.ts','console.log',2345)]);
 remove('src/probe.ts');compile('distributed-restored');contract('distributed');compile('distributed-contract-controls-restored');
 fs.rmSync(path.join(story,'dist'),{recursive:true,force:true});
-compile('distributed-emit',[],'tsconfig.json',['--noEmit','false','--rootDir','src','--outDir','dist','--removeComments','true']);
+compile('distributed-emit',[],'tsconfig.json',emitFlags);
 assert.equal(read('dist/i18n.js'),emittedLoose);emitComparisons++;
 
 // Trace after untraced measurements. Inspect identities via the legend, never fixed IDs or sample counts.
 write('bench/case.ts',benchSource('union'));
-compile('trace-original-union',[],'bench/tsconfig.json',['--generateTrace','trace']);
+const traced=compile('trace-original-union',[],'bench/tsconfig.json',['--generateTrace','trace','--extendedDiagnostics']);
 const legend=JSON.parse(read('trace/legend.json')),events=JSON.parse(read('trace/trace.json'));
 let unionFound=false;
 for(const entry of legend){const types=JSON.parse(fs.readFileSync(entry.typesPath,'utf8')),byId=new Map(types.map(t=>[t.id,t]));const args=types.filter(t=>t.symbolName==='Args'&&t.unionTypes?.length===2000);if(args.length)unionFound=true;for(const event of events.filter(e=>e.name==='structuredTypeRelatedTo'&&e.args?.checkerId===entry.checkerId)){const target=byId.get(event.args.targetId),source=byId.get(event.args.sourceId);assert(target&&source,'Trace relation identities resolve through legend');if(args.some(t=>t.id===target.id||t.id===source.id))traceEvidence.push({checkerId:entry.checkerId,sourceId:source.id,targetId:target.id,sourceName:source.symbolName,targetName:target.symbolName,durationMicroseconds:event.dur,sourceUnionMembers:source.unionTypes?.length,targetUnionMembers:target.unionTypes?.length});}}
 assert(unionFound,'The trace type dump contains the large Args union');
 const expressions=events.filter(e=>e.name==='checkExpression'&&e.args?.path===path.join(story,'bench/case.ts')).map(e=>({pos:e.args.pos,end:e.args.end,source:read('bench/case.ts').slice(e.args.pos,e.args.end)}));
 const durations={};for(const e of events.filter(e=>e.ph==='X'&&typeof e.dur==='number')){const row=durations[e.name]??={events:0,summedMicroseconds:0};row.events++;row.summedMicroseconds+=e.dur;}
-fs.writeFileSync(path.join(scratch,'TRACE-EVIDENCE.json'),JSON.stringify({relations:traceEvidence,expressions,durations,note:'Duration sums may overlap. These events neither account for the full check nor establish its hot path.'},null,2));
-// CPU profiling is separate from timing. Format/readability assertions do not rank samples.
-compile('profile-original-union',[],'bench/tsconfig.json',['--pprofDir','profile']);
-const cpuProfiles=fs.readdirSync(path.join(story,'profile')).filter(f=>f.endsWith('-cpuprofile.pb.gz'));
-assert.equal(cpuProfiles.length,1,'One fresh CPU profile produced');
-const profilePath=path.join(story,'profile',cpuProfiles[0]);
-const profileBytes=require('node:zlib').gunzipSync(fs.readFileSync(profilePath));
+const checkEvents=events.filter(e=>e.ph==='X'&&(e.cat==='check'||e.cat==='checkTypes'));
+const checkEventSeconds=checkEvents.reduce((sum,e)=>sum+(e.dur??0),0)/1e6;
+const sourceSpans=[],starts=new Map();
+for(const e of events.filter(e=>e.name==='checkSourceFile')){
+ const key=JSON.stringify([e.pid,e.tid,e.args?.checkerId,e.args?.path]);
+ if(e.ph==='B')starts.set(key,e.ts);
+ if(e.ph==='E'&&starts.has(key)){sourceSpans.push({path:e.args?.path,seconds:(e.ts-starts.get(key))/1e6});starts.delete(key);}
+}
+const checkFileSeconds=sourceSpans.find(e=>e.path===path.join(story,'bench/case.ts'))?.seconds??null;
+const printedTrace=manuscript.match(/About ([\d.]+) seconds in the recorded check events, against about ([\d.]+)/);
+assert(printedTrace,'Trace observations are labelled approximate');
+fs.writeFileSync(path.join(scratch,'TRACE-EVIDENCE.json'),JSON.stringify({relations:traceEvidence,expressions,durations,checkEventSeconds,checkFileSeconds,sourceSpans,extendedDiagnostics:traced.stdout,printedObservation:{checkEventSeconds:Number(printedTrace[1]),checkFileSeconds:Number(printedTrace[2])},note:'Recorded durations, including the printed observations, are evidence only. Sums may overlap; no duration, ordering or ratio is asserted.'},null,2));
+// Both CPU profiles are separate from timing. Format assertions never rank samples.
 // Read the protobuf envelope even without Go. Profile.proto fields identify the sample schema.
 function protobufFields(buffer){
  let offset=0;const fields=[];
@@ -176,9 +188,7 @@ function protobufFields(buffer){
  }
  return fields;
 }
-const profileFields=protobufFields(profileBytes);
-for(const field of [1,6])assert(profileFields.some(f=>f.field===field&&f.wire===2),'CPU profile schema field '+field);
-function pprofEvidence(executable,label){
+function pprofEvidence(executable,label,profilePath){
  const available=cp.spawnSync(executable,['version'],{encoding:'utf8'});
  if(available.error?.code==='ENOENT'){const note=label+': SKIP pprof sample evidence — Go toolchain absent; CPU profile produced and protobuf envelope decoded.';console.log(note);return {skipped:true,note};}
  if(available.error)throw available.error;
@@ -195,10 +205,20 @@ function pprofEvidence(executable,label){
  evidence.note='Sample shares, hot-function presence and ordering are evidence only; never pass/fail conditions.';
  return evidence;
 }
-const profileEvidence=pprofEvidence('go','CPU profile');
-const absentGoControl=pprofEvidence(path.join(scratch,'absent-go-toolchain'),'No-Go control');
+function captureProfile(kind,directory){
+ write('bench/case.ts',benchSource(kind));
+ const r=compile('profile-'+kind,[],'bench/tsconfig.json',['--pprofDir',directory,'--extendedDiagnostics']);
+ const cpuProfiles=fs.readdirSync(path.join(story,directory)).filter(f=>f.endsWith('-cpuprofile.pb.gz'));
+ assert.equal(cpuProfiles.length,1,kind+' produces one fresh CPU profile');
+ const profilePath=path.join(story,directory,cpuProfiles[0]);
+ const profileFields=protobufFields(require('node:zlib').gunzipSync(fs.readFileSync(profilePath)));
+ for(const field of [1,6])assert(profileFields.some(f=>f.field===field&&f.wire===2),'CPU profile schema field '+field);
+ return {profilePath,protobufFields:profileFields,extendedDiagnostics:r.stdout,...pprofEvidence('go',kind+' CPU profile',profilePath)};
+}
+const profileEvidence={union:captureProfile('union','profile'),distributed:captureProfile('distributed','profile-distributed')};
+const absentGoControl=pprofEvidence(path.join(scratch,'absent-go-toolchain'),'No-Go control',profileEvidence.union.profilePath);
 assert(absentGoControl.skipped,'Missing Go skips visibly');
-fs.writeFileSync(path.join(scratch,'PROFILE-EVIDENCE.json'),JSON.stringify({profilePath,protobufFields:profileFields,...profileEvidence,absentGoControl},null,2));
+fs.writeFileSync(path.join(scratch,'PROFILE-EVIDENCE.json'),JSON.stringify({...profileEvidence,absentGoControl,note:'Both profiles are readable; their sample shares and relative costs are observations, not assertions.'},null,2));
 write('bench/case.ts',benchSource('distributed'));compile('trace-counterfactual-restored',[],'bench/tsconfig.json');
 run('final-banner-values',['--input-type=module','-e',bannerProbe],'Hello A, 2 items\nHello A\nReady');
 // Extra caller controls, on the final signature, do not change the manuscript's final repository.
@@ -206,6 +226,11 @@ const finalModule=read('src/i18n.ts');
 const forward='\ntype ArgsFor<K extends Key> = K extends Key ? (keyof Params<At<typeof messages,K>> extends never ? [K] : [K,Params<At<typeof messages,K>>]) : never;\nfunction forward<K extends Key>(...args:ArgsFor<K>){return t(...args);}\nconst callable: (...args:ArgsFor<Key>)=>string=t;\n';
 write('src/i18n.ts',finalModule+forward);compile('generic-forward-and-function-assignment');
 write('src/i18n.ts',finalModule+'\nt<Key>("shop.cart",{name:"A"});\n');compile('explicit-union-cannot-lose-pair',[error('src/i18n.ts','t<Key>',2345)]);
+const keyWitness='declare '+distributedSignature.replace('function t<','function inferredKey<').replace('): string;','): K;')+
+ '\nconst chosenKey = inferredKey("shop.cart", {name:"A",count:"2"});\nconst exactKey: "shop.cart" = chosenKey;\n';
+write('src/i18n.ts',finalModule+keyWitness);compile('literal-key-inference');
+write('src/i18n.ts',finalModule+keyWitness+'const wrongKey: "shop.hello" = chosenKey;\n');
+compile('literal-key-is-not-any-or-another-member',[error('src/i18n.ts','const wrongKey',2322)]);
 write('src/i18n.ts',finalModule);compile('extra-callers-restored');
 // Validation-only precomputed-map attempt: count and time it; never rank by either in an assertion.
 let map='type ParamMap = {\n';for(const fullKey of keys){const k=Number(fullKey.split('.k')[1]);map+=JSON.stringify(fullKey)+': '+(k%3===0?'{name:string;count:string}':k%3===1?'{name:string}':'{}')+';\n';}map+='};\ntype Key = keyof ParamMap;\n';
