@@ -1,0 +1,229 @@
+{
+  "status": "draft 2 frozen; revised Principle-only read and targeted recheck pending",
+  "date": "2026-10-29",
+  "settled_plan_commit": "c767daa",
+  "review_commit": "6a06919",
+  "base_commit": "6a0691988de029ecdbd4a98d5513d65393d65bdc",
+  "path": "book/04-the-real-world/04-performance-vs-safety.md",
+  "sha256": "476e8a59986f3e324f4c6ed4bc8fb4f54710e42e14cfa1937de77260ea2518bc",
+  "manuscript_mtime_utc": "2026-10-29T16:15:40.824998+00:00",
+  "words": 2501,
+  "word_count_method": "Whitespace-delimited words in the complete Markdown, including code fences.",
+  "code_fences": 11,
+  "fences_by_language": {
+    "typescript": 8,
+    "json": 2,
+    "javascript": 1
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "typescript",
+      "sha256": "8d94495a76f73af1d5b3909b9451a1eb93dd9c94659b0a085f85e3ddd44ba141"
+    },
+    {
+      "ordinal": 2,
+      "language": "typescript",
+      "sha256": "35b4b33d56f2204100e6f6d075ff30c38b2bfd1ba274da12a204a81f5037dc50"
+    },
+    {
+      "ordinal": 3,
+      "language": "typescript",
+      "sha256": "2c4665e1a53055ddd5254dc1f0dd82c5e2743c68413b4dfbaaef19603cd16d55"
+    },
+    {
+      "ordinal": 4,
+      "language": "typescript",
+      "sha256": "c56ea76e30a4ab76465e396a4f8c445eccf3387a4f34217916894ab95911e4b1"
+    },
+    {
+      "ordinal": 5,
+      "language": "json",
+      "sha256": "d80d8775bb6e45c92208e43b93672f3de7cd4447c3c2cde27b3ada564626e900"
+    },
+    {
+      "ordinal": 6,
+      "language": "javascript",
+      "sha256": "9397b2b6ea7925b37aa2195eedcac205458b53515761dd11c24d0c0eaf9611e5"
+    },
+    {
+      "ordinal": 7,
+      "language": "json",
+      "sha256": "772461ba69e6ce94f166d33020f2b99eb843d83acca4c24c32435d8d3afdb4a5"
+    },
+    {
+      "ordinal": 8,
+      "language": "typescript",
+      "sha256": "a2326dddbd4fa74c85ab334ab0e064aa65a14c146f509d7560e9a23bfcac75d2"
+    },
+    {
+      "ordinal": 9,
+      "language": "typescript",
+      "sha256": "07b712905405ae2e8a397f1bc71cf6526a71782f2f906ed418154724e83f8462"
+    },
+    {
+      "ordinal": 10,
+      "language": "typescript",
+      "sha256": "ece9507a45f26b264950753733a862fc39289eb2fb28c84fe5e9cf195a42bdac"
+    },
+    {
+      "ordinal": 11,
+      "language": "typescript",
+      "sha256": "c4bdbb15c51fcbde2838fcc9c44541592b988dcb115e2d966af34eb873fbb49b"
+    }
+  ],
+  "validator_sha256": "ade85cec06230e5ef94abb4d6bfaff2fd681f5fe990b41e6cd1b743231c0bda5",
+  "suite_runner_sha256": "ccf35b6d74bbcbd1eec2156def05a0fc3d71fb1ca923537208516cd46ed66e4f",
+  "compiler_profile_sha256": "3fbee0de1a72de52e3288a05c3682ba614932b91f56b237e570dfaec6ab99375",
+  "typescript": "7.0.2",
+  "node": "v22.23.4",
+  "go": "go version go1.26.10 darwin/arm64",
+  "validation": {
+    "installation": "Same locked npm ci installation used for the challenge and draft 1. No new clean-export claim.",
+    "targeted_suite": "Exit 0; 11 fences / 102 compiler cases / 5 runtime groups / 1 file-list query / 3 emit comparisons. Subsequent profile-error handling and printed probe-file-list extraction are covered by the full suite.",
+    "full_suite": "npm run check: exit 0 on this exact manuscript, validator, suite runner and compiler profile; input hashes recorded before execution and verified unchanged afterwards.",
+    "chapter_counts": {
+      "fences": 11,
+      "compiler_cases": 102,
+      "runtime_groups": 5,
+      "file_list_queries": 1,
+      "emit_comparisons": 3,
+      "untraced_benchmark_runs": 21,
+      "traced_compiles": 1,
+      "cpu_profile_compiles": 1
+    },
+    "book_counts": {
+      "fences": 454,
+      "compiler_cases": 769,
+      "runtime_groups": 308,
+      "default_cases": 2,
+      "searches": 2,
+      "file_list_queries": 8
+    },
+    "full_suite_manuscript_sha256": "476e8a59986f3e324f4c6ed4bc8fb4f54710e42e14cfa1937de77260ea2518bc",
+    "full_suite_log": ".probe/codex/draft2/full-check.log",
+    "full_suite_log_sha256": "b06045f07d33b44e56b8c1cc0377c51a7819ea2adc0f50c6a84082dea6dc2479",
+    "chapter_results": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-ch27-hqTx2w/RESULTS.json",
+    "chapter_results_sha256": "ebcaacfaf032ae62c7e6f9bce86eeb855a705f180e1233eb588c751bfa647da0",
+    "counter_and_time_evidence": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-ch27-hqTx2w/COUNTERS-AND-TIMES.json",
+    "counter_and_time_evidence_sha256": "83671a0c092f60ccf4aa195ba987205dbcdb865539084b442c562ec57f62e7a7",
+    "trace_evidence": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-ch27-hqTx2w/TRACE-EVIDENCE.json",
+    "trace_evidence_sha256": "ea3a9a96a5b8e3e6dfe05dadc4d95e199df1c6eea19ca8d4c426a20e43ad5752",
+    "profile_evidence": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-ch27-hqTx2w/PROFILE-EVIDENCE.json",
+    "profile_evidence_sha256": "341d0e4948c0fd49214abe4f0431f16131f93b012b548dad8d49d30367189c2c",
+    "cpu_profile": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-ch27-hqTx2w/story/profile/68909-cpuprofile.pb.gz",
+    "cpu_profile_sha256": "59a7306452b5c8b22fac40c43eb489c80016a76fd0652077df064f5ba08f24f8",
+    "profile_cumulative_row_observed": "     0.06s  3.31%  3.31%      1.02s 56.35%  github.com/microsoft/typescript-go/internal/checker.(*Checker).mapTypeEx",
+    "profile_policy": "Require production and readable format. With Go, record cumulative top and peek output; absent sampled function is not a failure. Without Go, visibly skip interpretation while retaining generation and envelope validation. No sample share, count, function presence or timing threshold is asserted.",
+    "missing_go_control": {
+      "skipped": true,
+      "note": "No-Go control: SKIP pprof sample evidence \u2014 Go toolchain absent; CPU profile produced and protobuf envelope decoded."
+    },
+    "final_benchmark_sha256": "6e1b9b76210289f4a9a6ee659a68c2214d07fc91fc2b6a7dae68e59667ad4752",
+    "generated_workload": {
+      "sections": 40,
+      "keys_per_section": 50,
+      "keys": 2000,
+      "calls": 2000,
+      "distinct_called_keys": 200
+    },
+    "configuration": "Book profile; --checkers 1; fixed installed libraries; explicit benchmark and probe file lists.",
+    "timing_policy": "One serial session for six printed variants, three rounds rotating order. Both tables reuse the baseline observations. Three separate validation-only ParamMap runs. No timing value or ordering determines pass/fail.",
+    "printed_measurements": {
+      "summary_file": ".probe/codex/draft2/printed-measurements.json",
+      "summary_file_sha256": "299a562b0ab0d044c71a1aca83b9eae7e6a74b4b40e964d54f6b5ffb8f6bddfa",
+      "log": ".probe/codex/draft2/targeted.log",
+      "log_sha256": "d747862967c62e5cca477a2aaf66c82f0cc7f0a003f7f262536551400a86e9cc",
+      "source_scratch": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-ch27-AJ92WQ",
+      "configuration": "Book profile; --checkers 1; one serial session of six variants, three rounds rotating order; untraced and unprofiled; the baseline row is reused in both tables",
+      "summaries": {
+        "bare": {
+          "Symbols": 40604,
+          "Types": 2181,
+          "Instantiations": 6,
+          "checkSeconds": [
+            0.005,
+            0.006,
+            0.006
+          ],
+          "medianCheckSeconds": 0.006
+        },
+        "key": {
+          "Symbols": 42765,
+          "Types": 4425,
+          "Instantiations": 13189,
+          "checkSeconds": [
+            0.015,
+            0.016,
+            0.016
+          ],
+          "medianCheckSeconds": 0.016
+        },
+        "untyped": {
+          "Symbols": 171464,
+          "Types": 18314,
+          "Instantiations": 39641,
+          "checkSeconds": [
+            1.013,
+            0.975,
+            1.013
+          ],
+          "medianCheckSeconds": 1.013
+        },
+        "union": {
+          "Symbols": 171014,
+          "Types": 18033,
+          "Instantiations": 118255,
+          "checkSeconds": [
+            1.481,
+            1.478,
+            1.483
+          ],
+          "medianCheckSeconds": 1.481
+        },
+        "broken": {
+          "Symbols": 48329,
+          "Types": 7956,
+          "Instantiations": 87431,
+          "checkSeconds": [
+            0.095,
+            0.093,
+            0.096
+          ],
+          "medianCheckSeconds": 0.095
+        },
+        "distributed": {
+          "Symbols": 118618,
+          "Types": 19158,
+          "Instantiations": 118628,
+          "checkSeconds": [
+            0.254,
+            0.255,
+            0.257
+          ],
+          "medianCheckSeconds": 0.255
+        },
+        "precomputed": {
+          "Symbols": 54093,
+          "Types": 8491,
+          "Instantiations": 1958,
+          "checkSeconds": [
+            0.501,
+            0.535,
+            0.52
+          ],
+          "medianCheckSeconds": 0.52
+        }
+      }
+    },
+    "profile_source_verification": {
+      "recorded_binary_revision": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b; vcs.modified=true",
+      "url": "https://github.com/microsoft/typescript-go/blob/2bd066d87f5bafd315be9f40889d0a60b9e58e0b/internal/checker/checker.go#L25473-L25508",
+      "source_sha256": "32384dde486c33c59c5695505f4c951c3009c6d7e50589cb5b18d0ea92cbf161",
+      "source_annotated_profile": ".probe/codex/draft2/profile-probe/list.txt",
+      "source_annotated_profile_sha256": "c457269fdaacb43690f81b031a186d62163ed15944f910b6001e0475faa7826b",
+      "claim_limit": "Mapping and reconstructing unions during contextual argument typing is supported; no per-call visit count or identification of every union is claimed."
+    }
+  }
+}

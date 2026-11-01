@@ -1,0 +1,213 @@
+{
+  "status": "draft 1 frozen; independent readers and Claude review pending",
+  "date": "2026-10-29",
+  "settled_plan_commit": "c767daa",
+  "base_commit": "c767daab27b24c3c9dc1799e58345d8ea60fdf5c",
+  "path": "book/04-the-real-world/04-performance-vs-safety.md",
+  "sha256": "7f6c66090b4f88481ad2068b15ee2087f65598bbcac27cb765fc610f18682a7b",
+  "manuscript_mtime_utc": "2026-10-29T15:43:09.412865+00:00",
+  "words": 2389,
+  "word_count_method": "Whitespace-delimited words in the complete Markdown, including code fences.",
+  "code_fences": 10,
+  "fences_by_language": {
+    "typescript": 7,
+    "json": 2,
+    "javascript": 1
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "typescript",
+      "sha256": "8d94495a76f73af1d5b3909b9451a1eb93dd9c94659b0a085f85e3ddd44ba141"
+    },
+    {
+      "ordinal": 2,
+      "language": "typescript",
+      "sha256": "35b4b33d56f2204100e6f6d075ff30c38b2bfd1ba274da12a204a81f5037dc50"
+    },
+    {
+      "ordinal": 3,
+      "language": "typescript",
+      "sha256": "2c4665e1a53055ddd5254dc1f0dd82c5e2743c68413b4dfbaaef19603cd16d55"
+    },
+    {
+      "ordinal": 4,
+      "language": "typescript",
+      "sha256": "c56ea76e30a4ab76465e396a4f8c445eccf3387a4f34217916894ab95911e4b1"
+    },
+    {
+      "ordinal": 5,
+      "language": "json",
+      "sha256": "d80d8775bb6e45c92208e43b93672f3de7cd4447c3c2cde27b3ada564626e900"
+    },
+    {
+      "ordinal": 6,
+      "language": "javascript",
+      "sha256": "9397b2b6ea7925b37aa2195eedcac205458b53515761dd11c24d0c0eaf9611e5"
+    },
+    {
+      "ordinal": 7,
+      "language": "json",
+      "sha256": "772461ba69e6ce94f166d33020f2b99eb843d83acca4c24c32435d8d3afdb4a5"
+    },
+    {
+      "ordinal": 8,
+      "language": "typescript",
+      "sha256": "07b712905405ae2e8a397f1bc71cf6526a71782f2f906ed418154724e83f8462"
+    },
+    {
+      "ordinal": 9,
+      "language": "typescript",
+      "sha256": "ece9507a45f26b264950753733a862fc39289eb2fb28c84fe5e9cf195a42bdac"
+    },
+    {
+      "ordinal": 10,
+      "language": "typescript",
+      "sha256": "c4bdbb15c51fcbde2838fcc9c44541592b988dcb115e2d966af34eb873fbb49b"
+    }
+  ],
+  "validator_sha256": "d26895687791ab1f3dead64dcdade586442d9a3b353212296f8c7a252f4fec68",
+  "suite_runner_sha256": "ccf35b6d74bbcbd1eec2156def05a0fc3d71fb1ca923537208516cd46ed66e4f",
+  "compiler_profile_sha256": "3fbee0de1a72de52e3288a05c3682ba614932b91f56b237e570dfaec6ab99375",
+  "typescript": "7.0.2",
+  "node": "v22.23.4",
+  "validation": {
+    "installation": "Same locked npm ci installation used for the challenge. No new clean-export claim.",
+    "full_suite": "npm run check: exit 0 on this exact manuscript, validator, suite runner and compiler profile; all input hashes verified unchanged after execution.",
+    "chapter_counts": {
+      "fences": 10,
+      "compiler_cases": 104,
+      "runtime_groups": 5,
+      "file_list_queries": 1,
+      "emit_comparisons": 3,
+      "untraced_benchmark_runs": 24
+    },
+    "book_counts": {
+      "fences": 453,
+      "compiler_cases": 771,
+      "runtime_groups": 308,
+      "default_cases": 2,
+      "searches": 2,
+      "file_list_queries": 8
+    },
+    "full_suite_manuscript_sha256": "7f6c66090b4f88481ad2068b15ee2087f65598bbcac27cb765fc610f18682a7b",
+    "full_suite_log": ".probe/codex/draft1/full-check.log",
+    "full_suite_log_sha256": "d02c6999347dbe8cfeeb5725527f06f14c7952e0facd9d4bf0956789f4888063",
+    "chapter_results": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-ch27-d5tmEi/RESULTS.json",
+    "chapter_results_sha256": "5627a691d4d4152cb5720931606b1a590649bcfb36db9c20531f15898d9bd217",
+    "counter_and_time_evidence": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-ch27-d5tmEi/COUNTERS-AND-TIMES.json",
+    "counter_and_time_evidence_sha256": "15803222154fa924b2b65b28627e2309f2f296f2347508b3c329a269b87ee9a7",
+    "trace_evidence": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-ch27-d5tmEi/TRACE-EVIDENCE.json",
+    "trace_evidence_sha256": "70d54148b53191a6ce5bb35e0d87b323b7d8894a4167ec837c7b46731380757b",
+    "final_benchmark_sha256": "6e1b9b76210289f4a9a6ee659a68c2214d07fc91fc2b6a7dae68e59667ad4752",
+    "generated_workload": {
+      "sections": 40,
+      "keys_per_section": 50,
+      "keys": 2000,
+      "calls": 2000,
+      "distinct_called_keys": 200
+    },
+    "configuration": "Book profile extracted from the manuscript; --checkers 1; fixed installed libraries; explicit benchmark file list.",
+    "timing_policy": "24 untraced benchmark runs; three per form per comparison; original/distributed Turn pair alternates first position. Times and sampled trace counts never decide pass/fail.",
+    "printed_measurements": {
+      "note": "Printed medians come from this earlier repeated run of the same generated fixture/configuration, not the later full suite. Both original-union rows are independent three-run comparisons. Counters match both runs exactly.",
+      "log": ".probe/codex/draft1/final-measurements.log",
+      "log_sha256": "1096c230de878c3db277965901af2c454a0985d569365f2dd85f690fcd9dc6a8",
+      "summary_file": ".probe/codex/draft1/printed-measurements.json",
+      "summary_file_sha256": "8579cc55006db53e11c88a8492aa70fefdd471dbd19501f33fdea5ed3bfab2c0",
+      "source_scratch": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-ch27-HQMex1",
+      "configuration": "Book profile; --checkers 1; three serial untraced runs per version per comparison; final old/new pair alternates order",
+      "summaries": {
+        "bare": {
+          "Symbols": 40604,
+          "Types": 2181,
+          "Instantiations": 6,
+          "checkSeconds": [
+            0.005,
+            0.005,
+            0.006
+          ],
+          "medianCheckSeconds": 0.005
+        },
+        "key": {
+          "Symbols": 42765,
+          "Types": 4425,
+          "Instantiations": 13189,
+          "checkSeconds": [
+            0.015,
+            0.016,
+            0.017
+          ],
+          "medianCheckSeconds": 0.016
+        },
+        "untyped": {
+          "Symbols": 171464,
+          "Types": 18314,
+          "Instantiations": 39641,
+          "checkSeconds": [
+            0.992,
+            1.118,
+            1.055
+          ],
+          "medianCheckSeconds": 1.055
+        },
+        "union": {
+          "Symbols": 171014,
+          "Types": 18033,
+          "Instantiations": 118255,
+          "checkSeconds": [
+            1.484,
+            1.664,
+            1.772
+          ],
+          "medianCheckSeconds": 1.664
+        },
+        "broken": {
+          "Symbols": 48329,
+          "Types": 7956,
+          "Instantiations": 87431,
+          "checkSeconds": [
+            0.094,
+            0.094,
+            0.096
+          ],
+          "medianCheckSeconds": 0.094
+        },
+        "union-turn": {
+          "Symbols": 171014,
+          "Types": 18033,
+          "Instantiations": 118255,
+          "checkSeconds": [
+            1.499,
+            1.934,
+            1.922
+          ],
+          "medianCheckSeconds": 1.922
+        },
+        "distributed": {
+          "Symbols": 118618,
+          "Types": 19158,
+          "Instantiations": 118628,
+          "checkSeconds": [
+            0.264,
+            0.257,
+            0.262
+          ],
+          "medianCheckSeconds": 0.262
+        },
+        "precomputed": {
+          "Symbols": 54093,
+          "Types": 8491,
+          "Instantiations": 1958,
+          "checkSeconds": [
+            0.503,
+            0.505,
+            0.497
+          ],
+          "medianCheckSeconds": 0.503
+        }
+      }
+    }
+  }
+}
