@@ -75,7 +75,7 @@ function t(...args: Args): string;
 
 **Linoy**: "Then measure the larger catalogue. Don't remove the feature and tell me the feature was implemented badly."
 
-Both probe calls get TS2345. So does the banner’s `t(pending[0], pending[1])`, which Oded expanded because `t(...pending)` gets TS2556 under his loose signature. The typo message ends by comparing `shop.crat` with `shop.hello`.
+Both probe calls get TS2345. So does the banner's `t(pending[0], pending[1])`, which Oded expanded because `t(...pending)` gets TS2556 under his loose signature. The typo message ends by comparing `shop.crat` with `shop.hello`.
 
 **Oded**: "It would be nice if the error suggested cart."
 
@@ -98,7 +98,7 @@ export const ready = t("shop.ready");
 
 **Linoy**: "The banner chooses the whole call, then passes it on. Both branches work. Keep that, and keep ready without an empty object just to satisfy the helper."
 
-**Gil**: "I saved the emit from Oded’s branch, with his expanded banner call. Now I’ll emit this restored version and compare `dist/i18n.js`. Same options both times. The root package has `"type": "module"`."
+**Gil**: "I saved the emit from Oded's branch, with his expanded banner call. Now I'll emit this restored version and compare `dist/i18n.js`. Same options both times. The root package has `"type": "module"`."
 
 **Gil**: "Same 387 bytes."
 
@@ -203,7 +203,7 @@ function t<K extends Key>(
 
 **Oded**: "And the two thousand calls?"
 
-**Gil**: "87,431 instantiations, a 0.095s median. Faster than Linoy’s original. The calls in that fixture are literals."
+**Gil**: "87,431 instantiations, a 0.095s median. Faster than Linoy's original. The calls in that fixture are literals."
 
 **Noam**: "This one isn't."
 
@@ -218,7 +218,7 @@ function messageFor(hasItems: boolean): "shop.cart" | "shop.hello" {
 console.log(t(messageFor(true), { name: "A" }));
 ```
 
-The full project gets TS2556 at the unchanged banner’s tuple spread. They give the probe a separate file list: `probe.json` extends the root config, with `files: ["src/i18n.ts", "src/probe.ts"]` and `include: []`. Checking and emitting with `-p probe.json` succeeds. Running `node dist/probe.js` prints `Hello A, {count} items`.
+The full project gets TS2556 at the unchanged banner's tuple spread. They give the probe a separate file list: `probe.json` extends the root config, with `files: ["src/i18n.ts", "src/probe.ts"]` and `include: []`. Checking and emitting with `-p probe.json` succeeds. Running `node dist/probe.js` prints `Hello A, {count} items`.
 
 **Noam**: "It lets my broken replacement through and rejects the caller I already had."
 
@@ -249,7 +249,7 @@ Noam's separate-key probe gets TS2345. The original pending-tuple banner compile
 
 ## The Turn
 
-**Gil**: "Same session as the first table. I’m reusing Linoy’s row."
+**Gil**: "Same session as the first table. I'm reusing Linoy's row."
 
 | Signature | Instantiations | Median check time |
 |---|---:|---:|
@@ -264,25 +264,25 @@ Noam's separate-key probe gets TS2345. The original pending-tuple banner compile
 
 **Noam**: "So where was the time going before?"
 
-**Linoy**: "I’ll put my original signature back and try `tsc -p bench/tsconfig.json --checkers 1 --generateTrace trace`."
+**Linoy**: "I'll put my original signature back and try `tsc -p bench/tsconfig.json --checkers 1 --generateTrace trace`."
 
-She follows a relation event’s checker ID through `legend.json` to its type file. Args resolves to two thousand tuples. Expression events point at generated calls.
+She follows a relation event's checker ID through `legend.json` to its type file. Args resolves to two thousand tuples. Expression events point at generated calls.
 
-**Linoy**: "There’s Args. My guess is we’re spending the time relating arguments to that union."
+**Linoy**: "There's Args. My guess is we're spending the time relating arguments to that union."
 
-**Gil**: "About 0.2 seconds in the recorded check events, against about 1.6 for checking the file. Finding Args isn’t finding the cost."
+**Gil**: "About 0.2 seconds in the recorded check events, against about 1.6 for checking the file. Finding Args isn't finding the cost."
 
 **Linoy**: "Then CPU samples. `tsc -p bench/tsconfig.json --checkers 1 --pprofDir profile`. With a Go toolchain installed, `go tool pprof -top -cum profile/*-cpuprofile.pb.gz`."
 
 The cumulative profile puts a large share of samples under [mapTypeEx](https://github.com/microsoft/typescript-go/blob/2bd066d87f5bafd315be9f40889d0a60b9e58e0b/internal/checker/checker.go#L25473-L25508). Linoy uses `-peek mapTypeEx` to inspect its callers and callees: contextual typing above it, union construction below.
 
-**Daniel**: "That function walks a union’s members, applies an operation and, when the results change, builds a union from them. That’s 7.0.2’s checker. Don’t build on the name."
+**Daniel**: "That function walks a union's members, applies an operation and, when the results change, builds a union from them. That's 7.0.2's checker. Don't build on the name."
 
 **Linoy**: "So I found Args and blamed the relation. This points to walking and rebuilding unions while working out the types expected for the arguments. My guess was too narrow."
 
 **Oded**: "Two thousand comparisons every call?"
 
-**Gil**: "Samples can’t tell you that. They locate work; they don’t count every visit or identify every union."
+**Gil**: "Samples can't tell you that. They locate work; they don't count every visit or identify every union."
 
 Linoy switches the fixture to the distributed signature and profiles it into a fresh directory. The time sampled under the same function drops sharply.
 

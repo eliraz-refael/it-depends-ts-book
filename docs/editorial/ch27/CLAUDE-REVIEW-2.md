@@ -208,7 +208,7 @@ is still one the chapter enacts.
 - **Naming the counters' flag or the profiler in the Principle.** The scene names them.
 - **`NoInfer` and memory.** Out of scope; Ch9 owns correlation.
 
-**Final text:** SHA-256 `63e9961a4c93966a8bc39d9d3257a48a8e31f7b1c8d8ba8899859c744badf1a3`, 2,384
+**Final text:** SHA-256 `56c54da21d327cf00c63998f040cea645ddee7ccb9ccc4f31c4fdb9d38be6082`, 2,384
 words, 10 fences, with the fence extract byte-identical to draft 3. The full `npm run check` exits 0
 on the settled text in the worktree, and again after a clean `npm ci` in a fresh export, on
 TypeScript 7.0.2 and Node 22.23.4.
@@ -220,3 +220,10 @@ TypeScript 7.0.2 and Node 22.23.4.
 - counters are pinned to the compiler and configuration, and times are recorded but never gate the
   build;
 - any later removal of a check names what newly passes and who catches it, or accepts the risk.
+
+**Full read of the final text (2026-11-01).** At the author's request, both of us read the final
+chapter start to finish after approval. I found one inconsistency. Draft 2 and draft 3's new lines
+used 18 curly apostrophes, where this chapter's other lines and the rest of the book use straight
+ones. I normalised them; the change is prose only, and the fence extract is byte-identical.
+`node checks/chapter27.cjs` passes on the normalised text. Codex read the whole final text and
+replied "Approved as is". The SHA above is the normalised text.

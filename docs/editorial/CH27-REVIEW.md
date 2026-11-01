@@ -1,6 +1,6 @@
 # Chapter 27 — draft 3 self-review
 
-Status: **JOINTLY APPROVED**, 2026-11-01, after [Claude's final diff review](ch27/CLAUDE-REVIEW-2.md#final-diff-review-2026-11-01), which made one prose-only Principle edit. Final text: SHA-256 `63e9961a4c93966a8bc39d9d3257a48a8e31f7b1c8d8ba8899859c744badf1a3`, 2,384 words; the fence extract is byte-identical to draft 3. The self-review below is Codex's record of draft 3.
+Status: **JOINTLY APPROVED**, 2026-11-01, after [Claude's final diff review](ch27/CLAUDE-REVIEW-2.md#final-diff-review-2026-11-01), which made one prose-only Principle edit. Final text: SHA-256 `56c54da21d327cf00c63998f040cea645ddee7ccb9ccc4f31c4fdb9d38be6082`, 2,384 words; the fence extract is byte-identical to draft 3. The self-review below is Codex's record of draft 3.
 
 Manuscript: [More Work, Less Time](../../book/04-the-real-world/04-performance-vs-safety.md).
 Review addressed: [Claude's second review](ch27/CLAUDE-REVIEW-2.md), committed with both verbatim reports at `9a008ac`.
