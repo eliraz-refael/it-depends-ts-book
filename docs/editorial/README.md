@@ -26,7 +26,7 @@ The [master plan](../../PLAN.md) remains at the repository root.
 | 25 — Monorepo type sharing | [Plan](CH25-PLAN.md) | [Review](CH25-REVIEW.md) |
 | 26 — Testing typed code | [Plan](CH26-PLAN.md) | [Review](CH26-REVIEW.md) |
 | 27 — Performance vs safety | [Plan](CH27-PLAN.md) | [Review](CH27-REVIEW.md) |
-| Bonus 1 — Prompting for TypeScript | [Plan](BONUS1-PLAN.md) | [Draft 1 self-review](BONUS1-REVIEW.md) |
+| Bonus 1 — Prompting for TypeScript | [Plan](BONUS1-PLAN.md) | [Draft 2 self-review](BONUS1-REVIEW.md) |
 
 The [voice review](VOICE-REVIEW.md) covers the prologue and early chapters.
 The [Chapter 3 pilot](CH3-PILOT.md) records the author-approved calibration for

@@ -38,6 +38,7 @@ assert.equal(scriptMatch[1],'test/**/*.test.ts');
 const requests=[...manuscript.matchAll(/^> (.*)$/gm)].map(m=>m[1]);assert.equal(requests.length,3);
 for(const request of requests.slice(1))assert(request.includes('npm run check'));
 const finalRequest=requests.at(-1);
+assert(manuscript.includes('He saves this request for the next time they ask the assistant to regenerate the parser:'),'Final request is saved for regeneration, not a new claimed response');
 for(const file of [parser,contract,testFile,'tsconfig.json','package.json','reset.d.ts'])assert(finalRequest.includes(file),file+' in final request');
 assert(finalRequest.includes('reject strings rather than coercing them'));
 assert(finalRequest.includes('Keep the contract, tests and project files unchanged'));
@@ -56,7 +57,7 @@ function remove(root,file){fs.unlinkSync(path.join(root,file));}
 function route(root){fs.symlinkSync(path.join(repo,'node_modules'),path.join(root,'node_modules'),'dir');}
 function command(name,root,exe,args,status){const r=cp.spawnSync(exe,args,{cwd:root,encoding:'utf8',timeout:60000,maxBuffer:12e6});if(r.error)throw r.error;results.push({name,root,exe,args,status:r.status,stdout:r.stdout,stderr:r.stderr});write(scratch,'RESULTS.json',results);assert.equal(r.status,status,name+'\n'+r.stdout+r.stderr);return r.stdout+r.stderr;}
 function diagnostic(file,needle,code,message){return {file,needle,code,message};}
-function compile(name,expected=[],root=story){const output=command(name,root,executable,['-p','tsconfig.json','--pretty','false','--noErrorTruncation'],expected.length?1:0);const found=[...output.matchAll(/^(.+)\((\d+),(\d+)\): error TS(\d+): (.*)$/gm)];assert.equal(found.length,expected.length,name+'\n'+output);for(const e of expected){const source=read(root,e.file).split('\n');const lines=source.flatMap((l,i)=>l.includes(e.needle)?[i+1]:[]);assert.equal(lines.length,1,e.needle);assert(found.some(m=>path.resolve(root,m[1])===path.resolve(root,e.file)&&+m[2]===lines[0]&&+m[4]===e.code&&(e.message===undefined||m[5]===e.message)),name+' exact diagnostic\n'+output);}compilerCases++;return output;}
+function compile(name,expected=[],root=story){const output=command(name,root,executable,['-p','tsconfig.json','--pretty','false','--noErrorTruncation'],expected.length?1:0);const found=[...output.matchAll(/^(.+)\((\d+),(\d+)\): error TS(\d+): (.*)$/gm)];assert.equal(found.length,expected.length,name+'\n'+output);for(const e of expected){const source=read(root,e.file).split('\n');const lines=source.flatMap((l,i)=>l.includes(e.needle)?[i+1]:[]);assert.equal(lines.length,1,e.needle);assert(found.some(m=>path.resolve(root,m[1])===path.resolve(root,e.file)&&+m[2]===lines[0]&&+m[4]===e.code&&(e.column===undefined||+m[3]===e.column)&&(e.message===undefined||m[5]===e.message)),name+' exact diagnostic\n'+output);}compilerCases++;return output;}
 function run(name,args,expected,root=story){const output=command(name,root,process.execPath,args,0);assert.equal(output.trim(),expected,name);runtimeGroups++;return output;}
 const owned=[contract,testFile,'package.json','tsconfig.json','reset.d.ts'];
 const hash=s=>crypto.createHash('sha256').update(s).digest('hex');
@@ -71,7 +72,7 @@ write(story,'package.json',manifest);write(story,'tsconfig.json',config);route(s
 for(const [f,s] of Object.entries(initial))write(story,f,s);write(story,probe,firstProbe);
 compile('initial-unchecked-return');run('initial-real-caller',[probe],printedInitial);
 write(story,'reset.d.ts',reset);
-const rawError=diagnostic(parser,'return JSON.parse(raw)',2322,quoted);
+const rawError={...diagnostic(parser,'return JSON.parse(raw)',2322,quoted),column:3};
 compile('reset-stops-unchecked-return',[rawError]);
 remove(story,'reset.d.ts');compile('removing-reset-restores-original');run('removing-reset-runtime-control',[probe],printedInitial);
 write(story,'reset.d.ts',reset);compile('reset-restored',[rawError]);
@@ -86,7 +87,11 @@ remove(story,probe);write(story,testFile,finalTests);freeze();
 // Only the owner-authored acceptance file changes at the Turn.
 for(const file of owned.filter(f=>f!==testFile))assert.equal(acceptedHashes[file],firstOwned[file]);
 assert.notEqual(acceptedHashes[testFile],firstOwned[testFile]);
-suite('coercion-fails-owned-text-cases',finalTests,['rejects text amounts']);
+const textFailure=suite('coercion-fails-owned-text-cases',finalTests,['rejects text amounts']);
+assert(addedTests.includes('for (const cents of ["", "100"])'),'Motivating empty string is first');
+assert(textFailure.includes('cents: ""'),'Failure identifies the empty-string input');
+assert(!textFailure.includes('cents: "100"'),'Failing loop stops before the second input');
+assert(/actual:\s*\n\s+ok: true\s*\n\s+value:\s*\n\s+id: 'r1'\s*\n\s+cents: 0/.test(textFailure),'Actual failing result is the zero-cent refund');
 write(story,parser,strict);suite('strict-restores-all-five',finalTests);
 // Verify that both contrasting values fail independently, despite the loop stopping at its first assertion.
 function values(name,expected){const source='import {parseRefund} from "./src/parse-refund.ts"; console.log(JSON.stringify([100,-1,"100","",0].map(cents=>parseRefund(JSON.stringify({id:"r1",cents})))));';run(name,['--input-type=module','-e',source],JSON.stringify(expected));unchanged();}

@@ -22,7 +22,7 @@ Chapter 27, **performance vs safety**, is [jointly approved](docs/editorial/CH27
 
 ### Bonus act
 
-Bonus 1, **prompting for TypeScript**, has draft 1, [Which File Says That?](book/05-bonus-ai-and-typescript/01-prompting-for-typescript.md), following the [settled plan](docs/editorial/BONUS1-PLAN.md#settlement-after-codexs-challenge-2026-11-01). Two cast-free parsers pass the same initial tests, but one converts an empty string into a zero-cent refund. The local Verdict puts the missing decision in the owned acceptance cases and visible implementation request. [Self-review](docs/editorial/BONUS1-REVIEW.md); independent readers and Claude's review are pending. Bonus 2 and Bonus 3 remain undrafted.
+Bonus 1, **prompting for TypeScript**, has draft 2, [Which File Says That?](book/05-bonus-ai-and-typescript/01-prompting-for-typescript.md), following the [settled plan](docs/editorial/BONUS1-PLAN.md#settlement-after-codexs-challenge-2026-11-01). Two cast-free parsers pass the same initial tests, but one converts an empty string into a zero-cent refund. The local Verdict puts the missing decision in the owned acceptance cases and visible implementation request. [Draft 1 review](docs/editorial/bonus1/CLAUDE-REVIEW.md) reproduced every claim and led to a local revision: Dima owns the wire-format decision, the Principle clarifies unchecked type claims and file scope, and the failing test now names the motivating empty string. [Self-review](docs/editorial/BONUS1-REVIEW.md); a revised Principle read and targeted recheck are pending. Bonus 2 and Bonus 3 remain undrafted.
 
 ### Act IV tasks
 
@@ -192,7 +192,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
 | Act III: Patterns & Design  | Done            | Ch14–23 reviewed, checked and merged (10 of 10) |
 | Act IV: The Real World      | Done            | Ch24–27 reviewed, checked and merged (4 of 4) |
-| Bonus: AI & TypeScript      | **IN PROGRESS** | 3 chapters; Bonus 1 draft 1, review pending |
+| Bonus: AI & TypeScript      | **IN PROGRESS** | 3 chapters; Bonus 1 draft 2, recheck pending |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |
 
 Print design sources and decisions: [design/print/README.md](design/print/README.md).

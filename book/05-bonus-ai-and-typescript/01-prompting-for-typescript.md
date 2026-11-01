@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Before asking for an implementation, agree on what it must keep true and which files it may change. Give the implementer a callable contract, examples of what must work and what must be rejected, and the project configuration and command that will check them. Reuse those things when you already have them. The configuration applies to the program, including source files brought in by imports; it doesn't know who wrote each file."
+**Prof. Eli Typeworth**: "Don't leave a blank where the decision belongs. Before asking for code, put the behavior you want in the signature and in examples of success and rejection. Send the project's configuration and check command with them; reuse what's already there. Agree which files may change, but check their imports first: the configuration reaches that source too. A setting that breaks old code may make this a bigger job than you meant."
 
-"Then run the agreed checks against what comes back. If two implementations pass but disagree on behavior you care about, you still owe the implementer a decision. An assertion can't establish a fact about incoming data, and the absence of assertions can't establish a correct implementation. The checks enforce what you've expressed in them. Someone still has to own what you meant."
+"Run those checks against the answer. If two implementations pass but disagree on behavior you need, decide and put that difference in the examples before handing the work back. A type assertion (`as` or `!`) doesn't check incoming data. Neither does a predicate whose body never checks its claim; code without those shortcuts isn't necessarily correct. The checks enforce what you've expressed in them. Someone still has to own what you meant."
 
 ## The Debate
 
@@ -12,7 +12,7 @@
 
 **Dima Bridge** has asked the shop's coding assistant for a refund parser. He turns the screen towards Idan.
 
-His request is still above the answer:
+Dima scrolls up to the request:
 
 > Write a TypeScript function to parse a refund webhook's JSON. Return its id and cents. Validate the payload and handle invalid input. Keep it simple.
 
@@ -34,7 +34,7 @@ export function parseRefund(raw: string): Refund {
 
 **Dima**: "The explanation is very confident about it."
 
-She adds a caller.
+Idan adds a caller.
 
 ```typescript
 // src/probe.ts — first probe
@@ -44,7 +44,7 @@ const refund = parseRefund('{"id":"r1","cents":"100"}');
 console.log(typeof refund.cents, refund.cents + 1);
 ```
 
-The compiler accepts it. `node src/probe.ts` prints `string 1001`.
+Dima runs `./node_modules/.bin/tsc -p tsconfig.json`. It passes. `node src/probe.ts` prints `string 1001`.
 
 **Idan**: "It validated the vibe."
 
@@ -96,7 +96,7 @@ And its `tsconfig.json`:
 }
 ```
 
-The first compiler run was `./node_modules/.bin/tsc -p tsconfig.json`. Once they add tests, `npm run check` will check the types and then run the TypeScript test files with Node. The book's strict settings are here; the Node types and `.ts` imports support this project's execution setup.
+**Dima**: "Once we add tests, `npm run check` runs the compiler and then those test files."
 
 **Idan**: "Give it these files too. And for this little project, I want the unchecked parse to stop at the return."
 
@@ -112,19 +112,17 @@ interface JSON {
 }
 ```
 
-The same compiler command now reports **TS2322: Type 'unknown' is not assignable to type 'Refund'.** It points to the returned `JSON.parse(raw)`.
+The same compiler command now reports **TS2322: Type 'unknown' is not assignable to type 'Refund'.** It points to the `return`.
 
 **Dima**: "Now that sentence in the explanation has some work to do."
 
-**Idan**: "This adds an overload to the global interface. Our later signature wins this call. It belongs to this program, including its imports, like the augmentation in Chapter 13."
-
-The [interface-merging rules](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#merging-interfaces) put later overload groups first. This is a checked choice for their small project, not a setting they're rolling across the shop's applications.
+**Idan**: "This adds an overload to the global interface. Our [later signature](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#merging-interfaces) wins this call. It belongs to this program, including its imports, like the augmentation in Chapter 13."
 
 **Chen**: "And if the answer just asserts Refund?"
 
 **Idan**: "It hasn't established the fields. We'll ask for checked construction and test the behavior. No casts isn't a certificate either."
 
-**Dima**: "Good. I don't want to spend the afternoon counting punctuation."
+**Dima**: "Good. I don't want to spend the afternoon counting casts."
 
 ### "I've written half of it"
 
@@ -181,15 +179,15 @@ test("rejects a negative amount", () => {
 
 **Dima**: "Me, apparently."
 
-**Eli**: "You own the integration. You can accept a proposal. You can change it. You can't use agreement with an unexamined proposal as evidence that it meets your requirement."
+**Eli**: "You can use its proposal. But you have to decide whether that is the job you meant."
 
 **Chen**: "The answer agrees with itself. Very harmonious."
 
 **Dima**: "Fine. But I'm not going to specify every possible string before asking for a parser. That's a parser written in English."
 
-**Idan**: "Start with the distinctions you care about. Keep the examples small enough that you can tell why each expected answer is right. We can add a case when we discover a decision we've missed."
+**Idan**: "Give it inputs you can explain. If you can't say why one should pass, we haven't settled the rule yet."
 
-**Dima**: "Two cases, then. Nobody quietly annexes the afternoon."
+**Dima**: "Two cases, then. I'm holding you to that."
 
 He selects the contract, test file, configuration, manifest and reset declaration, and sends another request:
 
@@ -229,7 +227,7 @@ Its explanation says: *"The parser validates the object, normalizes cents to a n
 
 Dima runs `npm run check`. Both tests pass. The contract, tests and project files are unchanged.
 
-**Idan**: "Try that amount without converting it."
+**Idan**: "That typeof check can't fail after Number. Try the amount without converting it."
 
 She replaces one line in the same implementation:
 
@@ -246,7 +244,7 @@ The checks below it now narrow the unknown field to a number. `npm run check` pa
 
 **Dima**: "I heard a distinction arriving."
 
-He puts the assistant's `Number(value.cents)` line back. He wants to finish checking the actual answer before they choose its replacement.
+He puts the assistant's `Number(value.cents)` line back. He wants to finish checking the actual answer before they choose.
 
 ## The Turn
 
@@ -285,11 +283,11 @@ Dima opens the contract. `cents: number`. Then the test file. A hundred. Minus o
 
 **Dima** looks back at the request. "Checked fields. No casts. Run the check."
 
-**Chen**: "It did all three."
+**Chen**: "It built the value without casts. You ran the check."
 
 **Dima**: "And the explanation said normalizes. I read that as a spelling of validates."
 
-The provider's agreed wire format requires numeric cents. The shop wants a format violation rejected so it can report it to the provider; silently converting it would hide the violation.
+**Dima**: "The provider's contract requires numeric cents. I want a format violation rejected so we can report it to them. Converting the amount would hide it. That's our rule."
 
 **Idan**: "Then put that decision in the next request. With an example that distinguishes the answers."
 
@@ -298,6 +296,14 @@ The provider's agreed wire format requires numeric cents. The shop wants a forma
 **Eli**: "Yes. That's a requirement in prose. The test runner still needs something it can execute."
 
 **Chen**: "And the hundred-cent refund should keep working. It's the only one so far that refunds anything."
+
+**Idan**: "Keep numeric zero too. A fix that rejects every falsy amount would catch the empty string and break zero."
+
+**Dima**: "And malformed JSON, null, a missing id. The caller needs a failure result for those, not an exception. A fractional cent must fail too; we refund whole cents."
+
+**Chen**: "Two cases?"
+
+**Dima**: "Two was before we successfully refunded nothing."
 
 Dima removes the probe again. They append these cases to `test/refund.test.ts`; the original two stay.
 
@@ -311,10 +317,10 @@ test("keeps numeric zero", () => {
 });
 
 test("rejects text amounts", () => {
-  for (const cents of ["100", ""]) {
+  for (const cents of ["", "100"]) {
     assert.deepEqual(parse(JSON.stringify({ id: "r1", cents })), {
       ok: false, error: "invalid amount",
-    });
+    }, `cents: ${JSON.stringify(cents)}`);
   }
 });
 
@@ -325,7 +331,7 @@ test("rejects malformed input", () => {
 });
 ```
 
-Under the returned, coercing implementation, `npm run check` fails at `rejects text amounts`. It still compiles. The numeric cases still pass. Replacing the amount line with `const cents = value.cents;` makes all five tests pass.
+Dima runs `npm run check` with the returned, coercing implementation. It compiles, but `rejects text amounts` fails on `""`: instead of the expected failure, it returns a success with zero cents. The numeric cases still pass. Replacing the amount line with `const cents = value.cents;` makes all five tests pass.
 
 **Dima**: "That line didn't get more intelligent. We finally asked it a different question."
 
@@ -339,7 +345,7 @@ Under the returned, coercing implementation, `npm run check` fails at `rejects t
 
 ### The next request
 
-Dima keeps the result contract, the five tests and the same project files. The selected implementation is the version without `Number`, with its other branches unchanged. Before handing over any further implementation work, he writes the request they should have sent:
+Dima keeps the result contract, the five tests and the same project files. The selected implementation is the version without `Number`, with its other branches unchanged. He saves this request for the next time they ask the assistant to regenerate the parser:
 
 > Implement only src/parse-refund.ts. Use src/contract.ts, test/refund.test.ts, tsconfig.json, package.json and reset.d.ts as supplied. The webhook must contain numeric cents: accept non-negative safe integers, including zero, and reject strings rather than coercing them. Return a failure for invalid input. Keep the contract, tests and project files unchanged. If they conflict, report the conflict before implementing. Don't replace a failing check with a cast or suppression. Run npm run check.
 
@@ -355,7 +361,7 @@ Dima keeps the result contract, the five tests and the same project files. The s
 
 **Idan**: "Of course. But when the proposed case says an empty amount is zero, someone here has to decide whether that's our rule."
 
-For this parser, they run the same command against the selected implementation with those owned files unchanged. All five tests pass. That is evidence for the contract and cases they chose. The request itself doesn't make an implementer obey, and a green result doesn't fill in requirements they never supplied.
+Dima runs `npm run check` against the selected file again, with the owned files unchanged. All five tests pass.
 
 **Dima**: "So the explanation stays useful. It called out normalization. I just didn't stop to ask what that meant."
 
@@ -365,7 +371,7 @@ For this parser, they run the same command against the selected implementation w
 
 **Dima**: "Then we change the requirement deliberately. We don't keep a bad test forever. But 'this implementation fails it' isn't, by itself, a reason to change it. That's why the request says to report conflicts."
 
-**Eli**: "Now the implementer knows where to stop and ask. That is part of a useful handoff too."
+**Eli**: "Then it knows when to ask you."
 
 **Chen**: "Who owns 'someone here'?"
 
