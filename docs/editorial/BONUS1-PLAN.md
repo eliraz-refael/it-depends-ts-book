@@ -1,6 +1,6 @@
 # Bonus 1 — Prompting for TypeScript (working title)
 
-Status: **PROPOSAL, awaiting Codex's challenge**, 2026-11-01.
+Status: **PLAN SETTLED**, 2026-11-01. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/bonus-1-prompting-for-typescript`, based on `origin/main` `27e4630` (Ch27's merge, PR #29).
 File: `book/05-bonus-ai-and-typescript/01-prompting-for-typescript.md`. It opens the bonus act.
 
@@ -250,8 +250,8 @@ scene they'd retell):
 
 ## Completion
 
-- [ ] Codex challenges this plan: new learning versus an AI costume, the no-claims rule, the
-  declaration merge, the Turn, the ending, and the heading. Disagreements are settled on evidence.
+- [x] Codex challenges this plan: new learning versus an AI costume, the no-claims rule, the
+  declaration merge, the Turn, the ending, and the heading. Disagreements are settled on evidence ([challenge](bonus1/CODEX-PLAN-CHALLENGE.md)).
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
@@ -259,3 +259,99 @@ scene they'd retell):
 - [ ] Clean `npm ci` and full suite green at final review.
 - [ ] Both of us read the final text start to finish.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-11-01)
+
+[Codex's challenge](bonus1/CODEX-PLAN-CHALLENGE.md) reproduced all three mechanisms, and showed that
+my proposed chain of evidence promised more than its checks establish. **This settlement governs
+where it differs from the proposal above.**
+
+**I verified the new Turn independently.** Two cast-free parsers share one `Result` contract and
+differ only in `value.cents` versus `Number(value.cents)`. Both compile, accept 100 and reject -1.
+On `"100"` the strict one fails and the coercing one returns 100. On `""` the strict one fails and
+the coercing one returns `{ ok: true, value: { id: "r1", cents: 0 } }`. That's a zero-cent refund
+from an empty string.
+
+**My errors, corrected by Codex:**
+- the proposed Turn's bare `as Refund` doesn't fit the later `Result` contract (TS2322);
+- the five-candidate count mixed contracts, and a "silent default currency" violated no printed
+  field;
+- the lexical escape-hatch gate both misses an always-true predicate and flags honest code;
+- `satisfies` is not an assertion escape (TS1360 under the reset);
+- Ch13 was missing from the repetition list, and Chen last appeared in Ch24, not "Act III or Ch25".
+
+**Settled:**
+1. **The chapter is about the handoff.** Before asking for an implementation, agree on what it must
+   keep true and which files it may change. Hand over the real contract, positive *and* negative
+   examples, the project configuration and the command. Run those checks unchanged against what
+   comes back. The new learning is *when and where* the owner states a decision so another
+   implementer (an assistant or a colleague) can act on it. Ch16 owns the input policy itself, so the
+   page states the shop's reason in a line and returns to delegation.
+2. **The hook stays short.**
+   - **The setup:** Dima's refund parser, the assistant's explanation that it "validates the payload",
+     a real call, and a printed bad amount (string cents).
+   - **The line:** Idan's "It validated the vibe", if it sounds like her in the exchange.
+   - **The `JSON.parse`/`any` cause:** one callback, no Ch1 lecture. Dima already knows it, and the
+     scene shouldn't make him rediscover it.
+3. **The environment reset is one bounded beat.**
+   - It lives in a deliberately small chapter project, and the page says the setting belongs to the
+     program (a Ch13 callback in at most one line).
+   - It shows the diagnostic and moves on.
+   - It's not recommended for arbitrary applications. The Zod-source and `Response.json()` findings
+     stay in validation.
+   - The `noUncheckedIndexedAccess` function leaves the page. It's check-only, or an Additional Take
+     at most.
+4. **The lexical gate is cut.** The request text carries the constraint ("Don't replace a failing
+   check with a cast or suppression"), and the owned acceptance cases verify behaviour. The lying
+   predicate stays in validation, or one line if a reader would otherwise think "no casts" means
+   "correct".
+5. **Compare two implementations under one fixed contract.** Not a five-column scoreboard. The
+   always-reject control runs in validation, so rejection cases alone can't pass as the whole
+   contract.
+6. **The Turn is "Which file says that?"**
+   - Two cast-free implementations pass the numeric cases, and Dima is ready to finish.
+   - Chen asks whether an empty amount means zero, and it does.
+   - Dima objects that a webhook sends numbers. Eli asks where they gave that requirement to the
+     implementer. No file says it.
+7. **The request is required and visible.** It's short, it names the chapter repository's real
+   paths and command, and it states the coercion decision and the scope (contract, tests and config
+   stay unchanged; report conflicts). The page claims nothing about whether any model obeys it. The
+   check verifies or restores the owned files between candidates.
+8. **The Verdict is local:**
+   - For this boundary: state the coercion decision with contrasting cases, hand over the contract,
+     the cases, the config and the command, and run them unchanged.
+   - **Dima wins the narrower point:** reuse an existing contract and tests when they already state
+     the requirement. Don't write specifications for ceremony.
+
+   It's not open. We measured no workload that would make the time trade-off honestly contested.
+9. **The Principle is Eli's,** with Codex's §7 direction, trimmed to speech.
+   - It says what must stay true and which files may change.
+   - It hands over the real configuration, a callable contract, and examples of what must work and
+     what must be rejected.
+   - If two implementations pass and disagree on behaviour you care about, you still owe a decision.
+   - An assertion can't establish an input fact, and the absence of assertions can't establish a
+     correct implementation.
+   - It ties "real project configuration" to every source the imports bring in, which is case 4.
+
+   No flag or syntax inventory.
+10. **The reader cases are Codex's four (§7):** both answers pass; an attractive shortcut to green;
+    the cheap task with an existing contract; "only the generated directory".
+11. **Cast:** Eli, Dima, Idan and Chen (all pronouns verified). Dima stays competent: his objection
+    is the cost of specification, and it buys him the narrower win.
+12. **Heading and numbering:** `# Bonus 1: <title>`, with "Which File Says That?" as the provisional
+    title. Use Bonus 1/2/3 consistently in cross-references, and `checks/bonus1.cjs`. No print code
+    changes.
+
+**Fun guardrails:**
+- **The scenes readers should retell:**
+  - "It validated the vibe";
+  - the zero-cent refund from an empty string;
+  - "Which file says that?";
+  - the visible request that finally says it.
+- **The assistant must feel present** without any real-model claim: the request on the page, its
+  fixed returned code, and its confident explanation contrasted with the printed behaviour.
+- **No hype, no doom, no leaderboards.**
+- Length is 2,300–3,000 words.
+
+**Not adopted:** nothing material. Codex's Ch16-boundary warning (don't argue coercion's merits)
+is adopted as a constraint, in item 1.
