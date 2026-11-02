@@ -1,4 +1,40 @@
-# Bonus 3 — draft 1 self-review
+# Bonus 3 — draft 2 self-review
+
+Status: **DRAFT 2; awaiting the Principle-only follow-up and targeted recheck**, 2026-11-02. This is Codex's self-review, not independent approval.
+
+Manuscript: [What Did the Fix Fix?](../../book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md).
+Review addressed: [Claude's draft 1 review](bonus3/CLAUDE-REVIEW.md), including both verbatim reader reports, at `f8da36e`.
+Snapshot: [DRAFT2-SNAPSHOT.json](bonus3/DRAFT2-SNAPSHOT.json). The draft 1 snapshot and delivery record are retained.
+
+## Response to the ranked findings
+
+1. **The referenced-type habit is performed.** Daniel says he checked order.d.ts, reports it unchanged, and explains why an identical import line did not settle that question. The checker extracts the named declaration from his line and compares it across the freshly emitted states, alongside both import lines. The existing referenced-alias control still demonstrates a changed dependency behind an identical entry declaration. The hypothetical is gone.
+2. **The flag's caller is explicit.** The page says the assistant's fallback. The checker now restores the original assertNever caller under the same isolatedDeclarations configuration and explicit string annotation, asserts TS2345, then restores the assistant's fallback and asserts green. Daniel speaks the simple-inference limitation himself, with the documentation link attached. The flag remains out of the Principle.
+3. **The narrator is shorter.** The artifacts are labelled once as saved with this review. Noam posts the question as a comment and the assistant replies; neither artifact is called fixed. Two labelled JSON fences carry package.json and the exact tsconfig.json. The suite parses and uses both, and verifies their options against the book profile. Emit logistics, the adapter's whereabouts and the scratch reset are shortened while retaining the state transitions. Eden now owns the one-line observation about the local alias and unchanged permitted statuses.
+4. **The muddled lines are repaired.** The table diagnostic is contrasted with the assistant's fallback printing the typo. Oded asks Noam to put his agreement near the Approve button, without demanding an apology for Oded's own repair. Eden fronts the generics callback and explains what it warned about. His Additional Take says plainly that narrowing can reject a string caller elsewhere while callers here compile.
+5. **The Principle gives a procedure and a decision rule.** Emitting declarations appears in the opening action. “Changes a caller to make it compile” includes the default-branch edit. The owner is named as the person who chooses the contract. Paragraph 2 asks which old calls a changed signature rejects and which results it stops guaranteeing, distinguishes representation changes, and explicitly says runtime tests. It retains the compiler's ability to check a promise without choosing the right one. There is no flag-exceptions list or type-test detour.
+6. **The optional clue stays small.** Noam observes that assertNever has nothing to assert. Its only remaining occurrence is verified as the declaration; a validation-only noUnusedLocals override produces TS6133, then the book profile is restored and passes. The chapter's project does not enable that flag. No new diagnostic or flag discussion was added to the page.
+7. **The Verdict is trimmed.** Oded keeps the swapped-label example. Daniel confirms only that its declaration report would be identical. The general aphorism is cut. The local decision and closing meeting line stay.
+
+No disagreements with the review and no material deviations. The Not adopted items remain out: no noUnusedLocals policy, private-alias accessibility tutorial, extra explanation of satisfies, type-level equality test, or direct-call probe instructions.
+
+## State, voice and Principle self-read
+
+The chapter remains in the same order, with the same source patch, consumer, typo experiments, as-const win and chosen repair. All eight original TypeScript and diff fences are byte-identical to draft 1. Only package.json and tsconfig.json fences are new. The saved assistant summary, question, reply and final rewritten summary are unchanged in content. The draft is **2,349 words**, with **10 fences**: four TypeScript, four unified diffs and two JSON.
+
+I read the revised chapter start to finish. The “refund” scene, the test catching the typo and “I've found a check the patch removed” are unchanged. Oded retains both wins. The configuration now has explicit boundaries and can be skipped as configuration without parsing a long narrative sentence. The flag names which fallback passes; discarding its scratch experiment returns to the chosen source. The copied adapter is set aside before the typo experiments and put back after the repair.
+
+Against the four Principle cases: following referenced types still exposes the derived alias; restoring a caller explicitly covers an edited default; choosing the promised contract remains distinct from satisfying a flag; and checking old calls and promised results covers narrowed parameters and widened returns. Runtime tests are named without the assertNever ambiguity. These are my self-checks, not fresh reader reports. The follow-up reader should judge whether the compatibility questions make paragraph 2 sound more like Daniel and less like qualifications.
+
+## Validation
+
+Targeted suite: **PASS — 10 fences, 45 compiler cases, 22 runtime groups and one file-list query**, TypeScript 7.0.2 / Node 22.23.4. Four compiler cases were added: the unused-helper control and profile restoration, and the flag's original-caller failure and assistant-fallback restoration. All prior declaration, runtime, mutation and restored-green controls remain. The two JSON fences are used directly; no unprinted strictness flags enter the normal story configuration.
+
+Full-suite result: **npm run check: exit 0; 483 fences, 877 compiler cases and 376 runtime groups**, plus two compiler-default cases, two source searches and eleven file-list queries. One full run was required for draft 2. The manuscript, validator, runner, compiler profile and coverage hashes match before and after the run; the snapshot records the log and detailed results. A subsequent PLAN.md wording correction distinguishes the full reader's reproduction from the Principle reader's four-case exercise. No new clean-install export or independent-reader pass is claimed.
+
+---
+
+## Draft 1 record (retained)
 
 Status: **DRAFT 1; awaiting Claude's independent readers and formal review**, 2026-11-02. This is Codex's self-review, not independent approval.
 
@@ -7,13 +43,13 @@ Governing settlement: [Bonus 3 plan](BONUS3-PLAN.md#settlement-after-codexs-chal
 Challenge: [Codex plan challenge](bonus3/CODEX-PLAN-CHALLENGE.md).
 Frozen record: [DRAFT1-SNAPSHOT.json](bonus3/DRAFT1-SNAPSHOT.json).
 
-## What this draft decides
+### What this draft decides
 
 The team accepts the lookup table with an explicit private status contract and a table checked against it. They restore the original exhaustive badge and require a declaration comparison for changes to this shared API, alongside the retained runtime assertions. This is a local Verdict on a refactor that promised the existing API. It is not a policy requiring annotations or isolated declarations throughout the shop.
 
 The new learning is reviewing the provider change and its accompanying caller repair together. The old caller is restored against the new provider before declarations explain the error. Eden brings an unchanged consumer outside the submitted patch. The chapter explicitly acknowledges his Ch6 warning rather than presenting export annotations as a discovery.
 
-## Settlement audit
+### Settlement audit
 
 1. **The title, cast and skeleton are retained.** Daniel states the Principle before the scenario. Noam, Oded and Eden are the other speakers; all use he/him. The chapter has Principle, Debate, Turn, Verdict and Additional Takes sections. Linoy does not appear. The register was calibrated against the full Ch7 text.
 2. **The hook has no missing-test excuse.** The initial and submitted versions pass the same three statuses and three badge assertions. The cases and harness are shown and held unchanged. Noam notices the badge hunk immediately. Oded is right about current runtime behavior, and the compiler's new complaint really is about the type.
@@ -27,7 +63,7 @@ The new learning is reviewing the provider change and its accompanying caller re
 
 No material settlement deviation. Keeping the aliases private and retaining the short flag beat were both explicitly permitted choices. The manuscript is 2,448 words (whitespace count including fences) and uses eight fences, below the ten-fence maximum.
 
-## Self-applied Principle-only cases
+### Self-applied Principle-only cases
 
 These are my answers against the drafted Principle, not reports from fresh readers.
 
@@ -38,7 +74,7 @@ These are my answers against the drafted Principle, not reports from fresh reade
 
 Potential reader pressure point: the Principle deliberately avoids a catalogue of flag exceptions. The fresh reader should be able to reject “the flag passed, therefore compatible” from the distinction between checking a stated promise and choosing one. If not, fix that sentence rather than expand the Principle into a configuration guide.
 
-## Voice and state review
+### Voice and state review
 
 I read the whole draft after its first targeted pass. The intended retelling is: a refactor with all its current tests passing also repaired the caller that would have exposed its changed return; the reviewer puts that caller back. The typo demonstrates the cost of the repair, and Oded correctly points out that his test still catches it. His “two words” also wins without qualification before Eden makes the local case for a separately stated contract.
 
@@ -46,7 +82,7 @@ The read caught “stays in a helper,” although the original has no helper; it
 
 The technical setup is one paragraph followed by small file bundles. The source patch is shown as a real unified diff, not a rewritten file with a claim about what changed. No narrator explains the Turn before the characters run it. The middle still has substantial code and diagnostics; the fresh full reader should judge whether the helper/table diff plus retained test harness earns that space. The flag exchange is the first optional cut if it interrupts the finish.
 
-## Validation
+### Validation
 
 The chapter check extracts all eight fences: four TypeScript bundles/fragments and four unified diffs. It applies source and declaration hunks with range, context and removal verification. It uses one evolving ESM repository on the book profile plus the printed declaration settings, hashes the three owned files throughout, and clears emit output before every compiler case. Every quoted diagnostic is asserted at its extracted source location and against its full quoted primary message. The fixed artifacts and rewritten summary are extracted and recorded too.
 

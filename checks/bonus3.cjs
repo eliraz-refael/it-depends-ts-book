@@ -6,10 +6,10 @@ const {defaults,version}=require('./compiler.cjs');
 const repo=path.resolve(__dirname,'..'),tsc=path.join(repo,'node_modules/.bin/tsc');
 const manuscript=fs.readFileSync(path.join(repo,'book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md'),'utf8');
 const fences=[...manuscript.matchAll(/```(\w+)\n([\s\S]*?)\n```/g)].map(m=>({language:m[1],body:m[2]}));
-assert.equal(fences.length,8);assert(fences.length<=10);assert.equal((manuscript.match(/^```/gm)||[]).length,16);
-assert.deepEqual(fences.map(f=>f.language),['typescript','typescript','diff','diff','typescript','diff','diff','typescript']);
+assert.equal(fences.length,10);assert(fences.length<=10);assert.equal((manuscript.match(/^```/gm)||[]).length,20);
+assert.deepEqual(fences.map(f=>f.language),['typescript','json','json','typescript','diff','diff','typescript','diff','diff','typescript']);
 assert(manuscript.includes('TypeScript '+version));assert(manuscript.includes('Node '+process.versions.node));
-for(const text of ['strict ES2022/Node16','exactOptionalPropertyTypes','"type": "module"','declaration','emitDeclarationOnly','allowImportingTsExtensions','rootDir: "."','outDir: "types"','root `*.ts`'])assert(manuscript.includes(text),text);
+assert(manuscript.includes("With the assistant's fallback, it passes the flag."));
 const consumed=new Set();
 function block(i){assert(!consumed.has(i));consumed.add(i);return fences[i].body+'\n';}
 function files(source){const result={};let file;for(const line of source.trimEnd().split('\n')){const match=line.match(/^\/\/ ([\w.-]+\.ts)(?: —.*)?$/);if(match){file=match[1];assert(!result[file]);result[file]='';}else if(file)result[file]+=line+'\n';else assert(!line.trim());}return result;}
@@ -20,12 +20,15 @@ function patch(inputs,text){const out={...inputs},lines=text.trimEnd().split('\n
   while(i<lines.length&&!lines[i].startsWith('@@ ')&&!lines[i].startsWith('--- ')){const line=lines[i++],kind=line[0],body=line.slice(1);assert([' ','-','+'].includes(kind),line);if(kind!=='+' ){assert.equal(src[cursor++],body,file+' context');oldCount++;}if(kind!=='-'){dest.push(body);newCount++;}}
   assert.equal(oldCount,m[2]===undefined?1:+m[2]);assert.equal(newCount,m[4]===undefined?1:+m[4]);}
  dest.push(...src.slice(cursor));out[file]=dest.join('\n')+'\n';}return out;}
-const initial={...files(block(0)),...files(block(1))};
-const submitted=patch(initial,block(2));
-const declarationPatch=block(3),mobile=files(block(4))['mobile.ts'];
-const typo=patch(submitted,block(5));
-const constRepair=patch(submitted,block(6));
-const final={...constRepair,...files(block(7))};
+const chapterPackage=JSON.parse(block(1)),chapterConfig=JSON.parse(block(2));
+assert.deepEqual(chapterPackage,{type:'module'});
+assert.deepEqual(chapterConfig,{compilerOptions:{...defaults,declaration:true,emitDeclarationOnly:true,allowImportingTsExtensions:true,rootDir:'.',outDir:'types'},include:['*.ts']});
+const initial={...files(block(0)),...files(block(3))};
+const submitted=patch(initial,block(4));
+const declarationPatch=block(5),mobile=files(block(6))['mobile.ts'];
+const typo=patch(submitted,block(7));
+const constRepair=patch(submitted,block(8));
+const final={...constRepair,...files(block(9))};
 assert.equal(consumed.size,fences.length,'Every fence extracted');
 assert.equal(submitted['badge.ts'],replace(initial['badge.ts'],'return assertNever(status);','return status;'));
 assert.equal(typo['status.ts'],replace(submitted['status.ts'],'all: "refunded"','all: "refund"'));
@@ -36,7 +39,7 @@ const reply=manuscript.match(/^> The inferred status[^\n]+/m)?.[0].slice(2);
 assert.equal(summary,'Refactor `orderStatus` into a lookup table. No public API changes. Also fixed a type error in `badge.ts`.');
 assert.equal(reply,'The inferred status is a string. Returning it in the fallback handles strings outside the three named cases. No exported type annotation changed, and the existing status cases retain their behavior.');
 const revisedSummary=manuscript.match(/Oded replaces the summary: \*([^*]+)\*/)?.[1];assert(revisedSummary);
-const question=manuscript.match(/Noam's review question is: \*([^*]+)\*/)?.[1];assert.equal(question,'What error required the change to badge.ts?');
+const question=manuscript.match(/\*\*Noam\*\*, in a comment: \*([^*]+)\*/)?.[1];assert.equal(question,'What error required the change to badge.ts?');
 const scratch=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'ts-book-bonus3-'))),story=path.join(scratch,'story');fs.mkdirSync(story);
 const results=[];let compilerCases=0,runtimeGroups=0,fileListQueries=0;
 const digest=s=>crypto.createHash('sha256').update(s).digest('hex');
@@ -45,7 +48,7 @@ const read=file=>fs.readFileSync(path.join(story,file),'utf8');
 const remove=file=>fs.rmSync(path.join(story,file),{force:true});
 const owned=Object.fromEntries(['order.ts','cases.ts','check.ts'].map(file=>[file,digest(initial[file])]));
 function verifyOwned(){for(const [file,hash] of Object.entries(owned))assert.equal(digest(read(file)),hash,file+' stays owned and unchanged');}
-function config(extra={}){write('tsconfig.json',{compilerOptions:{...defaults,declaration:true,emitDeclarationOnly:true,allowImportingTsExtensions:true,rootDir:'.',outDir:'types',...extra},include:['*.ts']});}
+function config(extra={}){write('tsconfig.json',{...chapterConfig,compilerOptions:{...chapterConfig.compilerOptions,...extra}});}
 function state(s){for(const file of fs.readdirSync(story))if(file.endsWith('.ts'))remove(file);for(const [f,text] of Object.entries(s))write(f,text);config();verifyOwned();}
 function command(name,exe,args,expected=0){const r=cp.spawnSync(exe,args,{cwd:story,encoding:'utf8',timeout:60000,maxBuffer:12e6});if(r.error)throw r.error;results.push({name,exe,args,status:r.status,stdout:r.stdout,stderr:r.stderr});fs.writeFileSync(path.join(scratch,'RESULTS.json'),JSON.stringify(results,null,2)+'\n');assert.equal(r.status,expected,name+'\n'+r.stdout+r.stderr);return r;}
 function diagnostic(file,needle,code,message,column){return {file,needle,code,message,column};}
@@ -70,11 +73,16 @@ const oldCallerError=diagnostic('badge.ts','default: return assertNever',2345,st
 const oldTypoErrors=[diagnostic('badge.ts','case "refunded"',2678,typoCase,10),diagnostic('badge.ts','default: return assertNever',2345,refundNever,33)];
 const finalTypoErrors=[diagnostic('status.ts','all: "refund"',2820,tableMessage,3),diagnostic('status.ts','return labels[',2322,returnMessage,3)];
 const adapterError=diagnostic('mobile.ts','return orderStatus',2322,mobileMessage,3);
-write('package.json',{private:true,type:'module'});state(initial);
+write('package.json',chapterPackage);state(initial);
 fs.writeFileSync(path.join(scratch,'ASSISTANT-ARTIFACTS.json'),JSON.stringify({summary,question,reply,revisedSummary},null,2)+'\n');
 compile('original');const originalDts=declarations();testRun('original-retained-tests');js('original-current-values',values,current);
 js('fixed-owned-case-contents',`import {cases} from './cases.ts';console.log(JSON.stringify(cases));`,[0,500,1000].map((refundedCents,i)=>({refundedCents,...current[i]})));
 state(submitted);compile('submitted-patch');testRun('submitted-retained-tests');js('submitted-current-values',values,current);
+// The optional clue is an unused declaration, not a change to the book profile.
+assert(manuscript.includes('It left `assertNever` with nothing to assert.'));
+assert.equal((submitted['badge.ts'].match(/\bassertNever\s*\(/g)||[]).length,1);
+config({noUnusedLocals:true});compile('orphaned-helper-under-unused-control',[diagnostic('badge.ts','function assertNever',6133,"'assertNever' is declared but its value is never read.",10)]);
+config();compile('book-profile-restored-after-unused-control');
 write('badge.ts',initial['badge.ts']);compile('new-provider-old-caller',[oldCallerError]);
 write('badge.ts',submitted['badge.ts']);compile('submitted-caller-restored');testRun('submitted-restored-tests');
 state(initial);compile('declaration-report-original');assert.deepEqual(declarations(),originalDts);
@@ -84,7 +92,11 @@ fs.writeFileSync(path.join(scratch,'DECLARATIONS-AFTER.json'),JSON.stringify(sub
 assert.deepEqual(patch(originalDts,declarationPatch),submittedDts,'Printed declaration diff is complete');
 assert.equal(originalDts['types/status.d.ts'],'import type { Order } from "./order.ts";\nexport declare function orderStatus(order: Order): "paid" | "partial" | "refunded";\n');
 assert.equal(submittedDts['types/status.d.ts'],'import type { Order } from "./order.ts";\nexport declare function orderStatus(order: Order): string;\n');
-assert.equal(originalDts['types/order.d.ts'],submittedDts['types/order.d.ts']);
+const referencedDeclaration=manuscript.match(/I checked `([^`]+)` too\./)[1];
+assert.equal(referencedDeclaration,'order.d.ts');
+assert.equal(originalDts['types/'+referencedDeclaration],submittedDts['types/'+referencedDeclaration]);
+assert(originalDts['types/status.d.ts'].includes('import type { Order } from "./order.ts";'));
+assert(submittedDts['types/status.d.ts'].includes('import type { Order } from "./order.ts";'));
 state({...initial,'mobile.ts':mobile});compile('unchanged-mobile-original');
 state({...submitted,'mobile.ts':mobile});compile('unchanged-mobile-submitted',[adapterError]);
 state(submitted);compile('mobile-copy-set-aside');
@@ -104,6 +116,8 @@ write('mobile.ts',mobile);compile('unchanged-mobile-final');const chosen={...fin
 // The flag experiment returns to the original project, before the copied consumer existed.
 state(initial);config({isolatedDeclarations:true});compile('flag-on-original',[diagnostic('status.ts','export function orderStatus',9007,isolatedMessage,17)]);
 state(submitted);write('status.ts',replace(submitted['status.ts'],'orderStatus(order: Order) {','orderStatus(order: Order): string {'));config({isolatedDeclarations:true});compile('flag-accepts-explicit-string');assert.equal(declarations()['types/status.d.ts'],submittedDts['types/status.d.ts']);testRun('wrong-contract-still-same-values');
+write('badge.ts',initial['badge.ts']);compile('explicit-string-flag-with-original-badge',[oldCallerError]);
+write('badge.ts',submitted['badge.ts']);compile('assistant-fallback-restored-under-flag');
 state(chosen);compile('flag-experiment-discarded');testRun('chosen-version-restored');
 // Additional Takes and off-page controls: same story repository; no check mutates owned cases.
 write('status.ts',replace(replace(final['status.ts'],'none: "paid"','none: "refunded"'),'all: "refunded"','all: "paid"'));compile('same-declarations-wrong-behavior');assert.deepEqual(declarations(),{...finalDts,'types/mobile.d.ts':read('types/mobile.d.ts')});

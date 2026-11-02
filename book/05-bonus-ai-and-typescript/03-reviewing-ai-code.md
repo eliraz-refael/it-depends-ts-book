@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Daniel Compiler**: "When a patch says the API stayed the same, I compare the public types before and after, with the same compiler and project settings. That includes the types a signature refers to: an unchanged alias can name a changed type. If the patch also fixes a caller, I put the old caller back and find what required the repair. The revised program compiling is useful evidence. It doesn't answer for the caller we just edited, or the caller in someone else's repo. We still have to decide which contract we intend to support."
+**Daniel Compiler**: "When a patch says the API stayed the same, I emit declarations before and after, with the same compiler and project settings, and compare the public types. That includes the types a signature refers to: an unchanged alias can name a changed type. If the patch changes a caller to make it compile, I put the old caller back and find what required the repair. A green compile covers the revised program. I also want an answer for the caller we just edited, and the caller in someone else's repo. Then the API's owner has to say which contract we're offering."
 
-"The summary is a claim about the change. Emitted declarations let you inspect its public types, but a textual difference still needs interpretation, and identical declarations don't prove identical behavior. Keep the runtime assertions. An explicit type gives the implementation a promise to meet; the compiler can check that promise without choosing the right one for you."
+"For each changed signature, I ask which old calls it rejects or which results it no longer guarantees. A different spelling of the same type needn't change that contract. Even with identical declarations, I run the runtime tests to check the values and effects. An explicit type gives the implementation a promise to meet; the compiler can check that promise without choosing the right one for us."
 
 ## The Debate
 
@@ -14,7 +14,7 @@
 
 **Noam Kiperman** has opened the last hunk. They are becoming less compatible.
 
-Oded asked an unnamed assistant to move the shop's order-status labels into a lookup table. The submitted patch and the two assistant messages below are fixed artifacts of this example. This is its summary:
+Oded asked an assistant to move the shop's order-status labels into a lookup table. He saved its patch and messages with the review. The summary:
 
 > Refactor `orderStatus` into a lookup table. No public API changes. Also fixed a type error in `badge.ts`.
 
@@ -57,7 +57,38 @@ export function badge(order: Order): string {
 
 "Still says the same things. I checked."
 
-This project uses TypeScript 7.0.2, Node 22.23.4 and the book's strict ES2022/Node16 profile, including `exactOptionalPropertyTypes`. Its package has `"type": "module"`. For the review they enable `declaration`, `emitDeclarationOnly` and `allowImportingTsExtensions`, with `rootDir: "."` and `outDir: "types"`; the project includes its root `*.ts` files. Node runs the TypeScript directly. These are the retained cases, written before the refactor:
+The review project runs TypeScript 7.0.2 and Node 22.23.4. Node runs the TypeScript directly. Its settings:
+
+`package.json`:
+
+```json
+{"type": "module"}
+```
+
+`tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "types": [],
+    "skipLibCheck": true,
+    "noEmitOnError": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "allowImportingTsExtensions": true,
+    "rootDir": ".",
+    "outDir": "types"
+  },
+  "include": ["*.ts"]
+}
+```
+
+**Oded**: "These cases were here before the refactor. I kept them."
 
 ```typescript
 // cases.ts
@@ -121,7 +152,7 @@ The assistant's submitted patch:
  }
 ```
 
-**Noam**: "Why did a lookup-table refactor need to change the badge's fallback?"
+**Noam**: "Why did a lookup-table refactor need to change the badge's fallback? It left `assertNever` with nothing to assert."
 
 **Oded**: "That's the type error it fixed."
 
@@ -129,7 +160,9 @@ The assistant's submitted patch:
 
 "We could ask."
 
-Noam's review question is: *What error required the change to badge.ts?* The assistant's fixed reply in this example is:
+**Noam**, in a comment: *What error required the change to badge.ts?*
+
+The assistant replies:
 
 > The inferred status is a string. Returning it in the fallback handles strings outside the three named cases. No exported type annotation changed, and the existing status cases retain their behavior.
 
@@ -159,7 +192,7 @@ At `assertNever(status)`, **TS2345**: `Argument of type 'string' is not assignab
 
 **Daniel**: "Yes. Let's look at the type."
 
-He puts the submitted badge back. Then he emits declarations from the original commit and the complete submitted patch, with the same compiler and settings, clearing the output directory before each run and keeping both results. Both compilations succeed. In `types/status.d.ts`, the difference is one line:
+He puts the submitted badge back. Then he emits declarations from the original commit and the complete submitted patch, with the same compiler and settings. Both compilations succeed. In `types/status.d.ts`, the difference is one line:
 
 ```diff
 --- a/types/status.d.ts
@@ -182,7 +215,7 @@ He puts the submitted badge back. Then he emits declarations from the original c
 
 **Eden Legacy** has been searching for `orderStatus` in another checkout.
 
-"I asked for explicit return types on APIs we intend to keep back in the generics argument. This is the implementation change I meant. Here's the mobile adapter's existing caller. It wasn't part of the assistant's patch."
+"Back in the generics argument, I asked for explicit return types on APIs we intend to keep: changing a body can change what we publish. Here's the mobile adapter's existing caller. It wasn't part of the assistant's patch."
 
 He copies it into the temporary review project:
 
@@ -202,9 +235,9 @@ With the original provider it compiles. With the submitted provider, the return 
 
 **Oded**: "Fine. That is a caller I hadn't checked."
 
-**Daniel**: "And `Order` is unchanged in both declaration sets. We're comparing the same input here. If its definition had changed, we would have to review that too, even though this import line stayed identical."
+**Daniel**: "I checked `order.d.ts` too. It's unchanged. An identical import line doesn't tell me whether `Order` still means the same thing."
 
-Eden removes the copied adapter from the temporary project. Noam keeps its source for the repaired version.
+Eden sets the copied adapter aside.
 
 **Oded**: "So fix the return type. I still want the table."
 
@@ -254,7 +287,7 @@ He tries the equivalent typo in a scratch copy of the original: the final `retur
 
 **Oded**: "I didn't ask for every string. I asked to move three of them up the file."
 
-Noam undoes the typo experiments and returns to the submitted patch. It compiles; the unchanged tests pass again.
+Noam returns to the submitted patch, without the typo.
 
 **Eden**: "We can keep the refactor. We can't keep calling that fallback an internal change."
 
@@ -290,11 +323,9 @@ Oded takes the keyboard.
 
 The old badge compiles with the table. `node check.ts` passes. Daniel emits again: `status.d.ts` is byte-identical to the original. Noam compares it himself.
 
-**Oded**: "I accept apologies as approvals."
-
 **Noam**: "That works."
 
-"A short approval is fine."
+**Oded**: "Could you say it where the Approve button is?"
 
 **Eden**: "It restores what we publish today. I still want this function to say what it promises. The table is how we implement the statuses. It shouldn't be where we accidentally decide which statuses the API offers."
 
@@ -335,11 +366,11 @@ Noam repeats the `all: "refund"` experiment on this version. At the table, **TS2
 
 **Oded**: "It has a suggestion now."
 
-**Noam**: "It used to have an objection. You replaced it with a string."
+**Noam**: "At the table. The assistant's fallback just printed the typo."
 
 He restores `"refunded"`. The program and all six assertions pass. Eden puts the unchanged mobile adapter back; it compiles too.
 
-The emitted declaration now names the private `OrderStatus` alias and refers to it from the exported function. Its text differs from the original, but the return type still permits exactly the same three statuses. Eden reviews that representation change; they have not added a named type export for consumers to import.
+**Eden**: "The declaration names our local `OrderStatus` now. Same three statuses; no new named export."
 
 ### "Explicitly wrong"
 
@@ -347,13 +378,11 @@ The emitted declaration now names the private `OrderStatus` alias and refers to 
 
 **Daniel**: "Here, yes. Choosing it is still our job."
 
-In scratch work, he enables `isolatedDeclarations` on the original project. It reports **TS9007** on `orderStatus`: `Function must have an explicit return type annotation with --isolatedDeclarations.` He then uses the submitted patch and annotates its function `orderStatus(order: Order): string`. With the repaired fallback, it passes the flag.
+In scratch work, he enables `isolatedDeclarations` on the original project. It reports **TS9007** on `orderStatus`: `Function must have an explicit return type annotation with --isolatedDeclarations.` He then uses the submitted patch and annotates its function `orderStatus(order: Order): string`. With the assistant's fallback, it passes the flag.
 
 **Oded**: "So now it's explicitly the wrong contract."
 
-**Daniel**: "Exactly. The original wasn't broken because it inferred a type. The flag has a different requirement."
-
-He discards that experiment and returns to their chosen version. The [isolated-declarations documentation](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html#isolated-declarations) permits some simple inferred exports; it does not promise an annotation on every export. They keep the declaration comparison rather than treating the flag as a compatibility check.
+**Daniel**: "Exactly. The original wasn't broken because it inferred a type. The flag even allows some simple inferred exports. It doesn't require a return annotation on every export." He opens the [isolated-declarations documentation](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html#isolated-declarations), then discards the experiment.
 
 ## The Verdict
 
@@ -363,7 +392,7 @@ He discards that experiment and returns to their chosen version. The [isolated-d
 
 **Oded**: "And keep the runtime tests. Swapping `paid` and `refunded` would satisfy that union perfectly."
 
-**Daniel**: "Yes. The declaration report would be identical too. A difference needs review; no difference isn't permission to skip the behavior."
+**Daniel**: "And the declaration report would be identical."
 
 Oded replaces the summary: *Move labels into a table. Preserve the status return and exhaustive badge. Name the existing return contract; mobile compatibility and all three runtime cases checked.*
 
@@ -373,6 +402,6 @@ Noam approves the revised patch.
 
 ## Additional Takes
 
-**Eden Legacy**: "A narrower parameter can break compatibility too. Every caller here might pass `paid`; another caller still has a `string`. Don't decide what a shared API accepts by searching only the repo that changed it."
+**Eden Legacy**: "Narrowing a parameter can break a caller elsewhere that still passes a `string`, even if every caller in this repo compiles. A search here won't find that caller."
 
 **Daniel Compiler**: "And if an exported alias uses `typeof`, follow it to the value. An unchanged alias line can acquire a different meaning. The declaration report is there to show you what the compiler made of the whole change."
