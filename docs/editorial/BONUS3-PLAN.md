@@ -1,6 +1,6 @@
 # Bonus 3 — Reviewing AI Code (working title)
 
-Status: **PROPOSED, awaiting Codex's challenge**, 2026-11-02.
+Status: **PLAN SETTLED**, 2026-11-02. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/bonus-3-reviewing-ai-code`, based on `origin/main` `8bdb687` (Bonus 2's merge,
 PR #31).
 File: `book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md`.
@@ -264,9 +264,9 @@ scene they'd retell):
 
 ## Completion
 
-- [ ] Codex challenges this plan: new learning versus Ch6 l.228 dramatised, where the AI is, the
+- [x] Codex challenges this plan: new learning versus Ch6 l.228 dramatised, where the AI is, the
   hook's honesty, the `isolatedDeclarations` beat, the ending and the cast. Disagreements are
-  settled on evidence.
+  settled on evidence ([challenge](bonus3/CODEX-PLAN-CHALLENGE.md)).
 - [ ] Codex drafts and self-reviews (record, snapshot).
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
@@ -274,3 +274,124 @@ scene they'd retell):
 - [ ] Clean `npm ci` and full suite green at final review.
 - [ ] Both of us read the final text start to finish.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-11-02)
+
+[Codex's challenge](bonus3/CODEX-PLAN-CHALLENGE.md) reproduced all six mechanisms (43 compiler cases
+and 12 runtime groups, with controls) and showed that the plan's ending rests on a false guarantee.
+**This settlement governs where it differs from the proposal above.** I independently confirmed the
+results that change the design:
+- under `isolatedDeclarations`, `export function label() { return "paid"; }` →
+  `return 42;` compiles both times, and the declaration changes from `label(): string` to
+  `label(): number`. The flag doesn't require an annotation on every export;
+- annotating the refactor's `orderStatus(order: Order): string` passes the flag and emits the
+  widened return;
+- `as const` on the table alone restores the original badge and emits a `status.d.ts`
+  byte-identical to the original (and still gets TS9013 under the flag).
+
+**My errors, corrected by Codex:**
+- **`isolatedDeclarations` doesn't make every public type change appear in the source,** and it
+  doesn't choose the contract. It's a declaration-emission constraint, not API stability. The
+  plan's either/or between the flag and a declaration report was a false choice.
+- **"A file it didn't touch" is wrong:** the patch plainly touches `badge.ts`. And the caller
+  already had a `default`; the patch replaces the expression in it.
+- **A shipped `"refund"` typo needs an implausibly missing test.** A full-refund test catches it.
+- **"The source diff isn't the contract diff" was too absolute.** The source diff contains the
+  cause; it doesn't spell out the inferred signature. A caller repair is a reason to investigate,
+  not proof of an exported-type change (configuration or an existing caller bug can also cause
+  errors).
+- **The named-alias repair isn't the only one,** and it doesn't give a byte-identical declaration.
+  `as const` or `satisfies` alone undo the widening.
+- **Declaration equality doesn't establish behaviour:** swapping two table values emits the same
+  declaration and mislabels orders.
+- **The public contract includes referenced types.** Comparing one entry file's declaration isn't
+  comparing the contract in general (here it is, since `Order` is unchanged).
+- "Long enough that nobody wants to read it twice" is a volume excuse that weakens the reviewer.
+
+**Settled:**
+1. **The subject is causal review of a finished patch:** the provider change and the caller repair
+   are one change. The reviewer reconstructs the state the submitted commit no longer contains
+   (the new provider with the old caller), compares the public declarations before and after under
+   the same settings, and decides whether the changed contract is intended. **This is Eden's Ch6
+   warning applied,** and the page admits it in one line, which Eden can say.
+2. **Working title: "Bonus 3: What Did the Fix Fix?"** Heading `# Bonus 3: <title>`, with
+   `checks/bonus3.cjs`. ("No Public API Changes" is the alternative.)
+3. **The hook is honest:** all three current statuses and badges genuinely pass before and after.
+   - **The fixed artifacts:** the assistant's summary ("Refactor `orderStatus` into a lookup table.
+     No public API changes. Also fixed a type error in `badge.ts`."), the small two-file patch, and
+     one short fixed reply to Noam's question. The reply says the fallback accepts strings outside
+     the three cases and that no exported annotation changed. Both are true, and neither settles the
+     API claim. Each is labelled as this assistant's reply in this example.
+   - **Noam sees the `badge.ts` hunk immediately:** "Why did a lookup-table refactor need to change
+     the badge's fallback?" He doesn't miss the line, and Oded doesn't either.
+   - **Oded defends its consequences** with the same three tests passing on both commits. He's right
+     about his evidence.
+   - No volume excuse and no "nobody wrote that line" overreach. "Nobody wrote that line" may refer
+     to the inferred declaration only.
+4. **The investigation:** restore the old `badge.ts` against the new provider (TS2345). Then emit
+   declarations from both commits with the same settings: the one-line return change contradicts the
+   summary. **Eden** brings one unchanged consumer annotated with the old union (green / TS2322 /
+   green), a caller the patch can't silently edit. One beat, not a Ch25 tour.
+5. **The Turn is a labelled scratch experiment:** Noam changes `"refunded"` to `"refund"` in the
+   table. Under the original code, `badge.ts` rejects it (TS2678, TS2345). Under the patch, it
+   compiles and the badge says `refund`. Undo it. **This is the check the fix removed,** and it moves
+   the argument from "what happens today?" to "what did this repair stop checking?" The typo never
+   ships.
+6. **The repair:**
+   - **Oded offers the small fix,** `as const`, and it works: the old caller compiles and the
+     declaration is byte-identical. He wins that point.
+   - The team still chooses an explicit return type and a table checked with `satisfies`, **for a
+     stated reason:** this is a shared API they intend to keep, so the promise is written down and
+     future implementations are checked against it, and the typo then fails at the table, with
+     "Did you mean '"refunded"'?". Restore `assertNever`.
+   - If `OrderStatus` is exported, the declaration's text changes, though it accepts the same
+     statuses. Review that addition or keep the alias private; don't claim byte identity unless the
+     check shows it.
+7. **`isolatedDeclarations` gets one short, accurate beat at most,** owned by Daniel: TS9007 on the
+   original (an adoption cost, not a defect), then `: string` satisfying it on the patch. "Now it's
+   explicitly the wrong contract." It requires an annotation here; it doesn't choose the right one.
+   Codex may cut the beat if it doesn't earn the space. No project-wide flag policy, and no claim
+   that it applies to a single file when source imports join the program.
+8. **The Verdict is local.** Accept the table with the agreed contract, reject the caller fallback,
+   and require a declaration comparison (emitted with the same settings) for changes to this shared
+   API, alongside the runtime tests, because each checks something the other doesn't. The summary
+   has to describe the actual change. End on the completed review decision. The refactor promised
+   the old API, so preserving it isn't a matter of taste.
+9. **Principle: Daniel Compiler (he).** Open on the testable review action: compare the public types
+   before and after under the same compiler and project settings, including the types they refer to;
+   when the patch repairs a caller, find what made that repair necessary. The owner decides whether a
+   changed contract is intended. A green compile checks the revised program, not compatibility with
+   the callers the patch no longer contains. Then the evidence: a summary is a claim, a declaration
+   comparison establishes a type change, and runtime tests establish the behaviour they assert. No
+   "never trust AI", no "review carefully", no escape-hatch list, and no flag exceptions list.
+10. **Cast: Daniel (Principle, the flag beat), Noam (the question, the scratch experiment), Oded
+    (green tests, `as const`), Eden (the unchanged consumer and the Ch6 callback).** Linoy is cut.
+    Don't replay Noam's bio (forty-seven comments, 11:47 PM). Pronouns verified: all he.
+11. **Reader cases are Codex's four (§6):**
+    - the derived export with `as const` dropped;
+    - the provider and caller repaired together;
+    - the green flag (the trivial export, or `: string`);
+    - the narrowed parameter with every local caller passing, plus unchanged declarations not
+      proving unchanged behaviour.
+12. **Repetition boundaries:** Codex's §5 list is adopted. The fresh composition is reviewing the
+    provider and its caller fix as one causal change.
+13. **Checks: Codex's §7 requirements,** in particular:
+    - apply the shown diff hunks to their preceding state;
+    - use the same fixed expected outputs for the original and the patch;
+    - emit from clean states (no stale declaration);
+    - reset explicitly after the experiment;
+    - keep the green `: string` control, the trivial-export counterexample and the
+      same-declaration-wrong-behaviour control in validation, even if unprinted.
+
+**Fun guardrails:**
+- **The scenes readers should retell:**
+  - "No public API changes";
+  - "Why did a lookup-table refactor need to change the badge's fallback?";
+  - the one-line declaration diff;
+  - the badge that says `refund`;
+  - "Did you mean '"refunded"'?";
+  - "explicitly the wrong contract", if the beat stays.
+- **Oded isn't a strawman.** He wins the runtime claim and the smaller-repair counter.
+- Aim for ten fences or fewer. No hype and no doom. Length 2,300–3,000 words.
+
+**Not adopted:** nothing material.
