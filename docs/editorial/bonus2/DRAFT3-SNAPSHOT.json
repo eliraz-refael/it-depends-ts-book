@@ -1,0 +1,157 @@
+{
+  "status": "draft 3 frozen; final Principle-only read and diff review pending",
+  "date": "2026-11-02",
+  "settled_plan_commit": "b32cb3f",
+  "base_commit": "b6d2b671f3e15c3c72ad88a11bdae6a858a8fef8",
+  "path": "book/05-bonus-ai-and-typescript/02-type-safe-agent-patterns.md",
+  "sha256": "1396e08f07746a6a8f5a2c3155fa7d0913429c6d9068166c0919ced30e54077c",
+  "manuscript_mtime_utc": "2026-11-02T18:02:24.077345+00:00",
+  "words": 2094,
+  "word_count_method": "Whitespace-delimited words in the complete Markdown, including code fences.",
+  "code_fences": 9,
+  "fences_by_language": {
+    "typescript": 9
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "typescript",
+      "sha256": "6b8fe8a69a92296b73c18721e19a3ebf9f650b56d14c3193dc092d0a4e85e3e1"
+    },
+    {
+      "ordinal": 2,
+      "language": "typescript",
+      "sha256": "26765d53a6de2ef6d8a5b6628e0a9ce002ada0ee01ae8a13fdc22c5a70f5136b"
+    },
+    {
+      "ordinal": 3,
+      "language": "typescript",
+      "sha256": "1cd3c03b5e52b614216fa4eb86db321dd9e66a460acdc94617808ebc900b64b1"
+    },
+    {
+      "ordinal": 4,
+      "language": "typescript",
+      "sha256": "1ab27e76bb950809906548e7994d854fcac2855dff0f7ede08e77f2f7ae71739"
+    },
+    {
+      "ordinal": 5,
+      "language": "typescript",
+      "sha256": "b82da785d319b3343c45be8f07c1626b1ce1402ca528eb3dce5359e95826bc7c"
+    },
+    {
+      "ordinal": 6,
+      "language": "typescript",
+      "sha256": "e6394274271ed5a76fb8b7953ff8e618345957c24de5b67397bb7463d71a4741"
+    },
+    {
+      "ordinal": 7,
+      "language": "typescript",
+      "sha256": "fd53565b9424fe8979dae078b0b6cec21a6dfa90d0b13921dafba26d358fd9bc"
+    },
+    {
+      "ordinal": 8,
+      "language": "typescript",
+      "sha256": "bfb6ce6acbee67919f52162f13ef3eb88dd42c5fbad0c5a5537a232cc8fc7b32"
+    },
+    {
+      "ordinal": 9,
+      "language": "typescript",
+      "sha256": "c9a45af0b9791e5d6e0287c2943c3adc993f4766872bdc3d2dee8728f09deebc"
+    }
+  ],
+  "validator_sha256": "c732ff3823f111c651e5d109349a94d2b86e79410971bae9fe3e63463d11feaf",
+  "suite_runner_sha256": "0498835314e1c6416c173175b735d36105e50b901b6e1c3dbf66cc7846c3bbe9",
+  "compiler_profile_sha256": "3fbee0de1a72de52e3288a05c3682ba614932b91f56b237e570dfaec6ab99375",
+  "typescript": "7.0.2",
+  "zod": "4.6.2",
+  "node": "v22.23.4",
+  "validation": {
+    "installation": "Existing locked npm ci installation supplied in the b2 worktree; no new clean-export claim.",
+    "targeted_suite": "Exit 0; 9 fences / 27 compiler cases / 31 runtime groups / 1 file-list query. Simplified outgoing declaration executed and its public fields asserted.",
+    "full_suite": "npm run check: exit 0; 473 fences / 832 compiler cases / 354 runtime groups, plus 2 compiler-default cases, 2 searches and 10 file-list queries.",
+    "full_log": ".probe/codex/draft3/full-check.log",
+    "full_log_sha256": "ed2d392347f99ea564db3daa5841a33e9746b4c1de4ff57a392553fe245a4ead",
+    "bonus2_summary": {
+      "typescript": "7.0.2",
+      "zod": "4.6.2",
+      "node": "v22.23.4",
+      "fences": 9,
+      "compilerCases": 27,
+      "runtimeGroups": 31,
+      "fileListQueries": 1,
+      "artifactSha256": "57e6bf2676a0bc473f228e8d3f31a91906bdbdb835d66f74cd058056dc3f3fed",
+      "scratch": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-bonus2-ARnJXO"
+    },
+    "source_hashes_verified_before_and_after_full_run": true,
+    "results_sha256": "7d19ba9087000e7c33decbd0bda35d1b25ed1631a2834743d8e1f6d1e16dc4bb",
+    "artifact_sha256": "57e6bf2676a0bc473f228e8d3f31a91906bdbdb835d66f74cd058056dc3f3fed",
+    "quoted_diagnostic": "TS2339: Property 'currency' does not exist on type '{ orderId: string; cents: number; }'.",
+    "quoted_diagnostic_column": 8,
+    "repository_states": [
+      "handwritten description and default USD",
+      "generated input description and single-tool replay; general registry validation-only",
+      "required currency, omitted and explicit USD",
+      "currency from record, no owner comparison",
+      "session-bound executor with private effect"
+    ],
+    "controls": [
+      "input/output required lists and object modes",
+      "two handler shapes and both help languages",
+      "invalid envelope/name/JSON/arguments",
+      "explicit EUR and invalid GBP",
+      "unchanged wire artifacts",
+      "own and foreign orders under separate sessions",
+      "zero effects on denial",
+      "repeated refunds and remaining balance",
+      "captured scalar session identity",
+      "fresh lookup after ownership transfer",
+      "private effect import/member errors",
+      "owner comparison removal and restored bad effect",
+      "always-deny loses positive calls",
+      "contextual refinement omitted from generated schema",
+      "model outcome contrasted with actual result",
+      "unsafe async wrapper and page helper async rejection",
+      "final source restoration and file membership",
+      "printed strict-schema USD rejection",
+      "seeded outcome append and both printed booleans",
+      "removed public refund entry",
+      "short dispatcher thrown-error control",
+      "extracted outgoing descriptor equality and public keys"
+    ],
+    "no_real_model_claims": true,
+    "effect_scope": "Synchronous in-memory refund ledger; no payment, delivery, transaction or idempotency proof.",
+    "prior_full_attempts": [],
+    "dispatcher_scope": "Printed single-refund replay validates name with a literal; malformed envelope and JSON throw. General registry with result-returning error branches and refund_help is a separately checked validation-only file.",
+    "outcome_sequence": "Saved friendReply seeded in calls.ts; initial final replay prints five session outputs, then appended extracted fence prints refundIssued:true and refundIssued:false from denied.ok.",
+    "strict_USD_payoff": "Explicit USD rejects with invalid arguments and empty ledger immediately after strictObject replacement, before original call restoration.",
+    "removed_entry": "TS2339 for makeShop().refund; restored before separate private-effect diagnostics.",
+    "repeated_refunds": "600/600 remains validation-only; no unexecuted prediction on page.",
+    "full_attempts": 1,
+    "outgoing_descriptor": "Fence 4 declaration extracted and executed in the schema comparison group; descriptor equals generated input schema with name/description and excludes invoke.",
+    "off_page_claims": "Ownership removal/restoration, fresh lookup after transfer and repeated 600/600 balance remain controls; no promised removal or Verdict balance demonstration on page.",
+    "incident_cleanup": "Closing instruction requires correcting the dollar entry and reversing the old wrongful o-17 refund before ticket closure; no reversal API or runtime output is claimed."
+  },
+  "settlement_deviations": [],
+  "principle_words": 122,
+  "verdict_words": 73,
+  "review_commit": "b6d2b67",
+  "review_disagreements": [],
+  "review_deviations": [],
+  "length_exception": {
+    "original_minimum": 2300,
+    "actual": 2094,
+    "approved_by_review": "b6d2b67, Not adopted: length floor",
+    "reason": "Review 2 explicitly retains the shorter-length exception and requests local cuts; no material added to reach 2300."
+  },
+  "fence_ordinals_unchanged_from_draft2": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9
+  ]
+}

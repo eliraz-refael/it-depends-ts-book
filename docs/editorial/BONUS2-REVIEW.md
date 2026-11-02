@@ -1,3 +1,38 @@
+# Bonus 2 — draft 3 self-review
+
+Status: **DRAFT 3; final Principle-only read and diff review pending.**
+
+Manuscript: [Whose Refund Is It?](../../book/05-bonus-ai-and-typescript/02-type-safe-agent-patterns.md).
+Review addressed: [Claude's second review](bonus2/CLAUDE-REVIEW-2.md), with both verbatim reader reports, at `b6d2b67`.
+Snapshot: [DRAFT3-SNAPSHOT.json](bonus2/DRAFT3-SNAPSHOT.json). Previous draft records and snapshots are retained.
+
+## Response to the ranked findings
+
+1. **No unkept replay promise.** Gilad's “Briefly” removal promise is cut. The compiler/runtime removal control still runs off-page, with its restored-green replay. The Principle drops “permission forever” and the standalone current-record instruction; it retains checking ownership at execution, as the shown handler does. The Verdict no longer claims a demonstrated balance limit or an ownership-change scenario. Both remain validation controls.
+2. **The Verdict decides.** Three lines select the version to wire into the client, confirm the removed entry point and result-derived outcome, and require the successful owner replay as well as the refusal. “Beautifully secure” has a reason to be there. The per-person round and repeated payment caveat are gone.
+3. **Incident cleanup includes o-17.** Before closing the ticket, Gilad commits to correcting the dollar entry and reversing the old refund on Bob's order, because Bob did not ask for it. This is an explicit cleanup condition, not a claim that the displayed program now implements a reversal API or a new printed execution result. The closing schema joke remains.
+4. **Liron's arrival is staged.** He has been reading the ticket and points to the order's currency at the Turn. His second, duplicate question is cut. No extra lecture or Debate subplot was added.
+5. **The leftovers are removed.** The one-tool fossil and the isolated payment caveat are cut. The description's introduction now sits next to its block; friendReply is explicitly the assistant's structured reply. The three-run paragraph becomes short replays prompted by Guy and Gilad. “Constructor” becomes defineTool. The outgoing descriptor is built directly, without an intermediate tools array.
+6. **Citation and Principle wording are corrected.** The citation says the guide names ZodDefault among the types whose input and output differ; the generated required lists remain this fixture's observed output. The refinement sentence names execution instead of “there”, and the stored-facts rule introduces currency without a backward-pointing “still”. The opening, actor-ID sentence and refundIssued line remain.
+
+## Self-review
+
+I agree with all findings. The revision stays local: only fence 4 changes, and only its outgoing construction. The refund implementation, handler types, fixed artifacts and every printed runtime result are unchanged. The revised descriptor is extracted and executed in the existing schema comparison group; it must equal the expected public description and expose only name, description and parameters.
+
+The four Principle-only cases still distinguish description from execution: generating the input shape leaves the wrong default; removing the actor ID leaves ownership to be checked; parsing a boolean doesn't establish an effect; and a contextual refinement can perform the ownership check at execution without exporting it into JSON Schema. These are self-review conclusions, not new independent reader results.
+
+The ending makes both incident corrections a condition of closing the ticket. It does not quietly reverse Bob's successful *test* call or add a cleanup capability to the agent. No reversal implementation or provider operation is asserted by the checker. The off-page ownership-removal, fresh-lookup and repeated-refund controls remain intact despite the shorter prose.
+
+The draft is **2,094 words** including code, with nine fences. The review explicitly retained the length exception; no replacement material was added to reach the old floor. No finding is disputed and no material review deviation remains.
+
+## Validation and freeze
+
+`npm run check` completed with exit 0 on its first draft 3 full invocation, on TypeScript 7.0.2, Zod 4.6.2 and Node 22.23.4. Bonus 2 passes **9 fences / 27 compiler cases / 31 runtime groups / 1 file-list query**. Full coverage remains **473 fences / 832 compiler cases / 354 runtime groups**, plus two compiler-default cases, two searches and ten file-list queries.
+
+The manuscript SHA-256 is `1396e08f07746a6a8f5a2c3155fa7d0913429c6d9068166c0919ced30e54077c`. The Principle is 122 words and the Verdict 73 words. Eight fences are byte-identical to draft 2; only fence 4 changes. Manuscript, validator, runner and compiler-profile hashes were verified unchanged across the full run. The snapshot records the successful log, extracted descriptor check and the review-approved length exception.
+
+---
+
 # Bonus 2 — draft 2 self-review
 
 Status: **DRAFT 2; revised Principle-only read and targeted recheck pending.**
