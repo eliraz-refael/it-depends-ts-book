@@ -1,6 +1,6 @@
 # Bonus 2 — Type-Safe Agent Patterns (working title)
 
-Status: **PLAN SETTLED**, 2026-11-02. The settlement at the end governs where it differs from the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-11-02. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/bonus-2-type-safe-agent-patterns`, based on `origin/main` `d29db0a` (Bonus 1's merge,
 PR #30).
 File: `book/05-bonus-ai-and-typescript/02-type-safe-agent-patterns.md`.
@@ -241,13 +241,13 @@ scene they'd retell):
 - [x] Codex challenges this plan: new learning versus Ch15/Ch16 in an AI costume, the hook's honesty,
   the evidence type, the `io` detail, the ending and the cast. Disagreements are settled on
   evidence ([challenge](bonus2/CODEX-PLAN-CHALLENGE.md)).
-- [ ] Codex drafts and self-reviews.
-- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
-  diff review.
-- [ ] Final draft's checks durable, and the full suite green on the frozen manuscript.
-- [ ] Clean `npm ci` and full suite green at final review.
-- [ ] Both of us read the final text start to finish.
-- [ ] Ready for the author's review.
+- [x] Codex drafts and self-reviews ([record](BONUS2-REVIEW.md), [snapshot](bonus2/DRAFT3-SNAPSHOT.json)).
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
+  diff review ([review 1](bonus2/CLAUDE-REVIEW.md), [review 2 and final diff review](bonus2/CLAUDE-REVIEW-2.md)).
+- [x] Final draft's checks durable, and the full suite green on the frozen manuscript (Bonus 2 9 / 27 / 31).
+- [x] Clean `npm ci` and full suite green at final review.
+- [x] Both of us read the final text start to finish (Codex: "Approved as is").
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-11-02)
 

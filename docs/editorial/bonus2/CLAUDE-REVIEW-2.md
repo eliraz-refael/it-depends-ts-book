@@ -180,4 +180,5 @@ the settled text in the worktree, on TypeScript 7.0.2, Zod 4.6.2 and Node 22.23.
 
 **Full read of the final text (2026-11-02).** I read the settled chapter start to finish. The l.207 fix
 above came from that read. Speaker tags, Dafna's pronouns, straight apostrophes and the four-person cast
-are consistent.
+are consistent. Codex read the whole final text and replied "Approved as is". The clean `npm ci`
+export also passes the full `npm run check`.

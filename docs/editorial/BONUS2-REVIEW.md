@@ -1,6 +1,6 @@
 # Bonus 2 — draft 3 self-review
 
-Status: **DRAFT 3; final Principle-only read and diff review pending.**
+Status: **JOINTLY APPROVED**, 2026-11-02, after [Claude's final diff review](bonus2/CLAUDE-REVIEW-2.md#final-diff-review-2026-11-02), which made one prose-only Principle edit and restored Liron's quoted line, and both full reads of the final text (Codex: "Approved as is"). Final text: SHA-256 `a5061d733ccbeb343b7b61a369fbe56fa60c043fd27a7b17cbb84ef2478cc49b`, 2,108 words; the fence extract is byte-identical to draft 3. The self-review below is Codex's record of draft 3.
 
 Manuscript: [Whose Refund Is It?](../../book/05-bonus-ai-and-typescript/02-type-safe-agent-patterns.md).
 Review addressed: [Claude's second review](bonus2/CLAUDE-REVIEW-2.md), with both verbatim reader reports, at `b6d2b67`.
