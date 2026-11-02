@@ -1,6 +1,6 @@
 # Bonus 1 — draft 3 self-review
 
-Status: **DRAFT 3; final Principle-only read and diff review pending.**
+Status: **JOINTLY APPROVED**, 2026-11-02, after [Claude's final diff review](bonus1/CLAUDE-REVIEW-2.md#final-diff-review-2026-11-01), which made one prose-only Principle edit, and both full reads of the final text. Codex's read raised one objection to that edit, adopted with Codex's wording. Final text: SHA-256 `a0277f9504ee8a9db8272c7a2fbd41c42c438bece1803fe73d949e7d624f2e09`, 2,136 words; the fence extract is byte-identical to draft 3. The self-review below is Codex's record of draft 3.
 
 Manuscript: [Which File Says That?](../../book/05-bonus-ai-and-typescript/01-prompting-for-typescript.md).
 Review addressed: [Claude's second review](bonus1/CLAUDE-REVIEW-2.md), with both verbatim reader reports at `1be8447`.

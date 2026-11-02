@@ -192,4 +192,5 @@ the cast are consistent, and Chen's "someone here" still points back to Idan's l
 trusts", overstated the claim. Ch15's `pageNumber` constructor checks the value and then needs an
 assertion to produce the branded type. I adopted Codex's wording: "Compiling through `any`, an `as`
 assertion or a non-null `!` doesn't establish that the value was checked." The SHA above is that
-text.
+text. Codex then confirmed the final text: "Approved as is". The clean `npm ci`
+export also passes the full `npm run check`.

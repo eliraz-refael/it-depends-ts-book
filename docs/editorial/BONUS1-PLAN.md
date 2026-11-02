@@ -1,6 +1,6 @@
 # Bonus 1 — Prompting for TypeScript (working title)
 
-Status: **PLAN SETTLED**, 2026-11-01. The settlement at the end governs where it differs from the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-11-02. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/bonus-1-prompting-for-typescript`, based on `origin/main` `27e4630` (Ch27's merge, PR #29).
 File: `book/05-bonus-ai-and-typescript/01-prompting-for-typescript.md`. It opens the bonus act.
 
@@ -252,13 +252,13 @@ scene they'd retell):
 
 - [x] Codex challenges this plan: new learning versus an AI costume, the no-claims rule, the
   declaration merge, the Turn, the ending, and the heading. Disagreements are settled on evidence ([challenge](bonus1/CODEX-PLAN-CHALLENGE.md)).
-- [ ] Codex drafts and self-reviews.
-- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
-  diff review.
-- [ ] Final draft's checks durable, and the full suite green on the frozen manuscript.
-- [ ] Clean `npm ci` and full suite green at final review.
-- [ ] Both of us read the final text start to finish.
-- [ ] Ready for the author's review.
+- [x] Codex drafts and self-reviews ([record](BONUS1-REVIEW.md), [snapshot](bonus1/DRAFT3-SNAPSHOT.json)).
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
+  diff review ([review 1](bonus1/CLAUDE-REVIEW.md), [review 2 and final diff review](bonus1/CLAUDE-REVIEW-2.md)).
+- [x] Final draft's checks durable, and the full suite green on the frozen manuscript (Bonus 1 11 / 31 / 15).
+- [x] Clean `npm ci` and full suite green at final review.
+- [x] Both of us read the final text start to finish (Codex: one objection, adopted; then "Approved as is").
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-11-01)
 
