@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Liron Closure**: "A valid tool call is still a proposal. It doesn't establish who may act on an order, what currency that order uses, or whether a refund happened. Those answers have to come from the program that executes the call. Bind the executor to the authenticated customer, and check the proposed action against the current record before doing it. A customer ID in the arguments isn't authentication."
+**Liron Closure**: "A valid tool call is still a proposal. Build its executor with the authenticated customer's identity, then check that customer against the referenced order when executing. A customer ID in the arguments isn't authentication; removing it doesn't check who owns the order. Use the record current at execution. A refinement can do that comparison if it runs there with the authenticated identity and that record. An earlier successful parse isn't permission forever."
 
-"Generate the input structure you advertise from the schema that parses what arrives. That saves you maintaining two descriptions of the fields; it doesn't put all your policy into JSON Schema. A runtime refinement can check ownership if it has the trusted session and record. A positive-number check can't. When you report an outcome, take it from the operation's result. Successfully parsing a boolean called `refundIssued` hasn't issued anything."
+"The schema describes what the caller may propose. Generate that input description from the parser so you don't maintain the fields twice. Generating it doesn't export the ownership comparison. Currency still comes from the order, and an outcome comes from the operation's result. Successfully parsing a boolean called `refundIssued` hasn't issued anything."
 
 ## The Debate
 
@@ -26,9 +26,9 @@ He opens the support conversation for order o-12, in Alice's authenticated sessi
 >
 > Assistant: I'll record that refund for you.
 
-The order belongs to Alice and is denominated in EUR. The shop used to sell only in USD; its refund parser kept the USD default when EUR orders arrived.
+The order belongs to Alice and is denominated in EUR.
 
-For the replay, Gilad has a synchronous, in-memory copy of the ledger adapter. It records a refund and reduces the remaining refundable amount. Nothing here contacts a payment provider. These are already eligible orders; the shop permits their authenticated owners to request partial refunds up to that remaining amount.
+Gilad replays it against a synchronous, in-memory copy of the ledger adapter. No payment provider is involved.
 
 ```typescript
 // contract.ts
@@ -69,12 +69,23 @@ export function makeShop() {
 
 The project uses the book's strict ES2022/Node16 profile, with `noEmit` and `allowImportingTsExtensions`; its package has `"type": "module"`. They compile with TypeScript 7.0.2 and run the `.ts` replay with Node 22.23.4. Zod is pinned to 4.6.2.
 
-The client sends this handwritten description. Its own wire format returns a name and a JSON string of arguments. `ownCall` is the saved response to Alice; `friendCall` is another saved response from her session, after she said, "My friend asked me to sort out o-17." They keep both artifacts for the replay.
+The shop's support client sends the handwritten tool description below to the assistant. The client's own wire format carries the returned tool name and a JSON string of arguments. `ownCall` is the saved call for Alice's request.
+
+**Gilad**: "There's another one in her session."
+
+> Customer: My friend asked me to sort out o-17. Please refund five dollars.
+>
+> Assistant: I've recorded your refund.
+
+He saves that call as `friendCall` and its structured outcome as `friendReply`. The replay keeps both calls on hand.
+
+**Guy**: "Both orders are eligible for partial refunds. That isn't the question on this ticket."
 
 ```typescript
 // calls.ts
 export const ownCall = { name: "refund_order", arguments: '{"orderId":"o-12","cents":500}' };
 export const friendCall = { name: "refund_order", arguments: '{"orderId":"o-17","cents":500}' };
+export const friendReply = { refundIssued: true };
 
 // description.ts
 export const description = {
@@ -98,6 +109,8 @@ It prints `[{"orderId":"o-12","cents":500,"currency":"USD"}]`.
 
 **Gilad**: "There's your conversion department. One default."
 
+**Guy**: "That was for the USD-only shop. We added EUR orders and kept it."
+
 **Dafna**: "The description has two fields. The parser has three. Who maintains the description?"
 
 **Guy**: "At the moment, apparently nobody."
@@ -106,7 +119,7 @@ It prints `[{"orderId":"o-12","cents":500,"currency":"USD"}]`.
 
 **Dafna**: "Let the parser produce the parameter description. Put the parser and handler together when we define the tool. Then dispatch doesn't have to rediscover which argument type goes with which function."
 
-She writes the small constructor and the dispatcher. The handler receives the parser's output, including any defaults. Each returned `invoke` accepts `unknown`; it retains the particular schema and handler inside.
+For this replay, she keeps only the refund tool.
 
 ```typescript
 // tool.ts
@@ -125,18 +138,13 @@ export function defineTool<S extends z.ZodType, R>(definition: {
     },
   };
 }
-const Envelope = z.strictObject({ name: z.string(), arguments: z.string() });
-export function dispatch(input: unknown, tools: readonly {
-  name: string; invoke: (raw: unknown) => Result<unknown>;
-}[]): Result<unknown> {
-  const envelope = Envelope.safeParse(input);
-  if (!envelope.success) return { ok: false, error: "invalid envelope" };
-  const tool = tools.find(tool => tool.name === envelope.data.name);
-  if (!tool) return { ok: false, error: "unknown tool" };
-  let raw: unknown;
-  try { raw = JSON.parse(envelope.data.arguments); }
-  catch { return { ok: false, error: "invalid JSON" }; }
-  return tool.invoke(raw);
+const Envelope = z.strictObject({ name: z.literal("refund_order"), arguments: z.string() });
+export function dispatch(input: unknown, refund: {
+  invoke: (raw: unknown) => Result<unknown>;
+}): Result<unknown> {
+  const call = Envelope.parse(input);
+  const raw: unknown = JSON.parse(call.arguments);
+  return refund.invoke(raw);
 }
 ```
 
@@ -144,37 +152,25 @@ export function dispatch(input: unknown, tools: readonly {
 
 **Dafna**: "Because we're describing what the caller may send. Zod's default is to describe what comes out."
 
-For `Refund`, the default generation's `required` list is `["orderId","cents","currency"]`. With `io: "input"`, it's `["orderId","cents"]`. [Zod documents the distinction](https://zod.dev/json-schema#io): a default can make the output field required even though the input may omit it.
+Zod 4.6.2 generates `["orderId","cents","currency"]` as the default `required` list for `Refund`. With `io: "input"`, it generates `["orderId","cents"]`. [Zod documents input and output types](https://zod.dev/json-schema#io), including their difference for `ZodDefault`; these lists are what this schema produces.
 
 **Guy**: "So the outgoing description says currency can be missing."
 
-**Dafna**: "Yes. Accurately."
-
-The registry also contains the support agent's existing `refund_help` tool. Its handler takes a language and returns text, rather than a refund receipt. Dafna keeps that entry so both handlers have to fit the dispatcher.
+**Dafna**: "Yes. Accurately. It even advertises `"default":"USD"`. We've documented the dollars."
 
 ```typescript
-// help.ts
-import { z } from "zod";
-import { defineTool } from "./tool.ts";
-export const help = defineTool({
-  name: "refund_help", description: "Explain partial refunds.",
-  schema: z.strictObject({ language: z.enum(["en", "fr"]) }),
-  run: args => ({ ok: true, value: args.language === "fr" ? "Remboursement partiel" : "Partial refund" }),
-});
-
 // replay.ts — generated description
 import { makeShop, Refund } from "./shop.ts";
 import { defineTool, dispatch } from "./tool.ts";
-import { help } from "./help.ts";
 import { ownCall, friendCall } from "./calls.ts";
 const shop = makeShop();
 const refund = defineTool({
   name: "refund_order", description: "Record a partial refund in cents.",
   schema: Refund, run: shop.refund,
 });
-const tools = [refund, help];
+const tools = [refund];
 const outgoing = tools.map(({ name, description, parameters }) => ({ name, description, parameters }));
-console.log(JSON.stringify(dispatch(ownCall, tools)));
+console.log(JSON.stringify(dispatch(ownCall, refund)));
 console.log(JSON.stringify(shop.receipts()));
 ```
 
@@ -199,15 +195,17 @@ The same replay now returns `{"ok":false,"error":"invalid arguments"}` and print
 
 **Gilad**: "We've stopped recording the wrong currency by refusing the original request. Now give it the wrong currency explicitly."
 
-He replaces `ownCall` at the dispatch site with `{ name: "refund_order", arguments: '{"orderId":"o-12","cents":500,"currency":"USD"}' }` and starts fresh. The dollar receipt returns. Both supported currency names are legal; neither name proves which currency belongs to o-12.
+He replaces `ownCall` at the dispatch site with `{ name: "refund_order", arguments: '{"orderId":"o-12","cents":500,"currency":"USD"}' }` and starts fresh. The dollar receipt returns.
+
+## The Turn
 
 ### "Why does that field decide anything?"
 
-**Liron**: "The waiter has asked the guest which currency the restaurant's till uses."
+**Liron**: "The order has the answer. Why are we asking the caller for a second opinion?"
 
-**Guy**: "We have an order record. We can skip the restaurant."
+**Guy**: "And accepting whichever opinion arrives in the arguments."
 
-**Liron**: "Gladly. Why does that field decide anything?"
+**Liron**: "Why does that field decide anything?"
 
 **Dafna**: "It doesn't need to. The caller chooses the order and proposes an amount. We get the currency from the order."
 
@@ -229,7 +227,7 @@ function refund(args: z.output<typeof Refund>): Result<Receipt> {
 
 Trying to read `args.currency` in that handler now gives **TS2339**: `Property 'currency' does not exist on type '{ orderId: string; cents: number; }'.`
 
-Gilad restores `dispatch(ownCall, tools)`. On the fresh ledger, the original request records EUR. Then he changes that one call to `dispatch(friendCall, tools)` and starts fresh again.
+Gilad runs the explicit-USD call against the new strict schema. It returns `{"ok":false,"error":"invalid arguments"}` and leaves the ledger empty: currency is no longer an accepted argument. He restores `dispatch(ownCall, refund)`. On the fresh ledger, the original request records EUR. Then he changes that one call to `dispatch(friendCall, refund)` and starts fresh again.
 
 The result is `{"ok":true,"value":{"orderId":"o-17","cents":500,"currency":"USD"}}`.
 
@@ -249,15 +247,13 @@ The result is `{"ok":true,"value":{"orderId":"o-17","cents":500,"currency":"USD"
 
 She stops typing.
 
-**Dafna**: "The caller's. We already have the authenticated customer."
+**Dafna**: "The caller's."
 
-**Liron**: "Knowing which order it names doesn't tell us who may refund it."
-
-**Guy**: "Taking currency from the record hasn't checked ownership. We just demonstrated that."
+**Liron**: "Keep Alice with the operation. The assistant can name Bob's order; it shouldn't get to become Bob to refund it."
 
 ### Two customers, one description
 
-Guy wants the refund operation behind the session-bound tool. Dafna agrees. They replace `shop.ts`; `contract.ts`, the constructor, dispatcher and help tool stay unchanged. The host builds tools for the authenticated session, not from anything in the assistant's arguments.
+They replace `shop.ts`. The contract, constructor and replay dispatcher stay unchanged.
 
 ```typescript
 // shop.ts — final replacement
@@ -296,30 +292,29 @@ export function makeShop() {
 }
 ```
 
-**Guy**: "Now nobody importing this module can call `recordRefund` directly. And the tool doesn't accept a customer ID."
+**Guy**: "The old `refund` entry point is gone. To request a refund now, the host has to build the tool for its authenticated session."
 
 **Liron**: "But the closure isn't the ownership check. That comparison is. Remove it and you're back to refunding Bob from Alice's session."
 
-**Gilad**: "I will remove it in the check. Briefly."
-
-The record is looked up on every invocation. The tool captures the customer ID itself; changing the session object's property later won't retarget it. The host must still choose the right authenticated session when constructing the tool. It cannot reuse Alice's tool in Bob's registry and expect an argument parser to notice.
+**Gilad**: "I'll remove it in the replay test. Briefly."
 
 Gilad replaces the replay. All three calls below share one fresh shop; Alice and Bob get separate tool instances.
 
 ```typescript
 // replay.ts — final replacement
+import { z } from "zod";
 import { makeShop } from "./shop.ts";
 import { dispatch } from "./tool.ts";
-import { help } from "./help.ts";
-import { ownCall, friendCall } from "./calls.ts";
+import { ownCall, friendCall, friendReply } from "./calls.ts";
 const shop = makeShop();
 const alice = shop.forSession({ customerId: "alice" });
 const bob = shop.forSession({ customerId: "bob" });
 console.log(JSON.stringify(alice.parameters) === JSON.stringify(bob.parameters));
-console.log(JSON.stringify(dispatch(friendCall, [alice, help])));
+const denied = dispatch(friendCall, alice);
+console.log(JSON.stringify(denied));
 console.log(shop.receipts().length);
-console.log(JSON.stringify(dispatch(friendCall, [bob, help])));
-console.log(JSON.stringify(dispatch(ownCall, [alice, help])));
+console.log(JSON.stringify(dispatch(friendCall, bob)));
+console.log(JSON.stringify(dispatch(ownCall, alice)));
 ```
 
 It prints `true`, then `{"ok":false,"error":"order unavailable"}`, then `0`. Bob's call returns `{"ok":true,"value":{"orderId":"o-17","cents":500,"currency":"USD"}}`; Alice's own call returns `{"ok":true,"value":{"orderId":"o-12","cents":500,"currency":"EUR"}}`.
@@ -328,25 +323,40 @@ It prints `true`, then `{"ok":false,"error":"order unavailable"}`, then `0`. Bob
 
 **Guy**: "Different customer. Finally."
 
-**Gilad**: "Fresh shop. Alice asks twice for six hundred?"
+**Gilad**: "The saved answer still says it recorded Alice's refund on o-17."
 
-**Dafna**: "First call records six hundred. Four hundred remain. Second call is refused."
+**Dafna**: "Let's parse its outcome too."
 
-**Guy**: "Good. The original amount isn't a fresh allowance for every conversation."
+She appends this to the replay, using the saved `denied` result:
+
+```typescript
+// replay.ts — append outcome
+const Reply = z.object({ refundIssued: z.boolean() });
+console.log(JSON.stringify(Reply.parse(friendReply)));
+console.log(JSON.stringify({ refundIssued: denied.ok }));
+```
+
+The two appended lines print `{"refundIssued":true}`, then `{"refundIssued":false}`.
+
+**Guy**: "The first one is a perfectly valid boolean."
+
+**Dafna**: "The second one knows we refused. That's the field we'll return."
 
 ## The Verdict
 
-Gilad keeps both successful owners in the check as well as the refused cross-customer call. Otherwise an implementation that refuses every refund would look beautifully secure. The two six-hundred-cent requests get their own fresh shop.
+**Guy**: "What goes back into the support client?"
 
-**Dafna**: "I'm keeping the generated description. It removed a handwritten structure, even though it didn't repair the refund."
+**Dafna**: "The generated description stays. It removed a handwritten structure. But we won't ask the caller to choose the order's currency. The executor reads that from the order."
 
-**Guy**: "And I'm keeping the operation private. The host gets a session-bound tool and a way to inspect receipts. The assistant gets its name, description and parameters. It doesn't get to choose the session."
+**Guy**: "And the host builds that executor for the authenticated customer. Each call looks up the order and checks its current owner and remaining balance before recording. No public `refund` entry point alongside it."
 
-**Liron**: "Or the order's currency. A proposed amount is something we can consider. Our own stored currency isn't a vote."
+**Gilad**: "I'll keep Bob's successful replay as well as Alice's refusal. Otherwise refusing every refund would look beautifully secure."
 
-**Gilad**: "There's still the answer in the transcript."
+**Liron**: "Keep those tools with their sessions, too. If you put Alice's tool in Bob's registry, it will faithfully act for Alice."
 
-The saved reply after the foreign-order request says, "I've recorded your refund." **Dafna**: "If we expose `refundIssued`, we'll fill it from the executor's result, not parse that sentence into a boolean." **Guy**: "Recorded here. Don't turn it into a claim about a payment arriving."
+**Dafna**: "And the outcome comes from the result we just got. The assistant's reply doesn't get to overrule a refusal."
+
+**Gilad**: "Recorded in our ledger. No promise about a payment arriving."
 
 ## Additional Takes
 
@@ -358,7 +368,7 @@ The saved reply after the foreign-order request says, "I've recorded your refund
 
 **Gilad**: "Who decided the assistant could request refunds at all?"
 
-**Guy**: "The shop's owner approved this policy for eligible orders belonging to the authenticated customer. That doesn't make a parsed call proof that the customer meant it. If the owner wants a confirmation step, we need to enforce that before recording. Another type name won't approve it."
+**Guy**: "The shop's owner approved this policy for eligible orders belonging to the authenticated customer. That doesn't make a parsed call proof that the customer meant it. If the owner wants a confirmation step, we need to enforce that before recording."
 
 **Gilad**: "Fine. Close the dollar ticket with the ledger correction."
 

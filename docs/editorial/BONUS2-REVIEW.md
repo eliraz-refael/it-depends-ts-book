@@ -1,3 +1,42 @@
+# Bonus 2 — draft 2 self-review
+
+Status: **DRAFT 2; revised Principle-only read and targeted recheck pending.**
+
+Manuscript: [Whose Refund Is It?](../../book/05-bonus-ai-and-typescript/02-type-safe-agent-patterns.md).
+Review addressed: [Claude's draft 1 review](bonus2/CLAUDE-REVIEW.md), with both verbatim reports, at `ca94b10`.
+Snapshot: [DRAFT2-SNAPSHOT.json](bonus2/DRAFT2-SNAPSHOT.json). The draft 1 record and snapshot remain below and unchanged respectively.
+
+## Response to the ranked findings
+
+1. **The Turn is a section.** `## The Turn` starts at Liron's question about the source of currency; the already-visible o-17 call supplies its second blow. The three-line “Bob's order / The currency is right / For Bob” exchange stays.
+2. **The narrator gives away less.** The USD-only history moves after the default's discovery, into Guy's response. Eligibility becomes a short spoken clarification; the project remains explicitly an in-memory ledger replay. The support client, two saved requests and the friend's confident response are introduced separately. The currency explanation, repeated ownership narration and Verdict test-report paragraph are removed or replaced with decisions in the room.
+3. **The unused SDK material is off-page.** `refund_help`, tool-name lookup and the result-returning malformed-envelope/JSON branches now exist only in the check. The printed dispatcher validates the single refund name and decodes the argument string before invoking the tool; malformed envelope/JSON throws in this small replay. The check explicitly distinguishes that from the fuller receiver's error Results. No assertions or unvalidated any were introduced. The shared generic constructor still keeps each handler with its own parser.
+4. **Liron has distinct work.** The waiter/till parable becomes a second-opinion question about a value already on the order. After Dafna stops typing, Liron supplies the construction decision: keep Alice with the operation. The repeated “order isn't permission” recap is gone. His later distinction between capturing a session and executing the ownership comparison stays, and the Verdict assigns tools to the right session.
+5. **The outcome is seeded and run.** The setup contains the friend's request, the saved confident response and `friendReply`. After the two-session replay, a ninth fence parses that saved boolean and prints it beside the result derived from the stored denial. Both outputs are asserted. The short exchange earns the retained Principle line. The Verdict now states the selected description, currency source, bound execution policy and result-derived outcome, with Gilad keeping the positive replay as well as the refusal.
+6. **The claims are corrected.** The required lists are attributed to this schema on Zod 4.6.2; the link supports the documented input/output distinction. Guy identifies the removed public `refund` entry point, not a supposedly newly private `recordRefund`. “The check” becomes the replay test. The 600/600 prediction is cut from the conversation and retained as a runtime control.
+7. **Both additional payoffs are present.** Dafna points to the advertised USD default. The explicit-USD call is then rerun against strict input and rejected before Gilad restores the original call. Its empty ledger is checked in that exact repository state.
+8. **The line and Principle fixes are adopted.** The cryptic type-name approval sentence is gone. The setup explicitly says both saved calls stay on hand through temporary substitutions. The Principle says removing the actor ID doesn't establish ownership, names execution as the time of the lookup, and places a contextual refinement at that point rather than treating earlier parsing as permanent permission.
+
+## Self-review and limits
+
+I agree with the review's findings; none was silently skipped. The page has nine fences, within the ten-fence guardrail. The refund implementation and its policy are unchanged. The reduced dispatcher is deliberately a single-tool replay, not a newly proposed general receiver. The general receiver's two-handler typing and rejection paths remain exercised separately against the same constructor.
+
+The outcome compares a saved artifact with the result of replaying its call after the repair. It does not claim a new response from a real assistant. Its two appended output lines come after the original five lines; the check runs those two states separately and preserves the denial value even after the subsequent successful calls. No payment or delivery claim was added.
+
+The four Principle-only cases still have direct answers: an accurate description cannot repair a wrong default; a removed actor ID doesn't check the target record; a valid boolean isn't evidence of an effect; and a contextual runtime refinement can check ownership at execution even though generation omits that comparison. These are my self-review conclusions, not new independent reader results.
+
+The revised draft is **2,180 words**, including code, below the original 2,300-word floor. This follows the review's requested cuts to narration, the unused help tool, dispatcher branches and the prediction. I retained those cuts rather than adding another scene to restore the old minimum. This length exception is disclosed in the snapshot and handoff; there is no technical disagreement with the review.
+
+## Validation and freeze
+
+`npm run check` completed with exit 0 on TypeScript 7.0.2, Zod 4.6.2 and Node 22.23.4. Bonus 2 passes **9 fences / 27 compiler cases / 31 runtime groups / 1 file-list query**. The full suite covers **473 fences / 832 compiler cases / 354 runtime groups**, plus two compiler-default cases, two searches and ten file-list queries.
+
+Two earlier full attempts timed out in unchanged legacy cases: Chapter 14's compiler process, then Chapter 18's live-clock runtime after it emitted expected JSON. Both logs are retained in the snapshot. The third complete invocation passed with identical limits and commands; no legacy checks were weakened or unrelated processes changed.
+
+The final manuscript SHA-256 is `6eebc22c4d2d86d07221596171e4072b8ebfa9ad4451aaa1479a46d585a45d63`. Its 2,180-word count includes code; the Principle has 126 words. Fences 1, 5, 6 and 7 remain byte-identical to draft 1. Manuscript, validator, runner and compiler-profile hashes were recorded before the final run and verified unchanged afterwards. The draft 2 snapshot records the successful run, prior timeout logs, source hashes, unchanged fences and the length exception.
+
+---
+
 # Bonus 2 — draft 1 self-review
 
 Status: **DRAFT 1; independent Principle-only readers, full read and targeted recheck pending.**
