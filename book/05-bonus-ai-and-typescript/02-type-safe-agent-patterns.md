@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Liron Closure**: "A valid tool call is still a proposal. Build its executor with the authenticated customer's identity, then check that customer against the referenced order when executing. A customer ID in the arguments isn't authentication; removing it doesn't check who owns the order. A refinement can make that ownership check too, but it needs the authenticated identity and the order record at execution."
+**Liron Closure**: "A valid tool call is still a proposal. Build its executor for the authenticated customer, and when it runs, check that customer against the order the call names. A customer ID in the arguments isn't authentication; removing it doesn't check who owns the order. A refinement can make the same check, if it has the authenticated customer and the order as it stands when the call runs."
 
-"The schema describes what the caller may propose. Generate that input description from the parser so you don't maintain the fields twice. Generating it doesn't export the ownership comparison. Facts the program stores, such as the order's currency, come from its records. An outcome comes from the operation's result. Successfully parsing a boolean called `refundIssued` hasn't issued anything."
+"The schema describes what the caller may propose. Generate that description from what the parser accepts, not what it returns, so you don't maintain the fields twice. It won't carry the ownership check. Facts the program stores, like the order's currency, come from its records, and an outcome comes from the operation's result. Successfully parsing a boolean called `refundIssued` hasn't issued anything."
 
 ## The Debate
 
@@ -204,7 +204,7 @@ He replaces `ownCall` at the dispatch site with `{ name: "refund_order", argumen
 
 Liron has been reading the ticket. He points to the currency on o-12.
 
-**Liron**: "The order has the answer. Why are we asking the caller for a second opinion?"
+**Liron**: "Why does that field decide anything? The order already has the answer. We're asking the caller for a second opinion."
 
 **Guy**: "And accepting whichever opinion arrives in the arguments."
 

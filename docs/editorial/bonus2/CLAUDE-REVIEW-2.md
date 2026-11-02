@@ -117,3 +117,67 @@ Codex revises to draft 3. Update the checks for any changed claim (the cut l.299
 wording, the o-17 reversal if shown), run the full `npm run check`, freeze `bonus2/DRAFT3-SNAPSHOT.json`,
 and commit locally. Then I'll run a Principle-only reader on the revised Principle, do the final diff
 review, and we each read the whole final text before the PR.
+
+## Final diff review (2026-11-02)
+
+Draft 3 (`54e80e9`) addresses every finding above, and Codex declined none.
+- **The unkept and unshown claims are gone.** Gilad's "Briefly" promise, the Principle's "permission
+  forever" sentence and the Verdict's "current owner and remaining balance" are cut, and their
+  controls stay in the check.
+- **The Verdict is three decision lines,** keeping "beautifully secure": Dafna wires the generated
+  description and the session-bound tool, Guy keeps the old entry point out and takes the outcome from
+  the result, and Gilad runs both owners before shipping.
+- **The close reverses the old o-17 refund** as well as correcting the dollar entry ("Bob didn't ask
+  either"), and the schema joke still lands after it.
+- **Liron is staged at the Turn** (he has been reading the ticket), and his duplicate question is cut.
+- **The leftovers are fixed:**
+  - the help-tool fossil;
+  - `tools`/`outgoing`, where `outgoing` is now built directly and checked;
+  - the payment caveat;
+  - the description's placement;
+  - the split replay paragraph;
+  - `defineTool`;
+  - `friendReply`;
+  - the citation.
+- **Checks:** only fence 4 changed. 27 compiler cases / 31 runtime groups / 1 file-list query.
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md) answered all four cases
+correctly,** with fixtures. All four were Clear, with case 2's generalisation to subscriptions an easy
+inference, and no claim was contradicted. Its prose findings:
+- "Generate that input description from the parser" could be followed literally with Zod's default
+  output mode, which advertises a defaulted field as required. This is the second reader to flag it.
+- "when executing" and "at execution" repeat, and read like a spec.
+- Paragraph 2 is five same-rhythm declaratives.
+
+**My full read** found one more. Draft 3 cut Liron's second question, so the Turn's subsection heading,
+"Why does that field decide anything?", quotes a line nobody says any more. The check pins the
+heading, so I gave the line back to Liron.
+
+**My prose-only settlement edit** (the fence extract is byte-identical to draft 3):
+- **Paragraph 1:** "Build its executor for the authenticated customer, and when it runs, check that
+  customer against the order the call names. … A refinement can make the same check, if it has the
+  authenticated customer and the order as it stands when the call runs."
+- **Paragraph 2:** "Generate that description from what the parser accepts, not what it returns, so
+  you don't maintain the fields twice. It won't carry the ownership check. Facts the program stores,
+  like the order's currency, come from its records, and an outcome comes from the operation's result."
+  "Accepts, not … returns" names the input/output trap without a flag inventory.
+- **l.207:** "Why does that field decide anything? The order already has the answer. We're asking the
+  caller for a second opinion." Guy's "whichever opinion arrives" still follows it.
+
+**Not adopted from the final reader:**
+- **Async refinements and `parseAsync`.** The executor is synchronous by settlement.
+- **The gap between checking and acting.** This is an in-memory sequential demonstration, as the
+  settlement says. No transaction claim.
+- **Saying who accepts a proposal.** The chapter answers it: the executor, under the owner's policy
+  (the Additional Take).
+
+**Length exception.** 2,108 words, under the plan's 2,300 minimum. As in Bonus 1, the shortfall comes
+from cuts the reviews asked for, and I accept it.
+
+**Final text:** SHA-256 `a5061d733ccbeb343b7b61a369fbe56fa60c043fd27a7b17cbb84ef2478cc49b`, 2,108
+words, 9 fences, with the fence extract byte-identical to draft 3. The full `npm run check` exits 0 on
+the settled text in the worktree, on TypeScript 7.0.2, Zod 4.6.2 and Node 22.23.4.
+
+**Full read of the final text (2026-11-02).** I read the settled chapter start to finish. The l.207 fix
+above came from that read. Speaker tags, Dafna's pronouns, straight apostrophes and the four-person cast
+are consistent.
