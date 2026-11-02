@@ -13,7 +13,7 @@ npm run check
 
 ## Coverage
 
-Successful run on **2026-11-01**, TypeScript **7.0.2**, Node **22.23.4**:
+Successful run on **2026-11-02**, TypeScript **7.0.2**, Node **22.23.4**:
 
 | Suite | Code fences | Compiler cases | Runtime scenario groups |
 | --- | ---: | ---: | ---: |
@@ -39,11 +39,12 @@ Successful run on **2026-11-01**, TypeScript **7.0.2**, Node **22.23.4**:
 | Chapter 26 | 17 | 74 | 18 |
 | Chapter 27 | 10 | 107 | 5 |
 | Bonus 1 | 11 | 31 | 15 |
-| Total | **464** | **805** | **323** |
+| Bonus 2 | 8 | 23 | 28 |
+| Total | **472** | **828** | **351** |
 
-Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Chapter 25 includes eight TypeScript and five JSON fences. Chapter 26 includes fifteen TypeScript and two JSON fences. Chapter 27 includes eight TypeScript, one JSON and one JavaScript fence, plus an extracted inline benchmark configuration. Bonus 1 includes nine TypeScript and two JSON fences, plus three extracted requests. Earlier chapter counts are TypeScript fences.
+Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Chapter 25 includes eight TypeScript and five JSON fences. Chapter 26 includes fifteen TypeScript and two JSON fences. Chapter 27 includes eight TypeScript, one JSON and one JavaScript fence, plus an extracted inline benchmark configuration. Bonus 1 includes nine TypeScript and two JSON fences, plus three extracted requests. Bonus 2 includes eight TypeScript fences, including labelled file bundles and replacement fragments. Earlier chapter counts are TypeScript fences.
 
-Chapter 25 also verifies two compiler file-list queries; Chapter 26 verifies five, Chapter 27 one and Bonus 1 one. These are separate from the compiler-case counts.
+Chapter 25 also verifies two compiler file-list queries; Chapter 26 verifies five, Chapter 27 one, Bonus 1 one and Bonus 2 one. These are separate from the compiler-case counts.
 
 Two additional cases check compiler defaults. Chapter 9 also reproduces both printed source searches, including filenames and line numbers.
 
@@ -193,6 +194,16 @@ The coercing implementation is restored before the empty-amount probe, whose exa
 The always-reject implementation runs separately: it fails exactly the two positive tests, while the three rejection tests pass when selected alone. Restoring the strict parser restores green. An always-true annotated predicate passes compilation but fails the three rejection groups; it too is restored. A file-list query verifies the final contract, parser, tests, reset and Node declarations, with no leftover probe.
 
 Validation-only controls cover the book's unmodified types:[] profile, the reset under that profile, noUncheckedIndexedAccess off/on and a checked empty-array branch, DOM Response.json remaining any, module-local versus explicit global augmentation, and imports bringing old source into a project whose include selects only generated files. Installed Zod/Express/Node declarations pass with and without the reset under skipLibCheck:false. Directly compiling Zod's shipped source passes without it, produces the five recorded TS2322/TS18046 diagnostics with it, then returns to green when removed. These source-compilation failures are not claims about ordinary consumers of its declarations. No real assistant is called, no model behavior or prompt-effectiveness rate is measured, and no timing threshold is asserted.
+
+## Bonus 2 coverage
+
+The suite extracts all eight fences into one evolving ESM repository on the book profile with noEmit and allowImportingTsExtensions. Its temporary project explicitly resolves the locked node_modules. The initial files, generated-description state, required-currency change, currency-from-record repair and final session-bound executor compile and run in the page's order. The same calls.ts artifacts are hash-checked across that evolution. Every printed JSON result, both required lists and the final true/zero outputs are connected to the manuscript and asserted against execution. The missing currency read produces the quoted TS2339 at its exact source location, then the handler is restored and rechecked.
+
+The initial dollar ledger is reproduced before and after description generation. Requiring currency rejects the original call but accepts explicit USD; EUR succeeds and GBP fails. The dispatcher validates the envelope, decodes its arguments to unknown and invokes the selected parser. Its registry includes the differently shaped refund_help handler, exercised in English and French, plus invalid language, invalid arguments, malformed JSON, invalid envelope and unknown-name controls. Generated parameters are compared by value with the parser's input JSON Schema. The default schema's input/output distinction and additionalProperties behavior are pinned to Zod 4.6.2; the final strict input rejects extra identity and currency fields.
+
+The final replay uses separate Alice and Bob tools against one ledger. The identical advertised schemas permit different legitimate outcomes: Alice's foreign order is denied without an effect, Bob's own order succeeds in USD, and Alice's succeeds in EUR. Validation checks both cross-customer directions, positive and invalid amounts, nonexistent orders, excess requests, repeated refunds against the maintained balance, capture of a scalar customer ID and copying of returned receipt snapshots. Removing only the ownership comparison restores the foreign-order effect; restoring it recompiles and replays the printed result. A separate always-deny control loses both legitimate refunds and is likewise restored. Direct imports and member access cannot reach the private effect (TS2305/TS2339).
+
+A temporary test-only transfer hook verifies fresh lookup after ownership changes. A contextual refinement accepts the owner and rejects the foreign order while generating the same JSON Schema as the base parser; the hook and refinement access are then removed. A schema-valid model outcome says true after denial while the host-derived outcome is false and the ledger empty. The unsafe generic wrapper accepts an asynchronous effect and immediately serializes success containing a Promise, whose later rejection is observed separately. The page's synchronous Result-returning helper rejects an async handler; its negative fixture is removed and the final replay restored. These asynchronous cases stay off the page. Final file membership and source comparisons verify the restoration, including removal of handwritten description and temporary control files. No assistant, payment provider, transaction system or delivery mechanism is called; no model or timing claim is measured.
 
 ## Updating the baseline
 
