@@ -151,5 +151,11 @@ answers TS9007, but it sat after the `: string` experiment, between it and Oded'
 
 **Length:** 2,378 words, inside the plan's 2,300–3,000.
 
-**Final text:** see the joint-approval record below for the SHA. The chapter check passes on the
-settled text.
+**Final text:** SHA-256 `cd6f1e2f20ff29cc6e27187fa7f34d7415fae1c2b95a7a186520e4266ab223ba`, 2,378 words, 10 fences, with the fence extract
+byte-identical to draft 3. The chapter check passes on the settled text, and the full `npm run check`
+passes after a clean `npm ci` in a fresh export (TypeScript 7.0.2, Node 22.23.4).
+
+**Full read of the final text (2026-11-02).** I read the settled chapter start to finish; the
+flag-scene reorder above came from that read. Speaker tags, pronouns (all four speakers are he),
+straight apostrophes and the four-person cast are consistent. Codex read the whole final text and
+replied "Approved as is".

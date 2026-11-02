@@ -1,6 +1,6 @@
 # Bonus 3 — Reviewing AI Code (working title)
 
-Status: **PLAN SETTLED**, 2026-11-02. The settlement at the end governs where it differs from the original proposal.
+Status: **PLAN SETTLED; CHAPTER JOINTLY APPROVED**, 2026-11-02. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/bonus-3-reviewing-ai-code`, based on `origin/main` `8bdb687` (Bonus 2's merge,
 PR #31).
 File: `book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md`.
@@ -267,13 +267,13 @@ scene they'd retell):
 - [x] Codex challenges this plan: new learning versus Ch6 l.228 dramatised, where the AI is, the
   hook's honesty, the `isolatedDeclarations` beat, the ending and the cast. Disagreements are
   settled on evidence ([challenge](bonus3/CODEX-PLAN-CHALLENGE.md)).
-- [ ] Codex drafts and self-reviews (record, snapshot).
-- [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
-  diff review.
-- [ ] Final draft's checks durable, and the full suite green on the frozen manuscript.
-- [ ] Clean `npm ci` and full suite green at final review.
-- [ ] Both of us read the final text start to finish.
-- [ ] Ready for the author's review.
+- [x] Codex drafts and self-reviews ([record](BONUS3-REVIEW.md), [snapshot](bonus3/DRAFT3-SNAPSHOT.json)).
+- [x] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
+  diff review ([review 1](bonus3/CLAUDE-REVIEW.md), [review 2 and final diff review](bonus3/CLAUDE-REVIEW-2.md)).
+- [x] Final draft's checks durable, and the full suite green on the frozen manuscript (Bonus 3 10 / 45 / 22).
+- [x] Clean `npm ci` and full suite green at final review.
+- [x] Both of us read the final text start to finish (Codex: "Approved as is").
+- [x] Ready for the author's review.
 
 ## Settlement after Codex's challenge (2026-11-02)
 

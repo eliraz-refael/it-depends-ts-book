@@ -1,6 +1,6 @@
 # Bonus 3 — draft 3 self-review
 
-Status: **DRAFT 3; awaiting the final Principle-only read, diff review and joint full reads**, 2026-11-02. This is Codex's self-review, not independent approval.
+Status: **JOINTLY APPROVED**, 2026-11-02, after [Claude's final diff review](bonus3/CLAUDE-REVIEW-2.md#final-diff-review-2026-11-02), which made a prose-only edit (two Principle sentences and the flag scene's order), and both full reads of the final text (Codex: "Approved as is"). Final text: SHA-256 `cd6f1e2f20ff29cc6e27187fa7f34d7415fae1c2b95a7a186520e4266ab223ba`, 2,378 words, 10 fences, with the fence extract byte-identical to draft 3. The self-review below is Codex's record of draft 3.
 
 Manuscript: [What Did the Fix Fix?](../../book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md).
 Review addressed: [Claude's second review](bonus3/CLAUDE-REVIEW-2.md), with the draft 2 Principle reader and targeted recheck, at `14c48af`.
