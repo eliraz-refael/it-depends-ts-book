@@ -22,7 +22,9 @@ Chapter 27, **performance vs safety**, is [jointly approved](docs/editorial/CH27
 
 ### Bonus act
 
-Bonus 1, **prompting for TypeScript**, is [jointly approved](docs/editorial/BONUS1-REVIEW.md): [Which File Says That?](book/05-bonus-ai-and-typescript/01-prompting-for-typescript.md), following the [settled plan](docs/editorial/BONUS1-PLAN.md#settlement-after-codexs-challenge-2026-11-01). Two cast-free parsers pass the same initial tests, but one converts an empty string into a zero-cent refund. The local Verdict puts the missing decision in the owned acceptance cases and a visible, saved implementation request. [Draft 1 review](docs/editorial/bonus1/CLAUDE-REVIEW.md) led to Dima owning the wire-format decision and a failing test that names the empty string. [Review 2](docs/editorial/bonus1/CLAUDE-REVIEW-2.md) led to a shorter Verdict and a Principle grounded in the page's `any` failure, with a prompted imports beat. The final diff review made one prose-only Principle edit, and both of us read the final text; Codex's one objection was adopted. Bonus 2 and Bonus 3 remain undrafted.
+Bonus 1, **prompting for TypeScript**, is [jointly approved](docs/editorial/BONUS1-REVIEW.md) and merged as PR #30: [Which File Says That?](book/05-bonus-ai-and-typescript/01-prompting-for-typescript.md), following the [settled plan](docs/editorial/BONUS1-PLAN.md#settlement-after-codexs-challenge-2026-11-01). Two cast-free parsers pass the same initial tests, but one converts an empty string into a zero-cent refund. The local Verdict puts the missing decision in the owned acceptance cases and a visible, saved implementation request. [Draft 1 review](docs/editorial/bonus1/CLAUDE-REVIEW.md) led to Dima owning the wire-format decision and a failing test that names the empty string. [Review 2](docs/editorial/bonus1/CLAUDE-REVIEW-2.md) led to a shorter Verdict and a Principle grounded in the page's `any` failure, with a prompted imports beat. The final diff review made one prose-only Principle edit, and both of us read the final text; Codex's one objection was adopted.
+
+Bonus 2, **type-safe agent patterns**, is [jointly approved](docs/editorial/BONUS2-REVIEW.md): [Whose Refund Is It?](book/05-bonus-ai-and-typescript/02-type-safe-agent-patterns.md), following the [settled plan](docs/editorial/BONUS2-PLAN.md#settlement-after-codexs-challenge-2026-11-02). Generating a tool description from its parser leaves the dollar refund unchanged; taking the currency from the order and a session-bound executor then separate a valid proposal from authority to act on the referenced order. Two formal reviews, three Principle-only reads, a full read and a targeted recheck later, the final diff review made one prose-only Principle edit, and both of us read the final text. Bonus 3 remains undrafted.
 
 ### Act IV tasks
 
@@ -192,7 +194,7 @@ Chapters without resolution skip "The Verdict" and end with **"The Debate Contin
 | Act II: Advanced TypeScript | Done | Ch7–13 drafted/revised and checked (7 of 7) |
 | Act III: Patterns & Design  | Done            | Ch14–23 reviewed, checked and merged (10 of 10) |
 | Act IV: The Real World      | Done            | Ch24–27 reviewed, checked and merged (4 of 4) |
-| Bonus: AI & TypeScript      | **IN PROGRESS** | 3 chapters; Bonus 1 jointly approved, in review |
+| Bonus: AI & TypeScript      | **IN PROGRESS** | 3 chapters; Bonus 1 merged, Bonus 2 jointly approved, in review |
 | Build Pipeline (PDF/Web)    | Design study    | 7 × 10 minimal sci-fi direction approved; full-book build, final pagination, and cover pending |
 
 Print design sources and decisions: [design/print/README.md](design/print/README.md).

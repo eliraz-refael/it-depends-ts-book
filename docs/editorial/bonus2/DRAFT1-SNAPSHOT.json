@@ -1,0 +1,118 @@
+{
+  "status": "draft 1 frozen; independent readers pending",
+  "date": "2026-11-02",
+  "settled_plan_commit": "b32cb3f",
+  "base_commit": "b32cb3fae35ffd465df43248c7c62ae480d2b47c",
+  "path": "book/05-bonus-ai-and-typescript/02-type-safe-agent-patterns.md",
+  "sha256": "27cf51b7396e623f49b93fd4657884665f249ed074838d292c80debf05a08824",
+  "manuscript_mtime_utc": "2026-11-02T16:32:41.074421+00:00",
+  "words": 2368,
+  "word_count_method": "Whitespace-delimited words in the complete Markdown, including code fences.",
+  "code_fences": 8,
+  "fences_by_language": {
+    "typescript": 8
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "typescript",
+      "sha256": "6b8fe8a69a92296b73c18721e19a3ebf9f650b56d14c3193dc092d0a4e85e3e1"
+    },
+    {
+      "ordinal": 2,
+      "language": "typescript",
+      "sha256": "4c158a57d29ac0b272b6c34b5b21fa164dafde64473ea8941b542ece7dd9c44b"
+    },
+    {
+      "ordinal": 3,
+      "language": "typescript",
+      "sha256": "cc4ae6e3cc8ff1a810acecc799e433cccb33d740eae6616731d1a9ecb05ffb8d"
+    },
+    {
+      "ordinal": 4,
+      "language": "typescript",
+      "sha256": "811a651eccc7d5011fe54004cd9c31de26ef117c19bdfb40e1009a2a80f9c2ed"
+    },
+    {
+      "ordinal": 5,
+      "language": "typescript",
+      "sha256": "b82da785d319b3343c45be8f07c1626b1ce1402ca528eb3dce5359e95826bc7c"
+    },
+    {
+      "ordinal": 6,
+      "language": "typescript",
+      "sha256": "e6394274271ed5a76fb8b7953ff8e618345957c24de5b67397bb7463d71a4741"
+    },
+    {
+      "ordinal": 7,
+      "language": "typescript",
+      "sha256": "fd53565b9424fe8979dae078b0b6cec21a6dfa90d0b13921dafba26d358fd9bc"
+    },
+    {
+      "ordinal": 8,
+      "language": "typescript",
+      "sha256": "a9b94344b0a3c054abe6c958b15bc7fee2e094000541be9b09e76baf9b2df334"
+    }
+  ],
+  "validator_sha256": "fd41abcc9c82d186db7b5175f1b7673dca60badfad577ad973968a469a69baf6",
+  "suite_runner_sha256": "0498835314e1c6416c173175b735d36105e50b901b6e1c3dbf66cc7846c3bbe9",
+  "compiler_profile_sha256": "3fbee0de1a72de52e3288a05c3682ba614932b91f56b237e570dfaec6ab99375",
+  "typescript": "7.0.2",
+  "zod": "4.6.2",
+  "node": "v22.23.4",
+  "validation": {
+    "installation": "Existing locked npm ci installation supplied in the b2 worktree; no new clean-export claim.",
+    "targeted_suite": "Exit 0; 8 fences / 23 compiler cases / 28 runtime groups / 1 file-list query. Final self-review edits repeated by the full suite.",
+    "full_suite": "npm run check: exit 0; 472 fences / 828 compiler cases / 351 runtime groups, plus 2 compiler-default cases, 2 searches and 10 file-list queries.",
+    "full_log": ".probe/codex/draft1/full-check.log",
+    "full_log_sha256": "7d6aa365de4902c6dfd7a2156ef041ae7ff068779fc1f01c75703ddeb197e839",
+    "bonus2_summary": {
+      "typescript": "7.0.2",
+      "zod": "4.6.2",
+      "node": "v22.23.4",
+      "fences": 8,
+      "compilerCases": 23,
+      "runtimeGroups": 28,
+      "fileListQueries": 1,
+      "artifactSha256": "c6c9fae03f8d983114de5e269445d8f029300cf511040bf6eace18b9d840e7ff",
+      "scratch": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-bonus2-I9b7hB"
+    },
+    "source_hashes_verified_before_and_after_full_run": true,
+    "results_sha256": "8b69c85270550ca562b323296ef8cd1bbaa4e47cd879b6e3d8c31a0ed5802123",
+    "artifact_sha256": "c6c9fae03f8d983114de5e269445d8f029300cf511040bf6eace18b9d840e7ff",
+    "quoted_diagnostic": "TS2339: Property 'currency' does not exist on type '{ orderId: string; cents: number; }'.",
+    "quoted_diagnostic_column": 8,
+    "repository_states": [
+      "handwritten description and default USD",
+      "generated input description and typed registry",
+      "required currency, omitted and explicit USD",
+      "currency from record, no owner comparison",
+      "session-bound executor with private effect"
+    ],
+    "controls": [
+      "input/output required lists and object modes",
+      "two handler shapes and both help languages",
+      "invalid envelope/name/JSON/arguments",
+      "explicit EUR and invalid GBP",
+      "unchanged wire artifacts",
+      "own and foreign orders under separate sessions",
+      "zero effects on denial",
+      "repeated refunds and remaining balance",
+      "captured scalar session identity",
+      "fresh lookup after ownership transfer",
+      "private effect import/member errors",
+      "owner comparison removal and restored bad effect",
+      "always-deny loses positive calls",
+      "contextual refinement omitted from generated schema",
+      "model outcome contrasted with actual result",
+      "unsafe async wrapper and page helper async rejection",
+      "final source restoration and file membership"
+    ],
+    "no_real_model_claims": true,
+    "effect_scope": "Synchronous in-memory refund ledger; no payment, delivery, transaction or idempotency proof."
+  },
+  "settlement_deviations": [],
+  "principle_words": 137,
+  "verdict_words": 159
+}
