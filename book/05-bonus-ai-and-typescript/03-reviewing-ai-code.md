@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Daniel Compiler**: "When a patch says the API stayed the same, I emit declarations before and after, with the same compiler and project settings, and compare the public types. That includes the types a signature refers to: an unchanged alias can name a changed type. If the patch changes a caller to make it compile, I put the old caller back and find what required the repair. A green compile covers the revised program. I also want an answer for the caller we just edited, and the caller in someone else's repo. Then the API's owner has to say which contract we're offering."
+**Daniel Compiler**: "When a patch says the API stayed the same, I emit declarations before and after, with the same compiler and project settings, and compare the public types. That includes the types a signature refers to: an unchanged alias can name a changed type. If the patch changes a caller to make it compile, I put the old caller back and find what required the repair. A green compile covers the revised program. I check whether the old version of the caller we just edited still compiles, and whether the caller in someone else's repo does. Then the API's owner has to say which contract we're offering."
 
-"For each changed signature, I ask which old calls it rejects or which results it no longer guarantees. A different spelling of the same type needn't change that contract. Even with identical declarations, I run the runtime tests to check the values and effects. An explicit type gives the implementation a promise to meet; the compiler can check that promise without choosing the right one for us."
+"For each changed signature, I ask which old calls it rejects or which results it no longer guarantees. If a new spelling accepts the same inputs and promises the same results, the type contract is unchanged. Even with identical declarations, I run the runtime tests to check the values and effects. An explicit type gives the implementation a promise to meet; the compiler can check that promise without choosing the right one for us."
 
 ## The Debate
 
@@ -57,36 +57,7 @@ export function badge(order: Order): string {
 
 "Still says the same things. I checked."
 
-The review project runs TypeScript 7.0.2 and Node 22.23.4. Node runs the TypeScript directly. Its settings:
-
-`package.json`:
-
-```json
-{"type": "module"}
-```
-
-`tsconfig.json`:
-
-```json
-{
-  "compilerOptions": {
-    "strict": true,
-    "exactOptionalPropertyTypes": true,
-    "target": "ES2022",
-    "module": "Node16",
-    "moduleResolution": "Node16",
-    "types": [],
-    "skipLibCheck": true,
-    "noEmitOnError": true,
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "allowImportingTsExtensions": true,
-    "rootDir": ".",
-    "outDir": "types"
-  },
-  "include": ["*.ts"]
-}
-```
+Node 22.23.4 runs these TypeScript files directly; the project has `"type": "module"` in `package.json`.
 
 **Oded**: "These cases were here before the refactor. I kept them."
 
@@ -182,7 +153,45 @@ Noam reads the helper again. The comparisons are the same. The three labels are 
 
 ### "Put the old caller back"
 
-Noam restores only `badge.ts` to its original contents. The new table and helper stay. He runs `node_modules/.bin/tsc -p tsconfig.json --pretty false`.
+Noam restores only `badge.ts` to its original contents. The new table and helper stay.
+
+The review project pins TypeScript 7.0.2, installed with `npm install`:
+
+`package.json`:
+
+```json
+{
+  "type": "module",
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}
+```
+
+`tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "types": [],
+    "skipLibCheck": true,
+    "noEmitOnError": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "allowImportingTsExtensions": true,
+    "rootDir": ".",
+    "outDir": "types"
+  },
+  "include": ["*.ts"]
+}
+```
+
+He runs `node_modules/.bin/tsc -p tsconfig.json --pretty false`.
 
 At `assertNever(status)`, **TS2345**: `Argument of type 'string' is not assignable to parameter of type 'never'.`
 
@@ -202,6 +211,8 @@ He puts the submitted badge back. Then he emits declarations from the original c
 -export declare function orderStatus(order: Order): "paid" | "partial" | "refunded";
 +export declare function orderStatus(order: Order): string;
 ```
+
+**Daniel**: "Only `status.d.ts` changed. I checked `order.d.ts` too. It's unchanged. An identical import line doesn't tell me whether `Order` still means the same thing."
 
 **Oded** leans forward. "We didn't write `string` anywhere in that function."
 
@@ -234,8 +245,6 @@ With the original provider it compiles. With the submitted provider, the return 
 **Eden**: "The app relies on those three states. We don't get to widen its return because this repo's badge found a fallback."
 
 **Oded**: "Fine. That is a caller I hadn't checked."
-
-**Daniel**: "I checked `order.d.ts` too. It's unchanged. An identical import line doesn't tell me whether `Order` still means the same thing."
 
 Eden sets the copied adapter aside.
 
@@ -333,11 +342,11 @@ The old badge compiles with the table. `node check.ts` passes. Daniel emits agai
 
 "I'm saying it about this one. I have a caller outside this patch that depends on it. If someone changes the implementation tomorrow, I want that implementation checked against the same three states."
 
-**Daniel**: "The two-word repair is sufficient for today's widening. An explicit return gives that decision a separate place to live. Checking the table against it also puts the typo error where the label is written."
+**Daniel**: "The two-word repair is sufficient for today's widening. An explicit return gives that decision a separate place to live. Checking the table against the same type also puts the typo error where the label is written."
 
 Oded looks at the proposed replacement.
 
-"Keep the names private. Nobody has asked to import the refund calculation's vocabulary."
+"Keep both names private: `OrderStatus` and `RefundLevel`."
 
 They replace `status.ts`; the original exhaustive `badge.ts` stays:
 
@@ -378,11 +387,13 @@ He restores `"refunded"`. The program and all six assertions pass. Eden puts the
 
 **Daniel**: "Here, yes. Choosing it is still our job."
 
-In scratch work, he enables `isolatedDeclarations` on the original project. It reports **TS9007** on `orderStatus`: `Function must have an explicit return type annotation with --isolatedDeclarations.` He then uses the submitted patch and annotates its function `orderStatus(order: Order): string`. With the assistant's fallback, it passes the flag.
+In scratch work, he enables `isolatedDeclarations` on the original project. It reports **TS9007** on `orderStatus`: `Function must have an explicit return type annotation with --isolatedDeclarations.` He then uses the submitted patch and annotates its function `orderStatus(order: Order): string`. The annotation satisfies the flag. With the assistant's fallback, the project compiles.
+
+**Daniel**: "The original wasn't broken because it inferred a type. The [flag](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html#isolated-declarations) even allows some simple inferred exports. It doesn't require a return annotation on every export."
 
 **Oded**: "So now it's explicitly the wrong contract."
 
-**Daniel**: "Exactly. The original wasn't broken because it inferred a type. The flag even allows some simple inferred exports. It doesn't require a return annotation on every export." He opens the [isolated-declarations documentation](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html#isolated-declarations), then discards the experiment.
+**Daniel** discards the experiment. "Exactly."
 
 ## The Verdict
 

@@ -3,13 +3,13 @@
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const cp=require('node:child_process'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const {defaults,version}=require('./compiler.cjs');
-const repo=path.resolve(__dirname,'..'),tsc=path.join(repo,'node_modules/.bin/tsc');
+const repo=path.resolve(__dirname,'..');
 const manuscript=fs.readFileSync(path.join(repo,'book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md'),'utf8');
 const fences=[...manuscript.matchAll(/```(\w+)\n([\s\S]*?)\n```/g)].map(m=>({language:m[1],body:m[2]}));
 assert.equal(fences.length,10);assert(fences.length<=10);assert.equal((manuscript.match(/^```/gm)||[]).length,20);
-assert.deepEqual(fences.map(f=>f.language),['typescript','json','json','typescript','diff','diff','typescript','diff','diff','typescript']);
+assert.deepEqual(fences.map(f=>f.language),['typescript','typescript','diff','json','json','diff','typescript','diff','diff','typescript']);
 assert(manuscript.includes('TypeScript '+version));assert(manuscript.includes('Node '+process.versions.node));
-assert(manuscript.includes("With the assistant's fallback, it passes the flag."));
+assert(manuscript.includes("The annotation satisfies the flag. With the assistant's fallback, the project compiles."));
 const consumed=new Set();
 function block(i){assert(!consumed.has(i));consumed.add(i);return fences[i].body+'\n';}
 function files(source){const result={};let file;for(const line of source.trimEnd().split('\n')){const match=line.match(/^\/\/ ([\w.-]+\.ts)(?: —.*)?$/);if(match){file=match[1];assert(!result[file]);result[file]='';}else if(file)result[file]+=line+'\n';else assert(!line.trim());}return result;}
@@ -20,11 +20,11 @@ function patch(inputs,text){const out={...inputs},lines=text.trimEnd().split('\n
   while(i<lines.length&&!lines[i].startsWith('@@ ')&&!lines[i].startsWith('--- ')){const line=lines[i++],kind=line[0],body=line.slice(1);assert([' ','-','+'].includes(kind),line);if(kind!=='+' ){assert.equal(src[cursor++],body,file+' context');oldCount++;}if(kind!=='-'){dest.push(body);newCount++;}}
   assert.equal(oldCount,m[2]===undefined?1:+m[2]);assert.equal(newCount,m[4]===undefined?1:+m[4]);}
  dest.push(...src.slice(cursor));out[file]=dest.join('\n')+'\n';}return out;}
-const chapterPackage=JSON.parse(block(1)),chapterConfig=JSON.parse(block(2));
-assert.deepEqual(chapterPackage,{type:'module'});
+const chapterPackage=JSON.parse(block(3)),chapterConfig=JSON.parse(block(4));
+assert.deepEqual(chapterPackage,{type:'module',devDependencies:{typescript:version}});
 assert.deepEqual(chapterConfig,{compilerOptions:{...defaults,declaration:true,emitDeclarationOnly:true,allowImportingTsExtensions:true,rootDir:'.',outDir:'types'},include:['*.ts']});
-const initial={...files(block(0)),...files(block(3))};
-const submitted=patch(initial,block(4));
+const initial={...files(block(0)),...files(block(1))};
+const submitted=patch(initial,block(2));
 const declarationPatch=block(5),mobile=files(block(6))['mobile.ts'];
 const typo=patch(submitted,block(7));
 const constRepair=patch(submitted,block(8));
@@ -41,6 +41,9 @@ assert.equal(reply,'The inferred status is a string. Returning it in the fallbac
 const revisedSummary=manuscript.match(/Oded replaces the summary: \*([^*]+)\*/)?.[1];assert(revisedSummary);
 const question=manuscript.match(/\*\*Noam\*\*, in a comment: \*([^*]+)\*/)?.[1];assert.equal(question,'What error required the change to badge.ts?');
 const scratch=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'ts-book-bonus3-'))),story=path.join(scratch,'story');fs.mkdirSync(story);
+// Normal suite runs reuse the locked installation through the printed local CLI path.
+fs.symlinkSync(path.join(repo,'node_modules'),path.join(story,'node_modules'),'dir');
+const tsc=path.join(story,'node_modules/.bin/tsc');
 const results=[];let compilerCases=0,runtimeGroups=0,fileListQueries=0;
 const digest=s=>crypto.createHash('sha256').update(s).digest('hex');
 const write=(file,s)=>{const p=path.join(story,file);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof s==='string'?s:JSON.stringify(s,null,2)+'\n');};
@@ -74,6 +77,8 @@ const oldTypoErrors=[diagnostic('badge.ts','case "refunded"',2678,typoCase,10),d
 const finalTypoErrors=[diagnostic('status.ts','all: "refund"',2820,tableMessage,3),diagnostic('status.ts','return labels[',2322,returnMessage,3)];
 const adapterError=diagnostic('mobile.ts','return orderStatus',2322,mobileMessage,3);
 write('package.json',chapterPackage);state(initial);
+const projectCompilerVersion=command('project-local-compiler-version',tsc,['--version']).stdout.trim();
+assert.equal(projectCompilerVersion,'Version '+chapterPackage.devDependencies.typescript);
 fs.writeFileSync(path.join(scratch,'ASSISTANT-ARTIFACTS.json'),JSON.stringify({summary,question,reply,revisedSummary},null,2)+'\n');
 compile('original');const originalDts=declarations();testRun('original-retained-tests');js('original-current-values',values,current);
 js('fixed-owned-case-contents',`import {cases} from './cases.ts';console.log(JSON.stringify(cases));`,[0,500,1000].map((refundedCents,i)=>({refundedCents,...current[i]})));
@@ -90,6 +95,7 @@ fs.writeFileSync(path.join(scratch,'DECLARATIONS-BEFORE.json'),JSON.stringify(or
 state(submitted);compile('declaration-report-submitted');const submittedDts=declarations();
 fs.writeFileSync(path.join(scratch,'DECLARATIONS-AFTER.json'),JSON.stringify(submittedDts,null,2)+'\n');
 assert.deepEqual(patch(originalDts,declarationPatch),submittedDts,'Printed declaration diff is complete');
+assert.deepEqual(Object.keys(originalDts).filter(file=>originalDts[file]!==submittedDts[file]),['types/status.d.ts'],'Only the status declaration changes');
 assert.equal(originalDts['types/status.d.ts'],'import type { Order } from "./order.ts";\nexport declare function orderStatus(order: Order): "paid" | "partial" | "refunded";\n');
 assert.equal(submittedDts['types/status.d.ts'],'import type { Order } from "./order.ts";\nexport declare function orderStatus(order: Order): string;\n');
 const referencedDeclaration=manuscript.match(/I checked `([^`]+)` too\./)[1];
@@ -143,5 +149,5 @@ state(chosen);compile('all-controls-restored');testRun('final-retained-tests');j
 const membership=command('final-membership',tsc,['-p','tsconfig.json','--listFilesOnly']).stdout.trim().split(/\r?\n/).map(f=>fs.realpathSync(f));fileListQueries++;
 const local=membership.filter(f=>f.startsWith(story+path.sep)).map(f=>path.relative(story,f)).sort();assert.deepEqual(local,Object.keys(chosen).sort());
 for(const [f,s] of Object.entries(chosen))assert.equal(read(f),s,f+' final source');verifyOwned();
-const report={typescript:version,node:process.version,fences:fences.length,compilerCases,runtimeGroups,fileListQueries,ownedSha256:owned,assistantArtifactSha256:digest(JSON.stringify({summary,question,reply,revisedSummary})),scratch};
+const report={typescript:version,node:process.version,projectCompilerVersion,fences:fences.length,compilerCases,runtimeGroups,fileListQueries,ownedSha256:owned,assistantArtifactSha256:digest(JSON.stringify({summary,question,reply,revisedSummary})),scratch};
 fs.writeFileSync(path.join(scratch,'SUMMARY.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));console.log('Bonus 3: PASS');

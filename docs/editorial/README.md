@@ -28,7 +28,7 @@ The [master plan](../../PLAN.md) remains at the repository root.
 | 27 — Performance vs safety | [Plan](CH27-PLAN.md) | [Review](CH27-REVIEW.md) |
 | Bonus 1 — Prompting for TypeScript | [Plan](BONUS1-PLAN.md) | [Review](BONUS1-REVIEW.md) |
 | Bonus 2 — Type-safe agent patterns | [Plan](BONUS2-PLAN.md) | [Review](BONUS2-REVIEW.md) |
-| Bonus 3 — Reviewing AI code | [Plan](BONUS3-PLAN.md) | [Draft 2 self-review](BONUS3-REVIEW.md) |
+| Bonus 3 — Reviewing AI code | [Plan](BONUS3-PLAN.md) | [Draft 3 self-review](BONUS3-REVIEW.md) |
 
 The [voice review](VOICE-REVIEW.md) covers the prologue and early chapters.
 The [Chapter 3 pilot](CH3-PILOT.md) records the author-approved calibration for

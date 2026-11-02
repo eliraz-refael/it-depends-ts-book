@@ -1,4 +1,37 @@
-# Bonus 3 — draft 2 self-review
+# Bonus 3 — draft 3 self-review
+
+Status: **DRAFT 3; awaiting the final Principle-only read, diff review and joint full reads**, 2026-11-02. This is Codex's self-review, not independent approval.
+
+Manuscript: [What Did the Fix Fix?](../../book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md).
+Review addressed: [Claude's second review](bonus3/CLAUDE-REVIEW-2.md), with the draft 2 Principle reader and targeted recheck, at `14c48af`.
+Snapshot: [DRAFT3-SNAPSHOT.json](bonus3/DRAFT3-SNAPSHOT.json). Previous snapshots and delivery records are retained below.
+
+## Response to the ranked findings
+
+1. **The printed project installs its compiler.** package.json now declares typescript 7.0.2 under devDependencies, and the page names npm install. The prior checker had used the repository's compiler directly, so it had not caught this setup omission. The checker now asserts the dependency against the installed version, creates the printed package, gives the temporary project an explicit route to the locked node_modules, and invokes that project's node_modules/.bin/tsc, including a version check. A separate fresh project from the printed original files actually installed the dependency and passed the local compiler and runtime commands. The normal suite does not depend on network access.
+2. **Both placements are corrected.** The configuration fences are now at Noam's first tsc run in “Put the old caller back.” The earlier runtime example needs only the short Node version and package module-mode clause. Daniel's order.d.ts observation follows the declaration diff immediately. His “Only status.d.ts changed” statement is verified by the emitted declaration set, and his referenced-type comparison remains checked. The parser follows the new fence order; all eight TypeScript/diff fences and tsconfig.json remain byte-identical.
+3. **The flag scene distinguishes two checks and ends on speech.** The annotation satisfies isolatedDeclarations; the assistant's fallback lets the whole project compile. The existing control proves the distinction by restoring the original badge under the same explicit annotation and flag, observing TS2345, and restoring the assistant's fallback. Daniel's explanation and documentation link now precede Oded's “explicitly the wrong contract.” Daniel discards the scratch experiment and answers “Exactly.” The next section starts on the chosen implementation.
+4. **The four line fixes are applied.** The table is checked against the same type as the return. Oded names OrderStatus and RefundLevel as the private names, without reopening the export decision. The Principle explicitly asks whether the old caller and the caller in another repository still compile. Its representation sentence states that the type contract is unchanged when the new spelling accepts the same inputs and promises the same results; “needn't” is gone.
+
+No disagreements or deviations from the review. The orphaned-helper clue, private aliases, Additional Takes, runtime test payoff and local Verdict remain. No extra flag exceptions or public-API tutorial was added.
+
+## Full self-read
+
+I read the revised chapter start to finish before the full suite. The same current-case tests still give Oded his first win, the scratch refund scene still identifies the check the patch removed, and as const still gives him his second win. The dependency correction changes setup, not any implementation, call, diagnostic or printed runtime result. The saved assistant artifacts are unchanged. The configuration no longer interrupts the first test exchange, and the referenced declaration is checked where both emitted sets are already on screen.
+
+The chapter is **2,374 words** and **10 fences**. Nine fences retain their draft 2 bodies: all TypeScript, all diffs and the tsconfig. Only package.json changes; the two setup fences move. The Principle's two changes answer the reader's explicit questions without adding another subject. This remains a local revision.
+
+## Validation
+
+Targeted suite: **PASS — 10 fences, 45 compiler cases, 22 runtime groups and one file-list query**, TypeScript 7.0.2 / Node 22.23.4. The setup version query is additional setup evidence, not a compiler case. The existing counts remain unchanged. The printed dependency, project-local CLI route, reordered extraction and sole changed declaration are now asserted. All previous negative and restored-green controls remain.
+
+Fresh setup proof: the package.json, tsconfig.json, original implementation and retained test fences were extracted into `.probe/codex/draft3/bootstrap`, with no node_modules initially. `npm install --no-audit --no-fund` succeeded. `node_modules/.bin/tsc --version` printed `Version 7.0.2`; declaration compilation succeeded; `node check.ts` printed `3 statuses, 3 badges: passed`. Installation and command logs are retained in `.probe/codex/draft3/`. This is a clean chapter-project setup check, not a clean export of the whole book.
+
+Full-suite result: **npm run check: exit 0; 483 fences, 877 compiler cases and 376 runtime groups**, plus two compiler-default cases, two source searches and eleven file-list queries. One full run was required for draft 3. All recorded manuscript, validator, runner, compiler-profile, coverage and status hashes match before and after the run. The snapshot records that evidence and the separate fresh-install proof. No fresh independent-reader pass is claimed.
+
+---
+
+## Draft 2 record (retained)
 
 Status: **DRAFT 2; awaiting the Principle-only follow-up and targeted recheck**, 2026-11-02. This is Codex's self-review, not independent approval.
 
@@ -6,7 +39,7 @@ Manuscript: [What Did the Fix Fix?](../../book/05-bonus-ai-and-typescript/03-rev
 Review addressed: [Claude's draft 1 review](bonus3/CLAUDE-REVIEW.md), including both verbatim reader reports, at `f8da36e`.
 Snapshot: [DRAFT2-SNAPSHOT.json](bonus3/DRAFT2-SNAPSHOT.json). The draft 1 snapshot and delivery record are retained.
 
-## Response to the ranked findings
+### Response to the ranked findings
 
 1. **The referenced-type habit is performed.** Daniel says he checked order.d.ts, reports it unchanged, and explains why an identical import line did not settle that question. The checker extracts the named declaration from his line and compares it across the freshly emitted states, alongside both import lines. The existing referenced-alias control still demonstrates a changed dependency behind an identical entry declaration. The hypothetical is gone.
 2. **The flag's caller is explicit.** The page says the assistant's fallback. The checker now restores the original assertNever caller under the same isolatedDeclarations configuration and explicit string annotation, asserts TS2345, then restores the assistant's fallback and asserts green. Daniel speaks the simple-inference limitation himself, with the documentation link attached. The flag remains out of the Principle.
@@ -18,7 +51,7 @@ Snapshot: [DRAFT2-SNAPSHOT.json](bonus3/DRAFT2-SNAPSHOT.json). The draft 1 snaps
 
 No disagreements with the review and no material deviations. The Not adopted items remain out: no noUnusedLocals policy, private-alias accessibility tutorial, extra explanation of satisfies, type-level equality test, or direct-call probe instructions.
 
-## State, voice and Principle self-read
+### State, voice and Principle self-read
 
 The chapter remains in the same order, with the same source patch, consumer, typo experiments, as-const win and chosen repair. All eight original TypeScript and diff fences are byte-identical to draft 1. Only package.json and tsconfig.json fences are new. The saved assistant summary, question, reply and final rewritten summary are unchanged in content. The draft is **2,349 words**, with **10 fences**: four TypeScript, four unified diffs and two JSON.
 
@@ -26,7 +59,7 @@ I read the revised chapter start to finish. The “refund” scene, the test cat
 
 Against the four Principle cases: following referenced types still exposes the derived alias; restoring a caller explicitly covers an edited default; choosing the promised contract remains distinct from satisfying a flag; and checking old calls and promised results covers narrowed parameters and widened returns. Runtime tests are named without the assertNever ambiguity. These are my self-checks, not fresh reader reports. The follow-up reader should judge whether the compatibility questions make paragraph 2 sound more like Daniel and less like qualifications.
 
-## Validation
+### Validation
 
 Targeted suite: **PASS — 10 fences, 45 compiler cases, 22 runtime groups and one file-list query**, TypeScript 7.0.2 / Node 22.23.4. Four compiler cases were added: the unused-helper control and profile restoration, and the flag's original-caller failure and assistant-fallback restoration. All prior declaration, runtime, mutation and restored-green controls remain. The two JSON fences are used directly; no unprinted strictness flags enter the normal story configuration.
 
@@ -34,7 +67,7 @@ Full-suite result: **npm run check: exit 0; 483 fences, 877 compiler cases and 3
 
 ---
 
-## Draft 1 record (retained)
+### Draft 1 record (retained)
 
 Status: **DRAFT 1; awaiting Claude's independent readers and formal review**, 2026-11-02. This is Codex's self-review, not independent approval.
 
