@@ -1,6 +1,6 @@
 # Bonus 2 — Type-Safe Agent Patterns (working title)
 
-Status: **PROPOSED**, 2026-11-02. Codex challenges it before drafting.
+Status: **PLAN SETTLED**, 2026-11-02. The settlement at the end governs where it differs from the original proposal.
 Branch: `codex/bonus-2-type-safe-agent-patterns`, based on `origin/main` `d29db0a` (Bonus 1's merge,
 PR #30).
 File: `book/05-bonus-ai-and-typescript/02-type-safe-agent-patterns.md`.
@@ -238,9 +238,9 @@ scene they'd retell):
 
 ## Completion
 
-- [ ] Codex challenges this plan: new learning versus Ch15/Ch16 in an AI costume, the hook's honesty,
+- [x] Codex challenges this plan: new learning versus Ch15/Ch16 in an AI costume, the hook's honesty,
   the evidence type, the `io` detail, the ending and the cast. Disagreements are settled on
-  evidence.
+  evidence ([challenge](bonus2/CODEX-PLAN-CHALLENGE.md)).
 - [ ] Codex drafts and self-reviews.
 - [ ] Claude's formal review: Principle-only and fresh full readers, a targeted recheck and a final
   diff review.
@@ -248,3 +248,137 @@ scene they'd retell):
 - [ ] Clean `npm ci` and full suite green at final review.
 - [ ] Both of us read the final text start to finish.
 - [ ] Ready for the author's review.
+
+## Settlement after Codex's challenge (2026-11-02)
+
+[Codex's challenge](bonus2/CODEX-PLAN-CHALLENGE.md) reproduced all five mechanisms (19 compiler
+cases and runtime controls) and showed that two of my conclusions don't follow from them. **This
+settlement governs where it differs from the proposal above.** I independently confirmed the two
+that change the design:
+- `issueRefund({ ...order, id: "o-17", customerId: "bob", currency: "USD" }, 500)` compiles: the
+  spread keeps the brand while changing the checked id;
+- a session-aware `.refine` rejects o-17, while its `io: "input"` JSON Schema is equal by value to
+  the unrefined one.
+
+**My errors, corrected by Codex:**
+- **Generating the description doesn't fix the dollar refund.** The input description accurately
+  says currency may be omitted, and the parser still supplies USD. "We told it two different
+  things" isn't established by the example.
+- **The exported `OwnedOrder` brand doesn't guarantee what I claimed.** A spread changes the id and
+  keeps the marker. The type isn't indexed by session, and a checked snapshot outlives a later
+  transfer. That's Ch15's own warning, so using it as the payoff would undo Ch15.
+- **"So they can't disagree" is too strong.** A contextual refinement can authorise at runtime, and
+  its generated schema doesn't show it. Free-text `.describe()` copies unverified claims, and
+  `.meta()` can override the type. My reader case (d) wrongly implied refinements can't authorise.
+- **"Ask only for intent" bans too much.** A caller-supplied `expectedCurrency` may legitimately be
+  compared with the record. The rule is about which source *determines* the action.
+- **The synchronous `invoke` accepts an async handler** and reports success before the effect
+  completes.
+
+**Settled:**
+1. **The subject is the difference between the description a caller receives and the authority its
+   executor holds.** The program sends a description out, receives a proposed call back, and then
+   decides whether to exercise its own authority. These are old techniques in a new arrangement, and
+   the page should make that arrangement visible. It doesn't present five new lessons.
+2. **Working title: "Bonus 2: Whose Refund Is It?"** Heading `# Bonus 2: <title>`, with
+   `checks/bonus2.cjs`.
+3. **The currency hook stays, as a failed repair.**
+   - **Give the default a competent origin:** the shop had only USD orders and kept the default
+     when it introduced EUR. One line.
+   - **Show the effect adapter.** The page says the shop's ledger recorded a dollar refund. It makes
+     no claim about what a payment provider or the customer received.
+   - **Dafna's fix 1** generates the description from the parser and binds the typed handler inside
+     `invoke`. **Guy asks her to replay the original call: still dollars.** That's a retellable
+     surprise.
+   - **`io: "input"` earns one beat:** the two `required` lists, then back to the incident. Sending
+     the output description would demand a field the parser accepts missing. Sending the input
+     description describes the omission accurately and leaves the default in place. No schema dumps,
+     and no suggestion that JSON Schema's `default` performs Zod's insertion. Cite
+     [Zod's JSON Schema guide](https://zod.dev/json-schema#io).
+   - Use `z.input<S>` for what may enter and `z.output<S>`/`z.infer<S>` for the handler's argument,
+     only where the page needs the distinction.
+4. **The Turn moves from the supplied fields to which source has authority over the action.**
+   - Requiring currency only makes the caller supply one: a fixed call that supplies USD still
+     passes. **Liron:** why does that field decide anything when the order record already knows?
+   - Remove currency from the arguments and take it from the record.
+   - Then run the already visible o-17 artifact: well formed, and someone else's. Show o-17's owner
+     before the denial, so the reader can predict the check.
+   - **Guy's question carries this half:** "You've described the arguments. Who's allowed to run
+     it?" A class with the same encapsulation would also work. No FP-versus-OOP victory.
+5. **The repair is a session-bound executor with a private effect,** not an exported brand.
+   - Binding captures the authenticated customer id, not a mutable session object.
+   - Invocation parses the input (order id and cents only), looks up the *current* order, compares
+     the owner, checks the remaining refundable amount, and records the refund in the order's
+     currency.
+   - The effect and the order store are private: importing or reaching the effect is a compile error
+     (TS2305/TS2339) if the page shows it.
+   - Don't put a customer-bound tool in a registry shared across customers.
+   - **Capturing a session isn't itself authorisation.** The fresh lookup and owner comparison are
+     the check.
+6. **The payoff:** replay o-17 under Alice's session (denied, zero effects) and under Bob's
+   (succeeds), then o-12 under Alice (EUR). The same public schema gives different legitimate
+   answers.
+7. **The structured-reply beat is optional,** one short exchange at most. The fixed reply says it
+   refunded the denied order, and the outcome comes from the executor's result. No third subplot.
+8. **The single-source claim is scoped.** Generate the representable *input structure* from the
+   parser. The policy is executed, not described. If the page mentions refinements, it must not say
+   they can't authorise. A contextual one can; the schema just doesn't carry it.
+9. **Plumbing stays plumbing.**
+   - The effect is synchronous and in memory, and labelled so. No async handler, and no completion
+     claims the code hasn't established.
+   - The envelope `{ name, arguments }` is validated, the string decoded to `unknown`, then the
+     selected tool's parser runs. The page shows that path briefly. The extra controls (invalid
+     envelope, unknown name, async trap) live in the check.
+   - If the page promises a remaining balance, it maintains one.
+   - This is a policy demonstration, not a transaction, idempotency or payment proof, and the page
+     doesn't claim more.
+10. **The Verdict is local.** Once the session, ownership rule and authoritative currency are on the
+    page, neither the wrong-customer call nor the USD default is a matter of taste. Whether the shop
+    should allow automatic refunds at all is one Additional Take, with no new `ProposedRefund` /
+    `ApprovedRefund` types. Say who approves under the local policy.
+11. **Principle (Liron)** opens on a rule the reader can apply: a valid proposed call doesn't decide
+    who may act, which stored facts are true, or whether an effect happened. The caller proposes an
+    action; the program supplies the authority and verifies the conditions for doing it.
+    - Generate the representable input description from the argument schema, and validate what
+      actually arrives.
+    - Bind execution to the authenticated context, check the policy against authoritative records,
+      and build outcome fields from what actually ran.
+
+    Avoid "so they can't disagree", "only what you don't know", "evidence the model can't forge",
+    and anything implying that a parsed field establishes approval. No brands. A parable may belong
+    in the conversation, but it doesn't replace the opening rule.
+12. **The reader cases are Codex's four (§7):**
+    - the accurate description with the wrong default;
+    - the valid cancellation under someone else's session;
+    - the confident `emailSent: true`;
+    - the refinement with and without context.
+
+    A reader who concludes that refinements can never authorise has mislearned the chapter.
+13. **Cast:** Liron (Principle), Gilad (ticket, ledger, replays), Dafna (one definition), Guy (who
+    may run it). Eden is dropped. Pronouns verified: all he except Dafna, she.
+14. **Repetition boundaries:** Codex's table (§6) is adopted, including Ch22 (descriptions don't
+    replace executing policy) and Ch23 (a promise wrapped in success isn't a completed refund).
+15. **Checks:** Codex's requirements (§8). In particular:
+    - hold the wire artifact fixed across the handwritten and generated descriptions;
+    - assert the ledger, not just the returned sentence;
+    - run two separately bound sessions;
+    - removing the owner comparison must restore the bad effect;
+    - zero effects on denial;
+    - repeated refunds if a balance is promised;
+    - drop the brand diagnostics.
+
+**Fun guardrails:**
+- **The scenes readers should retell:**
+  - the euro customer's dollar ledger entry;
+  - "still dollars" after the generation fix;
+  - "Why does that field decide anything?";
+  - o-17, valid and Bob's;
+  - the same schema answering Alice and Bob differently.
+- **Keep the registry small on the page.** Aim for ten fences or fewer. A reader should never feel
+  they're reading an SDK tutorial.
+- **The agent must feel present** without real-model claims: the shop's outbound description, a
+  short customer conversation, the returned call, and the ledger.
+- **No hype and no doom.** Length is 2,300–3,000 words.
+
+**Not adopted:** nothing material. I'd keep "We told it…" as a candidate line only if a replay on
+the page actually establishes it; otherwise Codex finds a better one.
