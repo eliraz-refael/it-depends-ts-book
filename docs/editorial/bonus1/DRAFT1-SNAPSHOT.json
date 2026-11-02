@@ -1,0 +1,128 @@
+{
+  "status": "draft 1 frozen; independent readers and Claude review pending",
+  "date": "2026-11-01",
+  "settled_plan_commit": "bcc90ab",
+  "base_commit": "bcc90abc1fdd8c55f42ca122bddb525cacf52549",
+  "path": "book/05-bonus-ai-and-typescript/01-prompting-for-typescript.md",
+  "sha256": "bbb3592788f7f64ce4a10d9fb030ac4672c10738e2a64f34f2e728b7b29b1952",
+  "manuscript_mtime_utc": "2026-11-01T12:18:50.016313+00:00",
+  "words": 2328,
+  "word_count_method": "Whitespace-delimited words in the complete Markdown, including code fences.",
+  "code_fences": 11,
+  "fences_by_language": {
+    "typescript": 9,
+    "json": 2
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "typescript",
+      "sha256": "d25b33ecb178777be7d05bab18a0605b76f20186b8614e2ea0054a0620179569"
+    },
+    {
+      "ordinal": 2,
+      "language": "typescript",
+      "sha256": "17ca4f2931d23855d85d0da299fdd306c4fa465d2cd0fdee30056ec0591c3cc0"
+    },
+    {
+      "ordinal": 3,
+      "language": "json",
+      "sha256": "e7c8c53c97321501248cca7afa6f125b072e90fa791707a509c8b8ebdc8aa69a"
+    },
+    {
+      "ordinal": 4,
+      "language": "json",
+      "sha256": "857f0628e0746452ba38ca25b487b230e8132ef71c9d47986f7b07de6d4db7ff"
+    },
+    {
+      "ordinal": 5,
+      "language": "typescript",
+      "sha256": "7eda7ce2a5b7d2ca6fc71d08f3978bdf47ef28992e470462f5b3950b92a0e8b7"
+    },
+    {
+      "ordinal": 6,
+      "language": "typescript",
+      "sha256": "069af27945ac169ef61e4087fa3a5af6be5120400bde31f90e60668370c8b22e"
+    },
+    {
+      "ordinal": 7,
+      "language": "typescript",
+      "sha256": "8fd9509689a3107ce4d9a9f41c167a8c3f2dc6ba4c56563f0f918d2409f61628"
+    },
+    {
+      "ordinal": 8,
+      "language": "typescript",
+      "sha256": "702273a9c304c1f2dfa8c60990aede821f34ef59203ae3a94576023e8516ade5"
+    },
+    {
+      "ordinal": 9,
+      "language": "typescript",
+      "sha256": "a4a95f41b7ed9f7145f0a763f5e1fea3c9ebabfd471935a964eb345563643094"
+    },
+    {
+      "ordinal": 10,
+      "language": "typescript",
+      "sha256": "df1a089bae282349c42dde26fbc8fbb015bf24d2c21604bb12e4c676fe7fe7ef"
+    },
+    {
+      "ordinal": 11,
+      "language": "typescript",
+      "sha256": "5752a3f5f28d68e6255083196fbaacbf9f7e0d277ba3b43fe033e7f82dbf2423"
+    }
+  ],
+  "validator_sha256": "0f617970c8e605c815beda79bc9a076d835583c2214ec7ce0caedb4b4b6563b6",
+  "suite_runner_sha256": "2d76eb510fca53f67b49a9bbfb48b3c9c8c1b5c70bf127a071007adc5d1268a9",
+  "compiler_profile_sha256": "3fbee0de1a72de52e3288a05c3682ba614932b91f56b237e570dfaec6ab99375",
+  "typescript": "7.0.2",
+  "node": "v22.23.4",
+  "validation": {
+    "installation": "Locked npm ci installation made in this worktree for the plan challenge; no new clean-export claim.",
+    "targeted_suite": "Exit 0; 11 fences / 32 compiler cases / 16 runtime groups / 1 file-list query. Final test-count and rejection-selection assertions are covered by the subsequent full run.",
+    "full_suite": "npm run check: exit 0; 464 fences / 806 compiler cases / 324 runtime groups, plus 2 compiler-default cases, 2 searches and 9 file-list queries.",
+    "full_log": ".probe/codex/draft1/full-check.log",
+    "full_log_sha256": "912666138c96ae928b0b2a285efa9907ede316923cbe3449ec9acba87f8c1f84",
+    "bonus1_summary": {
+      "typescript": "7.0.2",
+      "node": "v22.23.4",
+      "fences": 11,
+      "compilerCases": 32,
+      "runtimeGroups": 16,
+      "fileListQueries": 1,
+      "ownershipVerifications": 25,
+      "scratch": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-bonus1-aamDVb"
+    },
+    "source_hashes_verified_before_and_after_full_run": true,
+    "results_sha256": "b1b489f4eb72ce04ae914b34d2a2bf2405b3114698b5361f6f10a7d25088b27b",
+    "owned_hashes": {
+      "numericCases": {
+        "src/contract.ts": "ff6dae9addfef90a23c62ba270db61172ce8199a2e62f5650db454c3c6d94713",
+        "test/refund.test.ts": "8416c9740156e424f7bd124f0f45b734f8df5d462a165531ec2763418e9ea093",
+        "package.json": "6aa772777339feca944f6dccc6f322956c39bd5e4061c62124486e28011f2899",
+        "tsconfig.json": "c82e1daa31950ab55f24c52a475b8c01f136341cb5672e373ed803d0304c690d",
+        "reset.d.ts": "f5a887811abbef67d02f7228bab6aa6e2f071b22afdb80bafdca8c55773a4768"
+      },
+      "finalAcceptance": {
+        "src/contract.ts": "ff6dae9addfef90a23c62ba270db61172ce8199a2e62f5650db454c3c6d94713",
+        "test/refund.test.ts": "cb87a8b6bf3e8775d25592c6a357c9ced6e6b007c6a3967af0b2c3621b68fc42",
+        "package.json": "6aa772777339feca944f6dccc6f322956c39bd5e4061c62124486e28011f2899",
+        "tsconfig.json": "c82e1daa31950ab55f24c52a475b8c01f136341cb5672e373ed803d0304c690d",
+        "reset.d.ts": "f5a887811abbef67d02f7228bab6aa6e2f071b22afdb80bafdca8c55773a4768"
+      }
+    },
+    "printed_outputs": [
+      "string 1001",
+      "{\"ok\":true,\"value\":{\"id\":\"r1\",\"cents\":0}}"
+    ],
+    "quoted_diagnostic": "TS2322: Type 'unknown' is not assignable to type 'Refund'.",
+    "requests_extracted": 3,
+    "contract_comparison": "Both implementations use the same Result contract, initial two tests and complete project files; only the amount line changes.",
+    "acceptance_transition": "Only the owner changes the tests at the Turn: original numeric success and rejection retained, numeric zero and text/malformed cases added.",
+    "always_reject": "Fails exactly the two positive tests; all three rejection tests pass when selected alone; selected implementation restored green.",
+    "predicate": "Compiles and fails exactly the three rejection groups; selected implementation restored green.",
+    "reset": "Removing the declaration restores original compile success and runtime output; restoring it restores TS2322.",
+    "dependency_limit": "Published Zod/Express/Node declarations pass with skipLibCheck:false; directly compiled pinned Zod source produces five diagnostics only with the reset, then restores green.",
+    "no_real_model_claims": true
+  },
+  "settlement_deviations": []
+}
