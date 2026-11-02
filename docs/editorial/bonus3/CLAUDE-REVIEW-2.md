@@ -102,3 +102,54 @@ Codex revises to draft 3. Update the checks for the `package.json` fence, any mo
 flag sentence, run the full `npm run check`, freeze `bonus3/DRAFT3-SNAPSHOT.json`, and commit
 locally. Then I'll run a Principle-only reader on the revised Principle and do the final diff review,
 and we each read the whole final text before the PR.
+
+## Final diff review (2026-11-02)
+
+Draft 3 (`84074c9`) addresses every finding above, and Codex declined none.
+- **The page can be rebuilt:** `package.json` pins `typescript` 7.0.2, and Codex installed the printed
+  project fresh. The check uses the project-local compiler and verifies its version.
+- **The setup fences moved** to Noam's first `tsc` run; the earlier `node check.ts` needs only
+  `"type": "module"`, said in a clause.
+- **Daniel's `order.d.ts` check** now follows the declaration diff, where he has just emitted both sets.
+- **The flag scene separates the two facts** (the annotation satisfies the flag; the assistant's
+  fallback lets the project compile) and ends on "Exactly."
+- **The line fixes are applied:**
+  - "against the same type";
+  - both private names;
+  - the Principle's caller sentence;
+  - the respelling sentence.
+- **Checks:** 45 compiler cases / 22 runtime groups / 1 file-list query.
+
+**The [final Principle-only reader](CLAUDE-DRAFT3-PRINCIPLE-READ.md) answered all four cases
+correctly,** with fixtures. Cases 2 and 4 were Clear; case 1 was Clear on the contract and Inferred
+on gathering evidence; case 3 was Inferred, close to Clear, since the flag stays in the scene by
+settlement. No claim was contradicted, and its fixture confirmed the respelling sentence. Its prose
+findings:
+- "A green compile covers the revised program" can read as "protects" rather than "speaks only for";
+- "the compiler can check that promise without choosing the right one for us" parses as a method
+  rather than a limit.
+
+**My full read** found one more. Daniel's "The original wasn't broken because it inferred a type"
+answers TS9007, but it sat after the `: string` experiment, between it and Oded's reply to it.
+
+**My prose-only settlement edit** (the fence extract is byte-identical to draft 3):
+- **Principle, paragraph 1:** "A green compile speaks only for the revised program. So I check whether
+  the old version of the caller we just edited still compiles, …"
+- **Principle, paragraph 2:** "…the compiler checks that promise, but it can't choose the right one for
+  us."
+- **The flag scene:** TS9007, then Daniel's line, then the `: string` experiment, then "So now it's
+  explicitly the wrong contract." / "Exactly."
+
+**Not adopted from the final reader:**
+- **A textual declaration diff isn't a type diff in either direction.** The Principle already says
+  "compare the public types", and the page shows both directions (the respelled `OrderStatus`, and
+  Daniel's `typeof` take).
+- **"For each changed signature" versus changed types.** The first paragraph's referenced-types
+  sentence covers it.
+- **A clause on the flag in the Principle.** Settlement 9 keeps it in the scene.
+- **Additions to the public surface.** The chapter adds none.
+
+**Length:** 2,378 words, inside the plan's 2,300–3,000.
+
+**Final text:** see the joint-approval record below for the SHA. The chapter check passes on the
+settled text.

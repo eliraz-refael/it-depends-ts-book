@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Daniel Compiler**: "When a patch says the API stayed the same, I emit declarations before and after, with the same compiler and project settings, and compare the public types. That includes the types a signature refers to: an unchanged alias can name a changed type. If the patch changes a caller to make it compile, I put the old caller back and find what required the repair. A green compile covers the revised program. I check whether the old version of the caller we just edited still compiles, and whether the caller in someone else's repo does. Then the API's owner has to say which contract we're offering."
+**Daniel Compiler**: "When a patch says the API stayed the same, I emit declarations before and after, with the same compiler and project settings, and compare the public types. That includes the types a signature refers to: an unchanged alias can name a changed type. If the patch changes a caller to make it compile, I put the old caller back and find what required the repair. A green compile speaks only for the revised program. So I check whether the old version of the caller we just edited still compiles, and whether the caller in someone else's repo does. Then the API's owner has to say which contract we're offering."
 
-"For each changed signature, I ask which old calls it rejects or which results it no longer guarantees. If a new spelling accepts the same inputs and promises the same results, the type contract is unchanged. Even with identical declarations, I run the runtime tests to check the values and effects. An explicit type gives the implementation a promise to meet; the compiler can check that promise without choosing the right one for us."
+"For each changed signature, I ask which old calls it rejects or which results it no longer guarantees. If a new spelling accepts the same inputs and promises the same results, the type contract is unchanged. Even with identical declarations, I run the runtime tests to check the values and effects. An explicit type gives the implementation a promise to meet; the compiler checks that promise, but it can't choose the right one for us."
 
 ## The Debate
 
@@ -387,9 +387,11 @@ He restores `"refunded"`. The program and all six assertions pass. Eden puts the
 
 **Daniel**: "Here, yes. Choosing it is still our job."
 
-In scratch work, he enables `isolatedDeclarations` on the original project. It reports **TS9007** on `orderStatus`: `Function must have an explicit return type annotation with --isolatedDeclarations.` He then uses the submitted patch and annotates its function `orderStatus(order: Order): string`. The annotation satisfies the flag. With the assistant's fallback, the project compiles.
+In scratch work, he enables `isolatedDeclarations` on the original project. It reports **TS9007** on `orderStatus`: `Function must have an explicit return type annotation with --isolatedDeclarations.`
 
 **Daniel**: "The original wasn't broken because it inferred a type. The [flag](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html#isolated-declarations) even allows some simple inferred exports. It doesn't require a return annotation on every export."
+
+He then uses the submitted patch and annotates its function `orderStatus(order: Order): string`. The annotation satisfies the flag. With the assistant's fallback, the project compiles.
 
 **Oded**: "So now it's explicitly the wrong contract."
 
