@@ -121,6 +121,15 @@ window.collectProof = () => {
       blocks:[...p.querySelectorAll('.pagedjs_page_content [data-ref]')].map(e=>({ref:e.dataset.ref,tag:e.tagName,rect:rect(e)})),
       headings:[...p.querySelectorAll('h1,h2,h3,h4')].map(e=>({text:e.textContent,rect:rect(e)})),
       figures:[...p.querySelectorAll('figure.source')].map(e=>({id:e.dataset.fenceId,continued:e.hasAttribute('data-split-from'),rect:rect(e)})),
+      openers:[...p.querySelectorAll('.act-opener,.prologue-opener,.chapter-opener')].map(e=>{
+        const mark=e.querySelector('.part-mark,.opener-number'), style=mark ? getComputedStyle(mark) : null;
+        return {kind:e.matches('.act-opener')?'act':e.matches('.prologue-opener')?'prologue':'chapter',act:e.dataset.act,
+          title:e.querySelector('h1').textContent.trim(),label:e.querySelector('.part-label,.eyebrow')?.textContent || '',mark:mark?.textContent || '',
+          center:rect(e.querySelector('.opener-center') || e),text_align:getComputedStyle(e.querySelector('.opener-center') || e).textAlign,
+          chapter_furniture:!!e.querySelector('.opener-art,.eyebrow,.opener-bottom'),
+          mark_style:style ? [style.fontFamily,style.fontSize,style.lineHeight,style.letterSpacing] : [],
+          mark_relative_y:mark ? mark.getBoundingClientRect().y-p.getBoundingClientRect().y : null};
+      }),
       front_parts:[...p.querySelectorAll('[data-front-part]')].map(e=>e.dataset.frontPart).filter(Boolean),
       key_code:[...p.querySelectorAll('.symbol-key code')].map(e=>({text:e.textContent,rects:[...e.getClientRects()].map(r=>({x:r.x,y:r.y,right:r.right,bottom:r.bottom}))})),
       quiet_frontmatter:[...p.querySelectorAll('[data-quiet-frontmatter="true"]')].map(e=>({id:e.id,paragraphs:e.querySelectorAll('main > p').length,headings:e.querySelectorAll('h1').length,opener:!!e.querySelector('.chapter-opener,.opener-art')})),

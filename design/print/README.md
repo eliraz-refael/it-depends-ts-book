@@ -189,7 +189,7 @@ page-bottom notes, with no manuscript rewrite or printer setup.
 ## Whole-book proof
 
 Step 2 assembles the frozen **d03727a** manuscript through the approved 34-file
-manifest. The current proof has **439 pages**, all marked **PROOF**, and passes
+manifest. The current proof has **438 pages**, all marked **PROOF**, and passes
 content, navigation, layout and reproducibility checks;
 see the page-specific [spread review](../../docs/editorial/full-review/WHOLE-BOOK-PROOF-REVIEW.md).
 This is not release approval.
@@ -212,7 +212,7 @@ design/print/.venv/bin/python design/print/build_proof.py --run a --inspect-exis
 ```
 
 Outputs live in ignored `output/whole-book-proof-d03727a/`. The review PDF is
-`a/It-Depends-PROOF.pdf`; `a/pages/page-001.png` through `page-439.png` are the
+`a/It-Depends-PROOF.pdf`; `a/pages/page-001.png` through `page-438.png` are the
 individual pages. `a/contact-sheets/spreads-01.png` through `spreads-28.png`
 show consecutive facing pages. The independent `b/` render supplies comparison
 evidence without duplicating the image gallery. Each run saves input hashes,
@@ -258,8 +258,13 @@ strand a narrative heading, a short introduction or a fence fragment. Fences of
 least four source lines. Saved-DOM checks assert the keeps and fragment counts.
 Three measured tiny endings (Ch13, Ch20 and Ch21) receive earlier break choices;
 the verifier counts their source lines separately from generated captions. Other
-light ending pages are left alone. Unnumbered prologue and Bonus act openers no
-longer get a numeral box; Bonus chapter numbers remain.
+light ending pages are left alone. Acts I–IV now have centred part title pages
+with a small ACT label and outlined Roman numeral; the Bonus part uses BONUS
+and AI and TypeScript. Chapter openers keep their Arabic numerals and existing
+layout. How to Read and Meet the Cast have centred title-only openers, followed
+by body text on the next page. These seven title pages have no running head or
+chapter rules. The build asserts their contents and physical-page centring, and
+that part numeral typography/positions differ from chapter numerals.
 
 `prose_quotes.py` converts prose text tokens only. Code, literal URLs and link
 labels containing code are protected. The actual printed delimiters are checked
@@ -293,8 +298,9 @@ line rectangle and horizontal bounds, including `!= null`.
 
 PR #40 is merged. The frozen source is main `d03727a0947a8434ac36e3978533152dc93a2e0f`,
 with 34 files. The physical order is title (1), proof information (2), dedication
-(3), acknowledgments (4), contents (5–6), symbol key (7–8), Prologue opener (9),
-How to Read (10) and Meet the Cast (15). Dedication and acknowledgments are
+(3), acknowledgments (4), contents (5–6), symbol key (7–8), How to Read (9) and
+Meet the Cast (14). There is no separate Prologue part page: its contents group
+and bookmark both point at How to Read. Dedication and acknowledgments are
 front matter before the Prologue, with their own top-level bookmarks and contents
 entries. Order, running heads and measured navigation are asserted.
 Acknowledgments immediately follows the dedication as a single

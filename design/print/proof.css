@@ -41,7 +41,18 @@ code { font:8.5pt/1.35 JetBrains; overflow-wrap:anywhere; font-variant-ligatures
 .opener-bottom { position:absolute; bottom:0; border-top:.5pt solid #555; width:100%; padding-top:10pt; font:8pt/12pt Plex; }
 .cover h1 { font:500 64pt/70pt Oxanium; margin:100pt 0 20pt; }
 .cover h2 { font:22pt/29pt Oxanium; border:0; }
-.act-opener h1 { font:500 43pt/49pt Oxanium; margin-top:42pt; }
+/* Part titles and prologue sections center on the paper, not the mirrored text box.
+   Body origin is 49pt down, 59.04pt in on rectos / 48.96pt on versos. */
+.centered-opener { height:619pt; position:relative; break-after:page; }
+.opener-center { position:absolute; top:311.04pt; left:calc(50% - 5.04pt); width:100%; transform:translate(-50%, -50%); text-align:center; }
+.pagedjs_left_page .opener-center { left:calc(50% + 5.04pt); }
+.part-label { font:10pt/14pt JetBrains; letter-spacing:3pt; margin-bottom:12pt; }
+.part-mark { font:140pt/156pt Oxanium; letter-spacing:4pt; }
+.part-mark.roman { color:white; -webkit-text-stroke:.7pt #181818; }
+.part-mark.bonus { font-size:64pt; line-height:80pt; letter-spacing:2pt; }
+.act-opener h1 { font:500 36pt/44pt Oxanium; margin:20pt 0 0; }
+.prologue-opener h1 { font:500 36pt/44pt Oxanium; margin:0; }
+.pagedjs_page:has(.centered-opener) .pagedjs_margin-top-center { visibility:hidden; }
 .dedication { padding-top:230pt; }
 .metadata h1,.contents h1 { font:500 32pt/38pt Oxanium; margin:0 0 22pt; }
 .metadata dt { font-weight:600; margin-top:12pt; }

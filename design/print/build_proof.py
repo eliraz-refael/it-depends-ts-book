@@ -25,7 +25,7 @@ OUT = HERE / 'output' / ('whole-book-proof-' + trial.read_json(HERE/'release-met
 MD = trial.MD
 FINAL_LINE = 'Oded: "Good. Now I have a green pull request and a meeting four minutes ago."'
 ACTS = [
-    ('Prologue', 'Before the debates'),
+    ('Prologue', ''),
     ('Act I', 'The Type System'),
     ('Act II', 'Advanced TypeScript'),
     ('Act III', 'Patterns & Design'),
@@ -122,16 +122,23 @@ def assemble(data, directory):
         preface = name in ('book/00-prologue/00-dedication.md','book/00-prologue/00a-acknowledgments.md')
         article_start = len(articles)
         if not preface and act != last_act:
-            aid = f'act-{act}'
+            aid = f'document-{doc_index}' if act == 0 else f'act-{act}'
             act_name, act_title = ACTS[act]
-            heading = f'{act_name} / {act_title}'
+            heading = f'{act_name} / {act_title}' if act else 'Prologue'
             manifest['navigation'].append({'level': 1, 'id': aid, 'title': heading})
             toc.append((aid, heading, 'toc-act'))
-            articles.append(f'<section class="act-opener running-title" data-front-part="{'prologue' if act == 0 else ''}" data-running="{html.escape(heading, quote=True)}" data-destination="{aid}" id="{aid}"><div class="eyebrow">{act_name.upper()}</div>{opener_art(act if act in (1,2,3,4) else None)}<h1>{html.escape(act_title)}</h1><div class="opener-bottom">IT DEPENDS / {html.escape(data["subtitle"])}</div></section>')
+            if act:
+                mark = ('I', 'II', 'III', 'IV')[act-1] if act < 5 else 'BONUS'
+                display_font = pymupdf.Font(fontfile=str(HERE/'fonts/Oxanium-Regular.ttf'))
+                trial.require(all(display_font.has_glyph(ord(c)) for c in mark), 'Display face lacks part-title glyphs')
+                label = '<div class="part-label">ACT</div>' if act < 5 else ''
+                print_title = 'AI and TypeScript' if act == 5 else act_title
+                articles.append(f'<section class="act-opener centered-opener running-title" data-act="{act}" data-running="{html.escape(heading, quote=True)}" data-destination="{aid}" id="{aid}"><div class="opener-center">{label}<div class="part-mark {"roman" if act < 5 else "bonus"}">{mark}</div><h1>{html.escape(print_title)}</h1></div></section>')
             last_act = act
         first_h1 = next((i for i, t in enumerate(tokens) if t.type == 'heading_open' and t.tag == 'h1'), None)
         title = plain(tokens[first_h1 + 1].children) if first_h1 is not None else 'Dedication'
         quiet = name == 'book/00-prologue/00a-acknowledgments.md'
+        prologue_opener = act == 0 and not preface
         doc_id = f'document-{doc_index}'
         manifest['navigation'].append({'level': 1 if preface else 2, 'id': doc_id, 'title': title})
         toc.append((doc_id, title, 'toc-doc'))
@@ -162,13 +169,19 @@ def assemble(data, directory):
                 if i == first_h1 and not quiet:
                     label = re.match(r'(Chapter|Bonus) (\d+):', title)
                     number = label.group(2) if label else '·'
-                    articles.append(f'<header class="chapter-opener running-title" data-running="{html.escape(title, quote=True)}"><div class="eyebrow">{ACTS[act][0].upper()} / {html.escape(ACTS[act][1].upper())}</div>{opener_art(number if label else None)}')
+                    if prologue_opener:
+                        articles.append(f'<header class="prologue-opener centered-opener running-title" data-running="{html.escape(title, quote=True)}"><div class="opener-center">')
+                    else:
+                        articles.append(f'<header class="chapter-opener running-title" data-running="{html.escape(title, quote=True)}"><div class="eyebrow">{ACTS[act][0].upper()} / {html.escape(ACTS[act][1].upper())}</div>{opener_art(number if label else None)}')
                     open_heading = True
                 articles.append(MD.renderer.render([token], MD.options, {}))
             elif token.type == 'heading_close':
                 articles.append(MD.renderer.render([token], MD.options, {}))
                 if open_heading:
-                    articles.append(f'<div class="opener-bottom">IT DEPENDS / {html.escape(data["subtitle"])}</div></header><main>')
+                    if prologue_opener:
+                        articles.append('</div></header><main>')
+                    else:
+                        articles.append(f'<div class="opener-bottom">IT DEPENDS / {html.escape(data["subtitle"])}</div></header><main>')
                     open_heading = False
             elif token.type == 'inline':
                 text_id = f'text-{doc_index}-{i}'
@@ -390,7 +403,7 @@ def validate(directory, manifest):
     final_body = document[-1].get_text(clip=pdf_rect(pages[-1]['body'],pages[-1]['rect']))
     check(norm(final_body).endswith(norm(FINAL_LINE)), 'PDF final narrative line not exact / material follows it')
     check(not pages[-1]['notes'], 'A footnote follows final narrative')
-    front_headers = {'title':'IT DEPENDS / PROOF','proof-info':'Proof information','dedication':'Dedication','acknowledgments':'Acknowledgments','contents':'Contents','symbol-key':'Reading the code symbols','prologue':'Prologue / Before the debates'}
+    front_headers = {'title':'IT DEPENDS / PROOF','proof-info':'Proof information','dedication':'Dedication','acknowledgments':'Acknowledgments','contents':'Contents','symbol-key':'Reading the code symbols'}
     front_sequence = []
     for page in pages:
         for kind in page['front_parts']:
@@ -398,10 +411,48 @@ def validate(directory, manifest):
             check(norm(front_headers[kind]) in norm(header), 'Wrong front-matter running head: '+kind)
             if not front_sequence or kind!=front_sequence[-1]:
                 front_sequence.append(kind)
-    check(front_sequence==['title','proof-info','dedication','acknowledgments','contents','symbol-key','prologue'], 'Front matter order changed')
+    check(front_sequence==['title','proof-info','dedication','acknowledgments','contents','symbol-key'], 'Front matter order changed')
     how = next(d for d in manifest['documents'] if d['source'].endswith('/01-how-to-read.md'))
     cast = next(d for d in manifest['documents'] if d['source'].endswith('/02-meet-the-cast.md'))
-    check(targets['act-0']<targets[how['id']]<targets[cast['id']], 'Prologue reading order changed')
+    check(targets[how['id']]<targets[cast['id']], 'Prologue reading order changed')
+    check('act-0' not in targets and not any('Before the debates' in p['text'] for p in pages), 'Prologue part page remains')
+    check(next(n for n in manifest['navigation'] if n['title']=='Prologue')['id']==how['id'], 'Prologue bookmark must target How to Read')
+    check(targets[how['id']]==max(p['page'] for p in pages if 'symbol-key' in p['front_parts'])+1, 'Prologue opener must immediately follow the symbol key')
+    expected_parts = {'1':('I','The Type System'), '2':('II','Advanced TypeScript'), '3':('III','Patterns & Design'), '4':('IV','The Real World'), '5':('BONUS','AI and TypeScript')}
+    part_pages, prologue_pages, chapter_pages = {}, {}, []
+    for page in pages:
+        for opener in page['openers']:
+            if opener['kind']=='chapter':
+                chapter_pages.append({'page':page['page'], **opener})
+                continue
+            center, paper = opener['center'], page['rect']
+            check(abs((center['x']+center['right'])/2-(paper['x']+paper['right'])/2)<1, f'p{page["page"]}: opener not horizontally centered')
+            check(abs((center['y']+center['bottom'])/2-(paper['y']+paper['bottom'])/2)<1, f'p{page["page"]}: opener not vertically centered')
+            check(opener['text_align']=='center' and not opener['chapter_furniture'], f'p{page["page"]}: centered opener has chapter furniture')
+            check(not document[page['page']-1].get_text(clip=pymupdf.Rect(0,0,504,42)).strip(), f'p{page["page"]}: title page has a running head')
+            if opener['kind']=='act':
+                expected_mark, expected_title = expected_parts[opener['act']]
+                check((opener['mark'],opener['title'])==(expected_mark,expected_title), 'Wrong act numeral/title')
+                check(opener['label']==('ACT' if opener['act']!='5' else ''), 'Wrong part label')
+                check(not page['texts'] and not page['code'], 'Manuscript text on a part title page')
+                check(norm(expected_mark+expected_title) in norm(document[page['page']-1].get_text()), 'Part title missing in PDF')
+                part_pages[opener['act']]=page['page']
+            else:
+                check(opener['title'] in [how['title'],cast['title']] and not opener['mark'] and not opener['label'], 'Prologue opener is not title alone')
+                check(len(page['texts'])==1 and not page['code'], 'Prologue body starts on title page')
+                doc = how if opener['title']==how['title'] else cast
+                ids = [k for k,v in manifest['texts'].items() if v['source']==doc['source']]
+                check(source_pages[ids[1]][0]==page['page']+1, 'Prologue text must begin on next page')
+                prologue_pages[opener['title']]=page['page']
+    check(set(part_pages)==set(expected_parts), 'Missing or duplicate act title pages')
+    check(len([o for p in pages for o in p['openers'] if o['kind']=='act'])==5, 'Repeated part page')
+    check(len(prologue_pages)==2, 'Missing prologue title page')
+    check([o['mark'] for o in chapter_pages]==[str(i) for i in range(1,28)]+['1','2','3'], 'Chapter Arabic numerals changed')
+    for page in pages:
+        for part in (o for o in page['openers'] if o['kind']=='act'):
+            for chapter in chapter_pages:
+                check(part['mark_style']!=chapter['mark_style'], 'Part and chapter numeral typography is identical')
+                check(abs(part['mark_relative_y']-chapter['mark_relative_y'])>10, 'Part and chapter numeral positions are indistinguishable')
     for page in pages:
         for code in page['key_code']:
             check(len(code['rects'])==1, 'Key inline code wrapped: '+code['text'])
@@ -501,6 +552,7 @@ def validate(directory, manifest):
         if doc['act']>0:
             check(len(lines)>3, f'Chapter ending carries <=3 source lines: {doc["source"]} p{end_page}')
     report = {'status':'PASS' if not failures else 'FAIL','pages':len(final),'failures':failures,'observations':observations,'notes':printed_notes,
+              'opener_pages':{'acts':part_pages,'prologue':prologue_pages,'chapters':[{ 'title':o['title'],'page':o['page'],'numeral':o['mark']} for o in chapter_pages]},
               'symbol_key_measure':measure,'symbol_group_pages':dict(group_pages),'endings':endings, 'ligature_sequences':list(ligatures), 'fences':len(manifest['fences']),'fence_languages':dict(Counter(f['language'] for f in manifest['fences'])),
               'source_text_blocks':len(manifest['texts']),'code_lines':len(manifest['code']),'tables':dict(table_pages),'bookmarks':len(bookmarks),
               'fence_fragments':dict(fence_pages), 'quote_audit':manifest['quote_audit'], 'source_pages':dict(source_pages),'targets':targets,'pdf':str(final_path),'pdf_sha256':trial.digest(final_path.read_bytes())}
