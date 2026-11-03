@@ -20,7 +20,7 @@
 | 12 — Version ownership | Eden says template versions belong to templates; the tree starts at its own format 1 with its own reader. Existing separate-reader and migration checks pass. |
 | 13 — Node declarations | Added an exact root `@types/node` 22.20.5 devDependency and updated the lockfile and Bonus 1 manifest. Updated Ch26's installed-version assertion and coverage documentation. The printed Node test code runs on Node 22.23.4. |
 | 14 — Empty array | `firstElement` returns `T | undefined`; Linoy's explanation and the hover agree. Checks assert the inferred union and execute empty/nonempty controls; `any` still propagates as intended. |
-| 15 — Generic setter | Daniel states the union-key limitation beside the adopted setter decision. The inline `setSetting<SettingKey>("fontSize", false)` is extracted, compiled and run in isolation; a literal numeric call restores the value. |
+| 15 — Generic setter | The Verdict scopes its claim to literal calls; Daniel covers the setter's union-key limitation alongside the publisher in Additional Takes. The inline `setSetting<SettingKey>("fontSize", false)` is extracted, compiled and run in isolation; a literal numeric call restores the value. |
 | 16 — Cast pronoun | Daniel's bio now says Noam is rarely satisfied “until someone has called the function.” |
 | 17 — Maintenance | Pinned Zod 4.6.6, updated the lockfile, Bonus 2 version references/assertions and coverage documentation. The generated schema and all printed outputs still match. The README now explicitly names Ch27's fixture benchmark and distinguishes timing evidence from pass/fail thresholds. |
 
@@ -37,3 +37,9 @@
 The Ch18 API still has the optional timestamp. This revision explicitly scopes the compatibility claim and demonstrates the required callback adapter, rather than claiming the signature itself prevents misuse. That is one of the settled fix options, with no structural rewrite.
 
 The Ch1 logger retains the existing user-object contract; the new validation failures are explicit decisions on the page. The setter warning documents an accepted limitation rather than silently strengthening its signature. These choices keep PR A local while making the remaining obligations visible and executable in the checks.
+
+## Revision after recheck
+
+Moved Eli's explanation after Eden's migration example; scoped Ch9's Verdict to literal calls and folded the setter example into Daniel's existing publisher warning; corrected Bonus 2's configuration subject and package antecedent; changed Chen's phrase to “drops nulls and undefined”; removed Oded's repeated “direct.” All chapter fences remain byte-identical to 164d90f, and the existing Ch9 check still extracts and executes the relocated inline call.
+
+A fresh `npm ci` succeeded with zero reported vulnerabilities. The full `npm run check` passed again: **483 fences, 885 compiler cases, 383 runtime groups**. No check changes were needed. Run log: `/private/tmp/pr-a-revision-check.log`.

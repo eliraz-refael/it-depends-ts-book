@@ -193,8 +193,6 @@ config.database.host.toUpperCase();
 
 **Eden Legacy**: "On a three-million-line migration, we tried requiring complete types for every converted module. We got stuck on modules whose dependencies weren't typed yet. We had to let some of those calls through:"
 
-**Eli**: "`Promise<UserProfile>` describes the value the promise will resolve to. The type argument in `api.get<UserProfile>` tells the API client what type to report to its caller. It does not check the response body."
-
 ```typescript
 // Week 1: Rename .js to .ts, add any where needed
 export function fetchUserProfile(userId: any): any {
@@ -220,6 +218,8 @@ export function fetchUserProfile(userId: string): Promise<UserProfile> {
 ```
 
 "That let us type the callers without waiting for every dependency. The intermediate version still returns `any`. I'm not calling it finished."
+
+**Eli**: "`Promise<UserProfile>` describes the value the promise will resolve to. The type argument in `api.get<UserProfile>` tells the API client what type to report to its caller. It does not check the response body."
 
 **Noam**: "You're creating typed-looking code that isn't actually typed. It's worse than JavaScript because it gives false confidence. A developer sees `.ts` and assumes the compiler is checking things. It isn't."
 

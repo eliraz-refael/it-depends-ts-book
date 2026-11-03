@@ -303,7 +303,7 @@ const name2 = (user as NonNullable<typeof user>).name;
 
 **Noam**: "The exclamation mark is the most dangerous character in TypeScript. It's an assertion disguised as punctuation. I ban it in code reviews with exactly one exception: immediately after assignment in test `beforeEach` blocks."
 
-**Chen**: "Optional chaining changes the type, though. `user?.name` gives you `string | undefined`, not `string`. Sometimes you genuinely *know* the value exists — after `filter(Boolean)` removes missing objects, or after a check inside a callback the compiler can't follow."
+**Chen**: "Optional chaining changes the type, though. `user?.name` gives you `string | undefined`, not `string`. Sometimes you genuinely *know* the value exists — after `filter(Boolean)` drops nulls and undefined, or after a check inside a callback the compiler can't follow."
 
 ```typescript
 // Optional chaining: safe but changes the type

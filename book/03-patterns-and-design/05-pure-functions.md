@@ -213,7 +213,7 @@ function refresh(tickets: readonly Ticket[]): SlaStatus[] {
 
 **Eden**: "The digest still needs today's status when it passes a ticket. I'm keeping that direct call working. Use `evaluate` when you already have both numbers."
 
-**Oded**: "Same direct calls for three consumers. One clock read for the board. That's not the migration I was objecting to."
+**Oded**: "Same calls for three consumers. One clock read for the board. That's not the migration I was objecting to."
 
 Oded implements boundary expiry and compares all four versions over the same 20,000 tickets. As in the replays, he replaces the clock: each refresh holds it at 12:20:00, 12:20:30 or 12:21:00 Jerusalem time. He starts with empty caches, makes no edits and counts deadline walks:
 

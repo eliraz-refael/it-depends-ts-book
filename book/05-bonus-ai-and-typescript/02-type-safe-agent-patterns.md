@@ -67,7 +67,7 @@ export function makeShop() {
 }
 ```
 
-Their compiler enables `strict` and `exactOptionalPropertyTypes`, targets ES2022 and uses Node16 modules and resolution, with `noEmit` and `allowImportingTsExtensions`; its package has `"type": "module"`. They compile with TypeScript 7.0.2 and run the `.ts` replay with Node 22.23.4. Zod is pinned to 4.6.6.
+Their `tsconfig` turns on `strict` and `exactOptionalPropertyTypes`, targets ES2022 with Node16 modules and resolution, and sets `noEmit` and `allowImportingTsExtensions`; the package is `"type": "module"`. They compile with TypeScript 7.0.2 and run the `.ts` replay with Node 22.23.4. Zod is pinned to 4.6.6.
 
 The support client's own wire format carries the returned tool name and a JSON string of arguments. `ownCall` is the saved call for Alice's request.
 
