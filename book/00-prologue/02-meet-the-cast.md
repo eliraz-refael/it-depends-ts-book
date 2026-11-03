@@ -162,11 +162,11 @@ He's the one who always asks: "What's the migration path?" If a pattern doesn't 
 
 *Cutting-Edge Advocate*
 
-Linoy reads TypeScript release notes the day they're published. By lunch, she's usually found a place to try the feature. By three, Oded has asked whether that place had a problem before lunch.
+Linoy's `tsconfig.json` looks like a dare she has already run. She reads TypeScript release notes the day they're published. By lunch, she's usually found a place to try the feature. By three, Oded has asked whether that place had a problem before lunch.
 
 She likes code that lets the compiler do more of the work: `satisfies` for a configuration, inferred keys at a call, a type derived from the value everyone already maintains. When someone asks "can TypeScript do that?", she usually has a playground open before they've finished the question. If it can't, she may have a proposal ready. A proposal is not a shipped feature, a distinction Daniel has had to make while she was already typing.
 
-Her enthusiasm gets ahead of the implementation sometimes. A signature fits the caller beautifully, and she wants everyone to see it; Noam wants to see what the body can get wrong. She'll run his broken example. She'll also try to repair hers before letting him replace it with four overloads.
+Her enthusiasm gets ahead of the implementation sometimes. A signature fits the caller beautifully, and she wants everyone to see it; Noam wants to see what the body can get wrong. She'll run his broken example. She'll also try to repair hers before giving it up.
 
 She's had PRs rejected because the reviewer's editor didn't support the syntax yet. She now brings the compiler version with the example. The reviewer still has to read it, which is where her arguments with Oded tend to begin.
 
@@ -240,9 +240,9 @@ He came to programming through a winding path — started in data science, moved
 
 Dima's first move is to find out whether both sides are answering the same question. Noam wants to know what a generic preserves; Oded wants to know why this function needs one today. Dima can agree with both without pretending they've reached a decision. "Both have a point here" is usually followed by someone discovering that their point doesn't settle the other person's problem.
 
-Noam has accused him of "centrist type theory." Oded calls him "the human 'it depends.'" Dima considers both descriptions complimentary, though Oded likes the answer less when Dima is maintaining the package.
-
 Then he gets specific. Which caller needs the new entry point? Who owns the calculation? What input are they agreeing to accept? He'll keep two interfaces when they serve two callers, and refuse a second implementation of the same rule. Both sides can have a point. One of them still has to change the code.
+
+Noam has accused him of "centrist type theory." Oded calls him "the human 'it depends.'" Dima considers both descriptions complimentary, though Oded likes the answer less when Dima is the one making the call.
 
 *"Both have a point here."*
 

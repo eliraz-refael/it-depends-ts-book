@@ -17,7 +17,7 @@ Successful run on **2026-11-03**, TypeScript **7.0.2**, Node **22.23.4**:
 
 | Suite | Code fences | Compiler cases | Runtime scenario groups |
 | --- | ---: | ---: | ---: |
-| Chapters 1–6 | 109 | 120 | 14 |
+| Chapters 1–6 | 111 | 124 | 16 |
 | Chapters 7–8 | 50 | 55 | 8 |
 | Chapter 9 | 20 | 35 | 6 |
 | Chapter 10 | 20 | 32 | 9 |
@@ -41,7 +41,7 @@ Successful run on **2026-11-03**, TypeScript **7.0.2**, Node **22.23.4**:
 | Bonus 1 | 11 | 31 | 15 |
 | Bonus 2 | 9 | 27 | 31 |
 | Bonus 3 | 10 | 45 | 22 |
-| Total | **482** | **888** | **385** |
+| Total | **484** | **892** | **387** |
 
 Chapter 24 includes labelled JavaScript and JSON fences as well as TypeScript; its count covers all three languages. Chapter 25 includes eight TypeScript and five JSON fences. Chapter 26 includes fifteen TypeScript and two JSON fences. Chapter 27 includes eight TypeScript, one JSON and one JavaScript fence, plus an extracted inline benchmark configuration. Bonus 1 includes nine TypeScript and two JSON fences, plus three extracted requests. Bonus 2 includes nine TypeScript fences, including labelled file bundles and replacement fragments. Bonus 3 includes four TypeScript fences, four applied unified-diff fences and two JSON configuration fences. Earlier chapter counts are TypeScript fences.
 
@@ -51,7 +51,7 @@ Two additional cases check compiler defaults. Chapter 9 also reproduces both pri
 
 PR A adds runtime comparisons for the Chapter 1 logging contract and empty-array return, checks the complete Chapter 2 naming fence, and exercises `filter(Boolean)` against inferred predicate narrowing. The Chapter 5 event parser now uses the same `status` tag as Chapter 3. Chapter 7 compares the full printed TS2769 message (whitespace normalized) with the compiler diagnostic, and separates misspelled-case rejection from exhaustiveness. Chapter 9 checks the widened-key setter warning, including restoration by a literal call. Chapter 18 compares old and new callback behavior and the arrow control at both at-risk and breached times. The Chapter 4 placeholder no longer needs a harness repair.
 
-PR B reorders the Ch1 and Ch3 fence cases with the manuscript, checks the Ch3 state against its earlier printed `User`, and adds restored-green controls for both conflict spellings. Ch6 runs the printed misspelled JSON against the asserted and uncast generic parsers, checks their identical failure and valid-input controls, and verifies rejection and success through the constructed parser.
+PR B reorders the Ch1 and Ch3 fence cases with the manuscript, checks the Ch3 state against its earlier printed `User`, and adds restored-green controls for both conflict spellings. Its revision runs Ch2's factory test against the optional-email response contract and checks boundary rejection; loads Ch3's global declarations through actual package entry imports, with the second package installed but unimported as a control; and asserts Ch5's TS2638 message, truthy-primitive runtime failures and corrected object guard. Ch6 runs the cast-free generic parser on the printed misspelled JSON, checks its TypeError and valid input, and verifies rejection and success through the constructed parser. Package fixtures use private directories and cannot write through the repository dependency symlink.
 
 At Chapter 23's final review, `npm ci --offline` failed with ENOTCACHED for the locked Zod tarball in a fresh export. A plain `npm ci` against the same lockfile succeeded, and the full suite passed there on TypeScript 7.0.2 and Node 22.23.4. Chapter 23 is [jointly approved](../docs/editorial/CH23-REVIEW.md); its final edits touch Principle prose only.
 

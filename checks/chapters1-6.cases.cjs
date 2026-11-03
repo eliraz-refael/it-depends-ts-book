@@ -30,6 +30,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 const genericsChapter = fs.readFileSync(path.join(process.env.BOOK_ROOT || path.resolve(__dirname, ".."),
   "book/01-the-type-system/06-generics-basics.md"), "utf8");
+const collisionChapter = fs.readFileSync(path.join(process.env.BOOK_ROOT || path.resolve(__dirname, ".."),
+  "book/01-the-type-system/03-interface-vs-type.md"), "utf8");
+const collisionFence = [...collisionChapter.matchAll(/```typescript\n([\s\S]*?)\n```/g)][5][1];
+const widgetFiles = Object.fromEntries([...collisionFence.matchAll(
+  /\/\/ file: (node_modules\/[^\n]+)\n([\s\S]*?)(?=\/\/ file:|$)/g,
+)].map(([, filename, source]) => [filename, source]));
+assert.equal(Object.keys(widgetFiles).length, 2);
 const badConfigInput = genericsChapter.match(/const config = parseConfig<\{ retries: number \}>\('([^']+)'\);/)[1];
 function checkUncheckedConfig({parseConfig}) {
   const config = parseConfig(badConfigInput);
@@ -147,6 +154,19 @@ const inferred = candidates.filter(value => value !== undefined);
 inferred.map(value => value.name);`, expect: [["after", 4, 18048]]},
       {name: "map-has-get", fence: 17, before: `interface User { id: string }
 declare const userId: string;`},
+      {name: "factory-hides-optional-response", fence: [{fence: 3, lines: [1, 5]}, 7, 10, 18, {fence: 4, lines: [1, 7]}],
+        after: `export {receiptAddress, receiptTest, response, createMockUser, ApiUser};`,
+        runtime: async ({receiptAddress, receiptTest, response, createMockUser, ApiUser}, printed) => {
+          assert.deepEqual(printed, ["true", "response failed"]);
+          assert.equal(receiptTest(), true, "The unchanged factory test still passes");
+          assert.throws(() => receiptAddress(response), TypeError);
+          const supplied = createMockUser({email: "ADA@example.com"});
+          assert.equal(receiptAddress(supplied), "ada@example.com");
+          assert.equal(ApiUser.safeParse(response).success, false, "The receipt parser rejects missing email");
+          assert.equal(receiptAddress(ApiUser.parse(supplied)), "ada@example.com");
+        }},
+      {name: "response-before-email-became-optional", fence: [{fence: 3, lines: [1, 5]}, 7, 10, 18],
+        edit: [["email?: string", "email: string"]], expect: [[18, 16, 2741]]},
     ],
   },
   "01-the-type-system/03-interface-vs-type.md": {
@@ -178,8 +198,14 @@ declare module "express" {
     Locals extends Record<string, any> = Record<string, any>> { exportedOnly?: string }
 }
 app.get("/profile", (req) => req.exportedOnly);`, expect: [["after", 7, 2339]]},
-      {name: "global-interface-merge", fence: 6, separate: true, after: `
-type Merged = Expect<Equal<User, { id: string; name: string; email: string; role: "admin" | "user" }>>;`},
+      {name: "global-interface-merge", fence: 6, lines: [20, 24], files: widgetFiles, after: `
+type Merged = Expect<Equal<User, { id: string; name: string; email: string; role: "admin" | "user" }>>;`,
+        expect: [[6, 22, 2739, "Type '{ id: string; name: string; }' is missing the following properties from type 'User': email, role"]]},
+      {name: "profile-widget-without-admin", fence: 6, lines: [20, 24],
+        edit: [['import "admin-widget/index.js";', ""]],
+        files: widgetFiles},
+      {name: "merged-widget-user-complete", fence: 6, lines: [20, 24], files: widgetFiles,
+        edit: [['{ id: "u1", name: "Ada" }', '{ id: "u1", name: "Ada", email: "ada@example.com", role: "user" }']]},
       {name: "type-only-constructs", fence: 7, after: `
 type Names = Expect<Equal<EventName, "onClick" | "onHover" | "onFocus">>;
 type Unwrapped = Expect<Equal<UnwrapPromise<Promise<number>>, number>>;`},
@@ -256,16 +282,34 @@ function sameNarrowing(input: string | null | undefined) {
   if (input !== null) { type Strict = Expect<Equal<typeof input, string | undefined>>; }
 }`},
       {name: "typeof-instanceof-array", fence: 3},
-      {name: "in-operator-prototype", fence: 4, after: `export {};`, runtime: async (_, printed) => {
-        if (printed.join() !== "true,false") throw new Error(`printed ${printed}`);
+      {name: "in-operator-prototype", fence: 4, after: `export {isResponse};`, runtime: async ({isResponse}, printed) => {
+        assert.deepEqual(printed, ["true", "false"]);
+        for (const candidate of [{error: 42}, Object.create({error() {}})]) {
+          assert.equal(isResponse(candidate), true);
+          assert.throws(() => candidate.error.toLowerCase(), TypeError);
+        }
       }},
-      {name: "checked-predicate", fence: 5},
-      {name: "lying-predicate", fence: 6, before: `type User = { id: string; email: string; displayName: string };`},
-      {name: "assertion-function", fence: 7, before: `type User = { id: string; email: string; displayName: string };`},
-      {name: "parse-result", fence: 8, before: `type User = { id: string; email: string; displayName: string };`},
-      {name: "parse-or-throw", fence: [8, 9], before: `type User = { id: string; email: string; displayName: string };`},
-      {name: "request-state-switch", fence: 10},
-      {name: "parse-event", fence: [{fence: 8, lines: [1, 3]}, 10, 11],
+      {name: "truthy-primitive-in", fence: 5, options: {noEmitOnError: false},
+        expect: [[5, 3, 2638, "Type '{}' may represent a primitive value, which is not permitted as the right operand of the 'in' operator."]],
+        after: `export {hasError};`, runtime: async ({hasError}) => {
+          for (const value of ["abc", 42]) assert.throws(() => hasError(value), TypeError);
+          assert.equal(hasError({error: "bad"}), true);
+          assert.equal(hasError({}), false);
+        }},
+      {name: "object-guard-restored", fence: 5,
+        edit: [["if (value)", 'if (typeof value === "object" && value !== null)']],
+        after: `export {hasError};`, runtime: async ({hasError}) => {
+          for (const value of ["abc", 42, null, undefined, 0, ""]) assert.equal(hasError(value), false);
+          assert.equal(hasError({error: "bad"}), true);
+          assert.equal(hasError({}), false);
+        }},
+      {name: "checked-predicate", fence: 6},
+      {name: "lying-predicate", fence: 7, before: `type User = { id: string; email: string; displayName: string };`},
+      {name: "assertion-function", fence: 8, before: `type User = { id: string; email: string; displayName: string };`},
+      {name: "parse-result", fence: 9, before: `type User = { id: string; email: string; displayName: string };`},
+      {name: "parse-or-throw", fence: [9, 10], before: `type User = { id: string; email: string; displayName: string };`},
+      {name: "request-state-switch", fence: 11},
+      {name: "parse-event", fence: [{fence: 9, lines: [1, 3]}, 11, 12],
         after: `export {parseEvent, describeRequest};`, runtime: async ({parseEvent, describeRequest}) => {
           const states = [{status: "idle"}, {status: "loading"},
             {status: "success", data: 42}, {status: "error", error: new Error("failed")}];
@@ -279,9 +323,9 @@ function sameNarrowing(input: string | null | undefined) {
             assert.equal(parseEvent(invalid).ok, false);
           }
         }},
-      {name: "zod-parser", fence: [{fence: 8, lines: [1, 3]}, 12], after: `
+      {name: "zod-parser", fence: [{fence: 9, lines: [1, 3]}, 13], after: `
 type Inferred = Expect<Equal<User, { id: string; email: string; displayName: string }>>;`},
-      {name: "result-and-exception-reasons", fence: [8, 9, 13],
+      {name: "result-and-exception-reasons", fence: [9, 10, 14],
         before: `type User = { id: string; email: string; displayName: string };`, after: `export {};`,
         runtime: async (_, printed) => {
           if (printed.join("|") !== "id missing or not a string|id missing or not a string") throw new Error(`printed ${printed}`);
@@ -313,11 +357,8 @@ type Size = Expect<Equal<typeof size, number>>;`, expect: [[8, 10, 2345,
       {name: "explicit-type-argument", fence: [{fence: 9, lines: [1, 7]}, 10], after: `
 userStore.set({ id: "u1" });
 userStore.set(null);`},
-      {name: "asserted-generic-return", fence: 11},
-      {name: "any-to-generic-return", fence: 12},
-      {name: "asserted-generic-runtime", fence: 11, lines: [1, 3],
-        after: `export {parseConfig};`, runtime: checkUncheckedConfig},
-      {name: "uncast-generic-runtime", fence: 12,
+      {name: "cast-free-generic-caller", fence: [11, 12]},
+      {name: "cast-free-generic-runtime", fence: 11,
         after: `export {parseConfig};`, runtime: checkUncheckedConfig},
       {name: "honest-parse", fence: 13, after: `export {result, parseRetryConfig, parseJson};`, runtime: async ({result, parseRetryConfig, parseJson}) => {
         const expected = {ok: false, reason: "retries missing or not a number", input: {retires: 3}};

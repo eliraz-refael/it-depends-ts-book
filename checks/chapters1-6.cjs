@@ -40,7 +40,7 @@ function readChapter(relative) {
 //           number (line relative to that fence) or "before"/"after". A quote must appear in
 //           the compiler message and in fence `quotedIn` (default `where`), or anywhere in the
 //           chapter when quotedIn is "markdown".
-//   options compiler overrides; files: extra {name: source} beside the case; separate: own
+//   options compiler overrides; files: imported dependencies {name: source} beside the case; separate: own
 //           program (for global declarations). Any of these compiles the case alone.
 //   runtime async (module, printed) => assertions against the emitted JavaScript and its
 //           console.log output
@@ -85,10 +85,14 @@ for (const [relative, spec] of Object.entries(chapters)) {
       assert(edits.some(e => e.includes(JSON.stringify(find))), `${relative}: ${test.name} edit ${JSON.stringify(find)} unused`);
     }
     if (test.after) append("after", test.after);
-    const filename = path.join(scratch, name + ".ts");
+    // Package fixtures get a private node_modules, never the repository symlink.
+    const caseDirectory = test.files ? path.join(scratch, name) : scratch;
+    fs.mkdirSync(caseDirectory, {recursive: true});
+    const filename = path.join(caseDirectory, name + ".ts");
     fs.writeFileSync(filename, text);
     const extra = Object.entries(test.files || {}).map(([file, source]) => {
-      const extraName = path.join(scratch, file);
+      const extraName = path.join(caseDirectory, file);
+      fs.mkdirSync(path.dirname(extraName), {recursive: true});
       fs.writeFileSync(extraName, source);
       return extraName;
     });
@@ -108,7 +112,7 @@ const diagnostics = compile(shared.map(p => p.filename), base, scratch).diagnost
 for (const plan of plans.filter(p => p.alone)) {
   const options = {...base, ...plan.test.options};
   if (plan.test.runtime) Object.assign(options, {noEmit: false, outDir: path.join(scratch, "out-" + plan.name)});
-  diagnostics.push(...compile([plan.filename, ...plan.extra], options, scratch).diagnostics);
+  diagnostics.push(...compile([plan.filename], options, scratch).diagnostics);
 }
 const caseFiles = plans.flatMap(p => [p.filename, ...p.extra]);
 const unplaced = diagnostics.filter(d => !caseFiles.includes(d.fileName));

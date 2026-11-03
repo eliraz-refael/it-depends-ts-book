@@ -99,11 +99,7 @@ function formatResponse(data: any) {
 
 "Forty-seven call sites. We updated the response type when the API changed, but this function didn't use it. There was nothing to tell us it was still reading the old field."
 
-**Oded**: "We can fix it in the next sprint."
-
-**Noam**: "In the next sprint? *They never do.*"
-
-**Oded**: "That's not fair—"
+**Oded**: "That's a discipline problem, not a language problem. We can fix it in the next sprint."
 
 **Noam**: "That parameter had been there for eight sprints, Oded. I found the TODO at 2 AM, while I was tracing that `Invalid Date`."
 
@@ -474,7 +470,7 @@ function on(event: string, handler: (...args: any[]) => void): void {
 
 **Liron Closure**: "Imagine a map with a region marked *'Here be dragons.'* The warning tells you where the mapmaker stopped. You can travel farther, but you know where you are leaving the mapped ground."
 
-"`any` should be your 'here be dragons.' Not a permanent feature of your map, but a marker of what you haven't yet understood. The problem isn't `any` itself — it's when `any` becomes invisible. When it stops being a conscious choice and becomes the default."
+"Mark the unknown ground with `any` if you must. Leave the warning visible. The next person shouldn't have to meet the dragon to find out why you stopped there."
 
 **Noam**: "If every `any` had a reason and a ticket to remove it, I could review that."
 
@@ -661,12 +657,12 @@ type B = Unwrap<any>;
 
 "Here one branch contributes `any`, so the resulting union is `any`. The compiler is following its rules. Those rules can preserve the uncertainty all the way to the caller."
 
-**Noam** turns to Oded: "Your generic function can look properly typed while its callers still get `any`. That's why I check what went into it."
+**Noam** turns to Oded: "A generic function can look properly typed while its callers still get `any`. That's why I check what went into it."
 
 **Oded**: "But how often are we writing one of those?"
 
 **Linoy**: "Remember `firstElement`. One array of `any` is enough. You don't have to author a conditional type to pass `any` through a generic. You only have to call one."
 
-**Oded** looks back at the array declaration.
+**Oded** scrolls back to `firstElement`.
 
 "All right. I'd been looking for angle brackets in our own code."

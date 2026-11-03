@@ -47,15 +47,15 @@ const config2 = { env: "production" } as Config;
 
 **Noam Kiperman**: "This is a language design problem, and it's a real one. Developers learn that `as const` is safe — because it is — and then assume `as SomeType` is equally benign. I see it in code reviews constantly. *'But I used `as` and it worked fine before!'* Yes, because last time you used `as const`. This time you're lying."
 
-**Oded**: "Then why not `satisfies`? It checks against the type without replacing it. Can I retire `as Type`?"
+**Linoy**: "For values we write here, try `satisfies`. It checks against the type without replacing it."
 
-**Linoy**: "Because `satisfies` was added in TypeScript 4.9. Millions of lines of code predate it. And it doesn't cover every case."
+**Oded Shipley**: "It arrived in 4.9. My client already had assertions all over it. I'm not rewriting those just because there's a nicer keyword."
 
 ---
 
 ### "Assertions at system boundaries"
 
-**Oded Shipley**: "Take an endpoint we haven't put a parser around yet. You call it. You get JSON back. The compiler knows *nothing* about the shape, and the code calling it still needs a type:"
+**Oded**: "Take an endpoint we haven't put a parser around yet. You call it. You get JSON back. The compiler knows *nothing* about the shape, and the code calling it still needs a type:"
 
 ```typescript
 interface ApiUser {
@@ -133,7 +133,7 @@ dog.bark(); // Runtime: dog.bark is not a function
 
 **Oded**: "Well, the error's gone."
 
-**Chen**: "The cat still has no bark. It's type laundering."
+**Chen**: "Through `unknown`: 'I don't know what this is.' Then straight to 'I know exactly.' It's type laundering. The cat still has no bark."
 
 **Noam**: "This is putting a fake mustache on a bug and walking it past the type checker. If TypeScript tells you two types don't overlap, *listen*."
 
@@ -203,7 +203,7 @@ const mockUser: User = {
 
 "Nobody reads those extra six fields. They're noise. The assertion is saying 'I only care about these two fields for this test.' That's honest."
 
-**Noam**: "Over my dead type definition. I'll give you the two-field call. The factory can supply the rest:"
+**Noam**: "Over my dead type definition. I'll give you the one-field call. The factory can supply the rest:"
 
 ```typescript
 function createMockUser(overrides: Partial<User> = {}): User {
@@ -327,7 +327,7 @@ const assertedName = user!.name;
 // Only safe if you can PROVE user isn't null.
 ```
 
-**Oded**: "Here's one Noam can't wiggle out of. You check a `Map` with `.has()`, then access it. The compiler doesn't narrow through `.has()` — it's a known limitation:"
+"Here's one Noam can't wiggle out of. You check a `Map` with `.has()`, then access it. The compiler doesn't narrow through `.has()` — it's a known limitation:"
 
 ```typescript
 const cache = new Map<string, User>();
@@ -357,23 +357,58 @@ if (cache.has(userId)) {
 
 ## The Turn
 
-**Gilad Stacktrace**: "What happens at 3 AM when one of these assertions is wrong?"
+**Gilad Stacktrace**: "Who tests the response after the API changes?"
 
-He draws a timeline on the whiteboard.
+**Noam**: "The client tests use the same factory. It supplies a complete user."
 
-"An API boundary assertion. Correct for two years. The API provider changes a field from required to optional. Your assertion still compiles — it doesn't know anything changed. Your types still say the field is there. Your tests pass — because your tests use mock data that still has the field. The error surfaces three months later as `Cannot read properties of undefined` in a function four layers deep from the assertion. The stack trace never mentions the API call. The on-call engineer has no idea where to look."
+**Oded**: "Including fields the test didn't ask for."
 
-"Every assertion is a bet that the world outside your program still matches your model of it. You knew it was true when you wrote it. How will you find out when it stops being true?"
+**Gilad**: "The provider now allows `email` to be absent. Your client still asserts the old `ApiUser`."
 
-**Noam**: "That's what a parser at the boundary is for. When the field goes optional, the error names the response, not a function four layers down."
+He changes the response type and runs the receipt test, then tries the response without email.
 
-**Eden**: "And until that parser exists, every claim about that response lives in one client. That's where the type came from."
+```typescript
+// Provider's new contract; the client's ApiUser still requires email.
+type UserResponse = { id: string; name: string; email?: string };
 
-**Gilad**: "Then put that in the runbook. The on-call engineer won't know it otherwise."
+function receiptAddress(raw: unknown): string {
+  const user = raw as ApiUser;
+  return user.email.toLowerCase();
+}
+
+function receiptTest(): boolean {
+  const user = createMockUser({ name: "Test User" });
+  return receiptAddress(user) === "default@test.com";
+}
+
+console.log(receiptTest()); // true: the factory still supplies email
+
+const response: UserResponse = { id: "u1", name: "Ada" };
+try {
+  receiptAddress(response);
+} catch (error) {
+  if (!(error instanceof TypeError)) throw error;
+  console.log("response failed"); // response failed
+}
+```
+
+**Noam**: "My test reads email. Its setup only names the user. The factory hid the dependency."
+
+**Oded**: "That's the comment I wanted. Name the fields this test exercises."
+
+**Noam**: "And pass the email explicitly for this case. Add the response without it too. The comment won't run that test for us."
+
+**Gilad**: "Good. Who rejects the missing email?"
+
+**Noam**: "Our parser. Receipts still require it. The provider allowing less doesn't mean we can use less."
+
+**Gilad**: "An assertion is a bet that the other side still sends what you expect. Your factory was betting with you."
 
 ## The Verdict
 
-> An assertion that overrides the compiler is a bet against runtime reality. Justify it by what you know that the compiler can't check, and by answering: "When this stops being true, how will I find out?"
+> Justify an assertion by the evidence the compiler cannot check, and arrange to find out when that evidence stops holding. A test fixture that always supplies the asserted shape cannot test what happens when the boundary sends something else.
+
+The team keeps complete fixtures, names the fields each test exercises, and adds missing-field cases at the client boundary. The receipt path will reject responses without email in its parser; the remaining assertions stay centralized and tracked.
 
 **Choosing an approach:**
 

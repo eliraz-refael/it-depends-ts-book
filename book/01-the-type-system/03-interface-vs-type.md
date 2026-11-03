@@ -116,12 +116,11 @@ app.use((req, res, next) => {
 
 **Linoy**: "Yes. But the shared type can describe them. You couldn't reopen a type alias this way."
 
-**Chen Override**: "But have you considered... two application models ending up in that same scope?"
+**Chen Override**: "But have you considered... installing both widgets? Each package gives its host page a global `User`. What happens when we import both?"
 
 ```typescript
-// file: models/user.ts
+// file: node_modules/profile-widget/index.d.ts
 export {};
-
 declare global {
   interface User {
     id: string;
@@ -129,9 +128,8 @@ declare global {
   }
 }
 
-// file: api/responses.ts (separate module, same explicit global scope)
+// file: node_modules/admin-widget/index.d.ts
 export {};
-
 declare global {
   interface User {
     email: string;
@@ -139,16 +137,17 @@ declare global {
   }
 }
 
-// Merged result: { id: string; name: string; email: string; role: "admin" | "user" }
-// Was this intentional? Or did two developers independently
-// declare a User interface without knowing the other existed?
+// file: page.ts — both packages are loaded into this program
+import "profile-widget/index.js";
+import "admin-widget/index.js";
+const user: User = { id: "u1", name: "Ada" };
+// Error: Type '{ id: string; name: string; }' is missing the following
+// properties from type 'User': email, role
 ```
 
-"Two developers. Two files. One silently merged type that neither of them intended."
+**Daniel**: "Both declarations reach the same global scope. They merge, and now the profile widget's user needs the admin fields too. Separate modules protect their local names; these packages explicitly put `User` outside them."
 
-**Daniel**: "Declarations merge when they refer to the same interface in the same scope. Two `User` interfaces in separate modules do not merge just because their names match. Your example deliberately puts both in the global scope. For an extension point that may be useful; for two unrelated models it is a mistake."
-
-**Noam**: "I can see why a library would expose that extension point. I don't want an unrelated application model adding fields to mine. Keep those definitions closed."
+**Noam Kiperman**: "Keep our application model local to its module. If another package needs an extension point, let it name one. I don't want to acquire two required fields by installing a widget."
 
 ---
 
@@ -186,7 +185,7 @@ type Config = typeof defaultConfig;
 
 **Linoy** turns to him:
 
-"It uses unions. `string | null`, a loading status, a result with a failure branch. You don't have to be writing a library to need those. An interface describes an object shape. A union can describe a choice between shapes."
+"It uses unions. `string | null`, a loading status, a result with a failure branch. Guy, the profile screen needs those. We haven't become library authors by loading a user."
 
 ---
 
@@ -273,9 +272,7 @@ state.render(); // "Hello, Ada"
 
 ### "Performance — does the compiler care?"
 
-**Gil Benchmark**: "There's guidance on composing object types. I haven't measured these alternatives in our project."
-
-The [TypeScript performance guidance](https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections) favors `interface extends` for object composition, describing cached interface relationships and comparisons against each intersection constituent.
+**Gil Benchmark**: "The TypeScript performance guidance favors `interface extends` for composing objects. It describes caching interface relationships, while an intersection comparison checks each constituent. I haven't measured these alternatives here."
 
 **Linoy**: "That guidance predates the TypeScript 7 native compiler. I'd try it if a trace pointed here."
 
@@ -296,7 +293,7 @@ type Props = BaseProps & {
 // The same object shape, expressed as an intersection.
 ```
 
-**Chen**: "So we don't know how much it would save here. And the recommendation is about composing objects. Unions, mapped types, conditionals — there's no equivalent `interface` spelling to swap in."
+**Chen**: "Which of these types has an `interface` spelling we could actually compare? What would we replace a union with?"
 
 **Oded Shipley**: "If your compile time is slow, profile it first. Don't prematurely optimize your *type syntax*."
 
@@ -317,9 +314,9 @@ type User = { id: string; name: string; };
 
 "Identical. Pick one. Put it in your ESLint config. Ship the feature."
 
-"I've seen teams spend more time debating this in style guides than they save in a year of 'choosing the right one.' The overhead of the decision is more expensive than the occasional suboptimal choice."
+"I've seen teams spend more time debating this in style guides than they save in a year of 'choosing the right one.' We could have shipped the feature while everyone was still choosing a keyword."
 
-**Chen**: "For an object like that, fine. The rule still needs exceptions. You can't 'just use interface' for a union type. You can't 'just use type' and expect declaration merging."
+**Chen**: "Is the rule for plain objects, or everything? What does the person adding a union do with 'just use interface'?"
 
 **Noam**: "Consistency matters. Switching keywords for the same kind of thing makes me wonder what changed. Pick a default for each category and use it consistently."
 
@@ -377,15 +374,15 @@ const emp: Employee = {
 
 ```typescript
 interface Employee extends Base {
-  id: number;
-//^^ Error: Interface 'Employee' incorrectly extends interface 'Base'.
+//        ^^^^^^^^ Error: Interface 'Employee' incorrectly extends interface 'Base'.
 //   Types of property 'id' are incompatible.
 //   Type 'number' is not assignable to type 'string'.
+  id: number;
   name: string;
 }
 ```
 
-**Noam**: "The `extends` error message is a diagnosis. The intersection error message is a riddle. The first one names the conflict. The second points at an object literal, and somebody has to go looking for that `number`."
+**Noam**: "The `extends` error message is a diagnosis. The intersection error message is a riddle."
 
 **Dafna**: "I still want to assemble the parts independently. Timestamps don't make everything one of your entities."
 
@@ -397,7 +394,7 @@ type Named = { name: string; email: string };
 type User = Identifiable & Timestamped & Named;
 ```
 
-**Guy**: "They don't have to."
+**Guy**: "Extending an interface doesn't require a chain four levels deep. Use the same parts:"
 
 ```typescript
 interface UserContract extends Identifiable, Timestamped, Named {}
@@ -415,7 +412,7 @@ interface UserContract extends Identifiable, Timestamped, Named {}
 
 > Use `type` for unions and other type expressions; use an interface for deliberate extension points or declaration-time checks on composed objects. When either works, choose a convention for the reader.
 
-The team chooses `type` for plain data and `interface` for behavioral contracts, with composed data allowed to use `extends` for its diagnostics.
+The team chooses `type` for plain data and `interface` for behavioral contracts, and composed data uses `interface extends` for its diagnostics.
 
 **A starting convention:**
 

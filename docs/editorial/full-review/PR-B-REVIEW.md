@@ -47,3 +47,37 @@ Both risky restructures are shorter. The fun audit is an editorial judgment, not
 - `git diff --check` passes. All manuscript files in Acts II–IV and the bonus act are byte-identical to the base, including the refuted findings. PR A's logger contract, empty-array result, complete naming fence, status tag and diagnostic assertions remain covered.
 
 No settlement deviation. The main reader questions are whether Ch3 feels discovered and whether the revised bios and replacement jokes retain their warmth; compiler success cannot decide those.
+
+## Revision after the two Opus readers
+
+Follows every Must fix in [PR-B-REVISION.md](PR-B-REVISION.md). Both reader reports and the settled brief are included unchanged in this revision commit.
+
+| Finding | Revision and evidence |
+|---|---|
+| 1 — Ch6 Turn | Noam defends his cast-free billing parser; Oded supplies the misspelled input, and Noam concedes that the checked caller did not establish the returned config. Idan's search-for-`as` line now challenges Noam's “No assertions.” Cut the opening spoiler, the earlier Noam/querySelector conclusion, the rule before the Turn and its subheading. Renamed the unknown-returning helper `firstUnknown`; the Verdict explicitly leaves generalization timing open. Checks compile the caller against the cast-free function, execute its TypeError and valid-input control, then verify the constructed parser's rejection and success. |
+| 2 — Ch3 collision | Two independently published widget declarations augment global `User`. Their explicit Node16 entry imports load both into one program; the profile-shaped user now fails TS2739. Daniel confirms the collision. A control keeps both packages installed but imports only the profile package and compiles; another supplies all merged fields. The harness gives package fixtures private directories and compiles only their entry, so installed declarations are not smuggled in as root files. Chen's other statements become questions; Noam gets his full name, Guy restores the inheritance-chain antecedent, the local Verdict commits composed data to `interface extends`, and the TS2430 caret points to `Employee`. |
+| 3 — Ch2 Turn | Gilad changes the provider contract to optional email while the client retains its asserted `ApiUser`. Noam's factory test still prints `true`; the missing-email response prints `response failed`. Noam acknowledges the hidden dependency, accepts explicit tested fields and adds a missing-field case. Checks run the actual fence with the earlier factory and interface, assert both outputs, confirm the old required-email contract rejects the new response, and verify the earlier Zod parser rejects missing email and accepts valid data. Linoy introduces `satisfies`, Oded answers as the legacy caller, the factory line says one field, and duplicate Oded labels are removed. Chen's laundering irony returns. One bet metaphor remains; the Verdict starts with a rule and then the team's decision. |
+| 4 — Ch5 | Cut both Principle spoilers. Show the response guard before Chen's single reframing question in that section. The new `hasError` example demonstrates TS2638; emitted faulty code throws on `"abc"` and `42`, while the corrected object/null guard compiles and runs. Prototype and numeric-property counterexamples also run. Truthiness's over-rejection is stated separately. Fixed the runtime-union question. Guy now accepts the result for callers outside his handler while keeping his request adapter; the broader preference stays open. |
+| 5 — Ch1 | Restored Oded's discipline argument and routed his catchphrase directly into the eight-sprint TODO. Oded explicitly scrolls back to `firstElement` in Additional Takes. |
+| 6 — Cast | Restored Linoy's tsconfig dare without claiming every flag, removed the nonexistent Noam/four-overload scene, and changed Dima's package claim to making the call. Put his concrete decision paragraph immediately after his synthesis paragraph. The Daniel/proposal distinction remains an explicit PR C dependency, per the brief. |
+| 7 — Narrator and links | Gil, Daniel and Noam state their own performance, predicate-inference and Zod facts. Removed their link-carrier sentences and the corresponding citations. Ch4's consumer setting is a comment in the TS2748 fence. The substantive Express narration/link remains; no links returned to dialogue. |
+| 8 — Ch4 Verdict | Restored “Use or keep” and the new-service/learning-cost qualification. |
+
+Took the inexpensive optional voice trims: Liron's dragon warning, Noam's repeated diagnosis explanation, Linoy's union explanation, Oded's style-guide cost sentence, Guy's symmetric lookup explanation, Dima's noncommittal summary and Idan's generic inventory. Also made the photograph deadline belong to billing, where that exchange takes place. Did not add a new enum-count scene or alter Ch4's Turn. Kept “Two kingdoms. Shared building inspector,” the cast narrator's references to the book and Ch8's Eli quotation.
+
+The five allocated catchphrases still occur once each outside the bios. Ch7's two `Unwrap` callbacks, Ch8's teaser and Bonus 3's export-annotation callback remain supported; later acts and bonus chapters are unchanged. The approved interrupted analogy and the reader's listed jokes survive. Chen's final Ch2 narrow-and-delete take remains cut deliberately to preserve the settled two-question shape; its alternatives remain in Daniel's narrowing advice and the assertion checklist.
+
+Word counts use the same whitespace method, including fences:
+
+| Chapter | c3d1274 | Revision |
+|---|---:|---:|
+| 1 | 3,869 | 3,847 |
+| 2 | 2,842 | 2,938 |
+| 3 | 2,399 | 2,339 |
+| 4 | 2,777 | 2,769 |
+| 5 | 3,025 | 2,949 |
+| 6 | 2,487 | 2,435 |
+
+No disagreement with the settled brief. The new Ch2 Turn is 96 words of net growth; every other chapter is shorter.
+
+Validation: clean `npm ci` passed with zero reported vulnerabilities; the full `npm run check` passed on TypeScript **7.0.2**, Node **22.23.4** and Zod **4.6.6**. Act I: **111 fences, 124 compiler cases, 16 runtime groups**. Whole book: **484 fences, 892 compiler cases, 387 runtime groups**, plus the unchanged two default cases, two source searches and eleven file-list queries. Log: `/private/tmp/pr-b-revision-full.log`. The final Ch2 attribution adjustment changes prose only. `git diff --check` passes.

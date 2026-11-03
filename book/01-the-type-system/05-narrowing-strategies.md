@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Daniel Compiler**: "For external input, prefer a function that builds a typed value from the fields it has checked. Then the compiler checks that construction too. A return annotation claiming the input is valid doesn't give us the same protection when a field changes. Look at what the body must do to produce its answer. How it reports a rejected input is a separate choice."
+**Daniel Compiler**: "For external input, prefer a function that builds a typed value from the fields it has checked. Then the compiler checks that construction too. Look at what the body must do to produce its answer."
 
 ## The Debate
 
@@ -49,9 +49,7 @@ function process(input: string | null | undefined) {
 
 ### "The `typeof` family — what lies and what doesn't"
 
-**Linoy Nightly**:
-
-"Start with the checks you already write: `typeof`, `instanceof`, `Array.isArray`, `in`. Equality and truthiness checks narrow too. There are a few runtime details you have to remember."
+**Linoy Nightly**: "The checks we already write can narrow the type:"
 
 ```typescript
 function describe(value: unknown): string {
@@ -64,19 +62,11 @@ function describe(value: unknown): string {
 }
 ```
 
-"For ordinary primitives, dates and arrays, start here. Hover the variable inside each branch to see what the check established."
-
-**Linoy**: "Start with `typeof null === 'object'`. An object check still needs to exclude `null`."
-
-**Chen**: "Would your date check accept a `Date` from another iframe?"
-
-**Linoy**: "No. `instanceof` follows the prototype chain, and that iframe has a different `Date` constructor. A Node `vm` context can give you the same problem. `Array.isArray` works across those boundaries. It checks whether the value is an array, regardless of which constructor made it."
+"But they establish different things. `typeof null` is `'object'`, so an object check must exclude `null`. `instanceof Date` rejects a date from another iframe: its constructor is different. A Node `vm` context can do the same. `Array.isArray` works across those boundaries."
 
 "And `typeof x === 'function'` includes class constructors. Try calling one without `new`. That check is not an invitation."
 
-**Chen**: "Our response guard only checks for `error`. Would you let its caller read a string?"
-
-**Linoy**: "No. `in` walks the prototype chain too. `"toString" in {}` is `true`, although the empty object has no own `toString` property."
+Linoy opens a response guard:
 
 ```typescript
 const empty = {};
@@ -85,18 +75,30 @@ console.log(Object.hasOwn(empty, "toString")); // false
 
 function isResponse(x: object): x is { error: string } {
   return "error" in x;
-  // True for any object that has `error` anywhere on its prototype chain —
-  // including a class instance whose class defines a method called `error`.
-  // Also doesn't check that x.error is a string — double-unsafe by design,
-  // exactly the kind of unchecked promise we're warning about.
+  // Includes inherited properties; doesn't check their value types.
 }
 ```
 
-"A class method called `error` passes that check. So does an `error` property containing a number. The check only tells you the property exists, possibly on a prototype. It has not established `string`."
+**Chen Override**: "Which values pass that check and still crash when the caller uses the promised string?"
 
-"And the right operand must be an object. `in` throws on `null` or any primitive. Don't replace the object check with `if (x)` either; truthiness rejects `0`, the empty string, `false`, `0n`, and `NaN` too."
+**Linoy**: "A class with a method named `error`. An object with `error: 42`. `in` finds the property, including on the prototype. It hasn't checked for a string."
 
-**Daniel**: "`typeof NaN` is `number`. Narrowing to `number` does not promise a finite number. That takes another check."
+"It also needs an object on the right. `if (value)` won't establish that; `"abc"` and `42` get through."
+
+```typescript
+function hasError(value: unknown): boolean {
+  if (value) {
+    return "error" in value;
+    // Error: Type '{}' may represent a primitive value, which is not
+    // permitted as the right operand of the 'in' operator.
+  }
+  return false;
+}
+```
+
+**Linoy**: "Force that through and both of those calls throw. Check `typeof value === 'object'` and `value !== null` before using `in`. Separately, if you only wanted a nullish check, truthiness rejects zero and the empty string too."
+
+**Daniel**: "And `typeof NaN` is `number`. Narrowing to `number` does not promise a finite number. That takes another check."
 
 ---
 
@@ -150,9 +152,7 @@ if (isUser(x)) {
 }
 ```
 
-Since [TypeScript 5.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html), the compiler can infer predicates from some function bodies without return annotations.
-
-**Daniel**: "With an explicit predicate annotation, it takes your word instead. You've supplied the answer it would otherwise try to infer."
+**Daniel**: "Since TypeScript 5.5, the compiler can infer a predicate from some bodies without a return annotation. With an explicit predicate annotation, it takes your word instead. You've supplied the answer it would otherwise try to infer."
 
 **Noam**: "That always-true body fails the first rejection test. I'm not dropping the tests because I gave the function a return annotation."
 
@@ -328,7 +328,7 @@ function describeRequest<T>(state: RequestState<T>): string {
 
 **Daniel**: "That holds with strict null checking. Without that return annotation, the inferred result can become `string | undefined`. An explicit `assertNever` check is another way to enforce exhaustiveness."
 
-**Dafna**: "Where does the receiver get this union?"
+**Dafna**: "Where does this union come from at runtime?"
 
 **Idan**: "Our request module publishes state changes through an in-process event bus. The receiver gets `unknown`, so we have to check the tag and payload together. Error events carry actual `Error` objects here."
 
@@ -432,6 +432,8 @@ try {
 **Chen**: "Can the caller ignore your result, Idan?"
 
 **Idan**: "They can ignore the call. They can't take its `value` as a `User` without dealing with the union. That's the check I want when this function gets used somewhere new."
+
+**Guy**: "Then give callers outside our handler the result. I'll keep the throwing adapter for this request."
 
 ## The Debate Continues
 

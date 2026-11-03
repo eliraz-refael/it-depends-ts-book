@@ -114,9 +114,11 @@ export const enum Status {
 
 **Linoy**: "They receive a `.d.ts` with an ambient `const enum`. Their transpiler handles one file at a time. It can't read member values out of that other declaration file to inline them."
 
-She tries a consumer with `isolatedModules` enabled, which checks for constructs incompatible with single-file transpilation. Its member access hits the [ambient const-enum restriction](https://www.typescriptlang.org/docs/handbook/enums.html#const-enum-pitfalls):
+She tries the member access in a consumer:
 
-```
+```text
+// consumer tsconfig: "isolatedModules": true
+// Checks for constructs incompatible with single-file transpilation.
 error TS2748: Cannot access ambient const enums when 'isolatedModules' is enabled.
 ```
 
@@ -148,7 +150,7 @@ const okCode: number = HttpStatus.OK; // 200
 const statusName: string = HttpStatus[200]; // "OK"
 ```
 
-"Numeric enums are bidirectional. Given the value, you can get the name. Given the name, you can get the value. This is real in the compiled JavaScript — the IIFE assigns *both directions*:"
+"The logger gets its name lookup from the same declaration. Look at the two assignments in the JavaScript:"
 
 ```javascript
 // What the compiler actually emits:
@@ -434,7 +436,7 @@ sendToSdk(SdkStatus.Active); // Works.
 
 ## The Verdict
 
-> For new code, default to a string literal union; use an `as const` object when callers need named or enumerable values. Keep an enum when its reverse map or the team's ability to maintain it earns the extra construct. Check the consumer's build before publishing a `const enum`.
+> For new code, default to a string literal union; use an `as const` object when callers need named or enumerable values. Use or keep an enum when its reverse map or the team's ability to maintain it earns the extra construct, even for a new service. Plan for the learning cost of the alternative. Check the consumer's build before publishing a `const enum`.
 
 **Choosing an approach:**
 
@@ -498,8 +500,6 @@ enum Color {
 
 ## Additional Takes
 
-Noam uses [Zod's enum validation](https://zod.dev/api#enums) for either representation: in Zod 4, `z.enum(["active", "inactive", "banned"])` checks the literal values, and `z.enum(SdkStatus)` accepts the TypeScript enum directly.
-
-**Noam Kiperman**: "Pick whichever declaration you can maintain. External input still has to pass the check."
+**Noam Kiperman**: "Zod 4 can check either representation. `z.enum(["active", "inactive", "banned"])` checks the literal values; `z.enum(SdkStatus)` takes the TypeScript enum directly. Pick whichever declaration you can maintain. External input still has to pass the check."
 
 **Guy Singleton**: "When Oded says the Java team finds enums familiar, that gets them started. We still have to explain what TypeScript emits. The shared keyword doesn't teach them the reverse map."
