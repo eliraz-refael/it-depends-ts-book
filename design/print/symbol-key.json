@@ -1,0 +1,153 @@
+{
+  "title": "Reading the code symbols",
+  "intro": "The code in this book is set in a font that joins some characters into a single shape. `=>` prints as an arrow and `===` as one long bar. Nothing changes at the keyboard: you still type the separate characters in the middle column. This key lists every combination that joins somewhere in the book.",
+  "groups": [
+    {
+      "title": "Comparison and logic",
+      "rows": [
+        {
+          "combinations": [
+            "==="
+          ],
+          "meaning": "Strict equality."
+        },
+        {
+          "combinations": [
+            "!=="
+          ],
+          "meaning": "Strict inequality."
+        },
+        {
+          "combinations": [
+            "!="
+          ],
+          "meaning": "Loose inequality. The book uses it only as `!= null`, which rules out both `null` and `undefined`."
+        },
+        {
+          "combinations": [
+            "<=",
+            ">="
+          ],
+          "meaning": "Less than or equal to, greater than or equal to."
+        },
+        {
+          "combinations": [
+            "&&"
+          ],
+          "meaning": "Logical AND: the right side runs only when the left is truthy."
+        },
+        {
+          "combinations": [
+            "||"
+          ],
+          "meaning": "Logical OR: the right side runs only when the left is falsy."
+        },
+        {
+          "combinations": [
+            "??"
+          ],
+          "meaning": "Nullish coalescing: the right side is used only when the left is `null` or `undefined`."
+        },
+        {
+          "combinations": [
+            "?."
+          ],
+          "meaning": "Optional chaining: the access stops, giving `undefined`, when the left is `null` or `undefined`."
+        }
+      ]
+    },
+    {
+      "title": "Functions and types",
+      "rows": [
+        {
+          "combinations": [
+            "=>"
+          ],
+          "meaning": "Separates an arrow function's parameters from its body, or a function type's parameters from its return type."
+        },
+        {
+          "combinations": [
+            "?:"
+          ],
+          "meaning": "An optional property or parameter. `?` makes it optional, and `:` starts its type."
+        },
+        {
+          "combinations": [
+            "..."
+          ],
+          "meaning": "Spread or rest. In comments and strings, it just means text left out."
+        },
+        {
+          "combinations": [
+            "++",
+            "--"
+          ],
+          "meaning": "Add one, subtract one. In commands, `--` starts a long option such as `--noEmit`."
+        }
+      ]
+    },
+    {
+      "title": "Comments",
+      "rows": [
+        {
+          "combinations": [
+            "//"
+          ],
+          "meaning": "Starts a comment that runs to the end of the line."
+        },
+        {
+          "combinations": [
+            "/*",
+            "*/"
+          ],
+          "meaning": "Start and end a block comment."
+        },
+        {
+          "combinations": [
+            "/**"
+          ],
+          "meaning": "Starts a documentation comment."
+        }
+      ]
+    },
+    {
+      "title": "Punctuation that only looks joined",
+      "rows": [
+        {
+          "combinations": [
+            ">>",
+            ">>>"
+          ],
+          "meaning": "Two or three type-argument lists closing together."
+        },
+        {
+          "combinations": [
+            ">]",
+            "}}"
+          ],
+          "meaning": "Closing brackets next to each other."
+        },
+        {
+          "combinations": [
+            "__"
+          ],
+          "meaning": "Two underscores in a name."
+        },
+        {
+          "combinations": [
+            ".."
+          ],
+          "meaning": "The parent folder in a file path."
+        },
+        {
+          "combinations": [
+            "---",
+            "+++"
+          ],
+          "meaning": "The old-file and new-file headers in a diff."
+        }
+      ]
+    }
+  ],
+  "approved_text_sha256": "6259103681b421d5a7556e47e0a0530bc2c1d68ebdd070899875201bde966d7c"
+}
