@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Daniel Compiler**: "When a patch says it changes no public API, believe the declarations, not the summary. Emit them before and after and read the difference, following the types they refer to. An annotation is only one way to publish a promise. Inference publishes one too, whether or not the author thought to mention it. A confident summary doesn't get a vote in that comparison."
+**Daniel Compiler**: "A patch summary is its author's opinion of what changed. The declarations are the compiler's. Emit them before and after and read the difference, following every type they refer to. Where the two opinions differ, the summary doesn't get a vote."
 
 ## The Debate
 
@@ -401,7 +401,7 @@ He then uses the submitted patch and annotates its function `orderStatus(order: 
 
 ## The Verdict
 
-> When a patch makes a type error disappear, find what the error was protecting before you accept the repair. A fix that changes the contract is a contract decision, not a type-error repair.
+> Before accepting a repair that makes a type error disappear, find what the error was protecting. A fix that changes the contract is a contract decision, not a type-error repair.
 
 **Eden**: "Keep the table, the explicit return and the checked labels. Keep the original badge. This refactor promised the existing status API; the mobile caller still gets it."
 

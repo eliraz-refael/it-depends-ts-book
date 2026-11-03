@@ -236,7 +236,7 @@ She replaces one line in the same implementation:
 const cents = value.cents;
 ```
 
-Dima runs `npm run check` again without changing the contract, tests or project settings. Both implementations pass.
+Dima runs `npm run check` again. Both implementations pass.
 
 **Dima**: "So either one."
 

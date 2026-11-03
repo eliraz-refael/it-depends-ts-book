@@ -141,9 +141,9 @@ Now the check reports TS2578. Noam turns the screen towards Oded.
 
 **Eden**: "The fixture has its own check now. Add another required Draft field, and its declaration fails outside the directive."
 
-**Noam**: "I'll try the paid-only parameter first. The check passes with the directive. Without it, I get TS2741:" `Property 'paidAt' is missing in type 'Draft' but required in type 'Paid'.`
+**Noam**: "I'll try the paid-only parameter first. Without the directive, I get TS2741:" `Property 'paidAt' is missing in type 'Draft' but required in type 'Paid'.`
 
-**Noam**: "It's missing paidAt this time, but it's still a valid Draft being refused. With the comment back, the check passes."
+**Noam**: "It's missing paidAt this time, but it's still a valid Draft being refused. Comment's back; we're green."
 
 **Oded**: "Probe finished? Paid-only doesn't do my feature. Let me add the call we actually want and set the parameter to `Paid | PreOrder`."
 
@@ -234,7 +234,7 @@ TS2578: the directive is unused. Noam removes `: any`; the test passes with the 
 
 **Guy**: "Keep the comparison for now. It tells me the result I promised without making me read a deliberately wrong assignment."
 
-Noam removes `wrong` and its directive, then restores Row. The check passes. Sahar points at the helper's `Object.assign`.
+Noam removes `wrong` and its directive, then restores Row, and the file compiles cleanly. Sahar points at the helper's `Object.assign`.
 
 **Sahar**: "Why are we assembling two objects to get two fields?"
 
@@ -399,7 +399,7 @@ Oded widens the parameter to `Order`, and the moved draft directive reports TS25
 
 **Noam**: "And the row?"
 
-Oded adds `: any` to `orderRow`. Status reports TS2344 in its new file, although `expected` and the admin caller still compile. He removes the annotation and the check passes.
+Oded adds `: any` to `orderRow`. Status reports TS2344 in its new file, although `expected` and the admin caller still compile. Without the annotation, everything compiles again.
 
 With the false assertion back, `node --test type-tests/ship.types.ts` passes: Node erases it. Noam removes it again.
 

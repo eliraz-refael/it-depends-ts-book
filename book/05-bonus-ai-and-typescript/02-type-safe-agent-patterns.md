@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Liron Closure**: "Treat a valid tool call as a proposal until its executor has established permission to act. A description teaches the caller how to ask. It can make a request intelligible without making it permissible. The executor must decide whether to say yes before it changes anything."
+**Liron Closure**: "Treat a valid tool call as a proposal until its executor has established permission to act. A description teaches the caller how to ask. It can make a request intelligible; it can't make it permissible."
 
 ## The Debate
 
@@ -131,8 +131,8 @@ export function defineTool<S extends z.ZodType, R>(definition: {
 }) {
   return {
     name: definition.name, description: definition.description,
-    // Initial Refund, Zod's default (output) mode: required ["orderId","cents","currency"]
-    // Initial Refund, io: input: required ["orderId","cents"]
+    // Initial Refund, default (output) mode: required ["orderId","cents","currency"]
+    // Initial Refund, { io: "input" }: required ["orderId","cents"]
     parameters: z.toJSONSchema(definition.schema, { io: "input" }),
     invoke(raw: unknown): Result<R> {
       const parsed = definition.schema.safeParse(raw);

@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Gilad Stacktrace**: "A release check runs the program we ship, from the place it will ship. Anything else is a rehearsal. When the two disagree, keep the failing setup intact until someone can say why. At 3 AM nobody is running your checkout."
+**Gilad Stacktrace**: "Check a release where it will run: the program we ship, from the place it ships. Anything else is a rehearsal. When the rehearsal and the release disagree, keep the failing setup intact until someone can say why. At 3 AM nobody is running your checkout."
 
 ## The Debate
 
@@ -12,7 +12,7 @@
 
 **Idan**: "The shipping charge. The request says a thousand cents, the cart says five hundred. The quote should say fifteen dollars."
 
-**Dima**: "Node runs the built API. The release job copies it and its packages into an image. The links stay here."
+**Dima**: "Node runs the built API. The release job copies it and its packages into an image. The workspace links stay in the checkout."
 
 Root, money, cart and API all use `"type": "module"`; the checkout's `node_modules/@shop` links point to the packages.
 
@@ -117,7 +117,7 @@ console.log(buildId, amount.plus(shipping()).format());
 
 **Idan**: "The parser constructs a Money. Shipping constructs a Money. Both constructors are the one we just looked at."
 
-**Gil Benchmark**: "Same name, same constructor. Look at the paths."
+**Gil Benchmark**: "The error names two files. Look at the paths."
 
 Cart's generated declaration imports Money from `@shop/money`, leading to `money/dist/index.d.ts`. The parser imports its adjacent source index.
 

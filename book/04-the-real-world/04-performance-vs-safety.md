@@ -38,7 +38,7 @@ console.log(t("shop.crat", { name: "A", count: "2" }));
 console.log(t("shop.cart", { name: "A" }));
 ```
 
-**Gil Benchmark**: "I emitted it with the shared options below. On Node 22.23.4, `node dist/probe.js` prints `shop.crat`, then `Hello A, {count} items`."
+**Gil Benchmark**: "I emitted it with the project's options. On Node 22.23.4, `node dist/probe.js` prints `shop.crat`, then `Hello A, {count} items`."
 
 **Oded**: "Yes. I removed those checks. I'm not arguing that misspelling cart is a feature. I'm asking whether we need to compute the parameters from every message while checking every caller."
 
@@ -74,7 +74,7 @@ function t(...args: Args): string;
 
 **Linoy**: "Then measure the larger catalogue. Don't remove the feature and tell me the feature was implemented badly."
 
-Both probe calls get TS2345. So does `t(pending[0], pending[1])` in the banner we'll look at, which Oded expanded because `t(...pending)` gets TS2556 under his loose signature. The typo message ends by comparing `shop.crat` with `shop.hello`.
+Both probe calls get TS2345. So does `t(pending[0], pending[1])` in the banner below, which Oded expanded because `t(...pending)` gets TS2556 under his loose signature. The typo message ends by comparing `shop.crat` with `shop.hello`.
 
 **Oded**: "It would be nice if the error suggested cart."
 
@@ -128,8 +128,9 @@ export const ready = t("shop.ready");
 
 ```javascript
 // tools/workload.mjs
-// Build bench/case.ts from the catalogue as one-line const messages = … as const;,
-// the required helpers, the signature with declare, the calls, and export {};.
+// bench/case.ts is assembled from this workload: the catalogue as one line
+// (const messages = … as const), the required helpers, the declared signature,
+// the calls, then export {}.
 // bench/tsconfig.json: {"extends":"../tsconfig.json","files":["case.ts"],"include":[]}
 export function workload() {
   const texts = ["Hello {name}, {count} items", "Hello {name}", "Ready"];
@@ -148,9 +149,9 @@ export function workload() {
 }
 ```
 
-**Gil**: "I ran `tsc -p bench/tsconfig.json --checkers 1 --extendedDiagnostics` three times per version, rotating their order. The runs were serial, with no traces or profiles while timing. Here are the medians."
+**Gil**: "I ran `tsc -p bench/tsconfig.json --checkers 1 --extendedDiagnostics` three times per signature, rotating their order. The runs were serial, with no traces or profiles while timing. Here are the medians for four alternatives, each with only its required helpers."
 
-He compares four alternatives, each with only its required helpers. The last uses Linoy's original Args:
+The last uses Linoy's original Args:
 
 ```typescript
 // Counterfactual signatures — alternatives, not overloads
@@ -298,7 +299,7 @@ Oded reruns the small banner: `Hello A, 2 items` when it has items, `Hello A` ot
 
 ## The Verdict
 
-> Try a cheaper formulation that preserves the required calls before giving up checks. If the contract must change, name the lost guarantee and its owner.
+> Try a cheaper formulation that preserves the required calls before giving up checks. Giving one up is a contract change: name the lost guarantee and its owner.
 
 **Oded**: "I'll replace the PR with the distributed tuple. Same body; keys, placeholders and argument counts still checked. No banner rewrite."
 

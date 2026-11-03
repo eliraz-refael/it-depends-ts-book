@@ -131,3 +131,36 @@ The earlier span table describes eb2fc97, not this revision. The moved-regressio
 ### Revision validation
 
 Clean `npm ci` reports **zero vulnerabilities**. The full `npm run check` completes with exit 0 on **TypeScript 7.0.2, Node 22.23.4 and Zod 4.6.6**: coverage is unchanged at **483 fences, 891 compiler cases and 382 runtime groups**; these seven chapters account for **82/344/122**. Bonus 1 also passed its targeted suite with the corrected config order and stricter blockquote guard. All exact counter, byte, diagnostic, file-selection and runtime assertions remain. `git diff --check` passes. Audit evidence: `/private/tmp/pr-e-r2-audit.json`; logs: `/private/tmp/pr-e-r2-install.log`, `/private/tmp/pr-e-r2-full.log`. Neither logs nor scratch files are staged.
+
+
+## Final polish after 596be08
+
+Applied items **1–12** of [PR-E-REVISION-RECHECK.md](PR-E-REVISION-RECHECK.md) as requested; **13 is skipped**. The supplied recheck is committed unchanged (SHA-256 verified before and after editing). This section supersedes the preceding counts and Principle descriptions.
+
+- **1/4:** Bonus 3 uses the report's Principle verbatim: summary as the author's opinion, declarations as the compiler's, no inference explanation. Its ruling starts “Before accepting a repair…”. Read Daniel's Ch20/24/27/Bonus 3 Principles consecutively again: staged-call definitions, migration obligation, controlled measurement, then evidence against a summary. Bonus 3 no longer shares Ch27's conditional opening or announces Oded's inference discovery.
+- **2:** Applied all four proposed Ch26 variations: removed the redundant paid-only passing sentence; restored “Comment's back; we're green”; Row compiles cleanly; the final annotation removal makes everything compile again. Diagnostics and control order are unchanged.
+- **3:** Bonus 2's Principle ends “intelligible; it can't make it permissible.” Permission-before-action remains in its first sentence without restating the Verdict.
+- **5/6/9:** Dima names workspace links before referring to their location. Gilad opens “Check a release where it will run…” and names rehearsal/release as the antecedents. Gil reads the two file paths rather than claiming identical constructors.
+- **7/8/11:** Ch27's workload comment describes assembly from returned data, without suggesting the generator writes the file. Gil measures per signature and introduces the medians for the four alternatives in one sentence. He uses the project's options; the narrator refers to the banner below. The ruling's second sentence now names giving up a check as a contract change.
+- **10:** Bonus 2's comments use `default (output) mode` and `{ io: "input" }`. The extractor regex, expected keys and actual-output comparisons use those same labels. No generated expected value changed.
+- **12:** Bonus 1's second candidate run is two short sentences without repeating the unchanged-contract narration. Its ownership checks still assert unchanged files.
+
+The retained item 13 line, all protected jokes, catchphrase placements and Bonus 3's exact final line are unchanged. All executable fences and their order are identical to 596be08; only Ch27/Bonus 2 comments changed inside fences. Five links remain outside dialogue. No new technical claim or real-model claim was added.
+
+### Final lengths
+
+| Chapter | Base 5da9cbb | 596be08 | Final | Net versus base | Principle |
+|---|---:|---:|---:|---:|---:|
+| 24 | 2,134 | 2,045 | 2,045 | -4.17% | 84 |
+| 25 | 2,248 | 2,001 | 2,010 | -10.59% | 48 |
+| 26 | 2,544 | 2,390 | 2,382 | -6.37% | 59 |
+| 27 | 2,381 | 2,248 | 2,250 | -5.50% | 86 |
+| Bonus 1 | 2,143 | 2,133 | 2,125 | -0.84% | 121 |
+| Bonus 2 | 2,115 | 2,016 | 2,006 | -5.15% | 37 |
+| Bonus 3 | 2,378 | 2,261 | 2,236 | -5.97% | 43 |
+
+Ch25 is 40 words below its planned whole-chapter range; Ch26 is 12 above; Ch27 remains within. The explicitly requested Bonus 2/3 Principle cuts take their chapters just beyond the earlier 5% benchmark budget (−5.15% and −5.97%). Kept the approved wording rather than padding unrelated scenes to recover the budget. No other departure from this polish brief.
+
+### Final-polish validation
+
+Clean `npm ci` reports **zero vulnerabilities**. The full `npm run check` completes with exit 0 on **TypeScript 7.0.2, Node 22.23.4 and Zod 4.6.6**. Coverage remains **483 fences, 891 compiler cases and 382 runtime groups** overall, **82/344/122** for these seven chapters. `git diff --check` passes. Audit: `/private/tmp/pr-e-polish-audit.json`. Logs: `/private/tmp/pr-e-polish-install.log` and `/private/tmp/pr-e-polish-full.log`. Temporary evidence is not staged.
