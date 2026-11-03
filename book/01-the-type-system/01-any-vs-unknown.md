@@ -99,9 +99,9 @@ function formatResponse(data: any) {
 
 "Forty-seven call sites. We updated the response type when the API changed, but this function didn't use it. There was nothing to tell us it was still reading the old field."
 
-**Oded**: "That's a discipline problem, not a language problem. If someone had cleaned up the types—"
+**Oded**: "We can fix it in the next sprint."
 
-**Noam**: "In the next sprint? *They never do.* You said it yourself."
+**Noam**: "In the next sprint? *They never do.*"
 
 **Oded**: "That's not fair—"
 
@@ -273,34 +273,6 @@ mystery.thisMethodDoesNotExist(); // No error!
 
 "For the second array, `T` is `any`. The function preserves exactly that, and now `mystery` accepts a call to a method that doesn't exist."
 
-The next example previews a conditional type. Its result for `any` is the point here; the rules behind that result will get their own debate.
-
-**Daniel**: "You can also compute a type from another type. This definition extracts a promise's value type and otherwise keeps the input type. `infer U` names the value type it finds:"
-
-```typescript
-type Unwrap<T> = T extends Promise<infer U> ? U : T;
-
-type A = Unwrap<Promise<string>>;
-//   ^? type A = string ✓
-
-type B = Unwrap<any>;
-//   ^? type B = any
-// Not string. Not never. Just... any.
-// The conditional produces both branches; the any branch absorbs the other result.
-```
-
-"Here one branch contributes `any`, so the resulting union is `any`. The compiler is following its rules. Those rules can preserve the uncertainty all the way to the caller."
-
-**Noam** turns to Oded: "Your generic function can look properly typed while its callers still get `any`. That's why I check what went into it."
-
-**Oded**: "But how often are we writing one of those?"
-
-**Linoy**: "Look at `firstElement`. One array of `any` is enough. You don't have to author a conditional type to pass `any` through a generic. You only have to call one."
-
-**Oded** looks back at the array declaration.
-
-"All right. I'd been looking for angle brackets in our own code."
-
 ---
 
 ### "any vs type assertions — which is worse?"
@@ -340,7 +312,7 @@ const host = config.server.host; // string (maybe wrong, but contained)
 startServer(port, host);         // port and host ARE checked against function signature
 ```
 
-"The asserted `port` is checked as a number at later calls. If it is really a string at runtime, that static check still passes. The assertion contains the declared type; it does not establish the truth of it."
+"The next function sees a number. If the server sent a string, we've given it a string with excellent paperwork."
 
 **Noam**: "So the answer is: `any` is worse?"
 
@@ -470,36 +442,6 @@ on("user:login", (payload) => {
 
 "Define the relationship between event names and payload types once. The generic infers the rest."
 
-**Guy**: "Or pass the event name with the payload. The handler checks `type` before reading a field specific to that event:"
-
-```typescript
-// Interfaces: define a contract for what the callback receives
-interface LoginEvent {
-  type: "user:login";
-  userId: string;
-  timestamp: number;
-}
-
-interface LogoutEvent {
-  type: "user:logout";
-  userId: string;
-}
-
-type AppEvent = LoginEvent | LogoutEvent;
-
-function onEvent(handler: (event: AppEvent) => void) {
-  // handler receives a discriminated union — fully typed
-}
-
-onEvent((event) => {
-  if (event.type === "user:login") {
-    console.log(event.timestamp); // number ✓ — narrowed
-  }
-});
-```
-
-"Each event carries its own tag. This handler only reads `timestamp` after checking that tag. A handler that needs every event can check all the alternatives."
-
 **Noam**: "There are three events. We can list the calls we accept:"
 
 ```typescript
@@ -514,7 +456,7 @@ function on(event: string, handler: (...args: any[]) => void): void {
 
 "Every call site is type-safe. The overload signatures constrain what callers see — the implementation signature is hidden."
 
-**Dima**: "Guy's handler receives the whole event and decides which kind it handles. The other two select the payload through the name passed to `on`. All three give these callers a typed payload."
+**Dima**: "Both give this login callback its fields. I'd keep the event map; adding an event means adding one entry."
 
 **Chen**: "Dafna's assertion uses `EventMap[keyof EventMap]`, which allows any of the payload types in the map. Noam's implementation takes `any`. What keeps either one tied to the right event?"
 
@@ -562,7 +504,7 @@ function on(event: string, handler: (...args: any[]) => void): void {
 
 **Noam**: "The public overloads restrict the handlers."
 
-"Yes. What lets you remove the `any` underneath them?"
+**Daniel**: "Yes. What lets you remove the `any` underneath them?"
 
 Noam reads the signatures again.
 
@@ -614,9 +556,11 @@ function processOrder(user: any, order: any) {
 }
 ```
 
-The next version checks the purchase fields in `isPurchaseData`. Its return annotation, `data is PurchaseData`, tells the compiler to treat the original value as `PurchaseData` when the function returns `true`. The checks in its body supply the evidence for that claim. Look at the call inside `handleWebhook`: that is where `event.data` becomes usable by `processOrder`.
-
 **Dima**: "Keep the logger's user argument. Reject payloads missing that field. A purchase has to pass the user and order checks before we call the payment SDK."
+
+**Oded**: "What tells `processOrder` that the purchase check passed?"
+
+**Dima**: "The `data is PurchaseData` return annotation. A `true` result narrows the value at the call. We still have to make those field checks earn the annotation."
 
 ```typescript
 // After: properly typed with unknown, type guards, and one documented any
@@ -700,3 +644,29 @@ The application logic no longer uses `any`. The payment boundary still does, wit
 **Noam Kiperman**: "Put the rest on the migration list. I want to know which ones we're leaving."
 
 **Gil Benchmark**: "And don't call that list a count of all your `any`s. Dependencies and inferred types still need a different check."
+
+**Daniel Compiler**: "You can also compute a type from another type. This definition extracts a promise's value type and otherwise keeps the input type. `infer U` names the value type it finds:"
+
+```typescript
+type Unwrap<T> = T extends Promise<infer U> ? U : T;
+
+type A = Unwrap<Promise<string>>;
+//   ^? type A = string ✓
+
+type B = Unwrap<any>;
+//   ^? type B = any
+// Not string. Not never. Just... any.
+// The conditional produces both branches; the any branch absorbs the other result.
+```
+
+"Here one branch contributes `any`, so the resulting union is `any`. The compiler is following its rules. Those rules can preserve the uncertainty all the way to the caller."
+
+**Noam** turns to Oded: "Your generic function can look properly typed while its callers still get `any`. That's why I check what went into it."
+
+**Oded**: "But how often are we writing one of those?"
+
+**Linoy**: "Remember `firstElement`. One array of `any` is enough. You don't have to author a conditional type to pass `any` through a generic. You only have to call one."
+
+**Oded** looks back at the array declaration.
+
+"All right. I'd been looking for angle brackets in our own code."

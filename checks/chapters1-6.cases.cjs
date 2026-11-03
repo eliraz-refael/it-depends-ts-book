@@ -26,6 +26,20 @@ function checkWebhook({handleWebhook, effects}, validates) {
     }
   } finally { delete globalThis.chargeUser; }
 }
+const fs = require("node:fs");
+const path = require("node:path");
+const genericsChapter = fs.readFileSync(path.join(process.env.BOOK_ROOT || path.resolve(__dirname, ".."),
+  "book/01-the-type-system/06-generics-basics.md"), "utf8");
+const badConfigInput = genericsChapter.match(/const config = parseConfig<\{ retries: number \}>\('([^']+)'\);/)[1];
+function checkUncheckedConfig({parseConfig}) {
+  const config = parseConfig(badConfigInput);
+  assert.deepEqual(config, {retires: 3});
+  assert.throws(() => config.retries.toFixed(1), {
+    name: "TypeError", message: "Cannot read properties of undefined (reading 'toFixed')",
+  });
+  const valid = parseConfig('{"retries":3}');
+  assert.equal(valid.retries.toFixed(1), "3.0", "A valid input still works after the bad call");
+}
 const api = `declare const api: { get<T = any>(url: string): Promise<T> };`;
 const expressApp = `import express from "express";
 const app = express();
@@ -64,37 +78,36 @@ type Returned = Expect<Equal<ReturnType<typeof firstElement<number>>, number | u
           assert.equal(firstElement([]), undefined);
           assert.equal(firstElement([42]), 42);
         }},
-      {name: "unwrap-any", fence: 14, after: `
+      {name: "unwrap-any", fence: 23, after: `
 type AIsString = Expect<Equal<A, string>>;
 type BIsAny = Expect<IsAny<B>>;`},
-      {name: "any-versus-assertion", fence: 15, before: `
+      {name: "any-versus-assertion", fence: 14, before: `
 declare function fetchData(): unknown;
 interface User { id: string; process(): void }`},
-      {name: "any-spreads", fence: 16, lines: [1, 8], before: `
+      {name: "any-spreads", fence: 15, lines: [1, 8], before: `
 declare const rawConfig: string;
 declare function startServer(port: number, host: string): void;`, after: `
 type PortIsAny = Expect<IsAny<typeof port>>;`},
-      {name: "assertion-contained", fence: 16, lines: [10, 14], before: `
+      {name: "assertion-contained", fence: 15, lines: [10, 14], before: `
 declare const rawConfig: string;
 interface ServerConfig { server: { port: number; host: string } }
 declare function startServer(port: number, host: string): void;`, after: `
 type PortIsNumber = Expect<Equal<typeof port, number>>;`},
-      {name: "express-body-any", fence: 17, before: `declare function createUser(email: string, name: string): void;`, after: `
+      {name: "express-body-any", fence: 16, before: `declare function createUser(email: string, name: string): void;`, after: `
 type BodyIsAny = Expect<IsAny<express.Request["body"]>>;`},
-      {name: "parse-at-boundary", fence: 18, before: expressApp + `
+      {name: "parse-at-boundary", fence: 17, before: expressApp + `
 class ValidationError extends Error {}`, after: `
 type Parsed = Expect<Equal<ReturnType<typeof parseCreateUserRequest>, CreateUserRequest>>;`},
-      {name: "any-event-handlers", fence: 19},
+      {name: "any-event-handlers", fence: 18},
       // Continues the registry declared in the previous fence.
-      {name: "generic-event-handlers", fence: 20, before: `
+      {name: "generic-event-handlers", fence: 19, before: `
 type EventHandler = (payload: any) => void;
 const handlers: Map<string, EventHandler[]> = new Map();`},
-      {name: "interface-event-contract", fence: 21},
-      {name: "overload-event-handlers", fence: 22},
-      {name: "webhook-before", fence: 23, before: webhookEffects + `
+      {name: "overload-event-handlers", fence: 20},
+      {name: "webhook-before", fence: 21, before: webhookEffects + `
 declare function chargeUser(method: any, amount: number): Promise<void>;`,
         after: `export {handleWebhook, effects};`, runtime: async m => checkWebhook(m, false)},
-      {name: "webhook-after", fence: 24, before: webhookEffects,
+      {name: "webhook-after", fence: 22, before: webhookEffects,
         after: `export {handleWebhook, effects};`, runtime: async m => checkWebhook(m, true)},
     ],
   },
@@ -144,35 +157,39 @@ type Merged = Expect<Equal<Config, { port: number; host: string }>>;
 type Settings = { host: string };`,
         expect: [[3, 11, 2300], ["after", 3, 2300, "Duplicate identifier 'Settings'", 3]]},
       {name: "interface-hierarchy", fence: 4},
-      {name: "interface-extends-conflict", fence: [4, 5], expect: [[5, 1, 2430,
+      {name: "interface-extends-conflict", fence: [4, 17], expect: [[17, 1, 2430,
         "Interface 'Employee' incorrectly extends interface 'Base'. Types of property 'id' are incompatible. Type 'number' is not assignable to type 'string'."]]},
-      {name: "intersection-conflict", fence: [6, 7], after: `type Impossible = Expect<Equal<Employee["id"], never>>;`,
-        expect: [[7, 2, 2322, "Type 'string' is not assignable to type 'never'"]]},
-      {name: "intersection-composition", fence: [8, 9]},
-      {name: "express-global-augmentation", fence: 10, separate: true, after: `
+      {name: "intersection-conflict", fence: [15, 16], after: `type Impossible = Expect<Equal<Employee["id"], never>>;`,
+        expect: [[16, 2, 2322, "Type 'string' is not assignable to type 'never'"]]},
+      {name: "interface-conflict-restored", fence: [4, 17],
+        edit: [["id: number;", "id: string;"]]},
+      {name: "intersection-conflict-restored", fence: [15, 16],
+        edit: [["id: number;", "id: string;"]], after: `type Usable = Expect<Equal<Employee["id"], string>>;`},
+      {name: "intersection-composition", fence: [18, 19]},
+      {name: "express-global-augmentation", fence: 5, separate: true, after: `
 app.get("/profile", (req) => {
   type Augmented = Expect<Equal<typeof req.user, AuthenticatedUser | undefined>>;
 });`},
       // The prose claims augmenting only the Request exported by "express" misses handler parameters.
-      {name: "express-exported-request-only", fence: 10, separate: true, after: `
+      {name: "express-exported-request-only", fence: 5, separate: true, after: `
 import type * as core from "express-serve-static-core";
 declare module "express" {
   interface Request<P = core.ParamsDictionary, ResBody = any, ReqBody = any, ReqQuery = core.Query,
     Locals extends Record<string, any> = Record<string, any>> { exportedOnly?: string }
 }
 app.get("/profile", (req) => req.exportedOnly);`, expect: [["after", 7, 2339]]},
-      {name: "global-interface-merge", fence: 11, separate: true, after: `
+      {name: "global-interface-merge", fence: 6, separate: true, after: `
 type Merged = Expect<Equal<User, { id: string; name: string; email: string; role: "admin" | "user" }>>;`},
-      {name: "type-only-constructs", fence: 12, after: `
+      {name: "type-only-constructs", fence: 7, after: `
 type Names = Expect<Equal<EventName, "onClick" | "onHover" | "onFocus">>;
 type Unwrapped = Expect<Equal<UnwrapPromise<Promise<number>>, number>>;`},
-      {name: "discriminated-state", fence: 13, before: `interface User { name: string }`},
-      {name: "state-classes", fence: 14},
-      {name: "state-class-use", fence: [14, 15]},
-      {name: "interface-extends-props", fence: 16, before: `interface BaseProps { id: string }`},
-      {name: "intersection-props", fence: 17, before: `interface BaseProps { id: string }`},
-      {name: "interface-default", fence: 18},
-      {name: "type-default", fence: 19},
+      {name: "discriminated-state", fence: [4, 8]},
+      {name: "state-classes", fence: 9},
+      {name: "state-class-use", fence: [9, 10]},
+      {name: "interface-extends-props", fence: 11, before: `interface BaseProps { id: string }`},
+      {name: "intersection-props", fence: 12, before: `interface BaseProps { id: string }`},
+      {name: "interface-default", fence: 13},
+      {name: "type-default", fence: 14},
       {name: "convention-summary", fence: 20},
     ],
   },
@@ -298,9 +315,15 @@ userStore.set({ id: "u1" });
 userStore.set(null);`},
       {name: "asserted-generic-return", fence: 11},
       {name: "any-to-generic-return", fence: 12},
-      {name: "honest-parse", fence: 13, after: `export { result };`, runtime: async ({result}) => {
+      {name: "asserted-generic-runtime", fence: 11, lines: [1, 3],
+        after: `export {parseConfig};`, runtime: checkUncheckedConfig},
+      {name: "uncast-generic-runtime", fence: 12,
+        after: `export {parseConfig};`, runtime: checkUncheckedConfig},
+      {name: "honest-parse", fence: 13, after: `export {result, parseRetryConfig, parseJson};`, runtime: async ({result, parseRetryConfig, parseJson}) => {
         const expected = {ok: false, reason: "retries missing or not a number", input: {retires: 3}};
         if (JSON.stringify(result) !== JSON.stringify(expected)) throw new Error(JSON.stringify(result));
+        assert.deepEqual(parseRetryConfig(parseJson(badConfigInput)), expected);
+        assert.deepEqual(parseRetryConfig(parseJson('{"retries":3}')), {ok: true, value: {retries: 3}});
       }},
       {name: "pluck", fence: [{fence: 7, lines: [1, 6]}, 14], after: `
 type Departments = Expect<Equal<typeof departments, string[]>>;`},

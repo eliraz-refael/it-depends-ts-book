@@ -2,9 +2,7 @@
 
 ## The Principle
 
-The team wants a convention for choosing between `interface` and `type`. Guy and Dafna have brought different defaults. Eli puts the same user on the board twice.
-
-**Prof. Eli Typeworth**: "Both of these describe the same user. What would make you choose one?"
+**Prof. Eli Typeworth**: "Choose the declaration that supports what other code needs to do with it. If both do the job, choose a convention your team can read. The shape alone won't decide. These two describe the same user:"
 
 ```typescript
 interface UserA {
@@ -29,8 +27,6 @@ const user2: UserB = { id: "1", name: "Eli", email: "eli@types.edu" };
 const user3: UserA = user2; // No error.
 const user4: UserB = user1; // No error.
 ```
-
-**Eli**: "Choose by what the declaration needs to do beyond describing the shape. Does other code need to reopen it? Where should a conflict between its parts be reported? Does it need to name something other than an object? If none of those differences matters, choose a convention for your readers."
 
 **Daniel Compiler**: "Start with a second declaration of the same name."
 
@@ -58,9 +54,9 @@ type Settings = {
 
 ## The Debate
 
-### "`extends` is not the same as `&`"
+### "An object contract"
 
-**Guy Singleton**: "I want conflicts reported where I put the types together. `interface extends` checks them at the declaration. Start with this:"
+**Guy Singleton**: "For a named object, I start with an interface. Here the user has everything in `Base`, plus a name and email:"
 
 ```typescript
 interface Base {
@@ -75,80 +71,17 @@ interface User extends Base {
 // Clean, readable hierarchy. Every property is accounted for.
 ```
 
-"Now watch what happens when I introduce a conflict:"
+**Dafna Functor**: "I can describe that with an alias too. Show me what needs the interface."
 
-```typescript
-interface Employee extends Base {
-  id: number;
-//^^ Error: Interface 'Employee' incorrectly extends interface 'Base'.
-//   Types of property 'id' are incompatible.
-//   Type 'number' is not assignable to type 'string'.
-}
-```
-
-**Guy**: "It points at the declaration and tells me which properties disagree. Now try the intersection:"
-
-```typescript
-type Base = {
-  id: string;
-  createdAt: Date;
-};
-
-type Employee = Base & {
-  name: string;
-  id: number; // No error here!
-};
-```
-
-"No error at the declaration. TypeScript computes `id: string & number`: a value would have to be both a string and a number. There is no such value, so that becomes `never`. The error only surfaces when you try to actually use it:"
-
-```typescript
-const emp: Employee = {
-  id: "1",
-//^^ Error: Type 'string' is not assignable to type 'never'
-  name: "Guy",
-  createdAt: new Date(),
-};
-// Where did 'never' come from? Hope you understand intersection theory.
-```
-
-**Noam Kiperman**: "The `extends` error message is a diagnosis. The intersection error message is a riddle. The first one names the conflict. The second points at an object literal, and somebody has to go looking for that `number`."
-
-**Dafna Functor** writes three smaller shapes.
-
-```typescript
-type Identifiable = { id: string };
-type Timestamped = { createdAt: Date; updatedAt: Date };
-type Named = { name: string; email: string };
-
-type User = Identifiable & Timestamped & Named;
-```
-
-"I want to assemble these independently. Something can have timestamps without being one of our entities."
-
-**Guy** writes underneath:
-
-```typescript
-interface UserContract extends Identifiable, Timestamped, Named {}
-```
-
-"So can mine. Extending interfaces doesn't require a chain four levels deep."
-
-Dafna checks the resulting properties.
-
-**Guy**: "And if two parts disagree about `id`, this declaration fails. The intersection can give you `id: never` and wait until somebody tries to use it."
-
-**Dafna**: "Yes. The independent parts weren't a reason to choose `&`. I still use intersections when I'm combining types in a generic expression. I don't want a new interface declaration for every intermediate result."
-
-**Guy**: "For this named object, I want the conflict reported here."
-
-**Noam**: "I would too. We know where the conflicting parts were combined."
+**Guy**: "Can you use it to add to someone else's declaration?"
 
 ---
 
 ### "Declaration merging — feature or footgun?"
 
-**Linoy Nightly**: "I do want to add fields to Express's request. It exposes an interface for that. We can describe what our middleware adds without forking the framework:"
+**Linoy Nightly**: "Our middleware needs somewhere to declare the user and request ID it adds. Express gives us an interface we can reopen."
+
+She adds the fields to the global extension point in the [Express core declarations](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/express-serve-static-core/index.d.ts):
 
 ```typescript
 import express from "express";
@@ -177,15 +110,13 @@ app.use((req, res, next) => {
 });
 ```
 
-"Express's core request type extends this global interface, so inferred handler parameters get the fields too. Augmenting only the `Request` exported by `"express"` doesn't reach those parameters."
-
-This extension point is declared in the [Express core type definitions](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/express-serve-static-core/index.d.ts).
+**Linoy**: "Express's core request type extends this global interface, so inferred handler parameters get the fields too. Augmenting only the `Request` exported by `"express"` doesn't reach those parameters."
 
 **Guy**: "The fields are optional because a request can reach a handler before this middleware runs. Declaring them doesn't install the middleware."
 
 **Linoy**: "Yes. But the shared type can describe them. You couldn't reopen a type alias this way."
 
-**Chen Override**: "What if two application models end up in that same scope?"
+**Chen Override**: "But have you considered... two application models ending up in that same scope?"
 
 ```typescript
 // file: models/user.ts
@@ -344,9 +275,9 @@ state.render(); // "Hello, Ada"
 
 **Gil Benchmark**: "There's guidance on composing object types. I haven't measured these alternatives in our project."
 
-"The TypeScript team's performance wiki recommends `interface extends` over intersections when composing object types. It describes caching relationships between interfaces, and checking each constituent when comparing against an intersection."
+The [TypeScript performance guidance](https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections) favors `interface extends` for object composition, describing cached interface relationships and comparisons against each intersection constituent.
 
-**Linoy**: "Here's the [guidance](https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections). It predates the TypeScript 7 native compiler. I'd try it if a trace pointed here."
+**Linoy**: "That guidance predates the TypeScript 7 native compiler. I'd try it if a trace pointed here."
 
 ```typescript
 // The TS team recommends this for extending object types:
@@ -398,35 +329,93 @@ type User = { id: string; name: string; };
 
 ---
 
+### "A convention for the reader"
+
+**Liron Closure**: "A blueprint tells a builder what to construct. A description tells an observer what is already there. I often use an `interface` for the blueprint and a `type` for the description."
+
+**Daniel**: "Either keyword can describe methods or data. The compiler doesn't enforce that distinction."
+
+**Liron**: "A convention, then. Guy's service contracts stay interfaces. Dafna's states, events and API responses get aliases."
+
 ## The Turn
 
-**Liron Closure** looks at the object definitions still on the board.
+**Guy**: "An employee record is data. Let's apply that rule. Our base record has a string ID; the employee part brings a number."
 
-**Liron**: "What would you want the choice to tell the next reader?"
+He writes the alias version:
 
-"A blueprint tells a builder what to construct. It defines capabilities — load-bearing walls, doors that open, windows that let in light. A builder follows a blueprint and produces a thing that *can do* what the blueprint specifies."
+```typescript
+type Base = {
+  id: string;
+  createdAt: Date;
+};
 
-"A description tells an observer what they're looking at. It captures shape — this wall is here, this door is there, this window faces east. An observer reads a description and understands a thing that *already is*."
+type Employee = Base & {
+  name: string;
+  id: number; // No error here!
+};
+```
 
-"I often use an `interface` as that blueprint and a `type` as that description."
+**Liron**: "Those IDs disagree."
 
-**Daniel**: "Either keyword can describe an object with methods, or one with only data. That distinction is a convention. It is not enforced by the compiler."
+**Guy**: "And the declaration passes. Now someone tries to make an employee:"
 
-**Liron**: "Yes. A convention for the reader. It still needs exceptions for the things we have just seen."
+```typescript
+const emp: Employee = {
+  id: "1",
+//^^ Error: Type 'string' is not assignable to type 'never'
+  name: "Guy",
+  createdAt: new Date(),
+};
+// Where did 'never' come from? Hope you understand intersection theory.
+```
 
-"Most of the code you write is not building things. It's passing data around — receiving it, transforming it, handing it off."
+**Oded**: "I have a number. I have a string. Apparently we're hiring neither."
 
-He turns to Guy.
+**Daniel**: "The intersection requires both at once: `string & number`. No value can satisfy that, so `id` is `never`."
 
-"Guy, I'd keep your service and repository contracts as interfaces. Dafna, I'd use aliases for the state, events and API responses."
+**Guy**: "Now replace those declarations with the interface version. Same string ID in `Base`:"
 
-**Guy**: "And the `UserContract` I composed? That's data too. I still want `extends` to catch the conflict."
+```typescript
+interface Employee extends Base {
+  id: number;
+//^^ Error: Interface 'Employee' incorrectly extends interface 'Base'.
+//   Types of property 'id' are incompatible.
+//   Type 'number' is not assignable to type 'string'.
+  name: string;
+}
+```
 
-**Liron**: "I'd keep that exception. The convention isn't worth giving up that error."
+**Noam**: "The `extends` error message is a diagnosis. The intersection error message is a riddle. The first one names the conflict. The second points at an object literal, and somebody has to go looking for that `number`."
+
+**Dafna**: "I still want to assemble the parts independently. Timestamps don't make everything one of your entities."
+
+```typescript
+type Identifiable = { id: string };
+type Timestamped = { createdAt: Date; updatedAt: Date };
+type Named = { name: string; email: string };
+
+type User = Identifiable & Timestamped & Named;
+```
+
+**Guy**: "They don't have to."
+
+```typescript
+interface UserContract extends Identifiable, Timestamped, Named {}
+```
+
+**Guy**: "Same parts. If two disagree about `id`, this declaration fails."
+
+**Dafna**: "Fine. The family tree was optional. For a named object, that error is useful. I still need intersections inside generic type expressions; I'm not declaring an interface for every intermediate result."
+
+**Liron**: "Then data alone isn't a reason to choose the alias. Keep the composed interface when you want the conflict reported there. The convention isn't worth losing that error."
+
+**Oded**: "Two kingdoms. Shared building inspector. Can we write this down now?"
 
 ## The Verdict
 
-> Our default is `type` for data and `interface` for behavioral contracts or deliberate extension points. That is a convention. Use `interface extends` for composed objects when declaration-time conflict checking is useful; use `type` for unions and other type expressions.
+> Use `type` for unions and other type expressions; use an interface for deliberate extension points or declaration-time checks on composed objects. When either works, choose a convention for the reader.
+
+The team chooses `type` for plain data and `interface` for behavioral contracts, with composed data allowed to use `extends` for its diagnostics.
 
 **A starting convention:**
 

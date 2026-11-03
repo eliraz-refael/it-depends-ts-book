@@ -2,7 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth** writes `ParseResult<T>` on the board.
+**Prof. Eli Typeworth**: "Use a type parameter when a caller needs a relationship between types in the signature. Ask what supplies the type argument and what depends on it. If nothing else depends on it, try removing it. If only the caller chooses a return type and nothing establishes it, review that choice as an assertion."
+
+He writes `ParseResult<T>` on the board.
 
 "In `let x = 42`, `x` stands for a value. In `ParseResult<T>`, `T` stands for a type. We call `T` the type parameter and the `User` in `ParseResult<User>` its type argument. The same idea works in a function:"
 
@@ -16,10 +18,6 @@ const user = identity({ id: "u1" }); // T becomes { id: string }
 ```
 
 "Read `identity` aloud: whatever type goes in is the type that comes out. The same `T` names the parameter type and the return type. The compiler infers it from the argument at each call."
-
-"Use a type parameter when a caller needs a relationship between types in the signature. Ask what supplies the type argument and what depends on it. If nothing else depends on it, try removing it. If only the caller's chosen type supplies a return-only `T`, with no check to establish it, treat that as an assertion. The type argument is a claim, not evidence."
-
-"Whether to write the generic before a second caller needs it is a separate decision. This rule tells us what the signature promises, not when to generalize."
 
 ## The Debate
 
@@ -60,9 +58,21 @@ const name = firstItem(names); // string | null
 
 **Noam**: "We don't need to wait for a second caller to write these three lines generically."
 
-**Dima**: "So you agree about what the generic does. You disagree about when to introduce it."
+**Dima**: "Both have a point here. Noam keeps the element type; Oded has one caller to ship. You agree about what the generic does. You disagree about when to introduce it."
 
 **Oded**: "Which is the part that comes up in my PRs."
+
+**Liron Closure**: "A lens holds no picture. Point it at a different scene tomorrow; the glass stays the same. A generic can preserve the relationship when you change the subject."
+
+**Chen Override**: "And `identity`? It returns exactly what it got. What did the lens do?"
+
+**Liron**: "Preserved the type. Not every useful function transforms something."
+
+**Oded**: "My billing function is still an invoice in and a payment plan out."
+
+**Liron**: "Then take a photograph. You know the subject."
+
+**Oded**: "Thank you. Payroll would like its photograph by Friday."
 
 ---
 
@@ -233,6 +243,8 @@ const userStore = createStore<{ id: string } | null>(null);
 
 ---
 
+## The Turn
+
 ### "Generics that lie"
 
 **Daniel**: "Here is the return-only case I would reject."
@@ -302,31 +314,13 @@ const result = parseRetryConfig(parseJson('{"retires": 3}'));
 
 **Daniel**: "The single-use check was about function signatures. `Array<T>`, `Promise<T>`, `ParseResult<T>` need their element or payload types."
 
-## The Turn
-
-**Liron Closure** takes the marker.
-
-"A lens holds no picture. You grind the glass and point it at a scene. Tomorrow you can point it somewhere else; the shape of the glass stays the same."
-
-"Or you can take a photograph. A photograph is often what you want. Oded's billing function knows its subject: `Invoice` in, `PaymentPlan` out. It does not have to admit a scene it will never see."
-
-"The generic is useful when the relationship survives a change of subject. An array of names gives you a name; an array of invoices gives you an invoice. You describe that once."
-
-**Chen Override**: "And `identity`? It returns exactly what it got. What did the lens do?"
-
-Liron looks back at Eli's first example.
-
-"It preserved the type. You are right to ask — the image only gets us so far. The work here need not be a transformation. It can be carrying information that an `unknown` return would lose."
-
-**Oded**: "And if the second subject never arrives?"
-
-**Liron**: "Then you and Noam still have a review to finish. The signature alone does not tell us whether you needed the generic."
-
 ## The Verdict
 
 > In a function signature, use a generic to express a relationship between types. Look for where the type argument comes from and what depends on it. A return-only parameter supplied solely by the caller, without evidence from the body, is an unchecked claim. A parameter that affects nothing else may be unnecessary; check existing calls before removing it.
 
-Noam would keep `sortByName` because its body already states the small shared requirement. Oded would keep `sortEmployees` until another caller needs the same ordering. The relationship test does not decide that timing question.
+**Noam**: "I'm keeping `sortByName`. The body only needs a name, and its caller keeps the rest of the type."
+
+**Oded**: "I'll generalize `sortEmployees` when another caller needs that ordering. Payroll still hasn't asked for a lens."
 
 **The Accepted Standard:**
 

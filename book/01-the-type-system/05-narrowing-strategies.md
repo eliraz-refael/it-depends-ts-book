@@ -2,7 +2,13 @@
 
 ## The Principle
 
-**Daniel Compiler** opens his laptop.
+**Daniel Compiler**: "For external input, prefer a function that builds a typed value from the fields it has checked. Then the compiler checks that construction too. A return annotation claiming the input is valid doesn't give us the same protection when a field changes. Look at what the body must do to produce its answer. How it reports a rejected input is a separate choice."
+
+## The Debate
+
+### "What did the check establish?"
+
+Daniel opens his laptop.
 
 ```typescript
 function handle(x: string | number) {
@@ -37,11 +43,9 @@ function process(input: string | null | undefined) {
 
 **Daniel**: "A return annotation like `value is User` is a type predicate: `true` tells the caller to treat `value` as a `User`. TypeScript checks that the body returns a boolean, but it doesn't prove that promise. The assertion-function form, `asserts value is User`, promises the type after a normal return."
 
-"For external input, prefer building a typed value from the fields you've checked. The compiler needs those checks before it will let you read the fields and use them in the new object. How a failed check reaches the caller is a separate choice."
-
 **Noam Kiperman**: "I want tests for that guard. Especially the inputs it should reject."
 
-## The Debate
+---
 
 ### "The `typeof` family — what lies and what doesn't"
 
@@ -62,19 +66,17 @@ function describe(value: unknown): string {
 
 "For ordinary primitives, dates and arrays, start here. Hover the variable inside each branch to see what the check established."
 
-**Chen Override**: "What do those checks leave unproven?"
-
 **Linoy**: "Start with `typeof null === 'object'`. An object check still needs to exclude `null`."
 
 **Chen**: "Would your date check accept a `Date` from another iframe?"
 
 **Linoy**: "No. `instanceof` follows the prototype chain, and that iframe has a different `Date` constructor. A Node `vm` context can give you the same problem. `Array.isArray` works across those boundaries. It checks whether the value is an array, regardless of which constructor made it."
 
-"And `typeof x === 'function'` includes class constructors, async functions and generators as well as ordinary functions. I wouldn't call all of those the same way."
+"And `typeof x === 'function'` includes class constructors. Try calling one without `new`. That check is not an invitation."
 
-**Chen**: "And `in`?"
+**Chen**: "Our response guard only checks for `error`. Would you let its caller read a string?"
 
-**Linoy**: "It walks the prototype chain too. `"toString" in {}` is `true`, although the empty object has no own `toString` property."
+**Linoy**: "No. `in` walks the prototype chain too. `"toString" in {}` is `true`, although the empty object has no own `toString` property."
 
 ```typescript
 const empty = {};
@@ -92,9 +94,7 @@ function isResponse(x: object): x is { error: string } {
 
 "A class method called `error` passes that check. So does an `error` property containing a number. The check only tells you the property exists, possibly on a prototype. It has not established `string`."
 
-**Chen**: "And `"x" in null` throws. So does using any primitive on the right of `in`. Check that you have an object first."
-
-**Linoy**: "And `if (x)` also rejects `0`, the empty string, `false`, `0n`, and `NaN`. If you only meant to reject nullish values, that check is too broad."
+"And the right operand must be an object. `in` throws on `null` or any primitive. Don't replace the object check with `if (x)` either; truthiness rejects `0`, the empty string, `false`, `0n`, and `NaN` too."
 
 **Daniel**: "`typeof NaN` is `number`. Narrowing to `number` does not promise a finite number. That takes another check."
 
@@ -150,7 +150,9 @@ if (isUser(x)) {
 }
 ```
 
-**Daniel**: "Since [TypeScript 5.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html), it can infer a predicate from some function bodies without return annotations. An explicit predicate annotation takes the place of that inference."
+Since [TypeScript 5.5](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html), the compiler can infer predicates from some function bodies without return annotations.
+
+**Daniel**: "With an explicit predicate annotation, it takes your word instead. You've supplied the answer it would otherwise try to infer."
 
 **Noam**: "That always-true body fails the first rejection test. I'm not dropping the tests because I gave the function a return annotation."
 
@@ -226,7 +228,7 @@ function greetOrFail(input: unknown) {
 
 **Guy**: "They're already on the object."
 
-**Idan**: "Yes. Watch what the compiler checks when I construct the return value."
+**Idan**: "Prove it by producing it. Watch what the compiler checks when I construct the return value."
 
 ```typescript
 type ParseResult<T> =
@@ -326,7 +328,9 @@ function describeRequest<T>(state: RequestState<T>): string {
 
 **Daniel**: "That holds with strict null checking. Without that return annotation, the inferred result can become `string | undefined`. An explicit `assertNever` check is another way to enforce exhaustiveness."
 
-**Idan**: "Our request module publishes state changes through an in-process event bus. The receiver gets `unknown`, so check the tag and payload together. Here an error event carries an actual `Error` object."
+**Dafna**: "Where does the receiver get this union?"
+
+**Idan**: "Our request module publishes state changes through an in-process event bus. The receiver gets `unknown`, so we have to check the tag and payload together. Error events carry actual `Error` objects here."
 
 ```typescript
 // At the boundary — produce the discriminated shape:
@@ -431,9 +435,9 @@ try {
 
 ## The Debate Continues
 
-The room has agreed to parse external input and keep the runtime checks in one place. It has not agreed on how every parser should report failure.
+Parse external input where it enters, and keep one set of checks. Choose how failure travels from what the callers need to do with it.
 
-Idan and Dafna prefer a result for expected rejection. The return type exposes the failure case, and a batch can retain failures alongside successes. Guy prefers throwing when an established handler owns rejection for the whole operation. Both versions above produce a checked `User`; both carry the same failure details.
+Idan and Dafna want a result that exposes rejection to each caller. Guy wants the established handler to reject his whole request. Neither choice requires giving up the checked `User` or the failure details.
 
 | Situation | Starting point | Condition |
 |-----------|----------------|-----------|
@@ -456,4 +460,4 @@ Idan and Dafna prefer a result for expected rejection. The return type exposes t
 
 **Noam Kiperman**: "Keep the predicate tests when the type changes. If `isUser` has its own field checks and a predicate annotation, adding a required field to `User` won't force those checks to change."
 
-**Eden Legacy**: "I would migrate the checks first. Get one parser behind the existing callers, including the ones that expect exceptions. Then change how failure travels where the callers need it. Those are separate changes; I'd like to review them separately."
+**Eden Legacy**: "I would migrate the checks first. Get one parser behind the existing callers, including the ones that expect exceptions. Then change how failure travels where the callers need it. Don't make the old callers learn both changes on the same morning."

@@ -162,13 +162,13 @@ He's the one who always asks: "What's the migration path?" If a pattern doesn't 
 
 *Cutting-Edge Advocate*
 
-Linoy's `tsconfig.json` looks like a dare. Every experimental flag enabled. Every beta feature activated. Her codebase uses `satisfies`, `const` type parameters, and template literal types in ways that make Daniel raise an eyebrow — and Daniel doesn't raise eyebrows easily.
+Linoy reads TypeScript release notes the day they're published. By lunch, she's usually found a place to try the feature. By three, Oded has asked whether that place had a problem before lunch.
 
-Linoy reads every TypeScript release note the day it's published, follows every RFC, and has opinions about proposals that haven't been accepted yet. When someone asks "can TypeScript do that?", Linoy's answer is always: *"There's an RFC for that."* Even when there isn't, there's usually a GitHub issue that Linoy has already commented on.
+She likes code that lets the compiler do more of the work: `satisfies` for a configuration, inferred keys at a call, a type derived from the value everyone already maintains. When someone asks "can TypeScript do that?", she usually has a playground open before they've finished the question. If it can't, she may have a proposal ready. A proposal is not a shipped feature, a distinction Daniel has had to make while she was already typing.
 
-She's the early adopter every team needs and every team fears. Her code is brilliant, forward-thinking, and occasionally incomprehensible to anyone who hasn't read the same three blog posts from the TypeScript team's design notes. She's had PRs rejected because the reviewer's editor didn't support the syntax yet.
+Her enthusiasm gets ahead of the implementation sometimes. A signature fits the caller beautifully, and she wants everyone to see it; Noam wants to see what the body can get wrong. She'll run his broken example. She'll also try to repair hers before letting him replace it with four overloads.
 
-Linoy is genuinely useful in debates because she always knows what's coming. When the team is arguing about a current limitation, Linoy knows whether it's being fixed in the next release. This is either helpful or maddening, depending on your deadline.
+She's had PRs rejected because the reviewer's editor didn't support the syntax yet. She now brings the compiler version with the example. The reviewer still has to read it, which is where her arguments with Oded tend to begin.
 
 *"There's an RFC for that."*
 
@@ -238,11 +238,11 @@ Dima is the person both sides of an argument quote when they think they're winni
 
 He came to programming through a winding path — started in data science, moved to backend development, spent two years doing frontend, then ended up as a tech lead responsible for full-stack architecture. This breadth gives him a perspective that specialists lack: he's seen FP patterns shine on the backend and struggle on the frontend. He's seen OOP patterns create clean UI architectures and nightmarish backend god-objects. He's used `any` when it was the right call and `strict: true` when it was the right call.
 
-Dima's superpower is synthesis. When Dafna and Guy are three rounds deep into an FP-vs-OOP argument, Dima is the one who says: *"Both have a point here"* — and then explains exactly where each approach wins and loses, without making either side feel dismissed.
+Dima's first move is to find out whether both sides are answering the same question. Noam wants to know what a generic preserves; Oded wants to know why this function needs one today. Dima can agree with both without pretending they've reached a decision. "Both have a point here" is usually followed by someone discovering that their point doesn't settle the other person's problem.
 
-This makes him either the most valuable person in the room or the most annoying, depending on how invested you are in your position. Noam has accused him of "centrist type theory." Oded calls him "the human 'it depends.'" Dima considers both descriptions complimentary.
+Noam has accused him of "centrist type theory." Oded calls him "the human 'it depends.'" Dima considers both descriptions complimentary, though Oded likes the answer less when Dima is maintaining the package.
 
-He doesn't always mediate. When he has a strong opinion, he'll state it clearly. But his strong opinions are rare enough that when he does take a side, both camps pay attention.
+Then he gets specific. Which caller needs the new entry point? Who owns the calculation? What input are they agreeing to accept? He'll keep two interfaces when they serve two callers, and refuse a second implementation of the same rule. Both sides can have a point. One of them still has to change the code.
 
 *"Both have a point here."*
 
@@ -286,11 +286,11 @@ She's not a moralist. She doesn't lecture. She has, over time, become the engine
 |   | Oded Shipley      | Velocity Advocate      | Has deployed to production on a Friday. Twice. This month.  |
 |   | Gil Benchmark     | Data-Driven Analyst    | Doesn't have opinions. Has datasets.                        |
 |   | Eden Legacy       | Migration Veteran      | Has migrated three million lines and lived to tell about it |
-|   | Linoy Nightly     | Cutting-Edge Advocate  | Uses features before the editor supports the syntax         |
+|   | Linoy Nightly     | Cutting-Edge Advocate  | Brings a new feature, then tries it on your caller         |
 |   | Chen Override     | Socratic Skeptic       | If Chen can't break it, ship it                             |
 |   | Dafna Functor     | FP Purist              | Sees a `for` loop, mourns a `reduce`                        |
 |   | Guy Singleton     | OOP Advocate           | Considers his whiteboard class diagram a form of art        |
-|   | Dima Bridge       | Balanced Pragmatist    | The human "it depends"                                      |
+|   | Dima Bridge       | Balanced Pragmatist    | Separates the questions, then makes the call               |
 |   | Idan Greenfield   | Parse-Don't-Validate   | Wants to see the value the parser actually produced       |
 
 ---
