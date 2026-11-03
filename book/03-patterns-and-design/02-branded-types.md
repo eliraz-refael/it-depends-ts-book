@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "When two values share a representation but not a job, give each job its own type, and convert where someone decides which job a number has. A brand adds a type-level marker so the compiler can distinguish them."
+**Prof. Eli Typeworth**: "When two values share a representation but not a job, give each job its own type, and convert where someone decides which job a number has. A page number and a count of pages are both numbers, but putting one where the other belongs changes the result. A brand adds a type-level marker so the compiler can distinguish them."
 
 "Some brands make a further promise: this value passed a check. Before relying on that promise, examine how code can create and change values of that type without bypassing the compiler with assertions or `any`. Those operations must preserve what the check established."
 

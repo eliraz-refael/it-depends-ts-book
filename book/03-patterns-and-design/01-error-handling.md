@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Liron Closure**: "When you catch a failure and return an error value, you make two decisions: what to report, and that the function can finish normally. Before returning, check whether the caller still needs that rejection to stop or undo the work."
+**Liron Closure**: "When you catch a failure and return an error value, you make two decisions: what to report, and that the function can finish normally. Before returning, check whether the caller still needs to see the failure to stop or undo the work."
 
 ## The Debate
 

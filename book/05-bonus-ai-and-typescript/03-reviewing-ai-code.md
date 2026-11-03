@@ -53,9 +53,7 @@ export function badge(order: Order): string {
 
 **Noam**: "And the badge?"
 
-"Still says the same things. I checked."
-
-**Oded**: "These cases were here before the refactor. I kept them."
+**Oded**: "Still says the same things. I checked. These cases were here before the refactor. I kept them."
 
 ```typescript
 // cases.ts

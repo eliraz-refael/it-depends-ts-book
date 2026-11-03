@@ -118,7 +118,7 @@ TS2578: `Unused '@ts-expect-error' directive.`
 
 **Eden**: "Before currency. The comment hid the stale fixture. Now the missing field hides the bad signature."
 
-**Noam**: "Last time a factory hid the dependency. This time it was a comment."
+**Noam**: "Like my user factory. It hid the dependency too."
 
 **Oded**: "I have accidentally passed two different tests with one comment."
 
@@ -369,9 +369,7 @@ type DeliberatelyWrong = Expect<Equal<1, 2>>;
 
 **Noam**: "Don't."
 
-**Eden**: "The `tsc -p tsconfig.json --listFilesOnly` result has the runtime test, but not `type-tests/ship.types.ts`. Our include only names src and `test/**/*.test.ts`, and no included file imports the type test. We taught the runner to leave it alone. We haven't told the compiler where we put it."
-
-**Eden**: "It wasn't checked in `test/ship.types.ts` either. We moved it before anyone asked."
+**Eden**: "The `tsc -p tsconfig.json --listFilesOnly` result has the runtime test, but not `type-tests/ship.types.ts`. Our include only names `src` and `test/**/*.test.ts`, and no included file imports the type test. We taught the runner to leave it alone. We haven't told the compiler where we put it. It wasn't checked in `test/ship.types.ts` either. We moved it before anyone asked."
 
 He replaces the include:
 

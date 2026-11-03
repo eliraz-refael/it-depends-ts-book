@@ -44,7 +44,7 @@ console.log(lines.slice(0, 1).map(lineTotal).join(",")); // 100
 
 **Daniel**: "The index. It calls the function with the element, the index and the array. At index zero you got the answer you expected."
 
-**Noam**: "Eden caught this with `tickets.map(slaStatus)`. That time the index became `now`."
+**Noam**: "Eden's SLA migration had the same trap: `tickets.map(slaStatus)` would have passed the index as `now`. He checked every callback reference before switching."
 
 **Linoy**: "The zero wasn't my default."
 

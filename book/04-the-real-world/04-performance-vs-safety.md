@@ -179,7 +179,7 @@ function t(...args: Args): string;
 
 **Oded**: "So the difference I measured exists."
 
-**Gil**: "It does. But key enumeration alone cost little here. These are whole-version comparisons, not charges we can add into a bill. Try a smaller change. I'm adding your bet to the spreadsheet. Entry 848."
+**Gil**: "It does. But key enumeration alone cost little here. I'm adding your bet to the spreadsheet. Entry 848. These are whole-version comparisons, not charges we can add into a bill. Try a smaller change."
 
 **Linoy**: "The loose tuple keeps a tuple per key without dependent params. The common dictionary signature doesn't need those tuples."
 

@@ -198,7 +198,7 @@ console.log(price(1250));
 
 Eden adds `lookup.js` and `sum.js` to the exception list with their owners, and puts `// @ts-nocheck` in each. Oded annotates `price` with `/** @param {number} cents */`.
 
-**Oded**: "The any budget again. An owner and a next step."
+**Oded**: "The 'any budget' again. An owner and a next step."
 
 **Eden**: "The sitemap is already on the exception list. The catalogue team left it opted out while they replace its footer callback. Their PR owns that work."
 

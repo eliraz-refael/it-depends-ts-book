@@ -317,7 +317,7 @@ Node refuses `node_modules/@shop/money/src/index.ts` with `ERR_UNSUPPORTED_NODE_
 
 **Linoy**: "For this quote? No. But I still want the source check."
 
-**Dima**: "Package JavaScript. Restore the `.js` imports and `default` targets, and remove `allowImportingTsExtensions` from the dev base. A rebuild won't delete the stray money copy."
+**Dima**: "Package JavaScript. Restore the `.js` imports and `default` targets, and remove `allowImportingTsExtensions` from the dev base. A rebuild won't delete the stray money copy, so clean the outputs first."
 
 **Gil**: "Clean the incremental build files too, so the outputs get rebuilt."
 

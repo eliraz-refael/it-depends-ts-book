@@ -32,7 +32,7 @@ Every chapter follows a debate structure:
 
 **The Debate Continues** marks a disagreement that remains open after the evidence, with the choice depending on what the callers need.
 
-**Additional Takes** explore a related case after the main argument; a single case is an **Additional Take**.
+**Additional Takes** explore related cases after the main argument; a chapter with only one has an **Additional Take**.
 
 Not every debate has a winner. That's not a cop-out. Some questions in software engineering are genuinely contextual, and pretending otherwise would be dishonest. When we say "it depends," we'll tell you exactly what it depends *on*.
 
