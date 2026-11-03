@@ -21,7 +21,7 @@ code { font-family:JetBrains; font-size:8.5pt; }
 .footnote { float:footnote; font-size:8pt; line-height:11pt; font-family:Plex; overflow-wrap:anywhere; }
 .footnote a { overflow-wrap:anywhere; }
 .footnote::footnote-call { content:counter(footnote); font-size:7pt; line-height:0; vertical-align:super; }
-.footnote::footnote-marker { content:counter(footnote) '. '; font-weight:600; }
+.footnote::footnote-marker { content:counter(footnote-marker) '. '; font-weight:600; }
 pre { margin:10pt 0; padding:7pt; border-left:1pt solid #666; white-space:pre-wrap; font:8.5pt/12.6pt JetBrains; }
 .code-line { display:block; break-inside:avoid; }
 table { border-collapse:collapse; width:100%; font-size:9pt; line-height:13pt; }
@@ -29,3 +29,8 @@ th, td { border-bottom:.5pt solid #aaa; text-align:left; padding:5pt; }
 tr { break-inside:avoid; }
 thead { display:table-header-group; }
 .near-break-space { height:490pt; }
+
+.chapter { break-before:page; counter-reset:footnote 0; }
+.table-sample + .table-sample { break-before:page; }
+table[data-book-table] { break-inside:avoid; }
+.table-boundary-space { height:520pt; }

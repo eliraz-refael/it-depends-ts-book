@@ -96,8 +96,9 @@ changes to the upstream fonts.
 
 The Chapter 10 studies above remain unchanged. The separate step-1 trial reads
 and hashes the frozen `book/` tree, derives its seven-link inventory, then renders
-five **synthetic layout specimens**, not a whole-book proof. Its current result
-is **FAIL / stopped**; see
+nine specimens: seven synthetic cases and two placements of all 17 actual book
+tables, not a whole-book proof. Its current result is **PASS with table-header
+repetition deferred**; see
 [the trial review](../../docs/editorial/full-review/PRINT-TRIAL-REVIEW.md).
 Do not use the study's source appendix as a fallback.
 
@@ -118,7 +119,7 @@ retain their existing exact requirements. No new Python packages are needed.
 # Source/inventory, dialogue, metadata and marker controls only:
 design/print/.venv/bin/python design/print/footnote_trial.py --validate-only
 
-# Fresh trial (currently exits 1 for the documented layout failures):
+# Fresh trial (all nine specimens; table-header limitation reported explicitly):
 design/print/.venv/bin/python design/print/footnote_trial.py
 
 # Inspect saved artifacts again without running Chrome/pagination:
@@ -150,9 +151,30 @@ All generated HTML, rendered DOM, layout metrics, PDFs, extracted text, PNGs,
 font/source hashes and `results.json` are under ignored
 `output/footnote-trial/`. Every page has a PNG; `all-pages.png` is the contact
 sheet. The verifier checks printed callout and note numbers as well as DOM
-references: matching IDs alone would miss the current failure. It also checks
+references: matching IDs alone missed the initial numbering failure. It also checks
 full selectable URL text, clickable destinations, note placement, retained code
-lines/table rows, repeated table headers, embedded fonts and 7 × 10 trim.
+lines/table rows, embedded fonts and 7 × 10 trim. Every PDF page also asserts that
+its callout numbers equal its note-body numbers; chapter reset restarts the
+notes without restarting page numbers.
 
-The step-1 stop is intentional. No whole-book assembler, renderer replacement,
-endnote fallback, printer setup or manuscript rewrite is included.
+The authorized repair changes the note-marker counter to `footnote-marker`.
+`chapter-counters.js` is a small local Paged.js Handler that preserves the folio
+increment on a footnote-reset page; the pinned renderer otherwise disables that
+increment. There are no new dependencies.
+
+Every actual Markdown table is parsed from the frozen source, identified, hashed
+and rendered twice: at a fresh-page placement and near a page boundary. Book
+tables use `break-inside: avoid`; verification fails if a table has more than one
+rendered fragment, exceeds the page body, or loses a cell in the DOM or PDF.
+The largest is 436.77 pt in a 620.64 pt body. Repeating headers is therefore
+deferred for this manuscript. The unchanged oversized synthetic table still
+loses continuation headers; that becomes a recorded limitation only when both
+complete sets of actual-table checks pass. No repeating-header handler is added.
+
+`footnote-pages.png` collects the 14 pages of footnote cases, `book-tables.png`
+collects the 17 natural-height table pages, and `all-pages.png` includes all 60
+pages, including near-boundary placements. The initial failing artifacts are
+preserved in `output/footnote-trial-before-b757e2e/`.
+
+No whole-book assembler, renderer replacement, endnote fallback, printer setup
+or manuscript rewrite is included. The trial's success is not release approval.

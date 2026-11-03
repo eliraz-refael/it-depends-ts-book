@@ -83,10 +83,11 @@ async function main() {
           page:i+1, rect:rect(p), body:rect(p.querySelector('.pagedjs_page_content')),
           footnotes:rect(p.querySelector('.pagedjs_footnote_area')),
           calls:[...p.querySelectorAll('[data-footnote-call]')].map(e => ({ref:e.dataset.footnoteCall, rect:rect(e), marker:getComputedStyle(e,'::after').content})),
-          notes:[...p.querySelectorAll('.pagedjs_footnote_area [data-note-id]')].map(e => ({id:e.dataset.noteId, ref:e.dataset.ref, text:e.textContent, rect:rect(e), marker:getComputedStyle(e,'::before').content})),
+          notes:[...p.querySelectorAll('.pagedjs_footnote_area [data-note-id]')].map(e => ({id:e.dataset.noteId, ref:e.dataset.ref, text:e.textContent, rect:rect(e), marker:getComputedStyle(e,'::marker').content})),
           markers:[...p.querySelectorAll('[data-body-marker]')].map(e => ({id:e.dataset.bodyMarker,rect:rect(e)})),
           lines:[...p.querySelectorAll('.code-line')].map(e => ({text:e.textContent,rect:rect(e)})),
           rows:[...p.querySelectorAll('tbody tr')].map(e => ({text:e.textContent,rect:rect(e)})),
+          tables:[...p.querySelectorAll('table[data-book-table]')].map(e => ({id:e.dataset.bookTable,rect:rect(e),cells:[...e.querySelectorAll('th, td')].map(c => c.textContent)})),
           text:p.innerText
         }));
       })()`);
