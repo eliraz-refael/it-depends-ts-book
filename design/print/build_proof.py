@@ -17,9 +17,11 @@ from pygments.lexers import TypeScriptLexer, JavascriptLexer, JsonLexer, DiffLex
 from pygments.token import STANDARD_TYPES
 
 import footnote_trial as trial
+import prose_quotes
+import symbol_key
 
 HERE, ROOT = trial.HERE, trial.ROOT
-OUT = HERE / 'output' / 'whole-book-proof'
+OUT = HERE / 'output' / 'whole-book-proof-layout'
 MD = trial.MD
 FINAL_LINE = 'Oded: "Good. Now I have a green pull request and a meeting four minutes ago."'
 ACTS = [
@@ -30,6 +32,8 @@ ACTS = [
     ('Act IV', 'The Real World'),
     ('Bonus', 'AI & TypeScript'),
 ]
+# Measured post-keep end pages: Ch13 two lines; Ch20 and Ch21 three source lines.
+TAIL_BALANCE = {'book/02-advanced-typescript/07-declaration-merging.md', 'book/03-patterns-and-design/08-hof-patterns.md', 'book/03-patterns-and-design/07-currying-partial-application.md'}
 LEXERS = {'typescript': TypeScriptLexer, 'javascript': JavascriptLexer, 'json': JsonLexer, 'diff': DiffLexer, 'text': TextLexer}
 
 
@@ -38,7 +42,7 @@ def write_json(path, value):
 
 
 def norm(text):
-    return re.sub(r'\s+', '', unicodedata.normalize('NFKC', text).replace('\u200b', ''))
+    return re.sub(r'\s+', '', unicodedata.normalize('NFKC', prose_quotes.straight(text)).replace('\u200b', ''))
 
 
 def plain(children):
@@ -62,12 +66,35 @@ def code_lines(source, language, fence_id):
     return ''.join(f'<span class="code-line" data-code-line="{fence_id}-{i}">{line or "&#8203;"}</span>' for i, line in enumerate(rendered)), {f'{fence_id}-{i}': line for i, line in enumerate(expected)}
 
 
+def opener_art(number):
+    if number is None:
+        return ''
+    return f'<div class="opener-art"><span class="opener-number">{number}</span></div>'
+
+
+def symbol_key_html():
+    key = trial.read_json(HERE/'symbol-key.json')
+    # Editorial explanations must cover exactly the combinations measured in
+    # the rendered source. validate() recomputes that inventory on every build.
+    items = list(key['meanings'].items())
+    pages = []
+    for offset in range(0,len(items),13):
+        rows = []
+        for sequence, meaning in items[offset:offset+13]:
+            literal = ''.join(f'<span class="key-character">{html.escape(c)}</span>' for c in sequence)
+            rows.append(f'<tr data-symbol-sequence="{html.escape(sequence, quote=True)}"><td><code data-key-glyph>{html.escape(sequence)}</code></td><td><code data-key-literal>{literal}</code></td><td>{html.escape(meaning)}</td></tr>')
+        title = key['title'] if not offset else 'Code symbols (continued)'
+        intro = f'<p>{html.escape(key["intro"])}</p>' if not offset else ''
+        pages.append(f'<section class="front-page symbol-key running-title" data-running="Reading the code symbols"><h1>{title}</h1>{intro}<table><thead><tr><th>Printed glyph</th><th>Characters to type</th><th>Meaning here</th></tr></thead><tbody>{"".join(rows)}</tbody></table></section>')
+    return ''.join(pages)
+
+
 def assemble(data, directory):
     links, hashes = trial.inputs(data)
     order = list(hashes)
     source_tables = trial.book_tables()
     tables_by_location = {(t['source'], t['line']): t for t in source_tables}
-    manifest = {'source_sha256': hashes, 'links': links, 'texts': {}, 'code': {}, 'fences': [], 'tables': [], 'notes': [], 'navigation': [], 'transcripts': [], 'documents': [],
+    manifest = {'source_sha256': hashes, 'links': links, 'texts': {}, 'code': {}, 'fences': [], 'tables': [], 'notes': [], 'navigation': [], 'transcripts': [], 'documents': [], 'quote_audit': [], 'inline_code': {},
                 'proof_settings': {'folios': 'continuous Arabic', 'starts': 'next page; no forced recto blanks'}}
     articles, toc = [], []
     last_act = None
@@ -82,7 +109,7 @@ def assemble(data, directory):
             heading = f'{act_name} / {act_title}'
             manifest['navigation'].append({'level': 1, 'id': aid, 'title': heading})
             toc.append((aid, heading, 'toc-act'))
-            articles.append(f'<section class="act-opener running-title" data-running="{html.escape(heading, quote=True)}" data-destination="{aid}" id="{aid}"><div class="eyebrow">{act_name.upper()}</div><div class="opener-art"><span class="opener-number">{act if act else "·"}</span></div><h1>{html.escape(act_title)}</h1><div class="opener-bottom">IT DEPENDS / {html.escape(data["subtitle"])}</div></section>')
+            articles.append(f'<section class="act-opener running-title" data-running="{html.escape(heading, quote=True)}" data-destination="{aid}" id="{aid}"><div class="eyebrow">{act_name.upper()}</div>{opener_art(act if act in (1,2,3,4) else None)}<h1>{html.escape(act_title)}</h1><div class="opener-bottom">IT DEPENDS / {html.escape(data["subtitle"])}</div></section>')
             last_act = act
         first_h1 = next((i for i, t in enumerate(tokens) if t.type == 'heading_open' and t.tag == 'h1'), None)
         title = plain(tokens[first_h1 + 1].children) if first_h1 is not None else 'Dedication'
@@ -91,7 +118,7 @@ def assemble(data, directory):
         toc.append((doc_id, title, 'toc-doc'))
         manifest['documents'].append({'source': name, 'id': doc_id, 'title': title, 'act': act})
         reset = act > 0 or doc_index == 0
-        articles.append(f'<article id="{doc_id}" data-document="{doc_index}" data-destination="{doc_id}" class="source-chapter {"chapter" if reset else "prologue"}">')
+        articles.append(f'<article id="{doc_id}" data-document="{doc_index}" data-tail-balance="{str(name in TAIL_BALANCE).lower()}" data-destination="{doc_id}" class="source-chapter {"chapter" if reset else "prologue"}">')
         if first_h1 is None:
             articles.append('<div class="dedication running-title" data-running="Dedication">')
         note_number = prologue_notes if act == 0 else 0
@@ -114,7 +141,7 @@ def assemble(data, directory):
                 if i == first_h1:
                     label = re.match(r'(Chapter|Bonus) (\d+):', title)
                     number = label.group(2) if label else '·'
-                    articles.append(f'<header class="chapter-opener running-title" data-running="{html.escape(title, quote=True)}"><div class="eyebrow">{ACTS[act][0].upper()} / {html.escape(ACTS[act][1].upper())}</div><div class="opener-art"><span class="opener-number">{number}</span></div>')
+                    articles.append(f'<header class="chapter-opener running-title" data-running="{html.escape(title, quote=True)}"><div class="eyebrow">{ACTS[act][0].upper()} / {html.escape(ACTS[act][1].upper())}</div>{opener_art(number if label else None)}')
                     open_heading = True
                 articles.append(MD.renderer.render([token], MD.options, {}))
             elif token.type == 'heading_close':
@@ -126,8 +153,15 @@ def assemble(data, directory):
                 text_id = f'text-{doc_index}-{i}'
                 manifest['texts'][text_id] = {'text': plain(token.children), 'source': name, 'line': token.map[0] + 1}
                 children = token.children or []
+                audit = prose_quotes.convert(children)
+                if audit.get('converted') or audit.get('ambiguous'):
+                    manifest['quote_audit'].append({'id':text_id, 'source':name, 'line':token.map[0]+1, **audit})
                 bits, pending = [], None
                 for j, child in enumerate(children):
+                    if child.type == 'code_inline':
+                        cid = f'inline-{doc_index}-{i}-{j}'
+                        child.attrSet('data-inline-code-id', cid)
+                        manifest['inline_code'][cid] = child.content
                     if child.type == 'link_open':
                         end = next(k for k in range(j + 1, len(children)) if children[k].type == 'link_close')
                         label = MD.renderer.renderInline(children[j + 1:end], MD.options, {})
@@ -155,8 +189,8 @@ def assemble(data, directory):
                 raw = '\n'.join(source.splitlines()[token.map[0]:token.map[1]]) + '\n'
                 manifest['fences'].append({'id': fid, 'source': name, 'line': token.map[0] + 1, 'language': language, 'content_sha256': trial.digest(token.content.encode()), 'raw_sha256': trial.digest(raw.encode()), 'content': token.content})
                 caption = f'{language.upper()} / {fence_number:02d}'
-                short = 'short' if len(lines) <= 8 else ''
-                articles.append(f'<figure class="source {short}" data-fence-id="{fid}" data-caption="{caption}"><figcaption>{caption}</figcaption><pre><code>{markup}</code></pre></figure>')
+                short = 'short' if len(lines) <= 12 else ''
+                articles.append(f'<figure class="source {short}" data-fence-id="{fid}" data-line-count="{len(lines)}" data-caption="{caption}"><figcaption>{caption}</figcaption><pre><code>{markup}</code></pre></figure>')
             elif token.type == 'paragraph_open':
                 upcoming = tokens[i + 1].content if i + 1 < len(tokens) else ''
                 token.attrSet('class', 'speech' if upcoming.startswith(('**', '"', '“')) else 'narration')
@@ -186,7 +220,7 @@ def assemble(data, directory):
     metadata = ''.join(f'<dt>{label}</dt><dd>{html.escape(data[key])}</dd>' for key, label in [('public_repository_url', 'Public repository (placeholder)'), ('release_tag','Release tag (placeholder)'), ('license','License (placeholder)'), ('imprint','Imprint (placeholder)'), ('manuscript_commit','Frozen manuscript commit')])
     front = f'''<section class="front-page cover running-title" data-running="IT DEPENDS / PROOF"><div class="eyebrow">WHOLE-BOOK PROOF</div><h1>{html.escape(data['title'])}</h1><h2>{html.escape(data['subtitle'])}</h2><div class="opener-bottom">PROOF / NOT FOR RELEASE</div></section>
 <section class="front-page metadata"><h1>Proof information</h1><p>This proof uses placeholder publication metadata. It is not for release.</p><dl>{metadata}</dl><p>Continuous Arabic folios. Acts and chapters start on the next page; no recto blanks have been inserted.</p></section>
-<nav class="contents"><h1>Contents</h1><ol class="toc">{contents}</ol></nav>'''
+<nav class="contents"><h1>Contents</h1><ol class="toc">{contents}</ol></nav>{symbol_key_html()}'''
     document = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><title>It Depends — whole-book PROOF</title><link rel="stylesheet" href="{(HERE/'proof.css').as_uri()}"><script>window.PagedConfig={{auto:false}};</script><script src="{(HERE/'node_modules/pagedjs/dist/paged.polyfill.js').as_uri()}"></script><script src="{(HERE/'chapter-counters.js').as_uri()}"></script><script src="{(HERE/'proof-handler.js').as_uri()}"></script></head><body>{front}{''.join(articles)}</body></html>'''
     directory.mkdir(parents=True, exist_ok=True)
     (directory / 'book.html').write_text(document)
@@ -214,6 +248,7 @@ def validate(directory, manifest):
     check(len(document) == len(pages) == result['pagination']['pages'], 'Page count mismatch')
     check(not result['external'] and not result['errors'], 'Browser errors/network attempts')
     text_pieces, code_pieces, table_pages = defaultdict(list), defaultdict(list), defaultdict(list)
+    inline_pieces, fence_pages = defaultdict(list), defaultdict(list)
     source_pages = defaultdict(list)
     note_pages, printed_notes = {}, []
     for p in pages:
@@ -264,6 +299,20 @@ def validate(directory, manifest):
                 check(r['y']>=body['y']-1 and r['bottom']<=body['bottom']+1, f'p{number}: vertical overflow {item["id"]}')
                 if p['notes']:
                     check(r['bottom']<=p['footnotes']['y']+1, f'p{number}: body/note overlap {item["id"]}')
+        for item in p['inline_code']:
+            inline_pieces[item['id']].append(item['text'])
+        for figure in p['figures']:
+            lines = [c for c in p['code'] if c['id'].startswith(figure['id']+'-')]
+            if lines:
+                fence_pages[figure['id']].append({'page':number,'lines':len(lines)})
+        for keep in p['keeps']:
+            target = next((b for b in p['blocks'] if b['ref']==keep['target']), None)
+            check(target is not None, f'p{number}: stranded heading/introduction: {keep["text"][:80]}')
+            if target and target['tag']=='FIGURE':
+                fig = next(f for f in p['figures'] if abs(f['rect']['y']-target['rect']['y'])<.1)
+                count = len([c for c in p['code'] if c['id'].startswith(fig['id']+'-')])
+                total = len([k for k in manifest['code'] if k.startswith(fig['id']+'-')])
+                check(count>=min(4,total), f'p{number}: introduction without meaningful code')
         for table in p['tables']:
             table_pages[table['id']].append(number)
             check(table['rect']['bottom']<=p['body']['bottom']+1, f'p{number}: table outside body')
@@ -287,7 +336,15 @@ def validate(directory, manifest):
                 if len(lines)<4:
                     observations.append({'page':number,'kind':'short code continuation','fence':figure['id'],'lines':len(lines)})
     for key, expected in manifest['texts'].items():
-        check(norm(''.join(text_pieces[key]))==norm(expected['text']), f'DOM source text loss/duplication: {key}')
+        check(prose_quotes.straight(''.join(text_pieces[key]))==prose_quotes.straight(expected['text']), f'DOM source text loss/duplication: {key}')
+    for key, expected in manifest['inline_code'].items():
+        check(''.join(inline_pieces[key])==expected, f'Inline code changed: {key}')
+    for fid, fragments in fence_pages.items():
+        total = sum(f['lines'] for f in fragments)
+        check(len(fragments)==1 or total>12, f'Short fence split: {fid}')
+        check(len(fragments)==1 or all(f['lines']>=4 for f in fragments), f'Fence fragment under four lines: {fid}: {fragments}')
+    for audit in manifest['quote_audit']:
+        check(not audit.get('converted') or prose_quotes.verify_printed(''.join(text_pieces[audit['id']]),audit), f'Unbalanced converted paragraph: {audit["id"]}')
     for key, expected in manifest['code'].items():
         check(''.join(code_pieces[key])==expected, f'DOM code line changed: {key}')
     for fence in manifest['fences']:
@@ -340,10 +397,38 @@ def validate(directory, manifest):
             check(any(l.get('page')==p['page']-1 and box.intersects(l['from']) and abs(l.get('to',pymupdf.Point(-1,-1))-destination)<.1 for l in saved_links), f'p{p["page"]}: callout destination is not its note')
         for row in p['contents']:
             check(any(l.get('page')==targets[row['target']]-1 and pdf_rect(row['rect'],p['rect']).intersects(l['from']) for l in saved_links), f'p{p["page"]}: contents link target')
+    ligatures = symbol_key.inventory(final_path, pages, HERE/'fonts')
+    write_json(directory/'symbol-inventory.json', ligatures)
+    check(set(ligatures)==set(trial.read_json(HERE/'symbol-key.json')['meanings']), 'Symbol key differs from actual rendered code ligatures')
+    key_font = pymupdf.Font(fontfile=str(HERE/'fonts/JetBrainsMono-Regular.ttf'))
+    key_rows = []
+    for page in pages:
+        pdf = final[page['page']-1]
+        for symbol in page['symbols']:
+            sequence = symbol['sequence']
+            drawn = symbol_key.printed_glyphs(pdf,symbol_key.rect(symbol['glyph'],page['rect']))
+            typed = symbol_key.printed_glyphs(pdf,symbol_key.rect(symbol['literal'],page['rect']))
+            check(any(drawn==x['glyphs'] for x in ligatures.get(sequence,[])), f'Symbol key does not show the source glyph: {sequence}')
+            check(typed==[key_font.has_glyph(ord(c)) for c in sequence], f'Symbol key typing column fused: {sequence}')
+            key_rows.append(sequence)
+    check(len(key_rows)==len(ligatures) and set(key_rows)==set(ligatures), 'Symbol key rows incomplete/duplicated')
+    failures.extend(symbol_key.text_errors(final,pages,trial.read_json(HERE/'symbol-key.json'),norm))
+    endings = []
+    for document_index, doc in enumerate(manifest['documents']):
+        ids = [k for k in manifest['texts'] if k.startswith(f'text-{document_index}-')]
+        end_page = source_pages[ids[-1]][-1]
+        metric = pages[end_page-1]
+        boxes = [pdf_rect(x['rect'],metric['rect'],.5) for x in metric['texts']+metric['code']]
+        lines = [line for block in final[end_page-1].get_text('dict')['blocks'] for line in block.get('lines',[])
+                 if any(box.contains((pymupdf.Rect(line['bbox']).tl+pymupdf.Rect(line['bbox']).br)/2) for box in boxes)
+                 and ''.join(s['text'] for s in line['spans']).strip()]
+        endings.append({'source':doc['source'],'page':end_page,'source_lines':len(lines)})
+        if doc['act']>0:
+            check(len(lines)>3, f'Chapter ending carries <=3 source lines: {doc["source"]} p{end_page}')
     report = {'status':'PASS' if not failures else 'FAIL','pages':len(final),'failures':failures,'observations':observations,'notes':printed_notes,
-              'fences':len(manifest['fences']),'fence_languages':dict(Counter(f['language'] for f in manifest['fences'])),
+              'endings':endings, 'ligature_sequences':list(ligatures), 'fences':len(manifest['fences']),'fence_languages':dict(Counter(f['language'] for f in manifest['fences'])),
               'source_text_blocks':len(manifest['texts']),'code_lines':len(manifest['code']),'tables':dict(table_pages),'bookmarks':len(bookmarks),
-              'source_pages':dict(source_pages),'targets':targets,'pdf':str(final_path),'pdf_sha256':trial.digest(final_path.read_bytes())}
+              'fence_fragments':dict(fence_pages), 'quote_audit':manifest['quote_audit'], 'source_pages':dict(source_pages),'targets':targets,'pdf':str(final_path),'pdf_sha256':trial.digest(final_path.read_bytes())}
     write_json(directory/'validation.json',report)
     (directory/'extracted-text.txt').write_text('\n\f\n'.join(p.get_text() for p in final))
     return report
@@ -375,6 +460,8 @@ def artifacts(directory):
 def compare(a,b):
     da,db = pymupdf.open(a/'It-Depends-PROOF.pdf'),pymupdf.open(b/'It-Depends-PROOF.pdf')
     failures=[]
+    for directory, pdf in [(a,da),(b,db)]:
+        failures.extend(symbol_key.text_errors(pdf,trial.read_json(directory/'layout.json')['layout']['pages'],trial.read_json(HERE/'symbol-key.json'),norm))
     if len(da)!=len(db):
         failures.append('Page count differs')
     page_hashes=[]
@@ -430,7 +517,7 @@ def main():
     write_json(directory/'toolchain.json',{'versions':trial.read_json(HERE/'trial-toolchain.json'),'metadata':data,'placeholders':placeholders,'fonts':{p.name:trial.digest(p.read_bytes()) for p in sorted((HERE/'fonts').glob('*.ttf'))},'styles':{p.name:trial.digest(p.read_bytes()) for p in [HERE/'proof.css',HERE/'proof-handler.js',HERE/'chapter-counters.js']}})
     if args.run=='a':
         count,sheets=artifacts(directory); print(f'{count} page images; {sheets} spread contact sheets',flush=True)
-    print(json.dumps({k:v for k,v in report.items() if k not in ('source_pages','targets','observations')},indent=2),flush=True)
+    print(json.dumps({k:v for k,v in report.items() if k not in ('source_pages','targets','observations','fence_fragments','quote_audit')},indent=2),flush=True)
     sys.exit(bool(report['failures']))
 
 

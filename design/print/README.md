@@ -186,7 +186,7 @@ page-bottom notes, with no manuscript rewrite or printer setup.
 ## Whole-book proof
 
 Step 2 assembles the frozen **517e0fc** manuscript through the approved 33-file
-manifest. The current proof has **428 pages**, all marked **PROOF**, and passes
+manifest. The current proof has **438 pages**, all marked **PROOF**, and passes
 content, navigation and reproducibility checks. It still needs layout polish;
 see the page-specific [spread review](../../docs/editorial/full-review/WHOLE-BOOK-PROOF-REVIEW.md).
 This is not release approval.
@@ -203,9 +203,9 @@ design/print/.venv/bin/python design/print/build_proof.py --compare
 design/print/.venv/bin/python design/print/build_proof.py --run a --inspect-existing
 ```
 
-Outputs live in ignored `output/whole-book-proof/`. The review PDF is
-`a/It-Depends-PROOF.pdf`; `a/pages/page-001.png` through `page-428.png` are the
-individual pages. `a/contact-sheets/spreads-01.png` through `spreads-27.png`
+Outputs live in ignored `output/whole-book-proof-layout/`. The review PDF is
+`a/It-Depends-PROOF.pdf`; `a/pages/page-001.png` through `page-438.png` are the
+individual pages. `a/contact-sheets/spreads-01.png` through `spreads-28.png`
 show consecutive facing pages. The independent `b/` render supplies comparison
 evidence without duplicating the image gallery. Each run saves input hashes,
 HTML, paginated DOM, layout metrics, extracted text, toolchain/font hashes and
@@ -233,3 +233,47 @@ line is asserted, and no generated appendix or notes follow it. The only page
 furniture below it is the required proof footer and folio. Rendering remains
 local with HTTP(S) requests blocked. Publication placeholders remain in the
 single metadata file; the release metadata gate continues to reject them.
+
+
+### Settled layout pass
+
+The 428-page first proof remains in `output/whole-book-proof/` as comparison
+evidence. The current commands write the revised proof to
+`output/whole-book-proof-layout/`. Intermediate development renders stay there
+under explicitly named `development-*` directories; `a/` and `b/` are the clean
+comparison runs. Type sizes remain 11/16 pt for body text and 8.5/12.6 pt for
+fences. No manuscript changes, added dependencies or renderer changes are used.
+
+`ProofKeeps` adjusts Paged.js overflow boundaries backwards when CSS keeps would
+strand a narrative heading, a short introduction or a fence fragment. Fences of
+12 source lines or fewer stay whole; every fragment of a longer split has at
+least four source lines. Saved-DOM checks assert the keeps and fragment counts.
+Three measured tiny endings (Ch13, Ch20 and Ch21) receive earlier break choices;
+the verifier counts their source lines separately from generated captions. Other
+light ending pages are left alone. Unnumbered prologue and Bonus act openers no
+longer get a numeral box; Bonus chapter numbers remain.
+
+`prose_quotes.py` converts prose text tokens only. Code, literal URLs and link
+labels containing code are protected. The actual printed delimiters are checked
+for balance, and mapping curly punctuation back to straight must reconstruct each
+source text block exactly, including whitespace. All 1,507 inline-code values
+are checked unchanged in addition to the fence hashes. Five ambiguous paragraphs
+are left unchanged and listed with source lines and proof folios in the review;
+no guessed typography is applied to them.
+
+The author replaced the proposed ligature removal with a print-only symbol key.
+The code keeps its existing shaping. `symbol_key.py` joins the PDF character text
+and glyph-drawing trace at their measured origins, restricted to source fences
+and inline code. It compares glyph IDs with the bundled font cmap to inventory
+actual fused combinations. Single-character contextual alternates and the blank
+line placeholder are not multi-character ligatures. The key must cover exactly
+that inventory: **26 sequences**, not the font's complete substitution list.
+`symbol-key.json` holds the draft introduction and explanations sent for editorial
+review before refinement. The key is generated after the contents, separately
+from the manuscript manifest and text count. Its printed column must use glyphs
+observed in the book; its typing column must use the individual character glyphs.
+Both checks run against the saved PDF. Only that typing column isolates glyphs.
+
+The source remains the frozen 33-file `517e0fc` tree while acknowledgments PR #40
+is pending. Its later merge and the 34-file baseline update are separate from
+this proof; no placeholder acknowledgments page is inserted.

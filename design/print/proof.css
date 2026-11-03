@@ -15,7 +15,7 @@
 }
 @page :left { margin-left:.68in; margin-right:.82in; }
 * { box-sizing:border-box; }
-body { margin:0; font:11pt/16pt Plex; color:#181818; font-variant-ligatures:none; }
+body { margin:0; font:11pt/16pt Plex; color:#181818; font-variant-ligatures:normal; }
 strong { font-weight:600; }
 p { margin:0 0 9pt; orphans:3; widows:3; }
 h1,h2,h3,h4 { font-family:Oxanium; font-weight:600; break-after:avoid; }
@@ -80,3 +80,13 @@ thead { display:table-header-group; }
 .footnote::footnote-marker { content:counter(footnote-marker) '. '; font-weight:600; }
 /* The final source note precedes the final Verdict; nothing follows the last scene. */
 [data-document='32'] h2[data-section='The Verdict'] { break-before:page; }
+
+[data-keep-next] { break-after:avoid; }
+
+.symbol-key h1 { font:500 30pt/36pt Oxanium; margin:0 0 18pt; }
+.symbol-key td:first-child, .symbol-key th:first-child { width:16%; }
+.symbol-key td:nth-child(2), .symbol-key th:nth-child(2) { width:22%; }
+/* Only the key's typing column isolates characters. Manuscript code is unchanged. */
+.key-character { display:inline-block; }
+
+.symbol-key [data-key-glyph] { font-variant-ligatures:normal; }
