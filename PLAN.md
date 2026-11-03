@@ -88,6 +88,8 @@ it-depends-ts-book/
 │       └── character-voices.md    # Writer-facing speech tendencies
 ├── book/
 │   ├── 00-prologue/
+│   │   ├── 00-dedication.md
+│   │   ├── 00a-acknowledgments.md
 │   │   ├── 01-how-to-read.md
 │   │   └── 02-meet-the-cast.md
 │   ├── 01-the-type-system/
