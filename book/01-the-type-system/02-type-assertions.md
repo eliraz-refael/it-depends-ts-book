@@ -137,11 +137,11 @@ dog.bark(); // Runtime: dog.bark is not a function
 
 **Oded** pushes back:
 
-"Sometimes the types are genuinely wrong. Third-party library declares a return type that's too narrow. You know the actual runtime value has additional properties. The library maintainer hasn't merged your PR yet. What do you do for the next three months?"
+"Sometimes the types are genuinely wrong. Third-party library declares an incomplete return type. You know the actual runtime value has additional properties. The library maintainer hasn't merged your PR yet. What do you do for the next three months?"
 
 **Daniel Compiler**: "The rejected assertion says neither type sufficiently overlaps with the other. The full message even suggests converting to `unknown` first if that was intentional. Each step then passes, but neither adds evidence that the value is a `Dog`. This one still has `meow`, not `bark`."
 
-"Your case doesn't need the detour. If the declared return type is too narrow, assert to that type plus the properties you know are there. That's a subtype of what the library declared, so a direct assertion is allowed."
+"Your case doesn't need the detour. If the declared return type leaves out those properties, assert to that type plus the properties you know are there. That's a subtype of what the library declared, so a direct assertion is allowed."
 
 **Oded**: "One `&` and a comment saying where the extra fields come from."
 
@@ -303,12 +303,12 @@ const name2 = (user as NonNullable<typeof user>).name;
 
 **Noam**: "The exclamation mark is the most dangerous character in TypeScript. It's an assertion disguised as punctuation. I ban it in code reviews with exactly one exception: immediately after assignment in test `beforeEach` blocks."
 
-**Chen**: "Optional chaining changes the type, though. `user?.name` gives you `string | undefined`, not `string`. Sometimes you genuinely *know* the value exists — after a `.filter()` that guarantees it, after a null check three lines up that the compiler can't trace."
+**Chen**: "Optional chaining changes the type, though. `user?.name` gives you `string | undefined`, not `string`. Sometimes you genuinely *know* the value exists — after `filter(Boolean)` removes missing objects, or after a check inside a callback the compiler can't follow."
 
 ```typescript
 // Optional chaining: safe but changes the type
-const name = user?.name;
-//    ^? const name: string | undefined
+const optionalName = user?.name;
+//    ^? const optionalName: string | undefined
 // Now every downstream function must handle undefined.
 
 // Control flow narrowing: safe AND preserves the type
@@ -318,8 +318,8 @@ if (user) {
 }
 
 // Non-null assertion: preserves the type but asserts
-const name = user!.name;
-//    ^? const name: string
+const assertedName = user!.name;
+//    ^? const assertedName: string
 // Only safe if you can PROVE user isn't null.
 ```
 

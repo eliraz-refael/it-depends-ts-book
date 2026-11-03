@@ -1,4 +1,31 @@
 // Case table for chapters1-6.cjs. Fence numbers count ```typescript blocks from 1.
+const assert = require("node:assert/strict");
+const webhookEffects = `
+const effects: {logs: Array<{action: string; detail: unknown}>; charges: Array<{method: unknown; amount: number}>} = {logs: [], charges: []};
+function logEvent(action: string, detail: unknown): void { effects.logs.push({action, detail}); }
+Object.assign(globalThis, {chargeUser(method: unknown, amount: number): Promise<void> {
+  effects.charges.push({method, amount}); return Promise.resolve();
+}});
+`;
+function checkWebhook({handleWebhook, effects}, validates) {
+  try {
+    const user = {id: "u1", email: "ada@example.com", paymentMethod: {token: "test-token"}};
+    const order = {items: [{price: 3, quantity: 4}]};
+    for (const type of ["purchase", "refund", "signup"]) handleWebhook({type, data: {user, order}});
+    assert.deepEqual(effects.logs, ["purchase", "refund", "signup"].map(action => ({action, detail: user})));
+    for (const log of effects.logs) assert.equal(log.detail, user, "Keep the original user argument");
+    assert.deepEqual(effects.charges, [{method: user.paymentMethod, amount: 12}]);
+    if (validates) {
+      const before = structuredClone(effects);
+      for (const data of [null, {}, {user}, {user, order: {items: [{price: "3", quantity: 4}]}}]) {
+        assert.throws(() => handleWebhook({type: "purchase", data}), /Invalid (webhook|purchase) data/);
+        assert.deepEqual(effects, before, "Rejected purchases neither charge nor log success");
+      }
+      handleWebhook({type: "purchase", data: {user, order}});
+      assert.equal(effects.charges.length, 2, "A valid purchase still succeeds after rejection");
+    }
+  } finally { delete globalThis.chargeUser; }
+}
 const api = `declare const api: { get<T = any>(url: string): Promise<T> };`;
 const expressApp = `import express from "express";
 const app = express();
@@ -28,8 +55,15 @@ type DateStays = Expect<Equal<Formatted["createdAt"], Date>>;`},
       {name: "migration-month-4", fence: 11, lines: [11, 21], before: api},
       {name: "tracked-any", fence: 12, before: api},
       {name: "any-breaks-inference", fence: 13, after: `
-type NumIsNumber = Expect<Equal<typeof num, number>>;
+type NumIncludesMissing = Expect<Equal<typeof num, number | undefined>>;
 type MysteryIsAny = Expect<IsAny<typeof mystery>>;`},
+      {name: "first-element-empty-and-nonempty", fence: 13, lines: [1, 3], after: `
+export {firstElement};
+type Returned = Expect<Equal<ReturnType<typeof firstElement<number>>, number | undefined>>;`,
+        runtime: async ({firstElement}) => {
+          assert.equal(firstElement([]), undefined);
+          assert.equal(firstElement([42]), 42);
+        }},
       {name: "unwrap-any", fence: 14, after: `
 type AIsString = Expect<Equal<A, string>>;
 type BIsAny = Expect<IsAny<B>>;`},
@@ -57,10 +91,11 @@ type EventHandler = (payload: any) => void;
 const handlers: Map<string, EventHandler[]> = new Map();`},
       {name: "interface-event-contract", fence: 21},
       {name: "overload-event-handlers", fence: 22},
-      {name: "webhook-before", fence: 23, before: `
-declare function logEvent(action: string, detail: unknown): void;
-declare function chargeUser(method: any, amount: number): Promise<void>;`},
-      {name: "webhook-after", fence: 24, before: `declare function logEvent(action: string, detail: unknown): void;`},
+      {name: "webhook-before", fence: 23, before: webhookEffects + `
+declare function chargeUser(method: any, amount: number): Promise<void>;`,
+        after: `export {handleWebhook, effects};`, runtime: async m => checkWebhook(m, false)},
+      {name: "webhook-after", fence: 24, before: webhookEffects,
+        after: `export {handleWebhook, effects};`, runtime: async m => checkWebhook(m, true)},
     ],
   },
   "01-the-type-system/02-type-assertions.md": {
@@ -85,13 +120,18 @@ type Parsed = Expect<Equal<typeof user, { id: string; name: string; email: strin
       {name: "satisfies-rejects-typo", fence: [11, 13], expect: [[13, 4, 2322, `Type '"purple"' is not assignable to type 'Color'.`]]},
       {name: "as-accepts-typo", fence: [11, 14]},
       {name: "non-null-equivalence", fence: 15, before: `declare const user: { name: string } | null;`},
-      // The fence declares name at top level twice to compare forms; each form is compiled separately.
-      {name: "optional-chaining-and-narrowing", fence: 16, lines: [1, 10],
-        before: `declare const user: { name: string } | undefined;`,
-        after: `type Optional = Expect<Equal<typeof name, string | undefined>>;`},
-      {name: "non-null-preserves", fence: 16, lines: [12, 15],
-        before: `declare const user: { name: string } | undefined;`,
-        after: `type Asserted = Expect<Equal<typeof name, string>>;`},
+      {name: "optional-chaining-narrowing-and-assertion", fence: 16,
+        before: `declare const user: { name: string } | undefined;`, after: `
+type Optional = Expect<Equal<typeof optionalName, string | undefined>>;
+type Asserted = Expect<Equal<typeof assertedName, string>>;`},
+      {name: "boolean-filter-versus-inferred-predicate", fence: 16,
+        before: `declare const user: { name: string } | undefined;`, after: `
+const candidates: Array<{name: string} | undefined> = [{name: "Ada"}, undefined];
+const filtered = candidates.filter(Boolean);
+filtered.map(value => value.name);
+filtered.map(value => value!.name);
+const inferred = candidates.filter(value => value !== undefined);
+inferred.map(value => value.name);`, expect: [["after", 4, 18048]]},
       {name: "map-has-get", fence: 17, before: `interface User { id: string }
 declare const userId: string;`},
     ],
@@ -146,7 +186,7 @@ type Unwrapped = Expect<Equal<UnwrapPromise<Promise<number>>, number>>;`},
       {name: "union-catches-typo", fence: [{fence: 2, lines: [1, 4]}, {fence: 3, lines: [1, 5]}], expect: [[3, 4, 2345,
         `Argument of type '"activ"' is not assignable to parameter of type '"active" | "banned" | "inactive"'.`]]},
       {name: "enum-call", fence: [{fence: 2, lines: [7, 15]}, {fence: 3, lines: [7, 9]}]},
-      {name: "named-union", fence: 4, edit: [["{ ... }", "{}"]]},
+      {name: "named-union", fence: 4},
       {name: "const-enum-declaration", fence: 5},
       // The chapter quotes this diagnostic outside a TypeScript fence.
       {name: "ambient-const-enum-isolated", fence: 5, lines: [3, 4], options: {isolatedModules: true},
@@ -208,7 +248,20 @@ function sameNarrowing(input: string | null | undefined) {
       {name: "parse-result", fence: 8, before: `type User = { id: string; email: string; displayName: string };`},
       {name: "parse-or-throw", fence: [8, 9], before: `type User = { id: string; email: string; displayName: string };`},
       {name: "request-state-switch", fence: 10},
-      {name: "parse-event", fence: [{fence: 8, lines: [1, 3]}, 10, 11]},
+      {name: "parse-event", fence: [{fence: 8, lines: [1, 3]}, 10, 11],
+        after: `export {parseEvent, describeRequest};`, runtime: async ({parseEvent, describeRequest}) => {
+          const states = [{status: "idle"}, {status: "loading"},
+            {status: "success", data: 42}, {status: "error", error: new Error("failed")}];
+          const labels = ["Click to load", "Loading...", "Got: 42", "Failed: failed"];
+          states.forEach((state, i) => {
+            const parsed = parseEvent(state);
+            assert.deepEqual(parsed, {ok: true, value: state});
+            assert.equal(describeRequest(parsed.value), labels[i]);
+          });
+          for (const invalid of [null, {}, {kind: "idle"}, {status: "success"}, {status: "error", error: "text"}]) {
+            assert.equal(parseEvent(invalid).ok, false);
+          }
+        }},
       {name: "zod-parser", fence: [{fence: 8, lines: [1, 3]}, 12], after: `
 type Inferred = Expect<Equal<User, { id: string; email: string; displayName: string }>>;`},
       {name: "result-and-exception-reasons", fence: [8, 9, 13],

@@ -86,7 +86,7 @@ updateUser("u_42", Status.Active);
 ```typescript
 type UserStatus = "active" | "inactive" | "banned";
 
-function updateUser(id: string, status: UserStatus) { ... }
+function updateUser(id: string, status: UserStatus) { /* ... */ }
 ```
 
 "The parameter's type gives me the domain name. I don't need an object just to pass one of these strings."

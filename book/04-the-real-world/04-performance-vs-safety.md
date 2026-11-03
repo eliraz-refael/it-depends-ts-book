@@ -14,7 +14,7 @@
 
 **Noam**: "The customer doesn't get the title."
 
-They're reviewing a translation helper in a fictional shop. Noam is reading the output of two deliberately broken calls he wrote against Oded's branch, in `src/probe.ts` below. Oded's PR accepts string keys and an optional dictionary of substitutions. His generated checking workload finishes sooner. The lookup and replacement code hasn't changed.
+They're reviewing the shop's translation helper. Noam is reading the output of two deliberately broken calls he wrote against Oded's branch, in `src/probe.ts` below. Oded's PR accepts string keys and an optional dictionary of substitutions. His generated checking workload finishes sooner. The lookup and replacement code hasn't changed.
 
 ```typescript
 // src/i18n.ts — Oded's PR

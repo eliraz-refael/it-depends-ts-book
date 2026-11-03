@@ -307,13 +307,13 @@ function parseUserOrThrow(input: unknown): User {
 
 ```typescript
 type RequestState<T> =
-  | { kind: "idle" }
-  | { kind: "loading" }
-  | { kind: "success"; data: T }
-  | { kind: "error"; error: Error };
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: T }
+  | { status: "error"; error: Error };
 
 function describeRequest<T>(state: RequestState<T>): string {
-  switch (state.kind) {
+  switch (state.status) {
     case "idle": return "Click to load";
     case "loading": return "Loading...";
     case "success": return `Got: ${JSON.stringify(state.data)}`;
@@ -322,7 +322,7 @@ function describeRequest<T>(state: RequestState<T>): string {
 }
 ```
 
-"In the success case, `state.data` is `T`. In the error case, `state.error` is `Error`. The tag gives me access to the right fields. If I add `{ kind: 'retrying'; attempt: number }` without handling it, this function's `: string` return annotation catches the missing return."
+"In the success case, `state.data` is `T`. In the error case, `state.error` is `Error`. The tag gives me access to the right fields. If I add `{ status: 'retrying'; attempt: number }` without handling it, this function's `: string` return annotation catches the missing return."
 
 **Daniel**: "That holds with strict null checking. Without that return annotation, the inferred result can become `string | undefined`. An explicit `assertNever` check is another way to enforce exhaustiveness."
 
@@ -334,18 +334,18 @@ function parseEvent(input: unknown): ParseResult<RequestState<unknown>> {
   if (typeof input !== "object" || input === null) {
     return { ok: false, reason: "not an object", input };
   }
-  if (!("kind" in input)) {
-    return { ok: false, reason: "missing kind", input };
+  if (!("status" in input)) {
+    return { ok: false, reason: "missing status", input };
   }
-  if (input.kind === "idle") return { ok: true, value: { kind: "idle" } };
-  if (input.kind === "loading") return { ok: true, value: { kind: "loading" } };
-  if (input.kind === "success" && "data" in input) {
-    return { ok: true, value: { kind: "success", data: input.data } };
+  if (input.status === "idle") return { ok: true, value: { status: "idle" } };
+  if (input.status === "loading") return { ok: true, value: { status: "loading" } };
+  if (input.status === "success" && "data" in input) {
+    return { ok: true, value: { status: "success", data: input.data } };
   }
-  if (input.kind === "error" && "error" in input && input.error instanceof Error) {
-    return { ok: true, value: { kind: "error", error: input.error } };
+  if (input.status === "error" && "error" in input && input.error instanceof Error) {
+    return { ok: true, value: { status: "error", error: input.error } };
   }
-  return { ok: false, reason: "unrecognized event kind", input };
+  return { ok: false, reason: "unrecognized event status", input };
 }
 ```
 

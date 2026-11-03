@@ -246,7 +246,7 @@ console.log(JSON.stringify(templateHold(order))); // {"hold":true,"reasons":["re
 
 **Dafna**: "You've kept `country-velocity` in the list. Can I reopen its old activations for compliance? Their settings have a count but no `days`."
 
-**Eden**: "Those are format 1, when the window was fixed at seven days. The reader supplies seven for them. Format 2 allows an editable window and rejects a missing `days`."
+**Eden**: "Those are format 1, when the window was fixed at seven days. The reader supplies seven for them. Format 2 allows an editable window and rejects a missing `days`. Those versions belong to templates. The tree has its own format 1 and its own reader."
 
 ## The Turn
 

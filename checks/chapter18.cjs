@@ -253,6 +253,32 @@ for(const [label,test] of [["before-zone-repair",preZone],["after-zone-repair",f
     }finally{Date.now=real;}
   }));
 }
+// The new optional argument consumes map's index; the page now requires arrows for these callers.
+for (const [label,test] of [["old",originalApi],["new",fixedApi]]) {
+  example(label+"-callback-remains-type-compatible", test.source +
+    "\nconst callbackResults: SlaStatus[] = [ticket].map(slaStatus);\n");
+  group(label+"-callback-clock-and-arrow-control",()=>{
+    const observed=run(test,(m,assert)=>{
+      const real=Date.now;
+      try {
+        Date.now=()=>Date.UTC(2026,10,9,10,40);
+        const before=m.riskRecords.length;
+        const direct=m.slaStatus(m.ticket);
+        assert.equal(direct,"at-risk");
+        m.riskRecords.length=before;
+        const callback=[m.ticket].map(m.slaStatus);
+        const arrow=[m.ticket].map(ticket=>m.slaStatus(ticket));
+        const records=m.riskRecords.length-before;
+        Date.now=()=>Date.UTC(2026,10,9,11);
+        return {callback,arrow,records,breachCallback:[m.ticket].map(m.slaStatus),
+          breachArrow:[m.ticket].map(ticket=>m.slaStatus(ticket))};
+      } finally {Date.now=real;}
+    });
+    assert.deepEqual(observed.result,{callback:[label==="old"?"at-risk":"ok"],
+      arrow:["at-risk"],records:label==="old"?2:1,
+      breachCallback:[label==="old"?"breached":"ok"],breachArrow:["breached"]});
+  });
+}
 group("local-deadline-table-and-consistent-host-repair",()=>{
   const rows=[...chapter.matchAll(/^\| `(UTC|Asia\/Jerusalem|America\/New_York)` \| `([^`]+)` \|$/gm)];
   assert.equal(rows.length,3);

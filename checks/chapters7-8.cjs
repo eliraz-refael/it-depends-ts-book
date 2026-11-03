@@ -27,10 +27,10 @@ function chapter(file, count) {
     complete() { assert.equal(used.size, blocks.length, "Every fence must be covered in " + file); },
   };
 }
-function example(name, code, expected = [], options = {}) {
+function example(name, code, expected = [], options = {}, messages = []) {
   const filename = path.join(scratch, name + ".ts");
   fs.writeFileSync(filename, "export {};\n" + code);
-  cases.push({name, filename, expected, options});
+  cases.push({name, filename, expected, options, messages});
 }
 const c7 = chapter("book/02-advanced-typescript/01-conditional-types.md", 29);
 const c8 = chapter("book/02-advanced-typescript/02-mapped-types.md", 21);
@@ -63,7 +63,12 @@ type One = Expect<Equal<typeof one, string>>;
 type Many = Expect<Equal<typeof many, string[]>>;
 `);
 example("ch7-two-overloads", twoOverloads);
-example("ch7-union-caller-rejected", frontMatter + twoOverloads + f7(8, "declare const post"), [2769]);
+const rejectedUnion = f7(8, "declare const post");
+const overloadMessage = rejectedUnion.split("// error TS2769: ")[1]
+  .split("\n").map(line => line.replace(/^\/\/ ?/, "")).join("\n").trim();
+assert(overloadMessage.startsWith("No overload matches this call."));
+example("ch7-union-caller-rejected", frontMatter + twoOverloads + rejectedUnion,
+  [2769], {}, [{code: 2769, text: overloadMessage}]);
 example("ch7-three-overloads", postDeclaration + threeOverloads + equal + `
 type One = Expect<Equal<typeof one, string>>;
 type Many = Expect<Equal<typeof many, string[]>>;
@@ -107,6 +112,23 @@ type TopCheckCheck = Expect<Equal<TopCheck, "ran">>;
 example("ch7-boolean-filter", filters + f7(24, "type Enabled") + equal + 'type Check = Expect<Equal<Enabled, true>>;');
 example("ch7-filter-typo-accepted", filters + channel + f7(25, "type Mistyped") + equal + 'type Check = Expect<Equal<Mistyped, Channel>>;');
 example("ch7-filter-typo-rejected", filters + channel + f7(26, "type StrictExclude"), [2344]);
+const misspelledSwitch = channel + `
+function label(c: Channel): string {
+  switch (c) {
+    case "email": return "Email";
+    case "smss": return "SMS";
+    case "push": return "Push";
+    default: { const missing: never = c; return missing; }
+  }
+}
+`;
+example("ch7-misspelled-case-and-missing-member", misspelledSwitch, [2678, 2322], {}, [
+  {code: 2678, text: `Type '"smss"' is not comparable to type 'Channel'.`},
+  {code: 2322, text: `Type '"sms"' is not assignable to type 'never'.`},
+]);
+example("ch7-misspelled-case-without-exhaustiveness", misspelledSwitch.replace(
+  'const missing: never = c; return missing;', 'return "Other";'), [2678]);
+example("ch7-restored-case-is-exhaustive", misspelledSwitch.replace('"smss"', '"sms"'));
 const historicalNullable = nonNullable.split("// TypeScript 4.8 and later:")[0];
 const currentNullable = nonNullable.split("// TypeScript 4.8 and later:")[1];
 example("ch7-historical-nullable-definition", historicalNullable + equal + 'type Check = Expect<Equal<NonNullable<string | null | undefined>, string>>;');
@@ -185,6 +207,11 @@ for (const group of groups.values()) {
   for (const test of group) {
     const found = diagnostics.filter(d => d.fileName === test.filename);
     assert.deepEqual(found.map(d => d.code).sort(), test.expected.slice().sort(), test.name + "\n" + describe(found));
+    const flat = text => text.replace(/\s+/g, " ").trim();
+    for (const {code, text} of test.messages) {
+      assert(found.some(d => d.code === code && flat(d.message) === flat(text)),
+        test.name + " quoted diagnostic message differs\n" + describe(found));
+    }
   }
   assert.equal(diagnostics.filter(d => !group.some(t => t.filename === d.fileName)).length, 0, describe(diagnostics));
 }

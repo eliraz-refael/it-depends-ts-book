@@ -300,6 +300,6 @@ write(boundary,'case.ts',boundarySource);check('boundary-type-restored',[],bound
 assert.equal(read(story,orders),finalOrders);assert.equal(read(story,rowFile),flatRow);
 assert.equal(read(story,tests),runtime);assert.equal(read(story,typesFile),compileOnly);
 assert.deepEqual(JSON.parse(read(story,'tsconfig.json')).include,fixedInclude.include);
-assert.equal(require(path.join(repo,'node_modules/@types/node/package.json')).version,'26.5.1');
+assert.equal(require(path.join(repo,'node_modules/@types/node/package.json')).version,'22.20.5');
 console.log(JSON.stringify({typescript:version,node:process.version,fences:fences.length,compilerCases:cases,runtimeGroups:groups,fileListQueries:queries,directivesVerified:coveredDirectives.size,scratch},null,2));
 console.log('Chapter 26: PASS');

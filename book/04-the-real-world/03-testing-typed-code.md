@@ -18,7 +18,7 @@
 
 **Noam**: "That's the problem."
 
-They're reviewing pre-order support for a fictional shop. Nothing has shipped. Their small review repository uses an in-memory shipping recorder: adding an id to `shipped` calls no courier. Before Oded's change, the relevant source was:
+They're reviewing the shop's pre-order support. Their small review repository uses an in-memory shipping recorder: adding an id to `shipped` calls no courier. Before Oded's change, the relevant source was:
 
 ```typescript
 // src/orders.ts — before the PR
