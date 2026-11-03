@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Before admiring the chain, look at what its next step returns. If it returns a plain value, use `map`. By plain I mean not the container you're already in: inside Result, even an array is a plain value. If it returns another Result, you need the operation arrays call `flatMap`, which hands back the step's Result as it is instead of wrapping it in a second one. Arrays show the difference plainly: `map` keeps an extra array level and `flatMap` joins it. Then write the early-return version as well, and compare. If later steps need earlier values, you may find those checks easier to follow than callbacks nested to keep the values available."
+**Prof. Eli Typeworth**: "Choose the chaining operation by what the next step returns, then check the shape the caller receives. If the step produces a plain value, `map` puts that value inside the container. Plain is relative here: an array is an ordinary payload inside a Result. If the step produces another Result, wrapping it again gives the caller a Result inside a Result. An operation such as `flatMap` instead hands back the step's result."
 
-"The lovely complication is promises. Their `then` does both jobs: it maps a plain return value and unwraps a returned promise, including an object with a callable `then`. No registration required. You can join a language protocol just by choosing a method name. Don't give an object a `then` method unless it keeps the promise contract. Give a different chaining operation a different name."
+"Write the caller before choosing the chain. Can it reach the answer it needs, and does it still handle failure where intended? The shorter expression earns nothing if it changes either. Sometimes two early returns make that easier to see. The container's name isn't the explanation; follow the value."
 
 ## The Debate
 
@@ -30,7 +30,7 @@ Guy has the preview result open beside the worker's counters. The catalogue team
 
 **Linoy**: "The same check as the screens. There are six screen callers, all synchronous. I only added an async entry point for the batch."
 
-The previews only read a stock snapshot. It has five units available:
+The previews only read a stock snapshot with five units available. Their result uses the same union shape as booking:
 
 ```typescript
 type Result<T, E> =
@@ -293,6 +293,8 @@ console.log(JSON.stringify(offered));
 
 **Dafna**: "That's the same refusal rule, without a wrapper object. We can map the offer into the preview after it."
 
+**Sahar**: "Simple made better."
+
 **Guy**: "And the six screens?"
 
 **Sahar**: "Their chains become function calls."
@@ -369,5 +371,3 @@ const pendingInside = new Res(parseQty("2")).map(availabilityAsync);
 ```
 
 **Dafna**: "That has already called `availabilityAsync`. Awaiting `pendingInside` after our rename gives you the same `Res`, with a promise still in its value. If the job needs the answer, await `availabilityAsync` and inspect the Result it gives back. `map` hasn't done that work for you."
-
-The promise protocol used in the incident is specified in ECMAScript's [resolving functions](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-createresolvingfunctions) and [thenable job](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-newpromiseresolvethenablejob).

@@ -65,6 +65,10 @@ console.log(receipt(before, cart)); // Was 80. Now 80.
 
 **Daniel Compiler**: "It does. `readonly` on an object property doesn't prevent that assignment. It prevents a write through the readonly type."
 
+**Liron**: "A river looks like it stays in place. The water you saw a minute ago—"
+
+**Eden**: "Is the water my receipt needs. It's showing me what's there now."
+
 **Dafna**: "So the receipt has the same object under a more reassuring name. I'd have pricing return a value. `before` would keep this one."
 
 **Guy**: "I'd stop handing our state to a package that owns the writes. It can tell the cart what discount to apply."
@@ -86,8 +90,6 @@ appendGift(cart.items); // Error TS4104.
 **Guy**: "It refuses the array, but accepts the price?"
 
 **Daniel**: "The array types expose different operations. The readonly array has no `push`. That doesn't make the whole cart safe from replacement either. A parameter with a writable `items` property could assign a different readonly array to it."
-
-The [object-type handbook](https://www.typescriptlang.org/docs/handbook/2/objects.html#readonly-properties) documents the property-compatibility rule.
 
 ### A price that stays put
 
@@ -241,7 +243,9 @@ receipt(readPrice, functionPricing.snapshot()); // Error TS2345.
 
 **Dafna**: "Call `readPrice()` when the panel renders. Saving that result takes a snapshot. Saving the function keeps a way to read the next price."
 
-**Guy**: "Where's the interface? The panel depends on a current-price capability. I'd name the operation on it."
+**Liron**: "Complexity is a choice, not a necessity. The receipt keeps a quote. The panel asks for one."
+
+**Guy**: "The panel depends on a current-price capability. I'd name the operation on an interface."
 
 ```typescript
 interface PriceView {

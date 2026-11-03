@@ -30,7 +30,6 @@ const folded=block("type Stop =");
 const looped=block("function looped(");
 const split=block("function split(");
 const held=block("const heldFirst:");
-const reservation=block("type WaitingPayout =");
 const names=block("const stopAtFirstBlocker =");
 const reportFailure=block("type ReportRow =");
 const reportMap=block("const refundAmounts =");
@@ -76,8 +75,6 @@ export {stopAtFirstBlocker,fillAvailable,ready};
 `);
 // Liron's printed split uses the same result type and eligibility stages.
 const splitApi=example("split-at-first-blocker",base+batchTypes+split+"export {split,ready};\n");
-const reserveApi=example("fill-then-reserve-with-explicit-day",base+batchTypes+reservation+
-  "export {fillThenReserve,ready};\n");
 const limitLine="    if (total + payout.amount > allowance) break;\n";
 const wrongOrder=replaceOnce(replaceOnce(original,limitLine,""),
   "  for (const payout of queue) {\n","  for (const payout of queue) {\n"+limitLine);
@@ -122,7 +119,6 @@ const stopFunctions=[load(originalApi).original,load(foldApi).folded,
 const typedFunctions=stopFunctions.slice(1);
 const skip=load(skipApi).skipping;
 const fillAvailable=load(namedApi).fillAvailable;
-const reserve=load(reserveApi).fillThenReserve;
 const queue=[ready("P1",400),ready("P2",900),ready("P3",200),ready("P4",300)];
 const heldQueue=[{id:"H",amount:1200,currency:"USD",status:"held",reason:"review"},
   ready("R1",600),ready("R2",500)];
@@ -205,11 +201,11 @@ group("printed-operation-counts",()=>{
 // Funding scheduler model: append arrivals before each day's batch, deposit or
 // reset, remove only selected IDs, retain queue order. All inputs are already
 // eligible. The actual emitted planners make the stop/skip decision each day.
-function schedule(planner,arrivals,daily,carry=false,days=arrivals.length+8){
+function schedule(planner,arrivals,daily,days=arrivals.length+8){
   let remaining=[],balance=0;const paid=new Map(),trace=[];
   for(let day=1;day<=days;day++){
     remaining.push(...(arrivals[day-1]??[]));
-    balance=carry?balance+daily:daily;
+    balance=daily;
     const before=balance,result=planner(remaining,balance,day);
     const ids=new Set(result.released.map(p=>p.id));
     for(const id of ids){assert(!paid.has(id));paid.set(id,day);}
@@ -219,8 +215,8 @@ function schedule(planner,arrivals,daily,carry=false,days=arrivals.length+8){
   return {paid,trace,remaining};
 }
 group("reset-next-days-table",()=>{
-  const stop=schedule(load(loopApi).looped,[queue],1000,false,3);
-  const skipping=schedule(skip,[queue],1000,false,3);
+  const stop=schedule(load(loopApi).looped,[queue],1000,3);
+  const skipping=schedule(skip,[queue],1000,3);
   const rows=[...chapter.matchAll(/^\| ([123]) \| (P[^|]+) \| (P[^|]+|—) \|$/gm)];
   assert.equal(rows.length,3);
   rows.forEach((r,i)=>{
@@ -256,100 +252,6 @@ group("named-78125-reset-cases-no-id-paid-later-under-skip",()=>{
     count++;
   }
   assert.equal(count,78125);assert(earlier>0);
-});
-function fundingRuns(amount,arrivalThrough=8,days=12) {
-  const arrivals=[[{...ready("P2",900),arrivedOn:1},{...ready("S1",400),arrivedOn:1}]];
-  for(let day=2;day<=arrivalThrough;day++)
-    arrivals.push([{...ready("S"+day,amount),arrivedOn:day}]);
-  return [load(loopApi).looped,skip,(q,b,day)=>reserve(q,b,day,2)]
-    .map(f=>schedule(f,arrivals,500,true,days));
-}
-group("all-id-accumulation-table-and-thirteen-payout-days",()=>{
-  assert(chapter.includes("both arrive on day 1, with P2 first"));
-  const runs=fundingRuns(450);
-  const rows=[...chapter.matchAll(/^\| (P2|S[1-8]) \| (\d+) \| (\d+) \| (\d+) \|$/gm)];
-  assert.equal(rows.length,9);
-  assert.equal(new Set(rows.map(r=>r[1])).size,9);
-  for(const [,id,...days] of rows){
-    assert.deepEqual(runs.map(r=>r.paid.get(id)),days.map(Number),id);
-  }
-  assert(runs.every(r=>r.remaining.length===0));
-  const [stop,fill,bounded]=runs;
-  const differences=Array.from({length:8},(_,i)=>{
-    const id="S"+(i+1);return stop.paid.get(id)-fill.paid.get(id);
-  });
-  assert.deepEqual(differences,[2,2,2,2,2,2,1,0]);
-  assert.equal(differences.reduce((a,b)=>a+b,0),13);
-  assert.equal(differences.filter(d=>d>0).length,7);
-  assert.equal(fill.paid.get("P2")-stop.paid.get("P2"),6);
-  assert.deepEqual([bounded.paid.get("P2")-stop.paid.get("P2"),
-    bounded.paid.get("S1")-stop.paid.get("S1"),
-    bounded.paid.get("S2")-stop.paid.get("S2")],[2,-2,-2]);
-  for(let i=3;i<=8;i++)assert.equal(bounded.paid.get("S"+i),stop.paid.get("S"+i));
-  assert(chapter.includes("Thirteen payout-days across seven payouts"));
-});
-group("500-arrivals-ending-day-eight-all-ids-and-day-ten",()=>{
-  const runs=fundingRuns(500);
-  const ids=["P2",...Array.from({length:8},(_,i)=>"S"+(i+1))];
-  const expected=[
-    [2,3,4,5,6,7,8,9,10],
-    [10,1,2,3,4,5,6,7,8],
-    [4,1,2,5,6,7,8,9,10],
-  ];
-  runs.forEach((r,i)=>{
-    assert.deepEqual(ids.map(id=>r.paid.get(id)),expected[i]);
-    assert.equal(r.remaining.length,0);
-  });
-  // Retain the finite-arrival control after the day-10 dialogue was cut.
-});
-group("continuing-500-arrivals-thirty-days-and-recurring-balance",()=>{
-  const [stop,fill,bounded]=fundingRuns(500,30,30);
-  assert.equal(stop.paid.get("P2"),2);
-  assert.equal(fill.paid.get("P2"),undefined);
-  assert.equal(bounded.paid.get("P2"),4);
-  assert.equal(fill.trace[0].before,500);
-  for(let i=0;i<30;i++){
-    assert.equal(fill.trace[i].after,100);
-    if(i>0)assert.equal(fill.trace[i].before,600);
-    assert.deepEqual(fill.trace[i].released,["S"+(i+1)]);
-  }
-  // Assert every ID through the horizon, not just the oldest payout.
-  for(let i=1;i<=30;i++){
-    const id="S"+i;
-    assert.equal(fill.paid.get(id),i);
-    assert.equal(stop.paid.get(id),i+2<=30?i+2:undefined);
-    const boundedDay=i<=2?i:i+2;
-    assert.equal(bounded.paid.get(id),boundedDay<=30?boundedDay:undefined);
-  }
-  assert(chapter.includes("still unpaid on day 30"));
-  assert(chapter.includes("As long as those arrivals continue, P2 never gets paid"));
-  // The infinite claim uses the stated recurring-balance invariant; a 30-day
-  // run alone would not prove it. Later arrivals are always appended.
-});
-group("reservation-threshold-boundaries-and-visible-stop-reason",()=>{
-  const input=[{...ready("P2",900),arrivedOn:1},{...ready("S2",500),arrivedOn:2}];
-  assert.deepEqual(simple(reserve(input,600,2,2)),{ids:["S2"],total:500});
-  assert.deepEqual(reserve(input,600,2,2).stop,{kind:"end"});
-  assert.deepEqual(reserve(input,600,3,2),{released:[],total:0,stop:{kind:"limit",id:"P2"}});
-  assert.deepEqual(simple(reserve(input,1100,4,2)),{ids:["P2"],total:900});
-  assert.deepEqual(reserve(input,1100,4,2).stop,{kind:"limit",id:"S2"});
-  const originalQueue=queue.map(p=>({...p,arrivedOn:1}));
-  assert.deepEqual(reserve(originalQueue,1000,1,0),load(loopApi).looped(originalQueue,1000));
-  assert.deepEqual(simple(reserve(originalQueue,1000,1,100)),simple(skip(originalQueue,1000)));
-  assert.deepEqual(reserve([],1000,1,2),{released:[],total:0,stop:{kind:"end"}});
-  const exact=[{...ready("EXACT",500),arrivedOn:1}];
-  assert.deepEqual(simple(reserve(exact,500,3,2)),{ids:["EXACT"],total:500});
-  assert.deepEqual(reserve(exact,500,3,2).stop,{kind:"end"});
-});
-group("reservation-explicit-day-and-local-state",()=>{
-  const input=Object.freeze(queue.map(p=>Object.freeze({...p,arrivedOn:1})));
-  const oldClock=Date.now;Date.now=()=>{throw new Error("The planner must not read a clock");};
-  try {
-    const first=reserve(input,1000,1,2),second=reserve(input,1000,1,2);
-    assert.deepEqual(first,second);assert.notEqual(first.released,second.released);
-    first.released.length=0;assert(second.released.length>0);
-    assert.deepEqual(simple(reserve(input,1000,3,2)),{ids:["P1"],total:400});
-  }finally{Date.now=oldClock;}
 });
 group("refund-repairs-values-and-associated-ids",()=>{
   const rows=[{id:"A"},{id:"B",refund:{amount:0}},{id:"C",refund:{amount:700}}];

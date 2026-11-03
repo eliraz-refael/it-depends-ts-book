@@ -49,13 +49,17 @@ console.log(refundForKnown("returned"));         // "issue"
 
 **Eden Legacy**: "Because it has a return annotation and no catch-all branch. We have switches with a `default` too. Adding a member won't stop those compiling."
 
-The HTTP handler rejects malformed JSON before calling the endpoint with the decoded value. The endpoint parses that value, stores the parsed update, then acknowledges receipt. The inbox's `append` stores a durable snapshot before resolving and rejects if storage fails. Its resolved value is the stored update's ID for processing and replay. The HTTP handler turns an uncaught storage failure into a 500 response.
+Eden opens the endpoint:
 
 ```typescript
 interface Inbox {
+  // Resolves with the stored ID only after saving a durable snapshot.
+  // Rejects if storage fails.
   append(value: unknown): Promise<string>;
 }
 
+// The HTTP handler rejects malformed JSON before calling this with decoded input.
+// An uncaught storage failure becomes an HTTP 500.
 async function receive(body: unknown, inbox: Inbox): Promise<number> {
   const parsed = KnownUpdate.safeParse(body);
   if (!parsed.success) return 400;
@@ -64,7 +68,7 @@ async function receive(body: unknown, inbox: Inbox): Promise<number> {
 }
 ```
 
-For this carrier, a non-2xx response or a missing acknowledgement counts as a rejected attempt. A rejected webhook gets two retries. Three rejected attempts pause delivery for the whole account. Those are the terms of this integration; the pause also stops updates for other shipments.
+**Eden**: "We acknowledge after saving the parsed update. The carrier retries twice if it gets no acknowledgement or a non-2xx response. Three rejected attempts pause the whole account, including the other shipments."
 
 Eden opens the rejected request body.
 
@@ -134,8 +138,6 @@ console.log(z.strictObject(KnownUpdate.shape).safeParse(withEta).success);
 **Oded**: "So keeping the status closed doesn't mean rejecting extra keys?"
 
 **Idan**: "They're separate choices. `eta` is an extra key. `held_at_customs` is a new value of a key we already check. A loose object with the same enum still rejects that status."
-
-The [Zod object documentation](https://zod.dev/api#objects) describes these three key policies.
 
 ### "Give the unfamiliar value a place"
 
@@ -360,7 +362,9 @@ console.log(project({ id: "r4", raw: { shipmentId: "", status: "returned" } }));
 
 ## The Verdict
 
-The consumers in this service will receive `Projection`, not `OpenUpdate`. Its type has no status field, so Oded's branch for unfamiliar statuses cannot compile at that handoff. The integration module will preserve the incoming JSON, acknowledge durable receipt, and produce the labels and refund decisions. Tracking can display the carrier's unfamiliar words. Refunds get `issue`, `skip` or `review`, with unresolved meanings routed to an owner rather than silently treated as ineligible. Known application objects can still omit extra keys; the inbox retains what they leave out.
+> Accepting input, retaining it and permitting an action are separate decisions. Give unresolved meanings an owner instead of silently treating them as a negative answer.
+
+**Noam**: "We'll hand these callers `Projection`. Tracking gets its label, refunds get a decision, and neither has a status field to reinterpret. The inbox keeps the raw receipt for review and replay."
 
 **Idan**: "I'd export the open update if those consumers had separate owners. Tracking could change its policy without waiting for this module. I'd accept having to check that refund consumers use the shared helper."
 
@@ -376,8 +380,6 @@ console.log(DefaultedStatus.parse("returned_damaged")); // "in_transit"
 ```
 
 "A `.catch` callback could log the rejected input. That wouldn't make `in_transit` the right status. Use a fallback only when it is an answer the caller actually permits."
-
-The [Zod catch documentation](https://zod.dev/api#catch) describes fallback values and callbacks.
 
 **Eden Legacy**: "Keeping `eta` in the receipt means we can try a new schema against it later. It doesn't mean the old schema checked it. Give the backfill its own checks."
 

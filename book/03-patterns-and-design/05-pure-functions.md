@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "A pure calculation gives the same result for the same input values, and does no required work along the way, such as writing a record someone relies on. Before reusing an earlier answer, ask two questions: what could change the answer without changing those inputs, and what required work would disappear if the call didn't run? An ordinary TypeScript function signature won't answer either."
+**Prof. Eli Typeworth**: "Before replacing a call with a saved answer, establish that the caller gets the same answer and that no required work disappears. A pure calculation gives the same result for the same input values without doing work someone else relies on. Its signature alone cannot establish that."
 
-"Make anything that can change the answer an explicit input. If a value comes from outside the call, like a host setting, reuse an answer only while that value cannot change. If an input changes too often to reuse the whole answer, like the clock, reuse only the work that does not depend on it. Put required work where returning a saved answer cannot skip it. Or decide to accept some staleness. But an acceptable old answer is still an old answer. Deciding how stale it may be is a separate decision from making the calculation pure."
+"I would try the substitution at a real caller. If the answer changes, something the calculation depends on is missing from our account of its inputs. If the answer stays right but the caller loses something, we have mistaken the return value for the whole operation. We may choose to tolerate a difference. Then we must name that difference and agree to it, rather than call the two versions equivalent."
 
 ## The Debate
 
@@ -18,9 +18,9 @@
 
 **Gilad**: "Nobody changed anything. That's the interesting part."
 
-Their support desk gives a P1 ticket four business hours, counted Monday to Friday, 09:00–17:00 in Jerusalem. It becomes at-risk thirty elapsed minutes before its deadline, and breached at the deadline. The escalation job escalates breached tickets hourly. The lead uses the dashboard to intervene before that next run.
+**Oded**: "Four business hours for a P1. Which deadline was it meant to show?"
 
-Their calendar has no holidays or paused tickets. The existing `deadlineFor` walks those business minutes from the opening time and returns an epoch timestamp. `slaStatus` compares that deadline with the current time and returns one of three strings:
+**Gilad**: "Open the ticket. The escalation job runs hourly. The lead needs this board to intervene before then."
 
 ```typescript
 type Ticket = Readonly<{
@@ -31,6 +31,10 @@ type Ticket = Readonly<{
 }>;
 type SlaStatus = "ok" | "at-risk" | "breached";
 
+// Calendar: Monday–Friday, 09:00–17:00 Jerusalem; no holidays or paused tickets.
+// deadlineFor walks business minutes from openedAt and returns an epoch timestamp.
+// slaStatus compares that deadline with now: at-risk 30 elapsed minutes before it,
+// breached at the deadline.
 declare function slaStatus(ticket: Ticket): SlaStatus;
 
 const ticket: Ticket = {
@@ -40,20 +44,19 @@ const ticket: Ticket = {
 };
 ```
 
-This ticket is due at 13:00 Jerusalem time, or 11:00Z. It should be `ok` at 12:20, `at-risk` at 12:40 and `breached` at 13:00.
+**Gilad**: "Due at 13:00 Jerusalem time, 11:00Z. It should be ok at 12:20, at-risk at 12:40, breached at 13:00."
 
-**Gilad**: "When `slaStatus` returns at-risk, it records the ticket, deadline and the instant used to evaluate it. We use those records to reconstruct what the lead saw. Where are this one's records?"
+"When `slaStatus` returns at-risk, it records the ticket, deadline and the instant used to evaluate it. We use those records to reconstruct what the lead saw. Where are this one's records?"
 
 **Oded**: "It never showed at-risk."
 
 **Eden Legacy**: "The escalation job still called `slaStatus` directly. It escalated the ticket after the breach. That doesn't give us the missing at-risk record."
 
-The ticket API and the digest also call `slaStatus` directly.
-
-The project's `memoizeBy` helper saves a function's result under the key its key function computes. A hit returns that result without running the function. Every edit to a ticket increments its revision, so Oded used the ID and revision together:
+**Oded**: "The API and digest call it directly too. I only changed the dashboard. Every edit increments the revision, so I keyed it by ID and revision:"
 
 ```typescript
 const ticketKey = (ticket: Ticket) => `${ticket.id}/${ticket.revision}`;
+// memoizeBy returns the saved result on a key hit, without calling slaStatus.
 const dashboardStatus = memoizeBy(ticketKey, slaStatus);
 ```
 
@@ -84,7 +87,7 @@ Only the direct call at 12:40 records an at-risk evaluation. The cached dashboar
 
 **Dafna Functor**: "Show me where it asks the clock."
 
-Eden opens the existing implementation. `assess` computes the answer; `slaStatus` also sends at-risk records to the application's `recordRisk` sink:
+Eden opens `assess` and the exported `slaStatus`:
 
 ```typescript
 type Evaluation = Readonly<{
@@ -116,10 +119,11 @@ function slaStatus(ticket: Ticket): SlaStatus {
 
 **Oded**: "We already have a TTL helper. Let an answer live for sixty seconds, and put the recording after the cache lookup. Only the dashboard changes."
 
-Their `withTtl` helper keeps a result per key until sixty seconds after its computation starts. The next call at or after expiry recomputes it and replaces the entry. Oded caches the evaluation, so a hit retains its actual evaluation timestamp:
-
 ```typescript
 const cachedEvaluation = withTtl(ticketKey, assess, 60_000);
+// withTtl expires each key 60 seconds after computation starts.
+// A call at or after expiry recomputes and replaces that entry.
+// A hit keeps the saved evaluation, including its evaluatedAt timestamp.
 
 function dashboardStatus(ticket: Ticket): SlaStatus {
   const result = cachedEvaluation(ticket);
@@ -179,10 +183,11 @@ function evaluate(deadline: number, now: number): Evaluation {
 
 **Eden**: "They don't. Keep their entry point. It can use her calculation."
 
-The module now constructs its exported `slaStatus` with Eden's factory. Each call creates a deadline cache, so tests can start with an empty one.
+Eden writes the factory for the module's entry point:
 
 ```typescript
 function makeSla() {
+  // Each factory call starts with an empty deadline cache.
   const cachedDeadline = memoizeBy(ticketKey, deadlineFor);
   return function slaStatus(ticket: Ticket, now = Date.now()): SlaStatus {
     const result = evaluate(cachedDeadline(ticket), now);
@@ -282,8 +287,6 @@ console.log(new Date(deadlineFor(ticket)).toISOString());
 
 **Eden**: "The digest was already wrong. We just never tested that host's setting. Our cache change didn't cause it."
 
-[`getHours`](https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date.prototype.gethours) and [`getDay`](https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date.prototype.getday) use local time, which Node selects through [`TZ`](https://nodejs.org/api/cli.html#tz); [`Intl.DateTimeFormat`](https://tc39.es/ecma402/#sec-initializedatetimeformat) can take an explicit zone instead.
-
 **Oded**: "Set the digest host to Jerusalem. We have one support team, not three calendars."
 
 **Chen**: "That gives the right deadline. I tried it."
@@ -292,7 +295,7 @@ console.log(new Date(deadlineFor(ticket)).toISOString());
 
 **Dafna**: "Then pass the zone to the calculation. For each instant, ask for both the weekday and hour in that zone. Leave the walk on epoch minutes."
 
-She replaces `deadlineFor` and adds the module's fixed policy:
+Dafna writes the replacement:
 
 ```typescript
 type SlaPolicy = Readonly<{ timeZone: string }>;
@@ -320,10 +323,11 @@ function deadlineFor(ticket: Ticket, policy: SlaPolicy): number {
 
 "And I'll copy the policy. `Readonly` won't stop a caller editing the object it passed us. That would change the zone halfway through filling our cache."
 
-He replaces the factory and rebuilds the entry point:
+Eden updates `makeSla`:
 
 ```typescript
 function makeSla(policy: SlaPolicy) {
+  // Replaces the earlier factory; rebuild the exported entry point below.
   const fixedPolicy = { timeZone: policy.timeZone };
   const cachedDeadline = memoizeBy(ticketKey,
     (ticket: Ticket) => deadlineFor(ticket, fixedPolicy));

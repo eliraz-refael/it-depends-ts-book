@@ -83,7 +83,7 @@ function pageCount(raw: number): PageCount {
 
 **Noam**: "There isn't even a symbol created by that declaration. `declare` emits nothing. The key belongs to this declaration, and the two types require different values at that key. Both are ordinary numbers when this runs."
 
-This is the intersection technique in TypeScript's [nominal-typing example](https://www.typescriptlang.org/play/typescript/language-extensions/nominal-typing.ts.html). The [symbol documentation](https://www.typescriptlang.org/docs/handbook/symbols.html#unique-symbol) describes the declaration-specific identity of a `unique symbol` key.
+"Our `UserId` used a property called `__brand`. This symbol key belongs to its declaration, so another module won't share the marker just by choosing the same property name. Both are type-level markers. Neither checks a value."
 
 Noam keeps the numbering function and puts a typed entry point in front of it:
 
@@ -307,7 +307,9 @@ function exportDraft(draft: PageDraft, render: (request: PageSpan) => void): str
 
 **Oded**: "And Export never calls the renderer for that draft. Two callers, one comparison."
 
-## The Verdict
+## The Debate Continues
+
+A scalar brand can distinguish roles without promising a relationship between fields. A checked object needs operations that preserve its check. Whether to retain that object or rebuild a request depends on what its consumers need to keep.
 
 **Eden**: "I'll put `PageNumber` and `PageCount` on the renderer's entry points. The dialog keeps endpoint drafts. Both actions go through `requestFrom`; there's no range brand to maintain."
 
@@ -315,11 +317,9 @@ function exportDraft(draft: PageDraft, render: (request: PageSpan) => void): str
 
 **Eden**: "The class works, and we'd have to adapt the old helpers and every reader to it. Here the dialog edits a draft and rebuilds the request. That request has a positive count from the scalar constructor, with no pair of endpoints to reverse. The renderer keeps its overflow and document checks."
 
-He leaves `requestFrom` in the patch.
+"If another consumer needs to retain an accepted selection, we'll revisit the class."
 
-**Eden**: "If another consumer needs to retain an accepted selection, we'll revisit the class."
-
-Oded adds the five-to-four edit to both action tests. He leaves the test of `count: selection.last` in the compiler checks.
+**Oded**: "Five to four gives no preview and never reaches the exporter. And passing the last page as the count still fails the compiler check. Keep those tests whichever way we go."
 
 ## Additional Takes
 

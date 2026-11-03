@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Gilad Stacktrace**: "A higher-order function takes a function or returns one. A wrapper can keep the call's types while changing what it skips, repeats or leaves running. Ask whether the operation allows those changes. A rejection doesn't prove the work didn't happen. Ask the operation's owner for a guarantee that repeating it is safe, such as a key the operation honors on every attempt to prevent duplicate work. Without that guarantee, don't retry a failure where the work may already have happened, like a timeout or a lost reply. Report the outcome as unknown. Retry it anyway and you can have a failed job and a customer with three messages."
+**Gilad Stacktrace**: "A wrapper is acceptable only if the operation still does what its caller agreed to. I want to trace a request through the wrapper and the operation, all the way to an outcome. A function type can tell me which arguments fit. It won't show me what happened to the request."
 
-"For stacked wrappers, follow the outside call inward, then the failure back out to find who retries and who stops waiting. Stopping the wait doesn't stop the work: an `AbortSignal` helps only if the operation uses it. The compiler can accept a detached method through a generic wrapper, even with an explicit `this` parameter. Call through the instance so the wrapper doesn't lose the receiver. Try each public overload on the returned function, too. A wrapper that infers one argument tuple and result keeps only the last overload."
+"Start with a caller we have, and an outcome it has to handle. Run that case through the original operation and through the wrapped one. Any difference needs an explanation from whoever owns the behavior. Don't end the trace just because one function returned. I need to know what the caller can report, and what evidence supports that report. Otherwise the wrapper has made the call easier to write and the incident harder to explain."
 
 ## The Debate
 
@@ -338,7 +338,9 @@ async function runJob(deliver: Send): Promise<string> {
 
 ## The Verdict
 
-The shipment job keeps `sendShipped`: three attempts, a fresh two-second timeout for each, around `sendOnce`, called through its instance. The timeout supplies a signal; the client uses it. The same notice ID reaches every attempt. A received receipt means accepted; exhausted temporary failures mean unconfirmed.
+> Retry only under a contract that makes repeating the operation safe. Giving up on a reply does not establish that the work never happened.
+
+**Oded**: "Three attempts around `sendOnce`, two seconds each, the same notice ID. A receipt means accepted. Exhausted temporary failures mean unconfirmed, with the reconciliation worker checking that ID."
 
 **Guy**: "Without that repeat-safe operation, use the client's predicate to retry only temporary failures it proves happened before sending. Never a timeout or a lost reply. Those stay unconfirmed. Don't copy this composition and assume the new client has the same contract."
 
@@ -348,7 +350,7 @@ The shipment job keeps `sendShipped`: three attempts, a fresh two-second timeout
 
 ## Additional Take
 
-**Prof. Eli Typeworth**: "Check the public signatures when wrapping the receipt lookup, too. This small forwarding wrapper keeps a generic function generic. It doesn't keep every overload."
+**Prof. Eli Typeworth**: "The courier wrapper lost a call when we derived its signature. Check the receipt lookup's public calls too. This small forwarding wrapper keeps a generic function generic. It doesn't keep every overload."
 
 ```typescript
 function forward<A extends unknown[], R>(f: (...args: A) => R): (...args: A) => R {

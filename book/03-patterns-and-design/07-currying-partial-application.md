@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Daniel Compiler**: "Partial application supplies some arguments now and leaves a function for the rest. Currying turns a function taking several arguments into successive calls taking one argument each. Start with a local arrow when you only need to hold an argument for later. A shared module should own the first call when that call does work only the module can do. Return the form its consumers take: a function, or a prepared value."
+**Daniel Compiler**: "Judge a staged API by what each call establishes for its caller. Partial application supplies some arguments now and leaves a function for the rest. Currying expresses a multi-argument function as successive calls taking one argument each. Those describe the arrangement of calls, not a reason to change an API."
 
-"But the first call is still a call. It can do work and throw. You can choose a type argument there deliberately. If you don't, inference may fix it before the later arguments supply enough information. Check what each call does, whether it can throw, and which type arguments it fixes. And check the code that calls your function: `map` passes the element, index and array. Write an arrow if you mean to forward only the element. Splitting the parentheses doesn't make those decisions for you."
+"Show me the caller that needs the intermediate function. What does it know when it obtains that function, and what can it supply later? A local arrow may already express that division. A shared entry point earns its place when the module has work or knowledge the caller should not duplicate. Compare the calls through both versions before choosing one. Similar-looking function types aren't enough to establish that they serve the same caller."
 
 ## The Debate
 
