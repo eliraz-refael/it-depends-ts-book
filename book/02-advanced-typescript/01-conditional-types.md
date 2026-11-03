@@ -2,7 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth** writes the `sortByName` signature again.
+**Prof. Eli Typeworth**: "Use a conditional type when the required type relationship depends on whether one type is assignable to another. Name the question before choosing the branches."
+
+He writes the `sortByName` signature again.
 
 "Daniel pointed out that `extends` has another job. In `sortByName`, it requires a property. Here it chooses a branch:"
 
@@ -222,7 +224,15 @@ function slugify<T extends string | string[]>(
 
 **Daniel**: "The body has to work for every allowed `T`. `Array.isArray` narrows `input`, but the checker does not use that check to resolve the conditional return type here."
 
-"You can separate the public signature from the implementation. One overload this time."
+**Linoy**: "There's an RFC for that."
+
+She opens the long-open [suggestion to relate control flow to conditional return types](https://github.com/microsoft/TypeScript/issues/33912), and starts copying its example into a scratch tab.
+
+**Daniel**: "A suggestion. It doesn't make this body pass."
+
+**Linoy** switches tabs. "Still red. What can I use here?"
+
+**Daniel**: "You can separate the public signature from the implementation. One overload this time."
 
 ```typescript
 function slugify<T extends string | string[]>(
@@ -297,7 +307,7 @@ He scrolls back to Eden's version.
 
 **Oded**, to Linoy: "You put my name on this PR, didn't you?"
 
-**Linoy** writes *test per branch* on the board, under the signature.
+**Linoy**: "Fine. I'll call both branches. Including the empty array, Oded. Your name can stay."
 
 ---
 
@@ -509,8 +519,6 @@ type NonNullable<T> = T & {};
 
 "For ordinary unions with `null` and `undefined`, yes. For `unknown`, the old definition returned `unknown`. The new one returns `{}`. It excludes the nullish values there too."
 
-The change and its effect on generic assignability are described in the [TypeScript 4.8 release notes](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-8.html).
-
 ## The Turn
 
 **Dafna Functor** points to `Exclude`, still on the whiteboard.
@@ -578,7 +586,7 @@ She leaves a comment on the PR, then returns to the conditional signature in her
 
 ## The Verdict
 
-> For this content pipeline, normalize tags to a list and keep the two functions. For an API that must preserve the input shape, both overloads and a conditional return type can work. Choose based on how clearly you can describe and maintain the relationship.
+> Choose the relationship the callers need before choosing how to spell it. When the API must preserve the input shape, overloads and a conditional return type can both work; choose the one you can describe and maintain clearly. For this content pipeline, normalize tags to a list and keep the two functions.
 
 | Situation | Start with | What to check |
 |-----------|------------|---------------|
@@ -590,11 +598,11 @@ She leaves a comment on the PR, then returns to the conditional signature in her
 | Comparing a union as a whole | `[T] extends [U]` | Tuple wrapping prevents distribution over `T` |
 | An implementation sits beneath overloads | Runtime tests for the promised input/output cases | Type tests check what callers see; they cannot prove the body returns the right branch |
 
-Eden prefers to list the cases while there are only a few. Linoy prefers to name the relationship once, especially when other generic signatures use it. A union caller alone does not settle their disagreement. The [handbook's conditional-type example](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html) starts with the same three-overload alternative.
+Eden prefers to list the cases while there are only a few. Linoy prefers to name the relationship once, especially when other generic signatures use it. A union caller alone does not settle their disagreement.
 
 ## Additional Takes
 
-**Linoy Nightly**: "We still owe `Unwrap` an explanation. The `infer U` part extracts the type inside `Promise<U>`. `ReturnType` uses the same mechanism for functions. It shipped with conditional types in 2.8. I'm going to need the board for that one."
+**Linoy Nightly**: "We still owe `Unwrap` an explanation. The `infer U` part extracts the type inside `Promise<U>`. `ReturnType` uses the same mechanism for functions. It shipped with conditional types in 2.8. I'm going to need the board for that one. Idan wants to derive the courier wrapper's signatures from the SDK. Bring `Unwrap` back when we open the wrapper."
 
 **Noam Kiperman**: "And test the type-only utilities too. `Exclude<Channel, "smss">` compiles. A check that the resulting union is exactly what you intended catches that typo. Different test from calling `slugify`, but it belongs in the PR."
 

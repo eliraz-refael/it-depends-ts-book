@@ -2,6 +2,12 @@
 
 ## The Principle
 
+**Daniel Compiler**: "When you extract a function's type, you inspect its declaration. You haven't made a call. Before rebuilding a callable API from that information, compare what callers can do through the original and through your replacement. A convenient alias isn't evidence that the same calls still work."
+
+"For a wrapper, the replacement also promises what happens when you call it. Write down the behavior you intend to change and keep the rest of the contract in view. The compiler can check calls against the new signature; you still have to establish that the wrapper performs what it advertises. I'd start with a caller we already have. What does it know before the call, and what can it use afterward?"
+
+## The Debate
+
 **Eden Legacy**: "Why does tracking a parcel need a second argument now?"
 
 **Idan Greenfield**: "It doesn't. The options are for the event history."
@@ -69,7 +75,7 @@ courier.retrieve("TRK-42"); // Error: Expected 2 arguments.
 
 **Idan**: "Same function underneath."
 
-**Daniel Compiler**: "Different type on top. `safe` declares its return type as `Safe<C>`. Here `C` is `Courier`. Open that alias."
+**Daniel**: "Different type on top. `safe` declares its return type as `Safe<C>`. Here `C` is `Courier`. Open that alias."
 
 **Eden**: "That's where I stopped. I can follow the mapped keys. There are two `infer`s in the next line."
 
@@ -86,11 +92,7 @@ type Code = Unwrap<string>; // string
 
 **Eden**: "And nobody supplies `U` when they use the alias."
 
-**Daniel**: "Only `T`. The match supplies `U`. Nothing here opens a promise at runtime. Your parcel is still in transit."
-
-The [`infer` keyword](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#inferring-within-conditional-types) declares that variable in a conditional type's `extends` pattern. The variable is available in its true branch, not its false branch or outside the conditional.
-
-## The Debate
+**Daniel**: "Only `T`. The match supplies `U`, within the true branch. That name isn't available in the false branch or outside the conditional. Nothing here opens a promise at runtime. Your parcel is still in transit."
 
 ### "Which call did it look at?"
 
@@ -132,7 +134,7 @@ Eden scrolls back to the two SDK declarations.
 
 **Eden**: "Could they publish a final signature with optional options?"
 
-**Daniel**: "They could. Extraction would then see that signature and its return type. It still wouldn't preserve the two cases for you. The [last-signature rule](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#type-inference-in-conditional-types) doesn't promise that the last signature covers everything."
+**Daniel**: "They could. Extraction would then see that signature and its return type. It still wouldn't preserve the two cases for you. The last-signature rule doesn't promise that the last signature covers everything."
 
 **Idan**: "We can preserve the cases ourselves. They only added one overload."
 
@@ -214,6 +216,8 @@ function acceptTrackingCode(text: string): "accepted" | "rejected" {
 
 **Eden**: "That one compiles. It returns a boolean."
 
+## The Turn
+
 **Noam**: "The declaration does. Run it with `bad`."
 
 ```typescript
@@ -280,7 +284,7 @@ type LocalCheck = Awaited<boolean>;
 // boolean
 ```
 
-**Idan**: "Our `Unwrap` removes one `Promise` layer. `await` keeps resolving. The built-in [`Awaited`](https://www.typescriptlang.org/docs/handbook/utility-types.html#awaitedtype) models that, including promise-like values. I want our return type to follow the operation we're actually doing."
+**Idan**: "Our `Unwrap` removes one `Promise` layer. `await` keeps resolving. The built-in `Awaited` models that, including promise-like values. I want our return type to follow the operation we're actually doing."
 
 **Noam**: "The old fallback wasn't wrong for `Unwrap`. Keeping a string as a string was the point. It was wrong here because the wrapper changed a function that the type said it would leave alone."
 
@@ -395,6 +399,8 @@ const courierAdapter = {
 
 ## The Verdict
 
+> Derive a wrapper over a client surface whose calls and behavior it can preserve. Make that supported surface a checked requirement, and test the runtime transformation. When methods need individual policies, an explicit adapter can make those decisions easier to maintain; its overloads still need runtime tests.
+
 Eden expands the integration module's existing export. The callers import its `courier` object, not the SDK package.
 
 **Eden**: "I started counting forty call sites. That's the wrong number. We can keep this export and its call signatures. Replacing the implementation means writing the forwarding methods here."
@@ -447,7 +453,7 @@ safeRequests(raw); // Error: Type '(text: string) => boolean' is not assignable 
 
 **Idan**: "I'll switch tracking to `safeRequests`. You can replace the courier export."
 
-Eden adds the remaining forwarding methods to the upgrade. Noam runs the invalid-code case again against the courier adapter.
+**Noam**: "And `bad` stays rejected through the courier adapter and the repaired courier wrapper. We are not celebrating a green tracking page that accepts every parcel."
 
 ## Additional Takes
 
