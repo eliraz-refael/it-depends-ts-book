@@ -2,6 +2,12 @@
 
 ## The Principle
 
+**Daniel Compiler**: "Derive one type from another when the parts you carry across are meant to change together. Matching today is not enough. Ask the owner of the second type what should happen when the first one changes. If the answer is 'we decide separately,' copying the current shape may be the right contract."
+
+"A mapped type can carry keys, property types and modifiers. You needn't carry all three. Say which relationship you're preserving, then try a change on the source and inspect the result. A useful derivation makes the change you intended follow through. Saving three lines is pleasant, but it doesn't tell us who should be allowed to change those lines."
+
+## The Debate
+
 Linoy's pull request deletes three type definitions from the account settings feature. Guy has asked her to restore one of them.
 
 **Linoy Nightly**: "Which field did I lose?"
@@ -10,7 +16,7 @@ Linoy's pull request deletes three type definitions from the account settings fe
 
 They're reviewing the diff on the meeting-room display. Oded has checked out the branch and left the settings page open on his laptop.
 
-Eli had promised "types that walk an object's keys." **Daniel Compiler** finds one behind the first line of Linoy's replacement, in the standard library.
+Eli had promised we could "walk an object's keys." **Daniel** opens the mapped type behind the first line of Linoy's replacement, in the standard library.
 
 ```typescript
 type Partial<T> = {
@@ -39,8 +45,6 @@ const wrongValue: ContactDraft = { email: 42 }; // Error: number isn't string.
 **Daniel**: "Most people don't. It gets more work done that way."
 
 **Guy**: "Fine. Now show me what we're making optional."
-
-## The Debate
 
 ### "These are the editable fields"
 
@@ -141,13 +145,12 @@ const clearedBio: DerivedUpdate = { bio: "" };
 const explicitUndefined: DerivedUpdate = { email: undefined };
 // strict alone: all three compile.
 // strict + exactOptionalPropertyTypes: error on explicitUndefined.
+// Both settings stay enabled for the examples below.
 ```
 
 **Daniel**: "`strict` alone accepts that last one. With `exactOptionalPropertyTypes` on, a present `email` has to be a string. Put `undefined` in the value type if you want to allow it. Reading a missing property still gives `undefined`. Both request definitions behave the same way."
 
 **Eden Legacy**: "Our service tests call the function directly. They don't serialize anything. Keep an absent property and a present `undefined` as separate cases."
-
-The remaining examples enable both `strict` and [`exactOptionalPropertyTypes`](https://www.typescriptlang.org/tsconfig/exactOptionalPropertyTypes.html).
 
 ### "The same field changes"
 
@@ -200,7 +203,7 @@ const reverse: DerivedUpdateWithOverride = contract;
 
 **Linoy**: "A type test. You've asked me for those often enough."
 
-She adds one to the type-test file, using [`@ts-expect-error`](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-9.html#ts-expect-error-comments), available since TypeScript 3.9.
+She adds the rejected call to the type-test file:
 
 ```typescript
 // @ts-expect-error: This endpoint does not accept a null email.
@@ -223,13 +226,17 @@ const cannotClearEmail: DerivedUpdateWithOverride = { email: null };
 
 **Guy**: "We do. I want that decision in the API review. For these three fields, I'm keeping the interface."
 
-Linoy leaves her repaired version in the review thread. Guy restores the published request definition and runs the same null-rejection check against it.
+Guy restores the published request and runs the same null-rejection check against it.
+
+**Linoy**: "It passes on either definition. We still disagree about where the next field change should start."
 
 ### "Let me save the biography"
 
 **Linoy**: "One definition back. What about the form? It edits all three of these fields. We don't have a password box hiding in there."
 
 **Guy**: "Let it follow the request. That's the contract this screen uses."
+
+**Linoy**: "Then the selected fields should do."
 
 **Oded**: "I tried using your `EditableFields`. I can't edit them."
 
@@ -240,10 +247,10 @@ const selected: EditableFields = {
 };
 
 selected.displayName = "Ada Lovelace";
-// Error: displayName is readonly.
+// Error TS2540: Cannot assign to 'displayName' because it is a read-only property.
 ```
 
-**Daniel**: "`Pick` preserves the modifiers, and `Partial` keeps `readonly` when it makes a property optional. You selected those fields out of a readonly record. They arrived readonly."
+**Daniel**: "The compiler disagrees. `Pick` preserves the modifiers, and `Partial` keeps `readonly` when it makes a property optional. You selected those fields out of a readonly record. They arrived readonly."
 
 **Linoy**: "For the draft, take it off. And every input holds a string, even when it's empty, so take off the optional modifier as well."
 
@@ -262,7 +269,7 @@ type FormValues = Editable<UpdateUserRequest>;
 
 **Oded**: "I'm going to keep looking for `Editable`."
 
-The two [mapping modifiers](https://www.typescriptlang.org/docs/handbook/2/mapped-types.html#mapping-modifiers) change the type. The draft still needs values, including defaults for the missing fields.
+**Linoy**: "Here are the values for that draft. Missing fields start empty:"
 
 ```typescript
 function startForm(user: ImportedUser): FormValues {
@@ -293,7 +300,7 @@ Eden gives Oded an imported-account fixture to load in the local preview. Oded c
 
 **Linoy** leans over to see the page.
 
-"It's empty. The validator checks every input before we build the request."
+"The validator is rejecting the empty email before we build the request."
 
 **Oded**: "So this person needs an email address to tell us they write software?"
 
@@ -303,7 +310,7 @@ Eden gives Oded an imported-account fixture to load in the local preview. Oded c
 
 **Linoy** finds the submit handler.
 
-"It already picks out the changed fields. Validation runs too early. I'll validate the patch we're actually sending."
+"We already select the changed fields. I'll validate that patch."
 
 The field-selection function compares the draft with its initial values:
 
@@ -333,13 +340,15 @@ const patch = changedFields(initial, draft);
 
 **Linoy**: "It differs from the initial value. It goes in."
 
-Oded retries after she moves the validation call. The biography saves. He adds the imported account to the form's regression cases.
+Linoy moves the validation call and Oded saves the biography.
+
+**Eden**: "Keep this account in the regression cases. It has other things to say before it gets an email address."
 
 ## The Turn
 
-Oded goes back to the email input, types `not-an-address`, and clicks Save again.
+Linoy types `not-an-address` into the email input and clicks Save again.
 
-**Oded**: "This one should complain."
+**Oded**: "Don't save that. We only just got rid of the complaint."
 
 The error appears beside the input. **Linoy** brings the error type onto the display.
 
@@ -397,8 +406,6 @@ Guy deletes `bio`. The object gets an error. He puts it back.
 
 **Guy**: "The labels belong to these inputs. I can make that promise. I couldn't make it about the record and the request."
 
-**Guy** marks the mapping as reviewed.
-
 Linoy leaves the existing `form` list for submission failures above the inputs and replaces just the `fields` type.
 
 ```typescript
@@ -417,9 +424,13 @@ const unavailable: FormErrors<FormValues> = {
 
 ## The Verdict
 
+> Derive the parts whose owners intend them to change together. Shared keys need not mean shared value types, and an internal model change need not change a published request. Choose the dependency deliberately; then check that it carries only what you intended.
+
 The published request keeps its three explicit properties. The form derives writable, required values from that contract, then submits only changed fields. Labels and field errors follow the form's keys. Submission failures appear above the inputs.
 
-Guy wants changes to the released request reviewed in the contract package. Linoy's repaired derivation passes the same checks, and she still wants shared definitions for fields that are meant to change together. Her alternative remains in the review thread.
+**Guy**: "The request changes in the contract package. The database doesn't get to release an API."
+
+**Linoy**: "Agreed about the release. I still want the fields that belong together defined together. My repaired version passes the same checks."
 
 ## Additional Takes
 
@@ -447,7 +458,7 @@ snapshot.values.bio = "Writes software"; // Compiles: the inner object is mutabl
 
 **Noam**: "The inner object is still writable. Nothing here calls `Object.freeze`, either."
 
-**Linoy Nightly**: "Now can I show you the `as`? Mapped types have had [key remapping](https://www.typescriptlang.org/docs/handbook/2/mapped-types.html#key-remapping-via-as) since 4.1. You can choose the output key:"
+**Linoy Nightly**: "Now can I show you the `as`? Mapped types have had key remapping since 4.1. You can choose the output key:"
 
 ```typescript
 type WithoutId<T> = {

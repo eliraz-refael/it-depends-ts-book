@@ -2,11 +2,17 @@
 
 ## The Principle
 
+**Gilad Stacktrace**: "A typed event name should give me two things: a check that the call belongs to the contract, and a route to the code that can produce it. Derive the name if it follows a rule the producers actually share. Then take a name from a log and try to find those producers without asking whoever wrote the helper."
+
+"I'm not asking every call to spell everything out. A shared function may be exactly where I want to look. I am asking what leads me there, and what I still have to inspect once I arrive. The type checks a call. It doesn't explain how that call ended up in my log."
+
+## The Debate
+
 **Oded Shipley**: "You actually opened another PR."
 
 **Linoy Nightly**: "You asked me to."
 
-The account form is still open behind the diff. Linoy's new branch applies her idea to the display preferences: a property called `fontSize`, an event called `fontSizeChanged`.
+Linoy's new branch applies the naming pattern to display preferences: `fontSize` becomes `fontSizeChanged`.
 
 Gilad has pasted a line from the settings demo into a review comment.
 
@@ -14,15 +20,13 @@ Gilad has pasted a line from the settings demo into a review comment.
 {"name":"fontSizeChanged","value":16}
 ```
 
-**Gilad Stacktrace**: "Where can this come from?"
+**Gilad**: "Where can this come from?"
 
-**Linoy**: "The font-size control. Restoring saved preferences. Both go through the helper."
-
-**Gilad**: "Show me how I find those from this."
+**Linoy**: "The font-size control and restored preferences. Both use the helper."
 
 **Oded**: "It's a demo. I haven't put you on call for the font size."
 
-**Gilad**: "In billing I had to follow wrappers across three packages just to find a publisher. I'd like to see the route here before we copy this helper anywhere else."
+**Gilad**: "In billing I followed wrappers across three packages to find a publisher. Show me the route here before we copy the helper."
 
 **Linoy**: "One folder. I'll show you."
 
@@ -48,15 +52,13 @@ export const settings: Settings = {
 };
 ```
 
-**Daniel**: "`SettingKey` has three members. Substitute each one and you get `themeChanged`, `fontSizeChanged`, and `autoSaveChanged`. That's a [template literal type](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html)."
+**Daniel**: "`SettingKey` has three members. Substitute each one and you get `themeChanged`, `fontSizeChanged`, and `autoSaveChanged`. That's a template literal type."
 
 **Oded**: "And `& string`? These are already strings."
 
-**Daniel**: "They are. Other objects can have number or symbol keys. Linoy's pattern selects the string ones. Here it doesn't remove anything."
+**Daniel**: "Other objects can have number or symbol keys. This selects strings. Here it removes nothing."
 
 **Linoy**: "The same thing I wanted for `emailChanged`. And once we've got the name, we can keep its value type too."
-
-## The Debate
 
 ### "We already had the value type"
 
@@ -72,7 +74,7 @@ interface ExistingEvents {
 
 **Oded**: "Like we did with `user:login`. Pick an event, get its payload. This already checks that."
 
-**Linoy**: "I know. I'm replacing how we write the map. Look at the names on the left. Every one is a setting plus `Changed`."
+**Linoy**: "Every name is a setting plus `Changed`. I'm replacing how we write that map."
 
 ```typescript
 type ChangeEvents<T> = {
@@ -83,13 +85,13 @@ type SettingsEvents = ChangeEvents<Settings>;
 // Same three properties and value types as ExistingEvents.
 ```
 
-**Linoy**: "The `as` makes the new key. After the colon, `T[K]` still looks up the old key. So `fontSizeChanged` gets the type of `fontSize`. Add another setting and the map follows."
+**Linoy**: "`as` makes the new key; `T[K]` looks up the old one's value type. Add a setting and the map follows."
 
 **Oded**: "Provided we want an event for it."
 
 **Linoy**: "For this observer, we do. Every setting is observable. If that changes, we select the keys, like we did for the form."
 
-She brings up the event bus's declarations. The bus already exists; these are its public signatures for settings events.
+She opens the existing bus's settings declarations:
 
 ```typescript
 // src/events.d.ts
@@ -106,7 +108,7 @@ export declare function publish<K extends SettingKey>(
 ): void;
 ```
 
-**Linoy**: "Here I've written the relationship directly in the signatures. The preview subscribes like this."
+**Linoy**: "The signatures express that relationship directly. Here's the preview:"
 
 ```typescript
 // src/preview.ts
@@ -119,11 +121,11 @@ on("fontSizeChanged", (value) => {
 
 **Oded**: "Where did it get `number`? You didn't pass `fontSize`."
 
-**Linoy**: "It inferred `K` from the name. `fontSize` fits the part before `Changed`. Then `Settings["fontSize"]` is `number`. You can try the other fields—"
+**Linoy**: "`fontSize` fits before `Changed`, so it infers that as `K`. `Settings["fontSize"]` is `number`. Try another—"
 
 **Daniel**: "Try a typo first."
 
-In the scratch file, Oded adds two calls.
+Daniel adds two calls to the scratch file.
 
 ```typescript
 on("fontSzieChanged", () => {}); // Error: not a settings event name.
@@ -133,11 +135,11 @@ on("fontSizeChanged", (value) => value.toUpperCase());
 
 **Oded**: "The old map caught those too."
 
-**Linoy**: "It did. I want to stop maintaining the list beside the list it came from."
+**Linoy**: "Yes. I'm removing the duplicate list."
 
 ### "That found the person listening"
 
-Oded returns to Gilad's comment and runs the search against the proposed feature files.
+Oded searches the proposed feature files:
 
 ```text
 $ rg --sort path -n -F 'fontSizeChanged' src
@@ -170,15 +172,15 @@ export function setSetting<K extends SettingKey>(key: K, value: Settings[K]) {
 }
 ```
 
-**Linoy**: "The template in `publish`'s parameter is a type. This one, inside the function, is JavaScript. This is where the string gets made."
+**Linoy**: "The template in the parameter is a type. This one is JavaScript: it makes the string."
 
 **Oded**: "I can read it once I'm here. I had to ask you where here was."
 
-**Linoy**: "Follow `publish` from the event module. That finds the wrapper. Find references to the wrapper and you have the callers. You do that with ordinary functions."
+**Linoy**: "Follow `publish`, then references to the wrapper. Like any other function."
 
 **Gilad**: "Which callers?"
 
-Linoy opens the control handlers, then the restore function. The controls supply typed values. `saved` has already been parsed into `Settings` before it reaches the restore function.
+Linoy opens the controls and restore. Restore receives `saved` already parsed into `Settings`.
 
 ```typescript
 // src/controls.ts
@@ -206,7 +208,7 @@ export function restore(saved: Settings) {
 }
 ```
 
-**Linoy**: "The ordinary setter changes one property and publishes. Restore copies all three first, then publishes them. A listener reading the other settings sees the restored values too. That ordering is why restore doesn't call the setter three times."
+**Linoy**: "Restore copies all three before publishing, so listeners see the complete restored state. Three setter calls would publish between updates."
 
 **Oded**: "So you still wrote the three restore calls."
 
@@ -216,19 +218,15 @@ export function restore(saved: Settings) {
 
 **Oded**: "Writing out the event name wouldn't tell you which one ran either."
 
-**Gilad**: "I'd still need the surrounding log or a reproduction. I'm asking how I get to the code I need to inspect. Your search got us there faster in the old version."
+**Gilad**: "I still need logs or a reproduction. First I need to find the code."
 
-**Linoy**: "For restore. The setter handles whichever key the control gives it. There isn't one font-size emission statement to find inside it."
-
-Oded leaves both files open.
+**Linoy**: "Restore lists the fields. The setter can publish any of them. What would you search for inside it?"
 
 ### "Put the names somewhere"
 
-**Oded**: "What about a constants object? Full names in one place. We'd find that, then its references."
+**Oded**: "What about constants? Full names in one place, then follow their references."
 
-**Linoy**: "We can check that too."
-
-She adds a candidate to the scratch file.
+**Linoy**: "We can check that too:"
 
 ```typescript
 const eventNames = {
@@ -245,7 +243,7 @@ function restoreWithNames(saved: Settings) {
 }
 ```
 
-**Linoy**: "Leave out `autoSave` and it's an error. Put `autoSaveChanged` under `fontSize` and that's an error too. This checks which name belongs to each field, not just whether the value is one of our event names."
+**Linoy**: "Missing `autoSave` fails, and so does `autoSaveChanged` under `fontSize`. Each field gets its own name checked."
 
 **Oded**: "I'd have a list I could open."
 
@@ -253,17 +251,15 @@ function restoreWithNames(saved: Settings) {
 
 **Oded**: "I have survived that before."
 
-**Gilad**: "This gets me to the entry. Its references get me to that producer. That's useful if producers actually use the object."
+**Gilad**: "Useful if the producers use it. I can follow the entry's references."
 
-**Linoy**: "And if every generic caller uses `eventNames[key]`, following that reference still takes you to a generic caller. It won't list every possible write for you."
+**Linoy**: "And `eventNames[key]` still takes you to a generic caller."
 
 **Oded**: "I wasn't asking it to. I want somewhere to start."
 
-He keeps the candidate beside the diff.
-
 ### "Do we have a paid profile?"
 
-**Linoy**: "The naming pattern isn't just useful for settings. I was going to try it on the audit viewer next. It already groups names by entity."
+**Linoy**: "The audit viewer groups names by entity. That was going to be next."
 
 ```typescript
 type Entity = "profile" | "invoice";
@@ -275,9 +271,9 @@ const event: AuditEvent = "profile:paid"; // Compiles.
 
 **Oded**: "Do we have a paid profile?"
 
-**Linoy**: "Not in that viewer. That combination shouldn't be there."
+**Linoy**: "No. That combination shouldn't be there."
 
-**Daniel**: "Both substitutions range over both members. You asked for four combinations."
+**Daniel**: "Two choices in each position. You asked for four combinations."
 
 ```typescript
 type ExpandedAuditEvent =
@@ -306,7 +302,7 @@ const wrongEvent: AllowedAuditEvent = "profile:paid"; // Error.
 
 **Oded**: "The brackets at the end?"
 
-**Linoy**: "The mapped type builds an object type. Its `profile` value is `profile:created`. Its `invoice` value is the two invoice events. Indexing with all its keys takes those values as a union."
+**Linoy**: "The mapping gives each entity its events. Indexing with all the keys collects those values into a union."
 
 Oded writes the result underneath.
 
@@ -322,8 +318,6 @@ type ListedAuditEvent =
 **Linoy**: "If we only use the flat list, fine. The filter menu picks an entity first. I want to check its props before throwing the grouped type away."
 
 **Oded**: "After this one. Your settings all have `Changed`. The audit events already needed a different rule."
-
-Linoy closes the audit example. The restore calls are still visible behind it.
 
 ## The Turn
 
@@ -384,13 +378,17 @@ src/restore.ts:7:  publish("fontSizeChanged", saved.fontSize);
 
 **Linoy**: "I'd still use the wrapper in both. Once you know where settings writes live, this is one extra naming choice to explain."
 
-**Oded**: "Put that in the review. I'm not making you write a second setter."
+**Oded**: "One naming choice for three calls. I'll take it. I'm not making you write a second setter."
 
-## The Verdict
+## The Debate Continues
 
-The PR keeps the template-typed signatures and the generic setter. Ordinary controls update a property through `setSetting`, which constructs the event name. Restore continues to update the complete state before publishing, with literal names at its three emission sites. For these literal calls, the preview still receives a number for `fontSizeChanged`.
+A type can check a naming rule without requiring a runtime name-building helper. Choose that indirection by what callers share and how maintainers find them; neither choice identifies which producer ran in a particular session.
 
-The registry stays in the review as an alternative. Linoy prefers using one wrapper throughout the feature. Oded accepts the extra step when tracing the shared setter, but wants the already enumerated restore emissions searchable by their full names. Neither the search result nor the signature tells Gilad which path ran in a particular session.
+The controls keep `setSetting`. Restore updates the complete state before its three literal emissions. For these literal calls, the preview still receives a number for `fontSizeChanged`.
+
+**Linoy**: "I'd use the wrapper for restore too. One route for every settings write."
+
+**Oded**: "I'm keeping the names on the calls that already list the fields. We can find those without knowing your route first."
 
 ## Additional Takes
 

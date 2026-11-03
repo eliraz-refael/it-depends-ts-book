@@ -2,9 +2,15 @@
 
 ## The Principle
 
+**Gilad Stacktrace**: "If a declaration promises an operation, show me what supplies it when the program runs. I want to follow the entry that reaches the call, not just see a file where the operation exists. A declaration can accurately describe one running application and still promise too much to another."
+
+"When behavior depends on initialization, give someone responsibility for that path. If you can't guarantee it for every value covered by the type, represent the uncertainty and decide what the caller should do when the operation is missing. Neither a stronger declaration nor a friendlier error installs the behavior. Start with the entry we intend to ship and show me it doing the job."
+
+## The Debate
+
 **Oded Shipley**: "The badges print. This is the PR that gets rid of the red underline."
 
-**Gilad Stacktrace**: "Show me one printing."
+**Gilad**: "Show me one printing."
 
 The registration desk prints name badges through `label-kit`, a JavaScript package. Its core makes a plain label. A separate plugin adds a frame around the name. The frame is just text, so they can inspect the whole result without a printer.
 
@@ -53,17 +59,15 @@ declare module "label-kit" {
 
 **Gilad**: "In that process. A declaration tells the compiler what to expect. For this one, the expectation depends on which JavaScript has run."
 
-## The Debate
-
 ### The other way in
 
 **Oded**: "The import makes this file a module. So `declare module` patches the package we imported. `Label` is a class, but the interface merges with its instance type. We still have one constructor."
 
 The [module augmentation rules](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation) resolve the name like an import. Once the augmentation is in the compiler's program, other files using that `Label` see the added member too.
 
-**Chen Override**: "Even a file that doesn't import this patch?"
+**Chen Override**: "Like the two widget packages merging `User`? Does a file see this member even if it doesn't import the patch?"
 
-**Dima Bridge**: "If the patch is included in the same program, yes."
+**Dima Bridge**: "Yes, if the patch is in the program. The widgets changed a global name; this changes the instance type exported by `label-kit`. Either way, a file can see the merged type without running the patch."
 
 Oded has already moved badge formatting into a shared function. The web app uses it now; a new batch entry will use it to reprint badges after registration closes.
 
@@ -198,7 +202,9 @@ The build passes. In a fresh process, the same `TypeError` returns.
 
 **Idan**: "Its type. Look at the emitted formatter."
 
-There is no import of `labels` in it. The type-only import brought `labels.ts`, including its augmentation, into the compiler's program. It didn't make the process execute that file. The plugin's side-effect import is still in the emitted `labels.js`; nothing on this execution path loads it.
+**Oded**: "No `labels` import. Where did it go?"
+
+**Idan**: "Erased. It brought `labels.ts` into the compiler's program, including the augmentation. The plugin import survives in `labels.js`, but this path never loads that file."
 
 **Dima**: "My smaller build caught the direct call. It can't catch this one. The type import is enough to make the method visible."
 
@@ -243,7 +249,9 @@ export function renderBadge(label: Label): string {
 
 **Idan**: "Yes. Keep your runtime import. The declaration wasn't going to load it, required or optional."
 
-Dima leaves both entry points importing the constructor from `./labels`. The web and batch runs still print `* Ada *`. With the optional declaration, removing the check from `renderBadge` produces `TS2722: Cannot invoke an object which is possibly 'undefined'.` Bypassing the integration module still compiles, but now the checked formatter reports the missing plugin explicitly.
+Dima runs both entries through `./labels`: each prints `* Ada *`. In a scratch copy of the batch, he tries the raw constructor again.
+
+**Dima**: "The bypass reaches our missing-plugin error now. Delete the guard and I get `TS2722: Cannot invoke an object which is possibly 'undefined'.` The type makes us account for that path."
 
 **Gilad**: "And nothing gets sent to the printer on that path. Don't turn the check into optional chaining and quietly print a different badge."
 
@@ -257,15 +265,17 @@ Dima leaves both entry points importing the constructor from `./labels`. The web
 
 **Idan**: "I'd want to see where its labels come from. Here you showed me two entry points and one place that calls `frame`. This check is enough."
 
-Oded leaves the optional member in the diff.
+**Oded**: "For this one call, keep the optional method and the guard. Keep my runtime import too. I still want a badge."
 
 ## The Verdict
+
+> Declaration visibility does not establish runtime initialization. Maintain that guarantee for every value the declaration covers, or describe and check the possible absence. Choose failure behavior at the caller; neither spelling loads a plugin.
 
 **Dima**: "Keep the augmentation. Keep it optional, and keep the check in `renderBadge`. Both entries import the constructor through `labels`, so they actually get the plugin. The type also accounts for a label that arrives without it."
 
 **Oded**: "And test that both entries print a badge. A nicer error message isn't the feature."
 
-Gilad adds the standalone batch run beside the web run. Neither test imports the other's setup.
+**Gilad**: "Two fresh processes, then. No web setup doing the batch's work for it."
 
 ## Additional Takes
 
@@ -287,13 +297,13 @@ import { version } from "label-kit"; // Error TS2305: Module '"label-kit"' has n
 console.log(version);
 ```
 
-**Chen**: "Put the import back. Without it, that file supplies an ambient module declaration named `label-kit`. Its description has no `version`. With the import, it augments the existing package."
+**Chen**: "What changed when you removed the import? The patch still names `label-kit`."
 
-The distinction depends on the containing file, as the [module reference explains](https://www.typescriptlang.org/docs/handbook/modules/reference.html#ambient-modules). An ambient declaration is useful when describing a module that has no types. Giving it the name of a typed package is not a shortcut for extending that package.
+**Dima**: "Without the import, this file supplies an ambient module declaration with that name. It has no `version`. Put the import back and it augments the existing package."
 
 **Oded**: "`export {}` fixed it too."
 
-**Chen**: "It also makes the file a module. The package import says which dependency you're patching."
+**Dima**: "It also makes the file a module. I'd keep the package import here: it names the dependency we're patching."
 
 ### "The host puts it on window"
 
@@ -325,6 +335,4 @@ console.log(prefix);
 
 **Chen**: "Who removes our patch when the plugin ships its own declarations?"
 
-**Oded**: "Whoever upgrades it. Put the patch in that review."
-
-**Chen**: "If their declaration requires `frame`, our optional one conflicts. That error is in `labels.ts`, so `skipLibCheck` won't hide it. But two required method signatures can merge as overloads without an error. A clean build isn't a reminder to remove the patch."
+**Oded**: "Whoever upgrades it. If their declaration requires `frame`, our optional one conflicts. That error is in `labels.ts`, so `skipLibCheck` won't hide it. But two required method signatures can merge as overloads without an error. A clean build isn't a reminder to remove the patch."

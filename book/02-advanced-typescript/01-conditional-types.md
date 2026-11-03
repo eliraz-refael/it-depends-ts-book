@@ -2,7 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth** writes the `sortByName` signature again.
+**Prof. Eli Typeworth**: "Use a conditional type when the required type relationship depends on whether one type is assignable to another. Name the question before choosing the branches."
+
+He writes the `sortByName` signature again.
 
 "Daniel pointed out that `extends` has another job. In `sortByName`, it requires a property. Here it chooses a branch:"
 
@@ -14,7 +16,7 @@ declare function sortByName<T extends { name: string }>(items: T[]): T[];
 type Reply<T> = T extends string ? "it was a string" : "it was not";
 ```
 
-"In a constraint, `extends` states a requirement: no `T` may enter without a `name`. In a conditional type, `extends` asks a question — *is the type on the left assignable to the type on the right?* The compiler answers, and the answer selects a branch. That is the whole of the syntax. If a value of type `T` would be accepted where a `string` is required, the result is the first branch. Otherwise it is the second."
+"In a constraint, `extends` states a requirement: no `T` may enter without a `name`. In a conditional type, `extends` asks a question — *is the type on the left assignable to the type on the right?* The answer selects a branch: the first if assignable, the second otherwise."
 
 "The branches describe types. They are evaluated during type checking and erased before the program runs."
 
@@ -222,7 +224,15 @@ function slugify<T extends string | string[]>(
 
 **Daniel**: "The body has to work for every allowed `T`. `Array.isArray` narrows `input`, but the checker does not use that check to resolve the conditional return type here."
 
-"You can separate the public signature from the implementation. One overload this time."
+**Linoy**: "There's an RFC for that."
+
+She opens the long-open [suggestion to relate control flow to conditional return types](https://github.com/microsoft/TypeScript/issues/33912), with the rejected body still in the other tab.
+
+**Daniel**: "A suggestion. It doesn't make this body pass."
+
+**Linoy** switches tabs. "Still red. What can I use here?"
+
+**Daniel**: "You can separate the public signature from the implementation. One overload this time."
 
 ```typescript
 function slugify<T extends string | string[]>(
@@ -297,7 +307,7 @@ He scrolls back to Eden's version.
 
 **Oded**, to Linoy: "You put my name on this PR, didn't you?"
 
-**Linoy** writes *test per branch* on the board, under the signature.
+**Linoy**: "Fine. I'll call both branches. Including the empty array, Oded. Your name can stay."
 
 ---
 
@@ -578,7 +588,7 @@ She leaves a comment on the PR, then returns to the conditional signature in her
 
 ## The Verdict
 
-> For this content pipeline, normalize tags to a list and keep the two functions. For an API that must preserve the input shape, both overloads and a conditional return type can work. Choose based on how clearly you can describe and maintain the relationship.
+> Choose the relationship the callers need before choosing how to spell it. When the API must preserve the input shape, overloads and a conditional return type can both work; choose the one you can describe and maintain clearly. For this content pipeline, normalize tags to a list and keep the two functions.
 
 | Situation | Start with | What to check |
 |-----------|------------|---------------|
@@ -594,7 +604,7 @@ Eden prefers to list the cases while there are only a few. Linoy prefers to name
 
 ## Additional Takes
 
-**Linoy Nightly**: "We still owe `Unwrap` an explanation. The `infer U` part extracts the type inside `Promise<U>`. `ReturnType` uses the same mechanism for functions. It shipped with conditional types in 2.8. I'm going to need the board for that one."
+**Linoy Nightly**: "We still owe `Unwrap` an explanation. The `infer U` part extracts the type inside `Promise<U>`. `ReturnType` uses the same mechanism for functions. It shipped with conditional types in 2.8. Idan wants to derive the courier wrapper's signatures from the SDK. Bring `Unwrap` back when we open that one."
 
 **Noam Kiperman**: "And test the type-only utilities too. `Exclude<Channel, "smss">` compiles. A check that the resulting union is exactly what you intended catches that typo. Different test from calling `slugify`, but it belongs in the PR."
 
