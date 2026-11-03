@@ -107,6 +107,7 @@ The fact-check showed that the book is right on each of these. Most reviewers' s
 chapter's.
 - Ch13:330 Chen's `skipLibCheck` line ("blocker", haiku-story). It holds for the chapter's plugin-import
   setup.
+  PR C revision: the unchanged explanation now belongs to Dima in Ch13's final Additional Take, “Until upstream catches up”.
 - Ch25 TS2741 ("really TS2345"). The chapter compares source with emitted `.d.ts`, and the check asserts
   the message.
 - Ch15:333 Noam's optional marker.

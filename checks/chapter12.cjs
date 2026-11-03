@@ -53,7 +53,7 @@ const repaired = block("function receipt(reader:");
 const receipt = before(repaired, "const panel =");
 const repairedSetup = before(repaired, 'panel.useArchive("orders.zip");');
 const methodOut = block("interface MethodCache<out T>");
-const builderCalls = block("const selected = ExportBuilder.start()");
+const builderCalls = block("// In a copy of ExportBuilder, replace the type parameter with:");
 assert.equal(used.size, blocks.length, "Every manuscript fence must be exercised");
 
 // The closing callback changes the actual Chapter 11 implementation, not a stub.
@@ -72,8 +72,9 @@ const sourceEnd = builder.indexOf("  destination(", sourceStart);
 assert(sourceStart > 0 && sourceEnd > sourceStart);
 const checkedBuilder = builder.slice(0, sourceStart) +
   previousBlock("// Replacement for the source method in ExportBuilder.") + builder.slice(sourceEnd);
-assert(chapter.includes("`in out S extends Partial<ExportSpec> = {}`"));
-const invariantBuilder = checkedBuilder.replace("<S extends", "<in out S extends");
+const builderParameter = builderCalls.match(/\/\/ In a copy of ExportBuilder, replace the type parameter with:\n\/\/ ([^\n]+)/)?.[1];
+assert(builderParameter, "The callback must print the replacement type parameter");
+const invariantBuilder = checkedBuilder.replace("S extends Partial<ExportSpec> = {}", builderParameter);
 assert.notEqual(invariantBuilder, checkedBuilder);
 const builderBase = spec + invariantBuilder;
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "ts-book-ch12-"));

@@ -2,6 +2,12 @@
 
 ## The Principle
 
+**Prof. Eli Typeworth**: "Use a state parameter to carry evidence that later operations require. Each operation must establish what its return type says is now known. If a helper promises to preserve earlier work, its signature must preserve that evidence too. Follow one value through the calls; don't stop at the fluent expression that makes the API look attractive."
+
+"Then ask what the protocol buys its callers. Requiring a complete object and restricting the steps used to construct it are different jobs. Either can be useful, but a builder should earn the machinery it asks people to carry between them. I want to see the operation we must forbid, the one we must still allow, and what happens to the object in each case."
+
+## The Debate
+
 **Oded Shipley**: "We added a whole builder and I still have to supply two strings."
 
 **Guy Singleton**: "You can supply them in different places."
@@ -38,11 +44,9 @@ incomplete.build(); // Error: TS2684.
 // but required in type 'ExportSpec'.
 ```
 
-**Prof. Eli Typeworth**: "A generic can carry what we know about a configuration through several calls. The next operation can require some of that knowledge. Guy's `build` requires evidence of both fields. We need to see how the earlier calls provide it."
+**Eli**: "Guy's `build` requires evidence of both fields. The earlier calls have to supply it."
 
 **Oded**: "Fine. Open the class. I want to see whether the method actually adds anything or just changes what the editor calls it."
-
-## The Debate
 
 ### "What's inside the brackets?"
 
@@ -86,8 +90,6 @@ class ExportBuilder<S extends Partial<ExportSpec> = {}> {
 
 **Eli**: "The constraint doesn't make every property of `S` optional. A particular `S` can still require `source`. Nor does the default create an empty object. The constructor call does that."
 
-The [generic parameter default](https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-parameter-defaults) makes the type argument optional to write. It doesn't mean “whichever state the caller happens to have.”
-
 **Dafna**: "The method copies the old state and adds a field. The return type does the corresponding thing with `S & { source: string }`."
 
 **Guy**: "Yes. And the private member is typed as `S`. The state isn't just a label attached to the class name. It affects which instances are compatible."
@@ -124,7 +126,7 @@ const reversed = ExportBuilder.start()
 
 **Guy**: "It describes the receiver. In `ready.build()`, the receiver is `ready`. Its state has both required fields, so the call is accepted. `selected.build()` fails because its receiver doesn't."
 
-An explicit [`this` parameter](https://www.typescriptlang.org/docs/handbook/2/classes.html#this-parameters) is checked by TypeScript and erased from the emitted JavaScript. It adds no runtime argument or check.
+**Eli**: "That `this` parameter is erased. It adds neither an argument nor a runtime check."
 
 **Dafna**: "Which is why you kept the `typeof` checks."
 
@@ -194,7 +196,7 @@ const fromDestination = forNightlyExport(ExportBuilder.start())
 
 **Oded**: "The application team now needs to understand the state parameter to write a wrapper around one method. Put this example in the quickstart. People will write my annotation."
 
-Guy adds the helper example below the fluent chain.
+**Guy**: "It goes in the quickstart. Both orders, including your annotation and why it loses the source."
 
 ### "Here's the function we already had"
 
@@ -382,7 +384,9 @@ const staged = selectOrders(
 
 **Oded**: "So every helper that sets the source has to repeat that constraint."
 
-**Guy**: "Otherwise its parameter would allow a source that was already set. The helper's contract has to say which states it accepts."
+**Eli**: "Let us return to first principles. What must selecting a source establish?"
+
+**Guy**: "That this job has its source, and that it cannot be selected again. A helper that accepts a state with a source already set can't promise that transition."
 
 **Dafna**: "For this preset, I'd export a function. The application supplies only the part it owns."
 
@@ -423,8 +427,6 @@ repoint(sourcePreset);
 
 **Eli**: "It lost the same information both times. Nothing about `{}` establishes that the runtime object has no source. Type parameters affect compatibility through the members that use them, and this class permits that assignment."
 
-The handbook's discussion of [generic type compatibility](https://www.typescriptlang.org/docs/handbook/type-compatibility.html#generics) follows the members in the same way. Distinct type arguments alone don't make instances incompatible.
-
 **Guy**: "Then the guard is for typed callers too. Keep it."
 
 **Chen**: "And none of this prevents someone starting a new builder for `customers`."
@@ -433,7 +435,7 @@ The handbook's discussion of [generic type compatibility](https://www.typescript
 
 ## The Debate Continues
 
-Oded keeps the error from `repoint` beside the builder and function examples.
+Use a construction protocol for the transitions its callers need controlled. Requiring a complete record alone does not settle the choice. A preserving helper can retain static evidence; widening can lose it, so the runtime rule still needs enforcement.
 
 **Guy**: "I'd lead with the builder when packages supply different stages and the SDK needs to control which transitions are allowed. Helpers that retain the state get the static checks. The runtime guards still enforce the rules after someone widens it."
 
@@ -456,3 +458,5 @@ const lessSpecific: ExportBuilder = sourcePreset; // Accepted.
 ```
 
 **Chen**: "Should we allow that assignment, given what `source` does with the result?"
+
+**Guy**: "The export runner shares a cache through a broader type too. I'll bring that. We need to know what the other reference is allowed to do."
