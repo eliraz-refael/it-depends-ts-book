@@ -35,7 +35,14 @@ assert.equal(manifest.devDependencies['@types/node'],require(path.join(repo,'nod
 assert.equal(manifest.type,'module');
 const scriptMatch=manifest.scripts.check.match(/^tsc -p tsconfig.json && node --test "([^"]+)"$/);assert(scriptMatch);
 assert.equal(scriptMatch[1],'test/**/*.test.ts');
-const requests=[...manuscript.matchAll(/^> (.*)$/gm)].map(m=>m[1]);assert.equal(requests.length,3);
+// Extract assistant requests, not the Verdict's editorial blockquote.
+const requests=[...manuscript.matchAll(/^> ((?:Write a TypeScript function|Implement (?:only )?src\/parse-refund\.ts).*)$/gm)].map(m=>m[1]);
+assert.equal(requests.length,3);
+const quotes=[...manuscript.matchAll(/^> ?(.*)$/gm)];
+const otherQuotes=quotes.filter(m=>!requests.includes(m[1]));
+assert.equal(otherQuotes.length,1,'Only the Verdict may be a non-request blockquote');
+assert.equal(manuscript.slice(0,otherQuotes[0].index).split('\n').slice(-3).join('\n'),'## The Verdict\n\n','Non-request blockquote directly follows the Verdict heading');
+assert.equal(quotes.length,4,'Three requests and one ruling, with no extra blockquotes');
 for(const request of requests.slice(1))assert(request.includes('npm run check'));
 const finalRequest=requests.at(-1);
 assert(manuscript.includes('He saves this request for the next time they ask the assistant to regenerate the parser:'),'Final request is saved for regeneration, not a new claimed response');
@@ -71,7 +78,11 @@ function suite(name,source,failures=[]){unchanged();const names=testNames(source
 write(story,'package.json',manifest);write(story,'tsconfig.json',config);route(story);
 for(const [f,s] of Object.entries(initial))write(story,f,s);write(story,probe,firstProbe);
 compile('initial-unchecked-return');run('initial-real-caller',[probe],printedInitial);
-write(story,'reset.d.ts',reset);
+assert.deepEqual(config.include,['src/**/*.ts','test/**/*.ts']);
+const resetPath=manuscript.match(/She adds `([^`]+)` to the config's `include`/)[1];
+assert.equal(resetPath,'reset.d.ts');
+write(story,'tsconfig.json',{...config,include:[...config.include,resetPath]});
+write(story,resetPath,reset);
 const rawError={...diagnostic(parser,'return JSON.parse(raw)',2322,quoted),column:3};
 compile('reset-stops-unchecked-return',[rawError]);
 remove(story,'reset.d.ts');compile('removing-reset-restores-original');run('removing-reset-runtime-control',[probe],printedInitial);

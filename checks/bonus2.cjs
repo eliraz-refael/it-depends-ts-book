@@ -29,13 +29,16 @@ const finalReplay=replayBeforeOutcome+outcome;
 assert.equal(used.size,fences.length,'Every fence extracted');
 assert(manuscript.indexOf('## The Turn')<manuscript.indexOf('### \"Why does that field decide anything?\"'));
 assert(!manuscript.includes('refund_help'));
-assert(manuscript.includes('these lists are what this schema produces'));
+const printedRequired=Object.fromEntries([...plumbing['tool.ts'].matchAll(/^\s*\/\/ Initial Refund, (default \(output\) mode|\{ io: "input" \}): required (\[[^\n]+\])/gm)]
+ .map(m=>[m[1],JSON.parse(m[2])]));
+assert.deepEqual(Object.keys(printedRequired),['default (output) mode','{ io: "input" }'],'Both generated required lists are printed');
 assert(manuscript.includes('The old `refund` entry point is gone'));
 assert(manuscript.includes('`\"default\":\"USD\"`'));
-assert(manuscript.includes('The replay keeps both calls on hand.'));
+assert(manuscript.includes('The replay keeps both calls on hand:'));
 assert(manuscript.includes('TypeScript '+version));assert(manuscript.includes('Node '+process.versions.node));
 assert.equal(require('../node_modules/zod/package.json').version,'4.6.6');assert(manuscript.includes('4.6.6'));
-for(const flag of ['noEmit','allowImportingTsExtensions','`strict`','exactOptionalPropertyTypes','ES2022','Node16','"type": "module"'])assert(manuscript.includes(flag));
+const projectNotes=initial['contract.ts'].split('\n').filter(line=>line.startsWith('// ')).join('\n');
+for(const flag of ['noEmit','allowImportingTsExtensions','strict','exactOptionalPropertyTypes','ES2022','Node16','moduleResolution','"type": "module"'])assert(projectNotes.includes(flag),'Project comment: '+flag);
 const scratch=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'ts-book-bonus2-'))),story=path.join(scratch,'story');
 const results=[];let compilerCases=0,runtimeGroups=0,fileListQueries=0;
 function write(file,value){const p=path.join(story,file);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof value==='string'?value:JSON.stringify(value,null,2)+'\n');}
@@ -55,7 +58,7 @@ const line=value=>JSON.stringify(value);
 const dollarLedger=line([usd]),dollarResult=line(ok(usd)),foreignResult=line(ok(foreign)),euroResult=line(ok(eur));
 // Every printed JSON result is tied to the manuscript, rather than silently copied into tests.
 const printed=[...manuscript.matchAll(/`(\{[^`]*\}|\[[^`]*\])`/g)].map(m=>m[1]);
-for(const value of [dollarLedger,dollarResult,foreignResult,euroResult,line(bad('invalid arguments')),line(bad('order unavailable')),'[]','{"refundIssued":true}','{"refundIssued":false}','["orderId","cents","currency"]','["orderId","cents"]'])assert(printed.includes(value),'Printed value: '+value);
+for(const value of [dollarLedger,dollarResult,foreignResult,euroResult,line(bad('invalid arguments')),line(bad('order unavailable')),'[]','{"refundIssued":true}','{"refundIssued":false}'])assert(printed.includes(value),'Printed value: '+value);
 assert(manuscript.includes('prints `true`, then'));assert(manuscript.includes('then `0`'));
 write('package.json',{private:true,type:'module'});
 write('tsconfig.json',{compilerOptions:{...defaults,noEmit:true,allowImportingTsExtensions:true},include:['*.ts']});
@@ -79,7 +82,7 @@ export function dispatchRegistry(input:unknown,tools:readonly {name:string;invok
 remove('description.ts');compile('generated-replay-and-validation-registry');run('generation-still-dollars',dollarResult+'\n'+dollarLedger);
 assert.equal(digest(read('calls.ts')),artifactHash);
 scenario('input-output-schema-beat',`const output=z.toJSONSchema(Refund),input=z.toJSONSchema(Refund,{io:'input'});const shop=makeShop();const tool=defineTool({name:'refund_order',description:'refund',schema:Refund,run:shop.refund});const refund=tool;${outgoingDefinition}
-console.log(JSON.stringify({outgoingMatches:JSON.stringify(outgoing)===JSON.stringify([{name:tool.name,description:tool.description,parameters:input}]),outgoingKeys:Object.keys(outgoing[0]).sort(),output:output.required,input:input.required,outputAdditional:output.additionalProperties,inputHasAdditional:Object.hasOwn(input,'additionalProperties'),default:input.properties.currency.default,same:JSON.stringify(tool.parameters)===JSON.stringify(input)}));`,{outgoingMatches:true,outgoingKeys:['description','name','parameters'],output:['orderId','cents','currency'],input:['orderId','cents'],outputAdditional:false,inputHasAdditional:false,default:'USD',same:true});
+console.log(JSON.stringify({outgoingMatches:JSON.stringify(outgoing)===JSON.stringify([{name:tool.name,description:tool.description,parameters:input}]),outgoingKeys:Object.keys(outgoing[0]).sort(),output:output.required,input:input.required,outputAdditional:output.additionalProperties,inputHasAdditional:Object.hasOwn(input,'additionalProperties'),default:input.properties.currency.default,same:JSON.stringify(tool.parameters)===JSON.stringify(input)}));`,{outgoingMatches:true,outgoingKeys:['description','name','parameters'],output:printedRequired['default (output) mode'],input:printedRequired['{ io: "input" }'],outputAdditional:false,inputHasAdditional:false,default:'USD',same:true});
 scenario('single-tool-replay-invalid-envelope-and-JSON',`const shop=makeShop();const refund=defineTool({name:'refund_order',description:'refund',schema:Refund,run:shop.refund});const inputs=[{name:'refund_order',arguments:'{'},{name:'refund_order',arguments:{}},{name:'missing',arguments:'{}'}];const thrown=inputs.map(input=>{try{dispatch(input,refund);return false}catch{return true}});console.log(JSON.stringify({thrown,receipts:shop.receipts()}));`,{thrown:[true,true,true],receipts:[]});
 scenario('second-tool-and-bad-wire',`const shop=makeShop();const refund=defineTool({name:'refund_order',description:'refund',schema:Refund,run:shop.refund});const tools=[refund,help];console.log(JSON.stringify({answers:[dispatchRegistry({name:'refund_help',arguments:'{"language":"en"}'},tools),dispatchRegistry({name:'refund_help',arguments:'{"language":"fr"}'},tools),dispatchRegistry({name:'refund_help',arguments:'{"language":"xx"}'},tools),dispatchRegistry({name:'refund_order',arguments:'{'},tools),dispatchRegistry({name:'refund_order',arguments:{}},tools),dispatchRegistry({name:'missing',arguments:'{}'},tools),dispatchRegistry({name:'refund_order',arguments:'{"orderId":"o-12"}'},tools)],receipts:shop.receipts()}));`,{answers:[ok('Partial refund'),ok('Remboursement partiel'),bad('invalid arguments'),bad('invalid JSON'),bad('invalid envelope'),bad('unknown tool'),bad('invalid arguments')],receipts:[]});
 write('shop.ts',replace(read('shop.ts'),'currency: z.enum(["USD", "EUR"]).default("USD"),',requiredField));

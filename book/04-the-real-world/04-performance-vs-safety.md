@@ -2,9 +2,7 @@
 
 ## The Principle
 
-**Daniel Compiler**: "Before you trade a type constraint for speed, measure the saving and say what newly compiles. First say what you're speeding up: checking the program or running it. If you only changed types, compare the emitted code before you time anything. A validator really runs, so it needs its own measurement. Change one thing, and repeat the timing with the same files, workload and options. Otherwise you're celebrating work you stopped doing. Counters aren't seconds. When they don't explain the time, profile the checker."
-
-"List which calls must stay legal and which must stay forbidden, and check both lists. A cheaper signature can still reject the typo, accept a different mistake and break a call that used to work. If you remove a constraint or a validator, name what catches those mistakes instead, or accept the risk. Someone has to own the mistake that now compiles."
+**Daniel Compiler**: "If a type change is supposed to make checking cheaper, time the same workload with the same compiler and options. Change one thing between runs. For annotation-only changes, compare the emitted code before timing anything; a runtime validator is executable code and needs its own measurement. The result has to say which work got cheaper and whether callers still have the contract we agreed to preserve. A faster check of a different contract can be useful, but then we have two decisions to make."
 
 ## The Debate
 
@@ -34,18 +32,19 @@ export { t };
 
 ```typescript
 // src/probe.ts — temporary calls against the PR
+// Emit: tsc -p tsconfig.json --checkers 1 --noEmit false --rootDir src --outDir dist --removeComments true
 import { t } from "./i18n.js";
 console.log(t("shop.crat", { name: "A", count: "2" }));
 console.log(t("shop.cart", { name: "A" }));
 ```
 
-Gil emits with `tsc -p tsconfig.json --checkers 1 --noEmit false --rootDir src --outDir dist --removeComments true`, using the shared options below. On Node 22.23.4, `node dist/probe.js` prints `shop.crat`, then `Hello A, {count} items`.
+**Gil Benchmark**: "I emitted it with the project's options. On Node 22.23.4, `node dist/probe.js` prints `shop.crat`, then `Hello A, {count} items`."
 
 **Oded**: "Yes. I removed those checks. I'm not arguing that misspelling cart is a feature. I'm asking whether we need to compute the parameters from every message while checking every caller."
 
 **Noam**: "That missing count was caught at the call before your edit. If this gets into the banner, somebody has to notice it there."
 
-**Gil Benchmark**: "Before you price either option, show me what you removed."
+**Gil**: "Before you price either option, show me what you removed."
 
 ### "It bought something"
 
@@ -75,7 +74,7 @@ function t(...args: Args): string;
 
 **Linoy**: "Then measure the larger catalogue. Don't remove the feature and tell me the feature was implemented badly."
 
-Both probe calls get TS2345. So does the banner's `t(pending[0], pending[1])`, which Oded expanded because `t(...pending)` gets TS2556 under his loose signature. The typo message ends by comparing `shop.crat` with `shop.hello`.
+Both probe calls get TS2345. So does `t(pending[0], pending[1])` in the banner below, which Oded expanded because `t(...pending)` gets TS2556 under his loose signature. The typo message ends by comparing `shop.crat` with `shop.hello`.
 
 **Oded**: "It would be nice if the error suggested cart."
 
@@ -98,9 +97,7 @@ export const ready = t("shop.ready");
 
 **Linoy**: "The banner chooses the whole call, then passes it on. Both branches work. Keep that, and keep ready without an empty object just to satisfy the helper."
 
-**Gil**: "I saved the emit from Oded's branch, with his expanded banner call. Now I'll emit this restored version and compare `dist/i18n.js`. Same options both times. The root package has `"type": "module"`."
-
-**Gil**: "Same 387 bytes."
+**Gil**: "I saved the emit from Oded's branch, with his expanded banner call. I emitted the restored version with the same options: `dist/i18n.js` is byte-identical, all 387 bytes. The root package has `"type": "module"`."
 
 **Oded**: "I did say type check."
 
@@ -110,7 +107,9 @@ export const ready = t("shop.ready");
 
 ### "Which part?"
 
-**Gil**: "TypeScript 7.0.2. One checker, these options."
+**Oded**: "I'd bet most of the cost is finding all the keys."
+
+**Gil**: "What does the data say? TypeScript 7.0.2. One checker, these options."
 
 **tsconfig.json**
 
@@ -129,6 +128,10 @@ export const ready = t("shop.ready");
 
 ```javascript
 // tools/workload.mjs
+// bench/case.ts is assembled from this workload: the catalogue as one line
+// (const messages = … as const), the required helpers, the declared signature,
+// the calls, then export {}.
+// bench/tsconfig.json: {"extends":"../tsconfig.json","files":["case.ts"],"include":[]}
 export function workload() {
   const texts = ["Hello {name}, {count} items", "Hello {name}", "Ready"];
   const messages = {};
@@ -146,11 +149,9 @@ export function workload() {
 }
 ```
 
-`bench/case.ts` contains the catalogue as `const messages = … as const;` on one line, required helpers, the signature with `declare`, calls and `export {};`. Its config, `bench/tsconfig.json`, is `{"extends":"../tsconfig.json","files":["case.ts"],"include":[]}`.
+**Gil**: "I ran `tsc -p bench/tsconfig.json --checkers 1 --extendedDiagnostics` three times per signature, rotating their order. The runs were serial, with no traces or profiles while timing. Here are the medians for four alternatives, each with only its required helpers."
 
-**Gil**: "Add `--extendedDiagnostics` to `tsc -p bench/tsconfig.json --checkers 1`: three runs, serially, rotating order, no tracing or profiling while timing. These are medians."
-
-Gil lays out four alternatives, one at a time, with only the helpers each needs. The string baseline doesn't compute Key; the last row uses Linoy's Args above.
+The last uses Linoy's original Args:
 
 ```typescript
 // Counterfactual signatures — alternatives, not overloads
@@ -178,9 +179,9 @@ function t(...args: Args): string;
 
 **Oded**: "So the difference I measured exists."
 
-**Gil**: "It does. We added key enumeration, then changed the call formulation, then restored dependent params. Those are whole-version comparisons, not charges we can add up into a bill. Now we can ask for a smaller change."
+**Gil**: "It does. But key enumeration alone cost little here. These are whole-version comparisons, not charges we can add into a bill. Try a smaller change."
 
-**Linoy**: "The loose tuple still has a tuple for every key, even though its params no longer depend on the key. That's work the common dictionary signature doesn't need."
+**Linoy**: "The loose tuple keeps a tuple per key without dependent params. The common dictionary signature doesn't need those tuples."
 
 **Noam**: "But the dictionary signature allows the missing count."
 
@@ -218,7 +219,7 @@ function messageFor(hasItems: boolean): "shop.cart" | "shop.hello" {
 console.log(t(messageFor(true), { name: "A" }));
 ```
 
-The full project gets TS2556 at the unchanged banner's tuple spread. They give the probe a separate file list: `probe.json` extends the root config, with `files: ["src/i18n.ts", "src/probe.ts"]` and `include: []`. Checking and emitting with `-p probe.json` succeeds. Running `node dist/probe.js` prints `Hello A, {count} items`.
+The full project gets TS2556 at the unchanged banner's tuple spread. They give the probe a separate file list: `probe.json` extends the root config, with `files: ["src/i18n.ts", "src/probe.ts"]` and `include: []`. Checking with `-p probe.json` succeeds, as does emitting with the earlier emit options, including `--noEmit false`. Running `node dist/probe.js` prints `Hello A, {count} items`.
 
 **Noam**: "It lets my broken replacement through and rejects the caller I already had."
 
@@ -266,27 +267,27 @@ Noam's separate-key probe gets TS2345. The original pending-tuple banner compile
 
 **Linoy**: "I'll put my original signature back and try `tsc -p bench/tsconfig.json --checkers 1 --generateTrace trace`."
 
-She follows a relation event's checker ID through `legend.json` to its type file. Args resolves to two thousand tuples. Expression events point at generated calls.
+Through a relation event's checker ID and `legend.json`, she finds Args: two thousand tuples. Expression events identify generated calls.
 
-**Linoy**: "There's Args. My guess is we're spending the time relating arguments to that union."
+**Linoy**: "My guess is we're spending the time relating arguments to that union."
 
 **Gil**: "About 0.2 seconds in the recorded check events, against about 1.6 for checking the file. Finding Args isn't finding the cost."
 
 **Linoy**: "Then CPU samples. `tsc -p bench/tsconfig.json --checkers 1 --pprofDir profile`. With a Go toolchain installed, `go tool pprof -top -cum profile/*-cpuprofile.pb.gz`."
 
-The cumulative profile puts a large share of samples under [mapTypeEx](https://github.com/microsoft/typescript-go/blob/2bd066d87f5bafd315be9f40889d0a60b9e58e0b/internal/checker/checker.go#L25473-L25508). Linoy uses `-peek mapTypeEx` to inspect its callers and callees: contextual typing above it, union construction below.
+The cumulative profile puts a large share of the CPU samples under [mapTypeEx](https://github.com/microsoft/typescript-go/blob/2bd066d87f5bafd315be9f40889d0a60b9e58e0b/internal/checker/checker.go#L25473-L25508). `-peek mapTypeEx` shows contextual typing above it, union construction below.
 
-**Daniel**: "That function walks a union's members, applies an operation and, when the results change, builds a union from them. That's 7.0.2's checker. Don't build on the name."
+**Daniel**: "It maps over union members and rebuilds the union if results change. That's 7.0.2's checker; don't build on the name."
 
-**Linoy**: "So I found Args and blamed the relation. This points to walking and rebuilding unions while working out the types expected for the arguments. My guess was too narrow."
+**Linoy**: "I blamed the relation. This points to walking and rebuilding unions for contextual argument types. My guess was too narrow."
 
 **Oded**: "Two thousand comparisons every call?"
 
 **Gil**: "Samples can't tell you that. They locate work; they don't count every visit or identify every union."
 
-Linoy switches the fixture to the distributed signature and profiles it into a fresh directory. The time sampled under the same function drops sharply.
+Linoy profiles the distributed signature into a fresh directory. Sampled time under that function drops sharply.
 
-**Daniel**: "For these literal-key calls, inference gives K one key, so the checker gets one tuple to type the arguments against instead of the entire catalogue. That removes the broad union work we just saw dominating the old profile."
+**Daniel**: "These literal calls infer one key for K: one tuple to type arguments against, replacing the catalogue-wide union work that dominated the old profile."
 
 **Noam**: "I was going to ask why the number got bigger. I still want that in the result."
 
@@ -298,20 +299,22 @@ Oded reruns the small banner: `Hello A, 2 items` when it has items, `Hello A` ot
 
 ## The Verdict
 
-**Oded**: "I'll replace the PR with the distributed tuple. Same body. Keys, placeholders and argument counts stay checked. The pending banner doesn't need rewriting."
+> Try a cheaper formulation that preserves the required calls before giving up checks. Giving one up is a contract change: name the lost guarantee and its owner.
 
-**Linoy**: "Keep the fixture and the caller cases with it. If I change the signature again, I want to know whether I've made those callers cheaper or merely made some of them wrong."
+**Oded**: "I'll replace the PR with the distributed tuple. Same body; keys, placeholders and argument counts still checked. No banner rewrite."
+
+**Linoy**: "The fixture and caller cases go with it. Next time, we need to know whether we made these calls cheaper or wrong."
 
 **Oded**: "I still don't want to pay for this in every helper we write."
 
-**Linoy**: "Then don't copy it into every helper. This one has callers that need different arguments. You brought a cost we could reduce without asking them to give that up."
+**Linoy**: "Then don't copy it everywhere. These callers need different arguments. We reduced the cost of keeping that."
 
-**Gil**: "Keep the counters pinned to this compiler and configuration. Record the times when the check runs, but don't make a passing build depend on beating these medians. These are measurements, not a service guarantee from the machine."
+**Gil**: "Counters stay pinned to this compiler and configuration. Record times, but don't fail a build for missing these medians. The machine hasn't signed a service guarantee."
 
-**Noam**: "And if we really do have to remove a check later, say which call starts passing and who catches that mistake. If nobody does, say we're accepting it. Don't put 'equivalent' in the title."
+**Noam**: "And if we ever do drop a check, don't call it equivalent."
 
 **Oded** changes the title to “Check translation calls faster without loosening their arguments.”
 
-**Noam**: "That's accurate."
+**Noam**: "Now I can tell what I'm approving."
 
-**Oded**: "Good. I'd hate to spend the saved time naming this PR."
+**Oded**: "Approve it before someone asks me to benchmark the title."

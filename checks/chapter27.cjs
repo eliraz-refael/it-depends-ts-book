@@ -14,7 +14,7 @@ const badLiteral=source('// src/probe.ts — temporary');
 const oldDeclarations=source('// src/i18n.ts — restore');
 const banner=source('// src/banner.ts');
 const options=JSON.parse(block('{\n  "compilerOptions"'));
-const benchOptions=JSON.parse(manuscript.match(/Its config, `bench\/tsconfig\.json`, is `([^`]+)`/)[1]);
+const benchOptions=JSON.parse(manuscript.match(/^\/\/ bench\/tsconfig\.json: (.+)$/m)[1]);
 const generator=source('// tools/workload.mjs');
 const brokenSignature=source('// src/i18n.ts — candidate');
 const badSelection=source('// src/probe.ts — try');
@@ -29,9 +29,9 @@ assert.equal(manuscript.match(/root package has `([^`]+)`/)[1],'"type": "module"
 const scratch=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'ts-book-ch27-'))),story=path.join(scratch,'story');
 const results=[],measurements=[],traceEvidence=[];let cases=0,runtimeGroups=0,fileLists=0,emitComparisons=0;
 const tsc=path.join(repo,'node_modules/.bin/tsc');
-const emitFlags=manuscript.match(/Gil emits with `tsc -p tsconfig.json --checkers 1 ([^`]+)`/)[1].split(' ');
+const emitFlags=badLiteral.match(/^\/\/ Emit: tsc -p tsconfig.json --checkers 1 (.+)$/m)[1].split(' ');
 assert.deepEqual(emitFlags,['--noEmit','false','--rootDir','src','--outDir','dist','--removeComments','true']);
-assert(manuscript.indexOf('Gil emits with')<manuscript.indexOf('On Node 22.23.4'),'Emit command precedes the output');
+assert(manuscript.indexOf('// Emit: tsc')<manuscript.indexOf('On Node 22.23.4'),'Emit command precedes the output');
 const record=process.argv.includes('--record-counters');
 assert(process.argv.slice(2).every(a=>a==='--record-counters'),'Only --record-counters is supported');
 function write(f,s){const p=path.join(story,f);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof s==='string'?s:JSON.stringify(s,null,2));}
@@ -91,7 +91,7 @@ compile('original-rejects-literal-mistakes',[error('src/probe.ts','shop.crat',23
 remove('src/probe.ts');write('src/banner.ts',banner);compile('original-restored');
 compile('original-emit',[],'tsconfig.json',emitFlags);
 assert.equal(read('dist/i18n.js'),emittedLoose,'Original and PR emit bytes');emitComparisons++;
-assert.equal(Buffer.byteLength(emittedLoose),Number(manuscript.match(/Same (\d+) bytes/)[1]),'Printed byte count');
+assert.equal(Buffer.byteLength(emittedLoose),Number(manuscript.match(/byte-identical, all (\d+) bytes/)[1]),'Printed byte count');
 const bannerProbe='import {banner,ready} from "./dist/banner.js"; console.log(banner(true)); console.log(banner(false)); console.log(ready);';
 run('original-allowed-values',['--input-type=module','-e',bannerProbe],'Hello A, 2 items\nHello A\nReady');
 // The same callers are tested under every signature; only their explicitly selected probe changes.

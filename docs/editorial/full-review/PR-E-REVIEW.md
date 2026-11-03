@@ -1,0 +1,166 @@
+# PR E self-review — Act IV and the bonus act
+
+Manuscript base: **5da9cbb** (tree identical to a0ba9d8). Plan: **080e3bc**, with the author's Settlement appended in this revision. Branch: `codex/release-act-4`. All seven chapters follow [PR-E-PLAN.md](PR-E-PLAN.md); no earlier chapter, dependency or compiler profile changes. No push.
+
+## Initial draft eb2fc97 — changes and settlement audit
+
+| Chapter | Change and retained argument |
+|---|---|
+| 24 | Daniel's opening states the unchanged-caller requirement without revealing exports or compiler membership. Noam reads the diagnostics; Daniel explains omitted strictness when it matters. Exception bookkeeping is shorter. Eden's phrase directly answers Noam's discovery that the sitemap's old opt-out would evade review; his next sentence names the catalogue caller, with no gloss. The ruling precedes the local migration decision. Both checking strategies, the old require test, sitemap, backfill and named-export counterexample remain. |
+| 25 | Gilad opens with what he checks on a release, not a question. Dima supplies the shorter module/build setup; source versus dist, composite references and the copied-image failure remain one story. Money/Cart's src roots remain distinct from the API's repository-wide root. Rebuild/reset narration is shorter without dropping metadata or copied manifests. The public-entry/release-layout ruling precedes the two-command decision. |
+| 26 | Sahar gives a plain regression-test rule without previewing the five traps or asking what could be removed. The historical states, comparison controls and file-move sequence are shorter. Oded's replacement joke is “If a red build counts as progress, I'm ahead of schedule.” The ruling addresses selection and targeted failure before the runtime-glob experiment. Both final test files, the intermediate file, negative usage, Status's any regression, all resets and the final silence remain. |
+| 27 | Daniel frames a controlled cost comparison without announcing the counters/profile or candidate failure. Oded guesses that key enumeration is most of the cost; Gil's exact phrase answers him, and the existing counterfactual table supplies the evidence. All four counterfactual signatures, both generic candidates, caller controls, tables and trace-to-profile correction stay. The ruling precedes Oded's explicit adoption. Noam's title response and Gil's machine-guarantee joke replace repeated approval/keep phrasing. |
+| Bonus 1 | Eli's Principle and every fixed request/code artifact stay. Dima returns to his two-tests bargain while asking what remains undecided, rather than anticipating an abstract distinction. The ruling gives ownership of the acceptance contract before the saved next request. All other benchmark scenes stay. |
+| Bonus 2 | Liron distinguishes a proposal's description from the executor's permission, without a parable or previewing the closure/currency/outcome repairs. Configuration moves into comments. The generated required lists move beside generation and are explicitly labelled for the initial Refund schema, so later replacements do not make the comments false. The ruling leads the local agreement. The currency, ownership and outcome discoveries, refinement take, positive control and refund reversal remain. |
+| Bonus 3 | Daniel's shorter opening separates public-contract comparison from runtime evidence. Daniel's typeof warning joins his referenced-type explanation; Eden's parameter warning joins the external-caller exchange, both as their own dialogue. The flag citation is outside speech and its fact-checked explanation is unchanged. The Verdict is last and leads with the contract decision. Oded's exact meeting line ends the book. |
+
+Read Daniel's **Ch20, Ch24, Ch27 and Bonus 3 Principles consecutively**. Ch20 remains unchanged: an imperative about staged calls, definitions, then the parentheses distinction. Ch24 starts with an invariant for an unchanged caller and ends with the outstanding migration obligation. Ch27 starts with a conditional measurement instruction and ends by distinguishing a cost decision from a contract decision. Bonus 3 starts with Daniel's review practice and ends with the independent need for runtime evidence. These are different opening/closing moves, rather than a repeated question or rule/type-limit/caller/aphorism sequence.
+
+The revised Principle lengths, counting speaker labels, are **84, 83, 59, 86, 147, 72 and 102 words**, respectively. Bonus 1's 147 is unchanged. Gilad has no question mark in his first sentence; Sahar does not reuse the Ch19 removal question. Liron stays conceptual and uses no analogy. This is an editorial assessment, not a property established by compilation.
+
+## Lengths and departures
+
+Whitespace-separated words, including code, headings and labels, measured against 5da9cbb:
+
+| Chapter | Base | Draft | Change | Planned whole-chapter range |
+|---|---:|---:|---:|---|
+| 24 | 2,134 | 2,018 | −5.4% | No fixed target |
+| 25 | 2,248 | 2,035 | −9.5% | 2,050–2,100: 15 below the lower target |
+| 26 | 2,544 | 2,305 | −9.4% | 2,310–2,370: 5 below the lower target |
+| 27 | 2,381 | 2,215 | −7.0% | 2,210–2,260: within |
+| Bonus 1 | 2,143 | 2,176 | +1.5% | Within 5% |
+| Bonus 2 | 2,115 | 2,037 | −3.7% | Within 5% |
+| Bonus 3 | 2,378 | 2,289 | −3.7% | Within 5% |
+
+Named cut windows below use the plan's **old line numbers**. Counts include retained fences within those spans; the Ch27 decision count excludes its newly added ruling. Moving prose into comments counts toward the new chapter length, not as a deletion.
+
+| Window | Base | Draft | Budget | Assessment |
+|---|---:|---:|---:|---|
+| Ch25 Principle, 5–7 | 178 | 83 | 85–95 | 2 shorter |
+| Ch25 setup, 17–21 | 76 | 47 | 45–50 | Within |
+| Ch25 stale build, 201–233 | 214 | 177 | 180–190 | 3 shorter |
+| Ch25 runtime experiment, 284–292 | 110 | 81 | 85–90 | 4 shorter |
+| Ch25 restoration, 324–330 | 109 | 85 | 75–80 | **5 longer**: retain the branch reset, output cleanup, build metadata and copied manifests |
+| Ch26 Principle, 5–7 | 210 | 59 | 60–70 | 1 shorter |
+| Ch26 history, 96–124 | 222 | 191 | 190–200 | Within |
+| Ch26 comparison control, 220–240 | 146 | 132 | 125–135 | Within |
+| Ch26 flattening, 253–270 | 200 | 172 | 175–185 | 3 shorter |
+| Ch26 moved checks, 373–405 | 189 | 155 | 165–175 | 10 shorter |
+| Ch27 Principle, 5–7 | 148 | 86 | 85–95 | Within |
+| Ch27 fixture logistics, 149–153 | 80 | 56 | 60–65 | 4 shorter |
+| Ch27 table interpretation, 175–187 | 117 | 97 | 100–105 | 3 shorter |
+| Ch27 profiling, 267–289 | 273 | 212 | 225–235 | 13 shorter |
+| Ch27 decision, 301–311 | 174 | 127 | 135–145 | 8 shorter |
+
+The shorter spans remove repetition while retaining the named state, control or joke. Ch25/26 therefore finish slightly below their overall target ranges. Liron's Bonus 2 Principle is also shorter than the planned 85–100 words: the permission rule and description distinction fit in 72 after removing the prescribed repairs. None was padded to a lower bound. The one over-budget span preserves the cleanup steps needed to reproduce Ch25's restored release. No planned mechanism, fence or check case was cut.
+
+## Evidence, extraction and continuity
+
+All **executable fence text and fence order are unchanged** from 5da9cbb. Only Ch26's project comment and Bonus 2's project/schema-result comments change inside fences. All seven endings start with a ruling. The two new catchphrases each occur exactly once outside the bios, with their approved speakers. Both are prompted by a specific preceding line: Noam's sitemap finding, and Oded's unmeasured key-cost guess. No phrase gets a gloss.
+
+Protected findings remain intact: Ch24's competing `@ts-check`/global-check proposals; Ch25's exact TS2741 source-versus-emitted-declaration message; Bonus 3's original TS9007, permitted trivial inference, and explicit-string/fallback experiment. No earlier-act file changed. The three bonus chapters retain their fixed assistant artifacts and do not claim anything about real models or products.
+
+Five external links remain, all outside dialogue. The Node and isolated-declarations links move onto substantive narration; the pinned checker source, interface-merging and Zod links keep their factual roles. Their URLs match the plan's print-footnote inventory. Bonus 3's final heading is `## The Verdict`; its final line is exactly:
+
+> **Oded**: "Good. Now I have a green pull request and a meeting four minutes ago."
+
+Updated extraction follows the manuscript:
+
+- Ch25 reads the module mode from Dima's setup and still verifies the output/metadata cleanup before the copied release.
+- Ch26 reads project mode and versions from its source comment; the pre-currency state and temporary recorder instrumentation match their shortened descriptions.
+- Ch27 reads the benchmark configuration at its shorter label. All counters, table rows, output bytes, caller sets, tracing and profiling controls are unchanged.
+- Bonus 1 extracts the three assistant requests by their request openings, separately from the new Verdict blockquote. The initial full run reached Bonus 1 after Ch27 passed and exposed the old “every blockquote is a request” assumption (4 versus 3). This was an extraction failure, not a changed compiler/runtime result; the selector was corrected and the three bonus suites passed before the repeated clean full run.
+- Bonus 2 extracts the two initial-schema required lists from comments and checks Zod's actual generated lists against them. Project flags remain checked beside the first file bundle. Runtime output expectations and owned artifacts stay unchanged.
+
+The source/fence, length, phrase, link and final-line audits are recorded in `/private/tmp/pr-e-audit.json` and `/private/tmp/pr-e-audit-output.txt`. Temporary scripts, fixtures and logs are not staged. Coverage documentation describes the extraction changes.
+
+## Validation
+
+Targeted Ch24, Ch25, Ch26 and Bonus 2 checks passed; after the request-selector correction, Bonuses 1–3 passed. Clean installation reports zero vulnerabilities. The repeated full `npm run check` passes on **TypeScript 7.0.2, Node 22.23.4 and Zod 4.6.6**: **483 fences, 891 compiler cases and 382 runtime groups**, unchanged. These seven chapters contribute **82 fences, 344 compiler cases and 122 runtime groups**. Ch27 retains exact counter assertions, observational timings, separate trace/CPU evidence and the visible no-Go control. `git diff --check` passes. Final logs: `/private/tmp/pr-e-install-final.log` and `/private/tmp/pr-e-full-final.log`; the earlier extraction failure is retained in `/private/tmp/pr-e-full.log`.
+
+Reader judgment remains necessary for the shorter Principles and replacement jokes. Compiler and runtime checks establish the claims and state sequence, not whether the voice edits land.
+
+
+## Revision after the settled Opus review
+
+This section supersedes the initial draft's length, Principle and extraction descriptions above. Followed [PR-E-REVISION.md](PR-E-REVISION.md), with both [reader](PR-E-READER.md) and [recheck](PR-E-RECHECK.md) reports retained unchanged. All three supplied reports are included in this commit. No disagreement with a must-fix finding.
+
+### Must-fix dispositions
+
+1. **Sentences, not notebook results.** Ch26's paid-only control, restored PreOrder, Row/Status controls, file membership and moved regressions now use sentences, alternating spoken results and narration. The runtime glob experiment does too. Ch27's assembly/config details are comments beside the generator; Gil states the serial, rotated, untraced three-run procedure in sentences. The four alternatives have a complete introduction. No regression or reset was removed.
+2. **Restored voice.** Linoy again guesses that time is spent “relating arguments to that union.” Her Ch25 line again distinguishes what the noEmit check allows from what she is asking the release build to do.
+3. **Principles.** Gilad gives the shipped-program/shipped-place rule with the 3 AM close; no scripted development/release failure or rebuilding warning. Liron keeps proposal-before-permission and distinguishes intelligibility from permission, without authenticated context, records or the generation repair. Permission explicitly precedes any change. Bonus 3 makes emitted declarations the evidence against a patch summary; it no longer lists the restored caller, ownership decision or runtime tests. Bonus 1 loses only the sentence spelling out the Turn. Ch24 and Ch27 Principles remain unchanged.
+4. **Rulings.** Bonus 1 rules on passing implementations that disagree. Bonus 3 rules on finding what a removed error protected. Ch27 keeps its ruling and gives Noam only the short non-equivalence reply.
+5. **Last-line cadence.** Ch27 now ends on “Approve it before someone asks me to benchmark the title.” It doesn't borrow the book's “Good. Now I have…” cadence.
+6. **Folded takes.** Eden's parameter warning follows Oded's concession to the shown mobile caller. Daniel's doubled alias sentence is gone. The former take's sentence “The declaration report is there to show you what the compiler made of the whole change” remains dropped: the declaration diff already performs that job. This omission was not recorded in the first review; it is recorded here.
+7. **Bonus 2 payoffs.** The narrator prints the same dollar entry and leaves “Still dollars” to Guy. The description lead-in names description.ts. The later explicit-USD replay ends with Gilad's spoken result.
+8. **References and attribution.** The nonexistent badge-plugin callback is gone. Gil distinguishes the Money paths without claiming the private-field declarations have identical text. Noam owns “We're not in the meeting yet”; Eden owns “I'm saying it about this one.”
+
+### Should-fix and leave-alone audit
+
+- Ch26's Turn and Bonus 1's Debate now close in speech. Kept Ch24's optional result close: it already reports both tests, the route result and compilation, rather than a silent stage direction.
+- Ch24 attributes strictness to the config, explicitly adds the two exception-list entries, names the backfill's compiler inputs, and lets Noam retract his earlier global-check claim before Eden's catchphrase.
+- Ch25 separates Dima's release-image explanation from one checked narrator sentence about module mode and package links. Gil introduces “two imports that only need types” before they appear.
+- Ch26 widens ship's parameter, not Paid. Kept the project comment at the first source fence rather than moving it to the later config: a recorded departure from the original plan's placement. The comment is already checked for versions and module mode. Did not add the optional extra “type tests green” claim: the existing failed refresh and final question keep that payoff without another assertion before Noam's deliberate failure.
+- Ch27 puts the emit command in the probe comment, lets Gil report output, identifies the forthcoming banner, combines the emit comparison as byte-identical, explicitly turns noEmit off for the isolated probe, and qualifies the profile share as CPU samples. The relation event is indefinite. The initial unmeasured guess stays Oded's, rather than the preceding speaker Daniel's: a recorded settlement departure. Oded owns the cheaper-check PR and the guess; Gil answers it immediately.
+- Bonus 1's printed initial config no longer includes a file Idan has not created. She adds reset.d.ts to include when she writes it. The check follows that order; later candidate ownership freezes the updated config. Removed the redundant toolchain sentence (the compiler/declaration pins stay in the manifest), the “Same…” cadence and “Very harmonious.” Only the specified sentence was cut from its benchmark Principle.
+- Bonus 2's schema comments explicitly distinguish Zod's default (output) mode from io: input for the initial Refund. The shorter guide sentence accurately states only the input/output distinction. The required lists still come from the actual generated schema in validation.
+- Noam speaks Bonus 3's original-typo diagnostics, with both exact messages retained. The two later diagnostic passages are untouched. Its repeated “Same…” cadence is gone, as is “perfectly” in the union line.
+- Protected: Ch26's negative-usage control, helper discussion, Node-link sentence, all printed final files and jokes; Ch24's money coda; Idan's arguments pun; both Noam “Yes” beats; the catchphrase placements; “below”; the Bonus 3 ending; and the readers' other leave-alone passages. No real-model claims were added. Five links remain outside dialogue.
+
+Read Daniel's four Principles in sequence again: Ch20 establishes what a staged call does and closes on the parentheses distinction; Ch24 tests migration compatibility and closes on the outstanding obligation to callers; Ch27 controls a measurement and closes on the separate cost/contract decisions; Bonus 3 judges a summary by emitted declarations and closes on the summary having no vote. Only Ch27 uses the “same compiler and options” measurement formulation; only Ch24 uses a first-person procedure. Bonus 2 no longer shares Ch27's “useful, but” close. This is a voice assessment, not a compiler result.
+
+### Revised lengths and budget departures
+
+Whitespace words include labels, headings, comments and code, as before. Base remains 5da9cbb; the middle column is eb2fc97.
+
+| Chapter | Base | Initial PR E | Revision | Net versus base | Principle |
+|---|---:|---:|---:|---:|---:|
+| 24 | 2,134 | 2,018 | 2,045 | -4.17% | 84 |
+| 25 | 2,248 | 2,035 | 2,001 | -10.99% | 43 |
+| 26 | 2,544 | 2,305 | 2,390 | -6.05% | 59 |
+| 27 | 2,381 | 2,215 | 2,248 | -5.59% | 86 |
+| Bonus 1 | 2,143 | 2,176 | 2,133 | -0.47% | 121 |
+| Bonus 2 | 2,115 | 2,037 | 2,016 | -4.68% | 48 |
+| Bonus 3 | 2,378 | 2,289 | 2,261 | -4.92% | 65 |
+
+Ch25 is **49 words below** the 2,050–2,100 range, chiefly because the settled revision replaces its 83-word Principle with 43 words. Ch26 is **20 words above** 2,310–2,370: complete sentences and the spoken close take precedence over the cut target. Ch27 is within 2,210–2,260. All bonuses stay within 5% of their base; Bonus 3 is 4.92% shorter and ends on the exact required line. The revised Ch25/Bonus 2/Bonus 3 Principle lengths follow this brief rather than the original plan's longer guides. Sahar stays one word below his original guide. No padding or omitted control compensates for a budget miss.
+
+The earlier span table describes eb2fc97, not this revision. The moved-regression span in Ch26 and fixture setup in Ch27 have intentionally regained complete sentences. All code states, controls, catches and protected jokes remain. The executable fence sequence is unchanged apart from Bonus 1's corrected initial include; Ch27/B2 fence edits are comments. The per-chapter fence counts remain 12/13/17/10/11/9/10.
+
+### Revision validation
+
+Clean `npm ci` reports **zero vulnerabilities**. The full `npm run check` completes with exit 0 on **TypeScript 7.0.2, Node 22.23.4 and Zod 4.6.6**: coverage is unchanged at **483 fences, 891 compiler cases and 382 runtime groups**; these seven chapters account for **82/344/122**. Bonus 1 also passed its targeted suite with the corrected config order and stricter blockquote guard. All exact counter, byte, diagnostic, file-selection and runtime assertions remain. `git diff --check` passes. Audit evidence: `/private/tmp/pr-e-r2-audit.json`; logs: `/private/tmp/pr-e-r2-install.log`, `/private/tmp/pr-e-r2-full.log`. Neither logs nor scratch files are staged.
+
+
+## Final polish after 596be08
+
+Applied items **1–12** of [PR-E-REVISION-RECHECK.md](PR-E-REVISION-RECHECK.md) as requested; **13 is skipped**. The supplied recheck is committed unchanged (SHA-256 verified before and after editing). This section supersedes the preceding counts and Principle descriptions.
+
+- **1/4:** Bonus 3 uses the report's Principle verbatim: summary as the author's opinion, declarations as the compiler's, no inference explanation. Its ruling starts “Before accepting a repair…”. Read Daniel's Ch20/24/27/Bonus 3 Principles consecutively again: staged-call definitions, migration obligation, controlled measurement, then evidence against a summary. Bonus 3 no longer shares Ch27's conditional opening or announces Oded's inference discovery.
+- **2:** Applied all four proposed Ch26 variations: removed the redundant paid-only passing sentence; restored “Comment's back; we're green”; Row compiles cleanly; the final annotation removal makes everything compile again. Diagnostics and control order are unchanged.
+- **3:** Bonus 2's Principle ends “intelligible; it can't make it permissible.” Permission-before-action remains in its first sentence without restating the Verdict.
+- **5/6/9:** Dima names workspace links before referring to their location. Gilad opens “Check a release where it will run…” and names rehearsal/release as the antecedents. Gil reads the two file paths rather than claiming identical constructors.
+- **7/8/11:** Ch27's workload comment describes assembly from returned data, without suggesting the generator writes the file. Gil measures per signature and introduces the medians for the four alternatives in one sentence. He uses the project's options; the narrator refers to the banner below. The ruling's second sentence now names giving up a check as a contract change.
+- **10:** Bonus 2's comments use `default (output) mode` and `{ io: "input" }`. The extractor regex, expected keys and actual-output comparisons use those same labels. No generated expected value changed.
+- **12:** Bonus 1's second candidate run is two short sentences without repeating the unchanged-contract narration. Its ownership checks still assert unchanged files.
+
+The retained item 13 line, all protected jokes, catchphrase placements and Bonus 3's exact final line are unchanged. All executable fences and their order are identical to 596be08; only Ch27/Bonus 2 comments changed inside fences. Five links remain outside dialogue. No new technical claim or real-model claim was added.
+
+### Final lengths
+
+| Chapter | Base 5da9cbb | 596be08 | Final | Net versus base | Principle |
+|---|---:|---:|---:|---:|---:|
+| 24 | 2,134 | 2,045 | 2,045 | -4.17% | 84 |
+| 25 | 2,248 | 2,001 | 2,010 | -10.59% | 48 |
+| 26 | 2,544 | 2,390 | 2,382 | -6.37% | 59 |
+| 27 | 2,381 | 2,248 | 2,250 | -5.50% | 86 |
+| Bonus 1 | 2,143 | 2,133 | 2,125 | -0.84% | 121 |
+| Bonus 2 | 2,115 | 2,016 | 2,006 | -5.15% | 37 |
+| Bonus 3 | 2,378 | 2,261 | 2,236 | -5.97% | 43 |
+
+Ch25 is 40 words below its planned whole-chapter range; Ch26 is 12 above; Ch27 remains within. The explicitly requested Bonus 2/3 Principle cuts take their chapters just beyond the earlier 5% benchmark budget (−5.15% and −5.97%). Kept the approved wording rather than padding unrelated scenes to recover the budget. No other departure from this polish brief.
+
+### Final-polish validation
+
+Clean `npm ci` reports **zero vulnerabilities**. The full `npm run check` completes with exit 0 on **TypeScript 7.0.2, Node 22.23.4 and Zod 4.6.6**. Coverage remains **483 fences, 891 compiler cases and 382 runtime groups** overall, **82/344/122** for these seven chapters. `git diff --check` passes. Audit: `/private/tmp/pr-e-polish-audit.json`. Logs: `/private/tmp/pr-e-polish-install.log` and `/private/tmp/pr-e-polish-full.log`. Temporary evidence is not staged.
