@@ -154,8 +154,6 @@ export function dispatch(input: unknown, refund: {
 
 **Dafna**: "Because we're describing what the caller may send. Zod's default is to describe what comes out."
 
-[Zod's guide](https://zod.dev/json-schema#io) lists `ZodDefault` among the types whose input and output differ.
-
 **Guy**: "So the outgoing description says currency can be missing."
 
 **Dafna**: "Yes. Accurately. It even advertises `"default":"USD"`. We've documented the dollars."

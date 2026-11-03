@@ -44,6 +44,8 @@ console.log(lines.slice(0, 1).map(lineTotal).join(",")); // 100
 
 **Daniel**: "The index. It calls the function with the element, the index and the array. At index zero you got the answer you expected."
 
+**Noam**: "Eden's SLA migration had the same trap: `tickets.map(slaStatus)` would have passed the index as `now`. He checked every callback reference before switching."
+
 **Linoy**: "The zero wasn't my default."
 
 **Dima**: "We could make the discount required. Then a caller has to supply it."
@@ -332,7 +334,7 @@ try {
 
 ## The Verdict
 
-> An adapter that only holds an argument can stay with its caller. A shared factory earns its entry point when its module owns preparation that callers should not duplicate.
+> An adapter that only holds an argument can stay with its caller. A shared factory earns its entry point when its module owns preparation that callers should not duplicate; creating the function should establish that its arguments are valid.
 
 **Dima**: "We'll publish `priceWith` for the tiered promotion. It validates and prepares at the call, then returns the unary pricing function. Checkout keeps `lineTotal`. Both use the same calculation."
 

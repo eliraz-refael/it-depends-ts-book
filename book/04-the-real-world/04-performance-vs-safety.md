@@ -179,7 +179,7 @@ function t(...args: Args): string;
 
 **Oded**: "So the difference I measured exists."
 
-**Gil**: "It does. But key enumeration alone cost little here. These are whole-version comparisons, not charges we can add into a bill. Try a smaller change."
+**Gil**: "It does. But key enumeration alone cost little here. I'm adding your bet to the spreadsheet. Entry 848. These are whole-version comparisons, not charges we can add into a bill. Try a smaller change."
 
 **Linoy**: "The loose tuple keeps a tuple per key without dependent params. The common dictionary signature doesn't need those tuples."
 
@@ -212,6 +212,7 @@ He takes the banner selection out of the pending tuple:
 
 ```typescript
 // src/probe.ts — try a separately selected key
+// probe.json: {"extends":"./tsconfig.json","files":["src/i18n.ts","src/probe.ts"],"include":[]}
 import { t } from "./i18n.js";
 function messageFor(hasItems: boolean): "shop.cart" | "shop.hello" {
   return hasItems ? "shop.cart" : "shop.hello";
@@ -219,7 +220,7 @@ function messageFor(hasItems: boolean): "shop.cart" | "shop.hello" {
 console.log(t(messageFor(true), { name: "A" }));
 ```
 
-The full project gets TS2556 at the unchanged banner's tuple spread. They give the probe a separate file list: `probe.json` extends the root config, with `files: ["src/i18n.ts", "src/probe.ts"]` and `include: []`. Checking with `-p probe.json` succeeds, as does emitting with the earlier emit options, including `--noEmit false`. Running `node dist/probe.js` prints `Hello A, {count} items`.
+**Linoy**: "The full project gets TS2556 at the unchanged banner's spread. With the separate file list in `probe.json`, `-p probe.json` checks and emits using the earlier emit options, including `--noEmit false`. Running `node dist/probe.js` prints `Hello A, {count} items`."
 
 **Noam**: "It lets my broken replacement through and rejects the caller I already had."
 
@@ -244,7 +245,7 @@ function t<K extends Key>(
 
 **Linoy**: "Now a union key distributes into whole tuples. Each key keeps its params—or its lack of them."
 
-Noam's separate-key probe gets TS2345. The original pending-tuple banner compiles again. They remove the probe and check the ordinary cart, hello and ready calls, plus their typo, missing count, wrong count type and extra-argument controls. The allowed calls still work; the mistakes still fail. Emitting the translator gives the same bytes again.
+The separate-key probe gets TS2345; after removing it, all allowed calls—including the original banner—compile, all mistake controls fail, and the translator's emit is byte-identical.
 
 **Oded**: "It accepts the working caller and rejects the broken one. I can defend that in a review. Run the big one."
 
@@ -313,7 +314,7 @@ Oded reruns the small banner: `Hello A, 2 items` when it has items, `Hello A` ot
 
 **Noam**: "And if we ever do drop a check, don't call it equivalent."
 
-**Oded** changes the title to “Check translation calls faster without loosening their arguments.”
+**Oded** changes the title to "Check translation calls faster without loosening their arguments."
 
 **Noam**: "Now I can tell what I'm approving."
 

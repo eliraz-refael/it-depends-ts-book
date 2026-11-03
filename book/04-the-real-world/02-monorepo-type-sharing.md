@@ -134,7 +134,7 @@ console.log(buildId, amount.plus(
 
 The API compiles. The run throws `TypeError: Cannot read private member #cents from an object whose class did not declare it`.
 
-**Gilad**: "`apps/api/out/packages/money/src/index.js`, at `Money.plus`. That's inside the API's output."
+**Gilad Stacktrace**: "`apps/api/out/packages/money/src/index.js`, at `Money.plus`. That's inside the API's output."
 
 **Linoy**: "Why is there a money package in the API's output?"
 
@@ -317,13 +317,11 @@ Node refuses `node_modules/@shop/money/src/index.ts` with `ERR_UNSUPPORTED_NODE_
 
 **Linoy**: "For this quote? No. But I still want the source check."
 
-They leave the experimental branch, restoring the `.js` imports and `default` targets and removing `allowImportingTsExtensions` from the dev base.
+**Dima**: "Package JavaScript. Restore the `.js` imports and `default` targets, and remove `allowImportingTsExtensions` from the dev base. A rebuild won't delete the stray money copy, so clean the outputs first."
 
-**Dima**: "Package JavaScript. Clean both dist directories and the API's out first. A rebuild won't delete the stray money copy."
+**Gil**: "Clean the incremental build files too, so the outputs get rebuilt."
 
-**Gil**: "And the incremental build files, so the clean outputs get rebuilt."
-
-They clean those directories and metadata, then run `tsc -b apps/api`. The API output and manifest, plus both dependencies' manifests and `dist`, go into a fresh image layout. The copy prints `release-42 USD 15.00`.
+They leave the experiment, clean both packages' dist directories, the API's out and the incremental build files, then run `tsc -b apps/api`. The API output and manifest, plus both dependencies' manifests and `dist`, go into a fresh image layout. The copy prints `release-42 USD 15.00`.
 
 **Gil**: "Two emitted from the start. One loaded until the parser arrived, then two. This image ships one."
 

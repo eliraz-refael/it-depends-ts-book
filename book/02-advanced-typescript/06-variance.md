@@ -341,7 +341,7 @@ const useArchive = archiveAction(latestDownload); // Accepted.
 
 ```typescript
 function receipt(reader: ResultReader<CsvResult>): string {
-  // Replaces the earlier receipt; the panel binding below replaces the old panel.
+  // Replaces the earlier receipt; the new `panel` binding replaces the old panel.
   return `${reader.read().rows.toFixed(0)} rows`;
 }
 

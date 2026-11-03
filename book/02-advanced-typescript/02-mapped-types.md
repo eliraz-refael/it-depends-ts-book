@@ -143,7 +143,7 @@ const clearedBio: DerivedUpdate = { bio: "" };
 const explicitUndefined: DerivedUpdate = { email: undefined };
 // strict alone: all three compile.
 // strict + exactOptionalPropertyTypes: error on explicitUndefined.
-// Both settings stay enabled for the examples below.
+// This project keeps both settings enabled.
 ```
 
 **Daniel**: "`strict` alone accepts that last one. With `exactOptionalPropertyTypes` on, a present `email` has to be a string. Put `undefined` in the value type if you want to allow it. Reading a missing property still gives `undefined`. Both request definitions behave the same way."

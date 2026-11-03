@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Gilad Stacktrace**: "When this job says failed, what do I tell the customer? A wrapper is acceptable only if the operation still does what its caller agreed to."
+**Gilad Stacktrace**: "A wrapper is acceptable only if the operation still does what its caller agreed to. When this job says failed, I have to know what to tell the customer."
 
 "I start with the operation's contract and the incident log. Which entries explain the result, and which only tell me that a function ran? If I have to guess what an entry means, I ask whoever owns that operation. Then I can say what we know and what we still need to investigate."
 
@@ -334,7 +334,7 @@ async function runJob(deliver: Send): Promise<string> {
 
 **Guy**: "The reconciliation worker looks up the notice ID before closing an unconfirmed job. It uses the client's receipt lookup."
 
-**Oded**: "I'll put that in a comment next to `sendShipped`, so the next person knows where these jobs go."
+**Oded**: "So 'unconfirmed' has an owner. That's more than 'failed' ever had."
 
 ## The Verdict
 

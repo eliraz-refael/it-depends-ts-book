@@ -438,7 +438,7 @@ type ListedAuditEvent =
 
 ```typescript
 type HandlerName = `on${Capitalize<ChangeEvent>}`;
-// "onThemeChanged" | "onFontSizeChanged" | "onAutoSaveChanged"
+// "onAutoSaveChanged" | "onFontSizeChanged" | "onThemeChanged"
 ```
 
 **Oded**: "Those aren't in the diff, are they?"

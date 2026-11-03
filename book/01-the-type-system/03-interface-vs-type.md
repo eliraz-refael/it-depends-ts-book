@@ -169,7 +169,7 @@ type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
 // Template literal types — interface can't do this
 type EventName = `on${Capitalize<"click" | "hover" | "focus">}`;
-// "onClick" | "onHover" | "onFocus"
+// "onClick" | "onFocus" | "onHover"
 
 // Tuple types — interface can't do this cleanly
 type Coordinate = [x: number, y: number, z: number];
@@ -464,6 +464,6 @@ interface AppConfig {
 }
 ```
 
-## Additional Takes
+## Additional Take
 
 **Daniel Compiler**: "Interface names appear in error messages. A complex intersection can expand into its parts. If the choice is otherwise a tie, try a bad assignment and read what comes back."
