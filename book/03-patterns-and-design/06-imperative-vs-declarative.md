@@ -2,13 +2,11 @@
 
 ## The Principle
 
-**Sahar Firstclass**: "Choose the simplest expression of the behavior the caller needs, and check that behavior before calling a rewrite a refactor. A chain can make independent transformations easy to read. A loop can make a sequence of decisions easy to follow. Neither spelling tells me which decisions you were supposed to make."
-
-"Start with a caller whose answer matters. Give both versions the same input and compare what that caller receives, including the order. If they disagree, settle which answer you owe before choosing the nicer body. Once they agree, I want the version where I can find the relevant decision without tracing an extra mechanism. Saving a few lines is useful only if the next person can still see what those lines do."
+**Sahar Firstclass**: "Choose the simplest expression of the behavior the caller needs, and check that behavior before calling a rewrite a refactor. What would we lose if we deleted this rewrite? If all we'd lose is a shorter spelling, I'd keep the version where I can see why an item is included or left out."
 
 ## The Debate
 
-**Dafna Functor**: "Three eligibility checks and a running total in one loop. I wanted to test the eligibility rules without arranging a treasury balance."
+**Dafna Functor**: "Three eligibility checks and a running total in one loop. I wanted to test the eligibility rules without setting up an allowance."
 
 The payouts team is looking at yesterday's batch. Dafna's refactor ran for the first time, and a seller has contacted support. The planner selects payouts for another service to submit; it doesn't move money itself. Its input queue is oldest first.
 
@@ -253,15 +251,13 @@ For the replay, yesterday is day 1. Gil removes each day's released payouts and 
 
 Gil runs all 78,125 combinations of four opening payouts and one arrival on each of the next three days. Each amount is one of 100, 200, 300, 400 or 500, and the allowance resets to 500, so every amount fits a fresh day. He compares the payment day of every ID, not just the time it takes to empty the queue.
 
-**Gil**: "No payout paid later under skip in that set. Some paid earlier."
+**Gil**: "With a fresh allowance every day and every payout fitting one, no payout paid later under skip in that set. Some paid earlier."
 
 **Dafna**: "Then I'd like a different rule: scan in queue order, pay what fits, leave the rest for tomorrow."
 
 **Chen**: "Support would have to stop promising that newer payouts won't go ahead."
 
 **Dafna**: "Yes. We wrote that promise. We can change it, with support, as a policy change. Today's patch still restores the old rule."
-
-**Gil**: "We compared fresh daily allowances and payouts that fit them, so this says nothing about balances that accumulate."
 
 ## The Verdict
 
@@ -278,7 +274,7 @@ const fillAvailable = skipping;
 
 **Gil**: "P2's date wasn't delayed yesterday. We still broke the queue-order promise we gave its seller."
 
-**Dafna**: "Restore that promise first. Then agree on filling for the reset as a policy change, with support's reply updated."
+**Dafna**: "Restore that promise first. Then agree on filling with support as a policy change and update their reply."
 
 **Chen**: "And filling could use a loop too?"
 

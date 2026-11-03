@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Liron Closure**: "If you promise to keep a policy, save enough to make its decision again. Load the saved version and apply the recorded input. It should give the answer that was recorded, even after the live policy has changed. That is the test I would start with."
+**Liron Closure**: "If you promise to keep a policy, save enough to make its decision again. Think of a recipe with a note saying 'cook it the usual way.' Everyone in the kitchen knows what that means today. The person opening the notebook next year may not."
 
-"In Lisp I could work with code as data. That doesn't mean a saved object in this system contains everything its running counterpart knew. The reader still needs to know what the saved description means. We might keep that meaning in an evaluator, or retain the particular code that made the decision. Either way, somebody must be able to recover it. A record that only makes sense to the person who remembers the deployment hasn't kept the policy."
+"In Lisp I could work with code as data. Here we must decide what the saved description means and keep that meaning available. It might live in an evaluator, or in the particular code that made the decision. Load an old policy and apply its recorded input after the live policy has changed. If you cannot recover its answer without asking the cook, something is missing from the record."
 
 ## The Debate
 
@@ -14,9 +14,9 @@
 
 **Eden Legacy**: "Refunds. That account had three refunds."
 
-**Dafna**: "Then why does the record say we only checked the total?"
+**Dafna**: "Then why does the record say we only checked the total? Risk edits and activates the policy in my console. They decide what gets held. Your service is supposed to carry that out."
 
-Dafna maintains the risk team's console. Analysts use it to edit review settings and activate revisions. Eden owns the orders service, which decides whether an order can ship or needs manual review. They jointly own the interface between the console and the service. The risk team decides which orders should be held.
+**Eden**: "Through the interface we both own. Let's see what it handed the logger."
 
 The audit log promises a complete account of the active policy alongside the order facts and the decision. On the third, the console had selected the total template; the logger received its live policy object, shown below. The refund ages were measured at that decision, not when Dafna opened the record:
 

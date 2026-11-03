@@ -2,9 +2,7 @@
 
 ## The Principle
 
-**Daniel Compiler**: "Judge a staged API by what each call establishes for its caller. Partial application supplies some arguments now and leaves a function for the rest. Currying expresses a multi-argument function as successive calls taking one argument each. Those describe the arrangement of calls, not a reason to change an API."
-
-"Show me the caller that needs the intermediate function. What does it know when it obtains that function, and what can it supply later? A local arrow may already express that division. A shared entry point earns its place when the module has work or knowledge the caller should not duplicate. Compare the calls through both versions before choosing one. Similar-looking function types aren't enough to establish that they serve the same caller."
+**Daniel Compiler**: "Judge a staged API by what each call establishes for its caller. Partial application supplies some arguments now and leaves a function for the rest. Currying expresses a multi-argument function as successive calls taking one argument each. Those are descriptions of the call structure. They don't decide which arguments belong together, or what work belongs to each call. Splitting the parentheses doesn't make those decisions for you."
 
 ## The Debate
 
@@ -334,13 +332,13 @@ try {
 
 ## The Verdict
 
+> An adapter that only holds an argument can stay with its caller. A shared factory earns its entry point when its module owns preparation that callers should not duplicate.
+
 **Dima**: "We'll publish `priceWith` for the tiered promotion. It validates and prepares at the call, then returns the unary pricing function. Checkout keeps `lineTotal`. Both use the same calculation."
 
 **Linoy**: "I'll create it when reporting accepts the promotion and give that function to the layout. The preview and statement will pass it just the line, without doing the preparation again."
 
 **Noam**: "Keep the empty invalid run in the tests. If somebody moves the check back into the returned function, the prices alone won't tell us."
-
-**Dima**: "And this isn't a request for two exports for every calculation in the package. An adapter that only holds an argument can stay in reporting. This one earns its entry point because the package owns the preparation."
 
 ## Additional Take
 

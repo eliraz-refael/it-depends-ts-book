@@ -23,9 +23,9 @@ const KnownUpdate = z.object({
 type KnownStatus = z.infer<typeof CarrierStatus>;
 type KnownUpdate = z.infer<typeof KnownUpdate>;
 type RefundDecision = "issue" | "skip" | "review";
+// skip: finished without a refund.
+// review: a work item for fulfilment on-call, linked to the stored update.
 ```
-
-The refund worker treats `skip` as finished without a refund. `review` creates a work item for the fulfilment on-call engineer, linked to the stored update. The current known statuses don't need that third outcome.
 
 ```typescript
 function refundForKnown(status: KnownStatus): RefundDecision {
@@ -68,7 +68,11 @@ async function receive(body: unknown, inbox: Inbox): Promise<number> {
 }
 ```
 
-**Eden**: "We acknowledge after saving the parsed update. The carrier retries twice if it gets no acknowledgement or a non-2xx response. Three rejected attempts pause the whole account, including the other shipments."
+**Eden**: "We acknowledge after saving the parsed update. No acknowledgement or a non-2xx response gets two retries."
+
+**Oded**: "And after those?"
+
+**Eden**: "Three rejected attempts pause the whole account, including the other shipments."
 
 Eden opens the rejected request body.
 
@@ -149,10 +153,10 @@ console.log(z.strictObject(KnownUpdate.shape).safeParse(withEta).success);
 
 **Idan**: "In a tag."
 
-The carrier's wire contract requires a nonempty status string and a nonempty shipment ID. An unfamiliar string can satisfy that contract; a number or an empty string cannot.
-
 ```typescript
 const WireStatus = z.string().min(1);
+// Wire contract: nonempty status and shipment ID strings.
+// An unfamiliar status can satisfy it; a number or empty string cannot.
 const OpenStatus = CarrierStatus
   .transform(status => ({ known: true as const, status }))
   .or(WireStatus.transform(raw => ({ known: false as const, raw })));

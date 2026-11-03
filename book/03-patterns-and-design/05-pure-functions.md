@@ -2,9 +2,11 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Before replacing a call with a saved answer, establish that the caller gets the same answer and that no required work disappears. A pure calculation gives the same result for the same input values without doing work someone else relies on. Its signature alone cannot establish that."
+**Prof. Eli Typeworth**: "Before replacing a call with a saved answer, establish that the caller gets the same answer and that no required work disappears. That is what makes substitution useful. A pure calculation gives the same result for the same input values without doing work someone else relies on."
 
-"I would try the substitution at a real caller. If the answer changes, something the calculation depends on is missing from our account of its inputs. If the answer stays right but the caller loses something, we have mistaken the return value for the whole operation. We may choose to tolerate a difference. Then we must name that difference and agree to it, rather than call the two versions equivalent."
+"Suppose I give you yesterday's answer instead of doing the calculation again. You might say it is still correct. Good. Now suppose doing the calculation was also how somebody learned that you had asked. The answer could be correct and the substitution still wrong. We have to account for the whole operation."
+
+"You may decide that an older answer is acceptable, or that the other work isn't needed here. Those are changes to what you require. They don't make the original calculation pure."
 
 ## The Debate
 
@@ -60,7 +62,7 @@ const ticketKey = (ticket: Ticket) => `${ticket.id}/${ticket.revision}`;
 const dashboardStatus = memoizeBy(ticketKey, slaStatus);
 ```
 
-Gilad replays the three instants, calling the original function and the cached one side by side. The replay runs in the dashboard's Jerusalem environment. He replaces `Date.now` for this isolated test and restores it afterward:
+Gilad replays the three instants in the dashboard's Jerusalem environment:
 
 ```typescript
 const realNow = Date.now;
@@ -220,7 +222,7 @@ function refresh(tickets: readonly Ticket[]): SlaStatus[] {
 
 **Oded**: "Same calls for three consumers. One clock read for the board. That's not the migration I was objecting to."
 
-Oded implements boundary expiry and compares all four versions over the same 20,000 tickets. As in the replays, he replaces the clock: each refresh holds it at 12:20:00, 12:20:30 or 12:21:00 Jerusalem time. He starts with empty caches, makes no edits and counts deadline walks:
+With empty caches and 20,000 unchanged tickets, Oded counts deadline walks at 12:20:00, 12:20:30 and 12:21:00 Jerusalem time, holding the clock fixed for each refresh:
 
 | Version | Deadline walks across the three refreshes |
 |---|---:|
@@ -327,7 +329,7 @@ Eden updates `makeSla`:
 
 ```typescript
 function makeSla(policy: SlaPolicy) {
-  // Replaces the earlier factory; rebuild the exported entry point below.
+  // Replaces the earlier makeSla; the export below is rebuilt with it.
   const fixedPolicy = { timeZone: policy.timeZone };
   const cachedDeadline = memoizeBy(ticketKey,
     (ticket: Ticket) => deadlineFor(ticket, fixedPolicy));
@@ -367,6 +369,8 @@ console.log(evaluate(record.deadline, record.evaluatedAt).status); // at-risk
 **Gilad**: "And replaying it through `slaStatus` would write another record. This just reads the old one."
 
 ## The Verdict
+
+> Reuse a calculation only while its relevant inputs stay the same. Read changing inputs fresh and keep required effects outside the cache.
 
 Gilad has checked with the lead: status as of the last thirty-second refresh is acceptable; an extra cache delay is not.
 

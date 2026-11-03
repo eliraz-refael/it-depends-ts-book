@@ -243,9 +243,9 @@ receipt(readPrice, functionPricing.snapshot()); // Error TS2345.
 
 **Dafna**: "Call `readPrice()` when the panel renders. Saving that result takes a snapshot. Saving the function keeps a way to read the next price."
 
-**Liron**: "Complexity is a choice, not a necessity. The receipt keeps a quote. The panel asks for one."
+**Liron**: "Complexity is a choice, not a necessity."
 
-**Guy**: "The panel depends on a current-price capability. I'd name the operation on an interface."
+**Guy**: "Then I'm choosing an interface. The panel depends on a current-price capability. I'd name the operation on it."
 
 ```typescript
 interface PriceView {

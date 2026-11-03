@@ -20,10 +20,6 @@ Guy starts with `bookParty`, the service function the page calls.
 
 **Guy**: "The page already reports the refusals, and the transaction rolls back. Why change `bookParty`'s contract?"
 
-**Dafna**: "I still want the caller outside the request handler to see the refusal in its return type."
-
-**Guy**: "We argued about who catches the parser's failure. Here the store has to see it too. Show me where you catch it."
-
 ```typescript
 type Failure =
   | { kind: "occupied"; seat: string }
@@ -67,7 +63,7 @@ function failureMessage(failure: Failure): string {
 }
 ```
 
-Guy opens the current service function and the page's `submit` handler:
+The service and the page's `submit` handler use that formatter:
 
 ```typescript
 async function bookParty(store: Store, seats: readonly string[]): Promise<Booking> {
@@ -110,6 +106,8 @@ type Result<T, E> =
 ```
 
 **Dafna**: "The catch is next to `hold`. I wanted it handling the seat operation, not errors from starting or committing the transaction."
+
+**Guy**: "We argued about who catches the parser's failure. There the handler owned the response. Here the store has to see it too."
 
 Her replacement `bookParty` catches the known refusal inside the callback:
 
@@ -166,7 +164,7 @@ Guy follows the failure branch back to `failureMessage`.
 
 Gil runs the original pair of functions against a fresh store, then Dafna's pair against another. Both pages show `"A2 is taken."`. Neither returns a booking message. Both compile.
 
-Gil adds the committed-state check below the response check.
+**Gil**: "Now let's see what the store kept."
 
 ## The Turn
 
@@ -266,7 +264,7 @@ async function bookParty(
 
 **Guy**: "Our library's steps don't return results."
 
-**Dafna**: "Then I'll wrap `hold` to try it. Only its known refusal:"
+**Dafna**: "Then I'll wrap `hold` to try it. It returns the known refusal and lets anything else escape:"
 
 ```typescript
 async function tryHold(tx: Tx, seat: string): Promise<Result<void, Failure>> {

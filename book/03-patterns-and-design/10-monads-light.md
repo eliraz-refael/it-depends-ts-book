@@ -2,9 +2,7 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Choose the chaining operation by what the next step returns, then check the shape the caller receives. If the step produces a plain value, `map` puts that value inside the container. Plain is relative here: an array is an ordinary payload inside a Result. If the step produces another Result, wrapping it again gives the caller a Result inside a Result. An operation such as `flatMap` instead hands back the step's result."
-
-"Write the caller before choosing the chain. Can it reach the answer it needs, and does it still handle failure where intended? The shorter expression earns nothing if it changes either. Sometimes two early returns make that easier to see. The container's name isn't the explanation; follow the value."
+**Prof. Eli Typeworth**: "Choose the chaining operation by what the next step returns, then check the shape the caller receives. A step returning an ordinary payload needs `map`. Ordinary means outside this particular container: an array can be a payload inside a Result. If the step already returns a Result, use the operation that passes that result on rather than wrapping it again. Otherwise the outer success may contain an inner failure. Neither is a contradiction. They answer different questions, and the caller has to reach the one it needs."
 
 ## The Debate
 
@@ -197,6 +195,8 @@ const refusedJob = runJob(() => loadPreview("7"));
 
 **Dafna**: "Yes. When the async function resolves with your object, JavaScript gets its `then` property. It's callable. JavaScript calls it with a resolve function and a reject function."
 
+**Eli**: "No registration required. You can join a language protocol just by choosing a method name."
+
 **Linoy**: "And my method takes one function."
 
 She follows the success branch with her cursor.
@@ -350,6 +350,8 @@ async function checkRepair() {
 ```
 
 ## The Verdict
+
+> A callable `then` makes an object participate in the promise protocol. Give a different chaining operation its own name.
 
 **Guy**: "Ship the rename with those checks. The unwrap worked, but gave the batch a union and the screens a class. With the rename, all of them receive the same `Res`. Both jobs close without turning no stock into a worker failure. The screens keep their chains, and other callers keep their early returns."
 

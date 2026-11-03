@@ -239,8 +239,8 @@ group("named-78125-reset-cases-no-id-paid-later-under-skip",()=>{
     const stop=schedule(load(loopApi).looped,arrivals,500);
     const skipping=schedule(skip,arrivals,500);
     assert.equal(stop.paid.size,7);assert.equal(skipping.paid.size,7);
-    // The prose gives an induction, not a claim that this finite set proves it.
-    // Pin its daily subset invariant in every named case too.
+    // This is a finite comparison, not a proof for every queue.
+    // Check the remaining-queue subset in each enumerated case too.
     for(let day=0;day<stop.trace.length;day++){
       const pending=new Set(stop.trace[day].remaining);
       assert(skipping.trace[day].remaining.every(id=>pending.has(id)));
