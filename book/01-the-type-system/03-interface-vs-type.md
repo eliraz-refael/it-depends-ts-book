@@ -116,10 +116,10 @@ app.use((req, res, next) => {
 
 **Linoy**: "Yes. But the shared type can describe them. You couldn't reopen a type alias this way."
 
-**Chen Override**: "But have you considered... installing both widgets? Each package gives its host page a global `User`. What happens when we import both?"
+**Chen Override**: "But have you considered... installing two widget packages that each declare a global `User`? What happens when we import both?"
 
 ```typescript
-// file: node_modules/profile-widget/index.d.ts
+// file: node_modules/badge-widget/index.d.ts
 export {};
 declare global {
   interface User {
@@ -138,14 +138,14 @@ declare global {
 }
 
 // file: page.ts — both packages are loaded into this program
-import "profile-widget/index.js";
-import "admin-widget/index.js";
+import "badge-widget";
+import "admin-widget";
 const user: User = { id: "u1", name: "Ada" };
 // Error: Type '{ id: string; name: string; }' is missing the following
 // properties from type 'User': email, role
 ```
 
-**Daniel**: "Both declarations reach the same global scope. They merge, and now the profile widget's user needs the admin fields too. Separate modules protect their local names; these packages explicitly put `User` outside them."
+**Daniel**: "Both declarations reach the same global scope. They merge, and now the badge widget's user needs the admin fields too. Separate modules protect their local names; these packages explicitly put `User` outside them."
 
 **Noam Kiperman**: "Keep our application model local to its module. If another package needs an extension point, let it name one. I don't want to acquire two required fields by installing a widget."
 
@@ -293,7 +293,7 @@ type Props = BaseProps & {
 // The same object shape, expressed as an intersection.
 ```
 
-**Chen**: "Which of these types has an `interface` spelling we could actually compare? What would we replace a union with?"
+**Chen**: "Which of our slow types even have an `interface` spelling? What would we replace a union with?"
 
 **Oded Shipley**: "If your compile time is slow, profile it first. Don't prematurely optimize your *type syntax*."
 
@@ -400,7 +400,7 @@ type User = Identifiable & Timestamped & Named;
 interface UserContract extends Identifiable, Timestamped, Named {}
 ```
 
-**Guy**: "Same parts. If two disagree about `id`, this declaration fails."
+"If two disagree about `id`, this declaration fails."
 
 **Dafna**: "Fine. The family tree was optional. For a named object, that error is useful. I still need intersections inside generic type expressions; I'm not declaring an interface for every intermediate result."
 

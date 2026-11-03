@@ -162,7 +162,7 @@ He's the one who always asks: "What's the migration path?" If a pattern doesn't 
 
 *Cutting-Edge Advocate*
 
-Linoy's `tsconfig.json` looks like a dare she has already run. She reads TypeScript release notes the day they're published. By lunch, she's usually found a place to try the feature. By three, Oded has asked whether that place had a problem before lunch.
+Linoy's `tsconfig.json` looks like a dare she has already taken. She reads TypeScript release notes the day they're published. By lunch, she's usually found a place to try the feature. By three, Oded has asked whether that place had a problem before lunch.
 
 She likes code that lets the compiler do more of the work: `satisfies` for a configuration, inferred keys at a call, a type derived from the value everyone already maintains. When someone asks "can TypeScript do that?", she usually has a playground open before they've finished the question. If it can't, she may have a proposal ready. A proposal is not a shipped feature, a distinction Daniel has had to make while she was already typing.
 

@@ -81,3 +81,17 @@ Word counts use the same whitespace method, including fences:
 No disagreement with the settled brief. The new Ch2 Turn is 96 words of net growth; every other chapter is shorter.
 
 Validation: clean `npm ci` passed with zero reported vulnerabilities; the full `npm run check` passed on TypeScript **7.0.2**, Node **22.23.4** and Zod **4.6.6**. Act I: **111 fences, 124 compiler cases, 16 runtime groups**. Whole book: **484 fences, 892 compiler cases, 387 runtime groups**, plus the unchanged two default cases, two source searches and eleven file-list queries. Log: `/private/tmp/pr-b-revision-full.log`. The final Ch2 attribution adjustment changes prose only. `git diff --check` passes.
+
+## Final polish after the revision recheck
+
+Applied all six requested changes and all six listed minors. The fresh [revision recheck](PR-B-REVISION-RECHECK.md) is included unchanged.
+
+- Ch2: Oded now identifies the fetch-result limit of `satisfies` in “our API client,” leaving the legacy-refusal beat to Additional Takes. Gilad writes the provider's type and reruns the test; Noam explicitly proposes a parser that this path does not yet have.
+- Ch3: Chen introduces the two global-augmenting widget packages before asking about their collision. Renamed the first to `badge-widget`, used bare package imports, aimed his performance question at the project's slow types, and removed Guy's repeated label and “Same parts.”
+- Ch5: the narration introduces the property demonstration before the response guard; Linoy's continuation names `hasError("abc")` and `hasError(42)` without relabelling her. The closing summary records Guy accepting the result for outside-handler callers and retains the disagreement inside the handler.
+- Ch4, Ch6 and cast: joined the learning-cost clause to its enum condition, cut the repeated no-cast comment from `loadState`, and changed Linoy's dare to one she has “taken.”
+- Checks: renamed the widget control and updated its import-removal edit. Installed-package fixtures now supply ordinary `package.json` files with `main`/`types` entries and empty JavaScript entry points alongside the extracted declarations. Bare imports produce the same quoted TS2739; keeping both packages installed but importing only the badge package remains green, as does providing the merged shape. Ch5's two named calls were already exercised by the existing runtime check.
+
+No disagreement or deviation. The first targeted run exposed the fixture's missing package manifests; completing the package layout resolved that failure without changing the printed declarations or diagnostic. The second targeted run passed all 124 compiler cases and 16 runtime groups. No new fences or cases were added; the Ch6 fence change removes only a comment. Ch1 and all later acts remain untouched in this polish round.
+
+Final validation: clean `npm ci` passed with zero reported vulnerabilities; full `npm run check` passed on TypeScript **7.0.2**, Node **22.23.4** and Zod **4.6.6**. Counts remain **484 fences, 892 compiler cases, 387 runtime groups** (Act I: **111 / 124 / 16**). Logs: `/private/tmp/pr-b-polish-install.log` and `/private/tmp/pr-b-polish-full.log`. `git diff --check` passes.

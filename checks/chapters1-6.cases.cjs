@@ -37,6 +37,15 @@ const widgetFiles = Object.fromEntries([...collisionFence.matchAll(
   /\/\/ file: (node_modules\/[^\n]+)\n([\s\S]*?)(?=\/\/ file:|$)/g,
 )].map(([, filename, source]) => [filename, source]));
 assert.equal(Object.keys(widgetFiles).length, 2);
+// Model installed packages: the page prints their declarations, not packaging boilerplate.
+for (const declaration of Object.keys(widgetFiles)) {
+  const directory = path.posix.dirname(declaration);
+  widgetFiles[`${directory}/package.json`] = JSON.stringify({
+    name: path.posix.basename(directory), version: "1.0.0", type: "module",
+    main: "./index.js", types: "./index.d.ts",
+  });
+  widgetFiles[`${directory}/index.js`] = "export {};\n";
+}
 const badConfigInput = genericsChapter.match(/const config = parseConfig<\{ retries: number \}>\('([^']+)'\);/)[1];
 function checkUncheckedConfig({parseConfig}) {
   const config = parseConfig(badConfigInput);
@@ -201,8 +210,8 @@ app.get("/profile", (req) => req.exportedOnly);`, expect: [["after", 7, 2339]]},
       {name: "global-interface-merge", fence: 6, lines: [20, 24], files: widgetFiles, after: `
 type Merged = Expect<Equal<User, { id: string; name: string; email: string; role: "admin" | "user" }>>;`,
         expect: [[6, 22, 2739, "Type '{ id: string; name: string; }' is missing the following properties from type 'User': email, role"]]},
-      {name: "profile-widget-without-admin", fence: 6, lines: [20, 24],
-        edit: [['import "admin-widget/index.js";', ""]],
+      {name: "badge-widget-without-admin", fence: 6, lines: [20, 24],
+        edit: [['import "admin-widget";', ""]],
         files: widgetFiles},
       {name: "merged-widget-user-complete", fence: 6, lines: [20, 24], files: widgetFiles,
         edit: [['{ id: "u1", name: "Ada" }', '{ id: "u1", name: "Ada", email: "ada@example.com", role: "user" }']]},

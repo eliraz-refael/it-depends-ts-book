@@ -49,7 +49,7 @@ const config2 = { env: "production" } as Config;
 
 **Linoy**: "For values we write here, try `satisfies`. It checks against the type without replacing it."
 
-**Oded Shipley**: "It arrived in 4.9. My client already had assertions all over it. I'm not rewriting those just because there's a nicer keyword."
+**Oded Shipley**: "Our API client asserts the shape of a fetch result. `satisfies` won't establish what came back."
 
 ---
 
@@ -365,7 +365,7 @@ if (cache.has(userId)) {
 
 **Gilad**: "The provider now allows `email` to be absent. Your client still asserts the old `ApiUser`."
 
-He changes the response type and runs the receipt test, then tries the response without email.
+He writes the provider's new type, reruns the receipt test, then feeds it the response without email.
 
 ```typescript
 // Provider's new contract; the client's ApiUser still requires email.
@@ -400,7 +400,7 @@ try {
 
 **Gilad**: "Good. Who rejects the missing email?"
 
-**Noam**: "Our parser. Receipts still require it. The provider allowing less doesn't mean we can use less."
+**Noam**: "A parser, once this path has one. Receipts still require it. The provider allowing less doesn't mean we can use less."
 
 **Gilad**: "An assertion is a bet that the other side still sends what you expect. Your factory was betting with you."
 

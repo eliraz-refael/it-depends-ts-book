@@ -66,7 +66,7 @@ function describe(value: unknown): string {
 
 "And `typeof x === 'function'` includes class constructors. Try calling one without `new`. That check is not an invitation."
 
-Linoy opens a response guard:
+Linoy tries a property check on an empty object, then opens a response guard:
 
 ```typescript
 const empty = {};
@@ -96,7 +96,7 @@ function hasError(value: unknown): boolean {
 }
 ```
 
-**Linoy**: "Force that through and both of those calls throw. Check `typeof value === 'object'` and `value !== null` before using `in`. Separately, if you only wanted a nullish check, truthiness rejects zero and the empty string too."
+"Force that through and `hasError("abc")` and `hasError(42)` both throw. Check `typeof value === 'object'` and `value !== null` before using `in`. Separately, if you only wanted a nullish check, truthiness rejects zero and the empty string too."
 
 **Daniel**: "And `typeof NaN` is `number`. Narrowing to `number` does not promise a finite number. That takes another check."
 
@@ -439,7 +439,7 @@ try {
 
 Parse external input where it enters, and keep one set of checks. Choose how failure travels from what the callers need to do with it.
 
-Idan and Dafna want a result that exposes rejection to each caller. Guy wants the established handler to reject his whole request. Neither choice requires giving up the checked `User` or the failure details.
+Callers outside Guy's handler get the result; inside it, Guy still wants the throwing adapter, and Idan and Dafna want the result there too. Neither choice requires giving up the checked `User` or the failure details.
 
 | Situation | Starting point | Condition |
 |-----------|----------------|-----------|

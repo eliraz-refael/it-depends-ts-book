@@ -436,7 +436,7 @@ sendToSdk(SdkStatus.Active); // Works.
 
 ## The Verdict
 
-> For new code, default to a string literal union; use an `as const` object when callers need named or enumerable values. Use or keep an enum when its reverse map or the team's ability to maintain it earns the extra construct, even for a new service. Plan for the learning cost of the alternative. Check the consumer's build before publishing a `const enum`.
+> For new code, default to a string literal union; use an `as const` object when callers need named or enumerable values. Use or keep an enum when its reverse map or the team's ability to maintain it earns the extra construct, even for a new service, while planning for the time the team needs to learn the alternative. Check the consumer's build before publishing a `const enum`.
 
 **Choosing an approach:**
 

@@ -343,7 +343,6 @@ const departments = pluck(team, "department"); // string[]
 // Danger: T appears only in the return type.
 function loadState<T>(key: string): T {
   return JSON.parse(localStorage.getItem(key) ?? "null");
-  // any → T: no relationship, no evidence — and no cast required.
 }
 ```
 
