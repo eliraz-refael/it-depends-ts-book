@@ -78,6 +78,16 @@ class ProofProgress extends Paged.Handler {
 }
 Paged.registerHandlers(ProofProgress);
 
+window.measureSymbolKey = () => {
+  const copy = document.querySelector('.symbol-key').cloneNode(true);
+  copy.style.cssText = 'position:absolute;left:-10000px;top:0;width:5.5in;display:flow-root;';
+  document.body.appendChild(copy);
+  window.symbolKeyMeasure = {total_pt:copy.getBoundingClientRect().height*.75,
+    first_bundle_pt:copy.querySelector('.symbol-first').getBoundingClientRect().height*.75,
+    group_heights_pt:[...copy.querySelectorAll('.symbol-group')].map(e=>e.getBoundingClientRect().height*.75)};
+  copy.remove();
+};
+
 window.collectProof = () => {
   const rect = e => { const r=e.getBoundingClientRect(); return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height}; };
   const pages = [...document.querySelectorAll('.pagedjs_page')];
@@ -97,7 +107,7 @@ window.collectProof = () => {
     return clone.textContent;
   };
   return {
-    targets,
+    targets,symbol_key_measure:window.symbolKeyMeasure,
     pages:pages.map(p=>({
       page:Number(p.dataset.pageNumber),rect:rect(p),body:rect(p.querySelector('.pagedjs_page_content')),
       footnotes:rect(p.querySelector('.pagedjs_footnote_area')),
@@ -111,6 +121,9 @@ window.collectProof = () => {
       blocks:[...p.querySelectorAll('.pagedjs_page_content [data-ref]')].map(e=>({ref:e.dataset.ref,tag:e.tagName,rect:rect(e)})),
       headings:[...p.querySelectorAll('h1,h2,h3,h4')].map(e=>({text:e.textContent,rect:rect(e)})),
       figures:[...p.querySelectorAll('figure.source')].map(e=>({id:e.dataset.fenceId,continued:e.hasAttribute('data-split-from'),rect:rect(e)})),
+      quiet_frontmatter:[...p.querySelectorAll('[data-quiet-frontmatter="true"]')].map(e=>({id:e.id,paragraphs:e.querySelectorAll('main > p').length,headings:e.querySelectorAll('h1').length,opener:!!e.querySelector('.chapter-opener,.opener-art')})),
+      symbol_groups:[...p.querySelectorAll('[data-symbol-group]')].map(e=>({id:e.dataset.symbolGroup,title:e.querySelector('h2')?.textContent,rows:[...e.querySelectorAll('[data-symbol-sequence]')].map(r=>r.dataset.symbolSequence)})),
+      symbol_intro:[...p.querySelectorAll('[data-key-intro-glyph]')].map(e=>({sequence:e.dataset.keyIntroGlyph,rect:rect(e)})),
       symbols:[...p.querySelectorAll('[data-symbol-sequence]')].map(e=>({sequence:e.dataset.symbolSequence,glyph:rect(e.querySelector('[data-key-glyph]')),literal:rect(e.querySelector('[data-key-literal]'))})),
       contents:[...p.querySelectorAll('[data-toc-target]')].map(e=>({target:e.dataset.tocTarget,page:e.querySelector('.toc-page').textContent,rect:rect(e)})),
       text:p.innerText

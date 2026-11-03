@@ -52,18 +52,19 @@ def printed_glyphs(page, box):
             for c in span['chars'] if box.contains(pymupdf.Point(c[2]))]
 
 
-def text_errors(pdf, pages, key, normalize):
+def text_errors(pdf, pages, key, normalize, plain):
+    meanings = {seq:row['meaning'] for group in key['groups'] for row in group['rows'] for seq in row['combinations']}
     errors = []
     first = True
     for metric in pages:
         if not metric['symbols']:
             continue
         text = normalize(pdf[metric['page']-1].get_text())
-        if first and normalize(key['intro']) not in text:
+        if first and normalize(plain(key['intro'])) not in text:
             errors.append('Symbol-key introduction missing from PDF')
         first = False
         for row in metric['symbols']:
-            if normalize(key['meanings'][row['sequence']]) not in text:
+            if normalize(plain(meanings[row['sequence']])) not in text:
                 errors.append(f'Symbol-key explanation missing: {row["sequence"]}')
     if first:
         errors.append('Symbol key missing from PDF')

@@ -1,32 +1,153 @@
 {
   "title": "Reading the code symbols",
-  "intro": "The code font joins some neighboring characters into a single visual symbol. Type the characters in the middle column, not a new symbol. This key includes only combinations that actually fuse in this book; their meaning still depends on the surrounding code. Commands, paths, comments and diffs appear alongside TypeScript.",
-  "meanings": {
-    "!=": "Loose inequality; the null check here also excludes undefined.",
-    "!==": "Strict inequality.",
-    "===": "Strict equality.",
-    "=>": "An arrow function, or the return type in a function type.",
-    "<=": "Less than or equal to.",
-    ">=": "Greater than or equal to.",
-    "&&": "Logical AND; evaluates the right operand only when the left is truthy.",
-    "||": "Logical OR; evaluates the right operand only when the left is falsy.",
-    "??": "Nullish coalescing; uses the right operand when the left is null or undefined.",
-    "?.": "Optional chaining; stops this access when the receiver is null or undefined.",
-    "?:": "The optional marker followed by the type annotation colon.",
-    "++": "Increment by one.",
-    "--": "Decrement by one; also the prefix of long options in the printed commands.",
-    "...": "Spread or rest syntax. In comments and strings, it can just mean omitted text.",
-    "..": "The parent-directory component in the printed paths.",
-    "//": "Starts a line comment.",
-    "/*": "Starts a block comment.",
-    "/**": "Starts a documentation comment.",
-    "*/": "Ends a block or documentation comment.",
-    ">>": "Here, closes two nested type-argument lists.",
-    ">>>": "Here, closes three nested type-argument lists.",
-    ">]": "Adjacent closing delimiters: a type-argument list, then a bracket.",
-    "}}": "Adjacent closing braces, including nested objects in the printed output.",
-    "__": "Two underscores in an identifier; they have no special TypeScript meaning.",
-    "---": "The old-file header in a printed diff.",
-    "+++": "The new-file header in a printed diff."
-  }
+  "intro": "The code in this book is set in a font that joins some characters into a single shape. `=>` prints as an arrow and `===` as one long bar. Nothing changes at the keyboard: you still type the separate characters in the middle column. This key lists every combination that joins somewhere in the book.",
+  "groups": [
+    {
+      "title": "Comparison and logic",
+      "rows": [
+        {
+          "combinations": [
+            "==="
+          ],
+          "meaning": "Strict equality."
+        },
+        {
+          "combinations": [
+            "!=="
+          ],
+          "meaning": "Strict inequality."
+        },
+        {
+          "combinations": [
+            "!="
+          ],
+          "meaning": "Loose inequality. The book uses it only as `!= null`, which rules out both `null` and `undefined`."
+        },
+        {
+          "combinations": [
+            "<=",
+            ">="
+          ],
+          "meaning": "Less than or equal to, greater than or equal to."
+        },
+        {
+          "combinations": [
+            "&&"
+          ],
+          "meaning": "Logical AND: the right side runs only when the left is truthy."
+        },
+        {
+          "combinations": [
+            "||"
+          ],
+          "meaning": "Logical OR: the right side runs only when the left is falsy."
+        },
+        {
+          "combinations": [
+            "??"
+          ],
+          "meaning": "Nullish coalescing: the right side is used only when the left is `null` or `undefined`."
+        },
+        {
+          "combinations": [
+            "?."
+          ],
+          "meaning": "Optional chaining: the access stops, giving `undefined`, when the left is `null` or `undefined`."
+        }
+      ]
+    },
+    {
+      "title": "Functions and types",
+      "rows": [
+        {
+          "combinations": [
+            "=>"
+          ],
+          "meaning": "Separates an arrow function's parameters from its body, or a function type's parameters from its return type."
+        },
+        {
+          "combinations": [
+            "?:"
+          ],
+          "meaning": "An optional property or parameter. `?` makes it optional, and `:` starts its type."
+        },
+        {
+          "combinations": [
+            "..."
+          ],
+          "meaning": "Spread or rest. In comments and strings, it just means text left out."
+        },
+        {
+          "combinations": [
+            "++",
+            "--"
+          ],
+          "meaning": "Add one, subtract one. In commands, `--` starts a long option such as `--noEmit`."
+        }
+      ]
+    },
+    {
+      "title": "Comments",
+      "rows": [
+        {
+          "combinations": [
+            "//"
+          ],
+          "meaning": "Starts a comment that runs to the end of the line."
+        },
+        {
+          "combinations": [
+            "/*",
+            "*/"
+          ],
+          "meaning": "Start and end a block comment."
+        },
+        {
+          "combinations": [
+            "/**"
+          ],
+          "meaning": "Starts a documentation comment."
+        }
+      ]
+    },
+    {
+      "title": "Punctuation that only looks joined",
+      "rows": [
+        {
+          "combinations": [
+            ">>",
+            ">>>"
+          ],
+          "meaning": "Two or three type-argument lists closing together."
+        },
+        {
+          "combinations": [
+            ">]",
+            "}}"
+          ],
+          "meaning": "Closing brackets next to each other."
+        },
+        {
+          "combinations": [
+            "__"
+          ],
+          "meaning": "Two underscores in a name."
+        },
+        {
+          "combinations": [
+            ".."
+          ],
+          "meaning": "The parent folder in a file path."
+        },
+        {
+          "combinations": [
+            "---",
+            "+++"
+          ],
+          "meaning": "The old-file and new-file headers in a diff."
+        }
+      ]
+    }
+  ],
+  "approved_text_sha256": "6259103681b421d5a7556e47e0a0530bc2c1d68ebdd070899875201bde966d7c"
 }

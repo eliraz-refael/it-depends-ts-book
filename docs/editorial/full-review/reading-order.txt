@@ -1,4 +1,5 @@
 book/00-prologue/00-dedication.md
+book/00-prologue/00a-acknowledgments.md
 book/00-prologue/01-how-to-read.md
 book/00-prologue/02-meet-the-cast.md
 book/01-the-type-system/01-any-vs-unknown.md

@@ -83,7 +83,9 @@ def baseline(actual, expected):
 def inputs(data):
     order = (ROOT / 'docs/editorial/full-review/reading-order.txt').read_text().splitlines()
     files = sorted(str(p.relative_to(ROOT)) for p in (ROOT / 'book').rglob('*.md'))
-    require(len(order) == 33 and sorted(order) == files, 'Reading order must cover every manuscript file exactly once')
+    frozen_files = subprocess.check_output(['git','ls-tree','-r','--name-only',data['manuscript_commit'],'--','book/'], cwd=ROOT, text=True).splitlines()
+    frozen_files = sorted(name for name in frozen_files if name.endswith('.md'))
+    require(sorted(order) == files == frozen_files, 'Reading order must cover every frozen manuscript file exactly once')
     links, hashes = [], {}
     for name in order:
         raw = (ROOT / name).read_bytes()

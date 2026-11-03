@@ -21,7 +21,7 @@ import prose_quotes
 import symbol_key
 
 HERE, ROOT = trial.HERE, trial.ROOT
-OUT = HERE / 'output' / 'whole-book-proof-layout'
+OUT = HERE / 'output' / ('whole-book-proof-' + trial.read_json(HERE/'release-metadata.json')['manuscript_commit'][:7])
 MD = trial.MD
 FINAL_LINE = 'Oded: "Good. Now I have a green pull request and a meeting four minutes ago."'
 ACTS = [
@@ -72,21 +72,37 @@ def opener_art(number):
     return f'<div class="opener-art"><span class="opener-number">{number}</span></div>'
 
 
+def key_meanings(key):
+    return {seq:row['meaning'] for group in key['groups'] for row in group['rows'] for seq in row['combinations']}
+
+
+def key_plain(text):
+    return plain(MD.parseInline(text)[0].children)
+
+
+def key_markup(text, intro=False):
+    children = MD.parseInline(text)[0].children
+    audit = prose_quotes.convert(children)
+    trial.require(not audit.get('ambiguous'), 'Ambiguous generated key typography')
+    for child in children:
+        if intro and child.type=='code_inline':
+            child.attrSet('data-key-intro-glyph',child.content)
+    return MD.renderer.renderInline(children,MD.options,{})
+
+
 def symbol_key_html():
     key = trial.read_json(HERE/'symbol-key.json')
-    # Editorial explanations must cover exactly the combinations measured in
-    # the rendered source. validate() recomputes that inventory on every build.
-    items = list(key['meanings'].items())
-    pages = []
-    for offset in range(0,len(items),13):
+    groups = []
+    for i,group in enumerate(key['groups']):
         rows = []
-        for sequence, meaning in items[offset:offset+13]:
-            literal = ''.join(f'<span class="key-character">{html.escape(c)}</span>' for c in sequence)
-            rows.append(f'<tr data-symbol-sequence="{html.escape(sequence, quote=True)}"><td><code data-key-glyph>{html.escape(sequence)}</code></td><td><code data-key-literal>{literal}</code></td><td>{html.escape(meaning)}</td></tr>')
-        title = key['title'] if not offset else 'Code symbols (continued)'
-        intro = f'<p>{html.escape(key["intro"])}</p>' if not offset else ''
-        pages.append(f'<section class="front-page symbol-key running-title" data-running="Reading the code symbols"><h1>{title}</h1>{intro}<table><thead><tr><th>Printed glyph</th><th>Characters to type</th><th>Meaning here</th></tr></thead><tbody>{"".join(rows)}</tbody></table></section>')
-    return ''.join(pages)
+        for row in group['rows']:
+            for j,sequence in enumerate(row['combinations']):
+                literal = ''.join(f'<span class="key-character">{html.escape(c)}</span>' for c in sequence)
+                meaning = f'<td rowspan="{len(row["combinations"])}">{key_markup(row["meaning"])}</td>' if j==0 else ''
+                rows.append(f'<tr data-symbol-sequence="{html.escape(sequence,quote=True)}"><td><code data-key-glyph>{html.escape(sequence)}</code></td><td><code data-key-literal>{literal}</code></td>{meaning}</tr>')
+        groups.append(f'<section class="symbol-group" data-symbol-group="{i}"><h2>{html.escape(group["title"])}</h2><table><thead><tr><th>Printed glyph</th><th>Characters to type</th><th>Meaning</th></tr></thead><tbody>{"".join(rows)}</tbody></table></section>')
+    intro = f'<h1>{html.escape(key["title"])}</h1><p>{key_markup(key["intro"],intro=True)}</p>'
+    return f'<section class="front-page symbol-key running-title" data-running="Reading the code symbols"><div class="symbol-first">{intro}{groups[0]}</div>{"".join(groups[1:])}</section>'
 
 
 def assemble(data, directory):
@@ -94,7 +110,7 @@ def assemble(data, directory):
     order = list(hashes)
     source_tables = trial.book_tables()
     tables_by_location = {(t['source'], t['line']): t for t in source_tables}
-    manifest = {'source_sha256': hashes, 'links': links, 'texts': {}, 'code': {}, 'fences': [], 'tables': [], 'notes': [], 'navigation': [], 'transcripts': [], 'documents': [], 'quote_audit': [], 'inline_code': {},
+    manifest = {'manuscript_commit':data['manuscript_commit'], 'source_sha256': hashes, 'links': links, 'texts': {}, 'code': {}, 'fences': [], 'tables': [], 'notes': [], 'navigation': [], 'transcripts': [], 'documents': [], 'quote_audit': [], 'inline_code': {},
                 'proof_settings': {'folios': 'continuous Arabic', 'starts': 'next page; no forced recto blanks'}}
     articles, toc = [], []
     last_act = None
@@ -113,14 +129,17 @@ def assemble(data, directory):
             last_act = act
         first_h1 = next((i for i, t in enumerate(tokens) if t.type == 'heading_open' and t.tag == 'h1'), None)
         title = plain(tokens[first_h1 + 1].children) if first_h1 is not None else 'Dedication'
+        quiet = name == 'book/00-prologue/00a-acknowledgments.md'
         doc_id = f'document-{doc_index}'
         manifest['navigation'].append({'level': 2, 'id': doc_id, 'title': title})
         toc.append((doc_id, title, 'toc-doc'))
-        manifest['documents'].append({'source': name, 'id': doc_id, 'title': title, 'act': act})
+        manifest['documents'].append({'source': name, 'id': doc_id, 'title': title, 'act': act, 'quiet':quiet, 'paragraphs':sum(t.type=='paragraph_open' for t in tokens)})
         reset = act > 0 or doc_index == 0
-        articles.append(f'<article id="{doc_id}" data-document="{doc_index}" data-tail-balance="{str(name in TAIL_BALANCE).lower()}" data-destination="{doc_id}" class="source-chapter {"chapter" if reset else "prologue"}">')
+        articles.append(f'<article id="{doc_id}" data-document="{doc_index}" data-quiet-frontmatter="{str(quiet).lower()}" data-final-chapter="{str(name == order[-1]).lower()}" data-tail-balance="{str(name in TAIL_BALANCE).lower()}" data-destination="{doc_id}" class="source-chapter {"chapter" if reset else "prologue"}">')
         if first_h1 is None:
             articles.append('<div class="dedication running-title" data-running="Dedication">')
+        if quiet:
+            articles.append('<main class="acknowledgments running-title" data-running="Acknowledgments">')
         note_number = prologue_notes if act == 0 else 0
         section = subheading = ''
         fence_number = 0
@@ -138,7 +157,7 @@ def assemble(data, directory):
                 token.attrSet('data-section', heading_text)
                 if token.tag == 'h2':
                     manifest['navigation'].append({'level': 3, 'id': hid, 'title': heading_text})
-                if i == first_h1:
+                if i == first_h1 and not quiet:
                     label = re.match(r'(Chapter|Bonus) (\d+):', title)
                     number = label.group(2) if label else '·'
                     articles.append(f'<header class="chapter-opener running-title" data-running="{html.escape(title, quote=True)}"><div class="eyebrow">{ACTS[act][0].upper()} / {html.escape(ACTS[act][1].upper())}</div>{opener_art(number if label else None)}')
@@ -199,7 +218,7 @@ def assemble(data, directory):
                 transcript = act == 5 and (section not in ('The Verdict', 'The Debate Continues') or subheading == 'The next request')
                 token.attrSet('class', 'transcript' if transcript else 'ruling')
                 if transcript:
-                    label = 'ASSISTANT REQUEST' if doc_index == 30 else 'SAVED TRANSCRIPT' if doc_index == 31 else 'ASSISTANT MESSAGE'
+                    label = 'ASSISTANT REQUEST' if Path(name).name.startswith('01-') else 'SAVED TRANSCRIPT' if Path(name).name.startswith('02-') else 'ASSISTANT MESSAGE'
                     token.attrSet('data-label', label)
                     manifest['transcripts'].append({'source': name, 'line': token.map[0] + 1, 'label': label})
                 articles.append(MD.renderer.render([token], MD.options, {}))
@@ -362,7 +381,17 @@ def validate(directory, manifest):
     final_body = document[-1].get_text(clip=pdf_rect(pages[-1]['body'],pages[-1]['rect']))
     check(norm(final_body).endswith(norm(FINAL_LINE)), 'PDF final narrative line not exact / material follows it')
     check(not pages[-1]['notes'], 'A footnote follows final narrative')
-    check(note_pages.get('note-32-1',0)<targets[next(n['id'] for n in manifest['navigation'] if n['level']==3 and n['title']=='The Verdict' and n['id'].startswith('heading-32-'))], 'Final source note must precede final Verdict')
+    last_doc = len(manifest['documents'])-1
+    check(note_pages.get(f'note-{last_doc}-1',0)<targets[next(n['id'] for n in manifest['navigation'] if n['level']==3 and n['title']=='The Verdict' and n['id'].startswith(f'heading-{last_doc}-'))], 'Final source note must precede final Verdict')
+    for i, doc in enumerate(manifest['documents']):
+        if not doc.get('quiet'):
+            continue
+        appearances = [(p['page'],item) for p in pages for item in p['quiet_frontmatter'] if item['id']==doc['id']]
+        check(len(appearances)==1, 'Quiet front matter must occupy exactly one page')
+        if appearances:
+            number,item = appearances[0]
+            check(not item['opener'] and item['paragraphs']==doc['paragraphs'] and item['headings']==1, 'Acknowledgments need their heading and source paragraphs, without an opener')
+            check(i>0 and manifest['documents'][i-1]['source'].endswith('/00-dedication.md') and targets[doc['id']]==targets[manifest['documents'][i-1]['id']]+1, 'Acknowledgments must immediately follow the dedication')
     write_json(directory/'content-validation.json', {'failures': failures, 'observations': observations})
     # Build-owned navigation uses measured destinations, not inferred page offsets.
     bookmarks = [[n['level'],n['title'],targets[n['id']]] for n in manifest['navigation']]
@@ -382,7 +411,7 @@ def validate(directory, manifest):
                 if box.intersects(link['from']):
                     pdf.delete_link(link)
             pdf.insert_link({'kind':pymupdf.LINK_GOTO,'from':box,'page':targets[row['target']]-1,'to':pymupdf.Point(0,0)})
-    document.set_metadata({'title':'It Depends — whole-book PROOF','subject':'Frozen manuscript 517e0fc; placeholder metadata; not for release','creator':'Pinned local Paged.js proof build','producer':'Chrome / PyMuPDF'})
+    document.set_metadata({'title':'It Depends — whole-book PROOF','subject':f'Frozen manuscript {manifest["manuscript_commit"]}; placeholder metadata; not for release','creator':'Pinned local Paged.js proof build','producer':'Chrome / PyMuPDF'})
     final_path = directory / 'It-Depends-PROOF.pdf'
     document.save(final_path, garbage=3, deflate=True)
     document.close()
@@ -399,7 +428,7 @@ def validate(directory, manifest):
             check(any(l.get('page')==targets[row['target']]-1 and pdf_rect(row['rect'],p['rect']).intersects(l['from']) for l in saved_links), f'p{p["page"]}: contents link target')
     ligatures = symbol_key.inventory(final_path, pages, HERE/'fonts')
     write_json(directory/'symbol-inventory.json', ligatures)
-    check(set(ligatures)==set(trial.read_json(HERE/'symbol-key.json')['meanings']), 'Symbol key differs from actual rendered code ligatures')
+    check(set(ligatures)==set(key_meanings(trial.read_json(HERE/'symbol-key.json'))), 'Symbol key differs from actual rendered code ligatures')
     key_font = pymupdf.Font(fontfile=str(HERE/'fonts/JetBrainsMono-Regular.ttf'))
     key_rows = []
     for page in pages:
@@ -412,7 +441,28 @@ def validate(directory, manifest):
             check(typed==[key_font.has_glyph(ord(c)) for c in sequence], f'Symbol key typing column fused: {sequence}')
             key_rows.append(sequence)
     check(len(key_rows)==len(ligatures) and set(key_rows)==set(ligatures), 'Symbol key rows incomplete/duplicated')
-    failures.extend(symbol_key.text_errors(final,pages,trial.read_json(HERE/'symbol-key.json'),norm))
+    key = trial.read_json(HERE/'symbol-key.json')
+    group_pages = defaultdict(list)
+    for page in pages:
+        for group in page['symbol_groups']:
+            if group['rows']:
+                group_pages[int(group['id'])].append(page['page'])
+                expected = key['groups'][int(group['id'])]
+                check(group['title']==expected['title'], 'Symbol group heading changed')
+                check(group['rows']==[seq for row in expected['rows'] for seq in row['combinations']], 'Symbol group row order changed')
+        for sample in page['symbol_intro']:
+            drawn = symbol_key.printed_glyphs(final[page['page']-1],symbol_key.rect(sample['rect'],page['rect']))
+            check(any(drawn==x['glyphs'] for x in ligatures.get(sample['sequence'],[])), 'Intro example is not fused: '+sample['sequence'])
+    check(sorted(group_pages)==list(range(len(key['groups']))) and all(len(v)==1 for v in group_pages.values()), 'Symbol-key page break split a group')
+    check([p for i in sorted(group_pages) for p in group_pages[i]]==sorted(p for v in group_pages.values() for p in v), 'Symbol key group order changed')
+    check([s['sequence'] for p in pages for s in p['symbol_intro']]==['=>','==='], 'Missing intro glyph examples')
+    measure = layout['symbol_key_measure']
+    body_height = pages[0]['body']['height']*.75
+    check(measure['first_bundle_pt']<=body_height+1, 'Symbol intro and first group cannot fit one page at body size')
+    if measure['total_pt']<=body_height:
+        check(len({p for v in group_pages.values() for p in v})==1, 'Symbol key fits one page but was split')
+
+    failures.extend(symbol_key.text_errors(final,pages,trial.read_json(HERE/'symbol-key.json'),norm,key_plain))
     endings = []
     for document_index, doc in enumerate(manifest['documents']):
         ids = [k for k in manifest['texts'] if k.startswith(f'text-{document_index}-')]
@@ -426,7 +476,7 @@ def validate(directory, manifest):
         if doc['act']>0:
             check(len(lines)>3, f'Chapter ending carries <=3 source lines: {doc["source"]} p{end_page}')
     report = {'status':'PASS' if not failures else 'FAIL','pages':len(final),'failures':failures,'observations':observations,'notes':printed_notes,
-              'endings':endings, 'ligature_sequences':list(ligatures), 'fences':len(manifest['fences']),'fence_languages':dict(Counter(f['language'] for f in manifest['fences'])),
+              'symbol_key_measure':measure,'symbol_group_pages':dict(group_pages),'endings':endings, 'ligature_sequences':list(ligatures), 'fences':len(manifest['fences']),'fence_languages':dict(Counter(f['language'] for f in manifest['fences'])),
               'source_text_blocks':len(manifest['texts']),'code_lines':len(manifest['code']),'tables':dict(table_pages),'bookmarks':len(bookmarks),
               'fence_fragments':dict(fence_pages), 'quote_audit':manifest['quote_audit'], 'source_pages':dict(source_pages),'targets':targets,'pdf':str(final_path),'pdf_sha256':trial.digest(final_path.read_bytes())}
     write_json(directory/'validation.json',report)
@@ -461,7 +511,7 @@ def compare(a,b):
     da,db = pymupdf.open(a/'It-Depends-PROOF.pdf'),pymupdf.open(b/'It-Depends-PROOF.pdf')
     failures=[]
     for directory, pdf in [(a,da),(b,db)]:
-        failures.extend(symbol_key.text_errors(pdf,trial.read_json(directory/'layout.json')['layout']['pages'],trial.read_json(HERE/'symbol-key.json'),norm))
+        failures.extend(symbol_key.text_errors(pdf,trial.read_json(directory/'layout.json')['layout']['pages'],trial.read_json(HERE/'symbol-key.json'),norm,key_plain))
     if len(da)!=len(db):
         failures.append('Page count differs')
     page_hashes=[]

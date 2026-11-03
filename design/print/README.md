@@ -185,8 +185,8 @@ page-bottom notes, with no manuscript rewrite or printer setup.
 
 ## Whole-book proof
 
-Step 2 assembles the frozen **517e0fc** manuscript through the approved 33-file
-manifest. The current proof has **438 pages**, all marked **PROOF**, and passes
+Step 2 assembles the frozen **d03727a** manuscript through the approved 34-file
+manifest. The current proof has **439 pages**, all marked **PROOF**, and passes
 content, navigation and reproducibility checks. It still needs layout polish;
 see the page-specific [spread review](../../docs/editorial/full-review/WHOLE-BOOK-PROOF-REVIEW.md).
 This is not release approval.
@@ -203,8 +203,8 @@ design/print/.venv/bin/python design/print/build_proof.py --compare
 design/print/.venv/bin/python design/print/build_proof.py --run a --inspect-existing
 ```
 
-Outputs live in ignored `output/whole-book-proof-layout/`. The review PDF is
-`a/It-Depends-PROOF.pdf`; `a/pages/page-001.png` through `page-438.png` are the
+Outputs live in ignored `output/whole-book-proof-d03727a/`. The review PDF is
+`a/It-Depends-PROOF.pdf`; `a/pages/page-001.png` through `page-439.png` are the
 individual pages. `a/contact-sheets/spreads-01.png` through `spreads-28.png`
 show consecutive facing pages. The independent `b/` render supplies comparison
 evidence without duplicating the image gallery. Each run saves input hashes,
@@ -213,7 +213,7 @@ HTML, paginated DOM, layout metrics, extracted text, toolchain/font hashes and
 
 The proof uses continuous Arabic folios and starts each act/chapter on the next
 page, without forced recto blanks. These are explicit proof settings, not final
-pagination decisions. Generated contents and 190 hierarchical bookmarks use
+pagination decisions. Generated contents and 191 hierarchical bookmarks use
 measured destinations. All five fence languages are selectable, highlighted
 text; continuation captions are generated, not inserted into the manuscript.
 Assistant requests/transcripts have a distinct box style. All 17 book tables
@@ -239,7 +239,7 @@ single metadata file; the release metadata gate continues to reject them.
 
 The 428-page first proof remains in `output/whole-book-proof/` as comparison
 evidence. The current commands write the revised proof to
-`output/whole-book-proof-layout/`. Intermediate development renders stay there
+`output/whole-book-proof-d03727a/`. Intermediate development renders stay there
 under explicitly named `development-*` directories; `a/` and `b/` are the clean
 comparison runs. Type sizes remain 11/16 pt for body text and 8.5/12.6 pt for
 fences. No manuscript changes, added dependencies or renderer changes are used.
@@ -268,12 +268,21 @@ and inline code. It compares glyph IDs with the bundled font cmap to inventory
 actual fused combinations. Single-character contextual alternates and the blank
 line placeholder are not multi-character ligatures. The key must cover exactly
 that inventory: **26 sequences**, not the font's complete substitution list.
-`symbol-key.json` holds the draft introduction and explanations sent for editorial
-review before refinement. The key is generated after the contents, separately
+`symbol-key.json` holds the approved introduction and four ordered groups,
+with a SHA-256 of the supplied text. The key uses body-size text on pages 5–6;
+its 1,005-point natural height exceeds the 621-point page body. Breaks are allowed
+only between whole groups. The intro's two inline examples must paint the fused
+source glyphs. Paired meanings may share a cell; all 26 combinations retain
+their own printed-glyph and typing cells. The key is generated after the contents, separately
 from the manuscript manifest and text count. Its printed column must use glyphs
 observed in the book; its typing column must use the individual character glyphs.
 Both checks run against the saved PDF. Only that typing column isolates glyphs.
 
-The source remains the frozen 33-file `517e0fc` tree while acknowledgments PR #40
-is pending. Its later merge and the 34-file baseline update are separate from
-this proof; no placeholder acknowledgments page is inserted.
+PR #40 is merged. The frozen source is main `d03727a0947a8434ac36e3978533152dc93a2e0f`,
+with 34 files. Acknowledgments immediately follows the dedication as a single
+quiet page, with its heading and three paragraphs, no opener or numeral box,
+and an entry in contents and bookmarks. Manifest coverage is checked against
+the frozen Git tree, not a hard-coded file count. Output directories derive
+their suffix from the frozen commit; the 33-file layout checkpoint is preserved
+in `output/whole-book-proof-layout/`. All new hashes and counts come from fresh
+source parsing and rendering.

@@ -79,14 +79,22 @@ thead { display:table-header-group; }
 .footnote::footnote-call { content:counter(footnote); font-size:7pt; line-height:0; vertical-align:super; }
 .footnote::footnote-marker { content:counter(footnote-marker) '. '; font-weight:600; }
 /* The final source note precedes the final Verdict; nothing follows the last scene. */
-[data-document='32'] h2[data-section='The Verdict'] { break-before:page; }
+[data-final-chapter='true'] h2[data-section='The Verdict'] { break-before:page; }
 
 [data-keep-next] { break-after:avoid; }
 
-.symbol-key h1 { font:500 30pt/36pt Oxanium; margin:0 0 18pt; }
-.symbol-key td:first-child, .symbol-key th:first-child { width:16%; }
-.symbol-key td:nth-child(2), .symbol-key th:nth-child(2) { width:22%; }
-/* Only the key's typing column isolates characters. Manuscript code is unchanged. */
+/* Body-sized key. Whole groups move together; nothing is scaled to fit. */
+.symbol-key h1 { font:500 30pt/36pt Oxanium; margin:0 0 14pt; }
+.symbol-first, .symbol-group { break-inside:avoid; }
+.symbol-group { margin-top:8pt; }
+.symbol-group h2 { font:600 14pt/18pt Oxanium; margin:0 0 4pt; padding:0; border:0; }
+.symbol-group table { font:11pt/16pt Plex; margin:0; }
+.symbol-group th,.symbol-group td { padding:1pt 5pt; }
+.symbol-group td:first-child,.symbol-group th:first-child { width:14%; }
+.symbol-group td:nth-child(2),.symbol-group th:nth-child(2) { width:20%; }
+.symbol-group code,.symbol-key > p code,.symbol-first > p code { font-size:11pt; line-height:16pt; }
 .key-character { display:inline-block; }
+.symbol-key [data-key-glyph],.symbol-key [data-key-intro-glyph] { font-variant-ligatures:normal; }
 
-.symbol-key [data-key-glyph] { font-variant-ligatures:normal; }
+.acknowledgments { padding-top:150pt; }
+.acknowledgments h1 { font:500 24pt/30pt Oxanium; margin:0 0 20pt; }

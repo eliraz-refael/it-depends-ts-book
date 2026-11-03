@@ -79,6 +79,7 @@ async function main() {
       const pagination = await evaluate(`(async () => {
         await Promise.all(['11pt Plex', '600 11pt Plex', '24pt Oxanium', '8.5pt JetBrains'].map(f => document.fonts.load(f)));
         await document.fonts.ready;
+        window.measureSymbolKey?.();
         const flow = await PagedPolyfill.preview();
         await document.fonts.ready;
         return { pages: flow.total, fonts: [...document.fonts].map(f => ({ family: f.family, status: f.status })) };

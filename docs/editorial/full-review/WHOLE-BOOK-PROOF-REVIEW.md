@@ -1,6 +1,6 @@
 # Whole-book PROOF review
 
-The current **438-page layout proof** and its before/after tables are in
+The current **439-page layout proof** and its before/after tables are in
 [Settled layout pass](#settled-layout-pass). The first-proof record below is retained
 as the accepted comparison baseline.
 
@@ -131,184 +131,193 @@ conceal a layout problem.
 
 ## Settled layout pass
 
-**PASS on the frozen 33-file 517e0fc manuscript; 438 pages.** The author dropped
-ligature removal during this pass. Code keeps its existing shaping; a generated,
-print-only symbol key follows the contents. No `book/` files, dependencies,
-renderer, body/code sizes, publication metadata, folio conventions or next-page
-starts were changed. Recto starts remain deferred.
+**PASS: 439 pages from frozen main `d03727a0947a8434ac36e3978533152dc93a2e0f`.**
+Layout checkpoint `406b86a` passed before the authorized main merge. The final
+proof incorporates PR #40's approved acknowledgments and the author's approved,
+grouped symbol-key text. The source manifest, hashes, counts and target folios
+below were regenerated from this tree; they are not edited old totals.
 
-Current PDF: `design/print/output/whole-book-proof-layout/a/It-Depends-PROOF.pdf`.
+Current PDF: `design/print/output/whole-book-proof-d03727a/a/It-Depends-PROOF.pdf`.
 
-SHA-256: `6d705b7fc901f9fe8c14769bcbe68cc28bd9e6ec05ed636ebcc4a50d097f42fe`.
+SHA-256: `5267622e4f1de910b6d117224589527138e569d443643725f33f2f5f7d909396`.
 
-The independent `b/` render has identical page text, character geometry, links,
-bookmarks and all 438 page rasters. Raw PDF bytes are not claimed identical.
-`comparison.json` records the comparison, including trim-bound checks. The two
-renders were clean browser runs; the final symbol-key text check also re-reads
-both saved PDFs. No source text follows the exact final narrative line on 438;
-its quotation marks are typographic and invert to the exact frozen sentence.
-The final footnote is on 437, before the final Verdict.
+Two independent clean renders pass the comparison: all 439 pages have identical
+text, character geometry, link destinations, bookmarks and raster hashes. Only
+volatile PDF metadata/object IDs are excluded; raw byte identity is not claimed.
+The code makes no manuscript edits. `book/` equals frozen main, and all 33 prior
+source files still have their original hashes. Acknowledgments is the only new
+file. The build retains proof metadata, PROOF on every page, continuous folios
+and next-page starts. No dependencies, renderer or body/fence sizes changed.
 
-Images: `a/pages/page-001.png` through `page-438.png`; all-spread contacts:
-`a/contact-sheets/spreads-01.png` through `spreads-28.png`. I visually reviewed
-all **39 focused target pages** in `a/target-review/targets-01.png` through
-`targets-10.png`, with enlarged checks of the symbol key, Ch7 debate and code
-fragments. The original proof's full-spread review remains above. The new
-all-page automated checks complement, rather than replace, visual inspection.
+### Fresh source and validation
 
-### Validation and implementation
+- **34 files**, **3,487 source text blocks**, **490 fences**,
+  **4,759 code lines**, **1,507 exact inline-code values**. All source hashes,
+  reconstructed fence hashes and text completeness checks pass. Prose maps curly
+  punctuation back to straight and matches each source block exactly, including
+  whitespace. The fenced/inline code and URLs remain unchanged.
+- **17 unsplit book tables**, **191 bookmarks**, **40 contents entries**,
+  **7 assistant transcript/request boxes**, all five fence languages, embedded
+  fonts, correct trim/folios, no source overflow or body-note collision, and no
+  unintended blank pages. Every short fence stays whole; every fragment of a
+  split fence has at least four source lines. All heading/introduction keeps pass.
+- All **7** links/notes match the inventory and PDF destinations. Callout and body
+  numbers agree and reset per chapter: folios **14, 68, 132, 249, 399, 406, 438**.
+  The last note precedes the final Verdict. Page **439** ends with the exact
+  frozen narrative sentence (using typographic quotes), with only the required
+  footer and folio below it. No source appendix or added narrative follows it.
+- **2,522 prose blocks** have verified, balanced typographic delimiters. Five
+  ambiguous paragraphs remain unchanged for the author; see their exact locations
+  below. The approved key prose is generated separately from manuscript counts.
+- Clean `npm ci` on the new main source: **0 vulnerabilities**. Full
+  `npm run check`: **PASS**. All nine trial specimens, rerun against the new source
+  and shared renderer: **PASS**. Placeholder metadata still rejects release mode.
+  Logs, `validation.json` for both runs and `comparison.json` are in ignored output.
 
-- Clean `npm ci` (0 vulnerabilities) and full `npm run check`: PASS. All nine
-  accepted footnote/table trial specimens: PASS. Copies of the logs are in the
-  ignored layout-proof directory.
-- Both final renders: **490 exact fence hashes**, **4,759 code lines**, **1,507
-  exact inline-code values**, **3,483 source text blocks**, **17 unsplit book
-  tables**, **190 bookmarks**, **39 contents entries**, seven transcript boxes,
-  all fonts embedded, no source overflow/body-note overlap, and PROOF/folio on
-  every page. All seven notes reset correctly and retain clickable targets:
-  pages **13, 67, 131, 248, 398, 405 and 437**.
-- `ProofKeeps` moves an overflow boundary backwards when the renderer's CSS keeps
-  are insufficient. Narrative headings retain following content. Short colon
-  introductions and label lines retain a meaningful start of their target;
-  code starts include at least four lines, or the whole shorter example.
-  All saved keep-target relationships are checked.
-- Fences of **12 source lines or fewer stay whole**. Every fragment of a longer
-  split has **at least four source lines**. These are failing assertions, not
-  observations. Font sizes are unchanged: body 11/16 pt; fences 8.5/12.6 pt.
-- **2,522 inline prose blocks** received typographic punctuation. Their actual
-  printed quote delimiters balance; converting curly punctuation back to straight
-  reconstructs each source block **exactly, including whitespace**. Fences,
-  inline code, URLs and whole link labels containing code are protected. The
-  five ambiguous paragraphs listed below stay unchanged, without a guess.
-- The symbol inventory comes from the rendered manuscript code's character text
-  and drawing glyph IDs, compared against the bundled font cmap. **26 fused
-  sequences** are present; the key must match exactly. Its first column must
-  paint glyphs found in the source; its typing column must paint the individual
-  character glyphs. The key's introduction/explanations are checked in the PDF
-  separately from manuscript text. A contextual single colon and blank-line
-  placeholders are excluded because they are not multi-character ligatures.
-- The key intro/table text was sent through `aoe` before layout refinement.
-  It is stored in `design/print/symbol-key.json`, not `book/`, and uses the existing
-  table styling across pages **5–6**. It includes comments, paths, commands and
-  diffs as well as TypeScript operators; meanings are scoped to the observed
-  contexts. The original code font's shaping is preserved. Body text uses its
-  normal ligatures.
+### Acknowledgments
 
-### Headings and introductions: original folios to current folios
+The title and three approved paragraphs occupy **page 9**, immediately after the
+dedication on 8, with no opener page or numeral box. The title appears in contents
+and as a bookmark. The build checks one-page membership, paragraph count, absence
+of opener artwork, and position after the dedication. I inspected the page image.
 
-| First proof | Current | Target and result |
+Source SHA-256: `27e3a4c4c2639dd44201be155b0a5a92dec03eb7b7ae89f4376f8542331d657f`.
+
+### Approved symbol key
+
+The complete approved text is in `design/print/symbol-key.json`, including the
+four headings in the supplied order. Approved input SHA-256:
+`6259103681b421d5a7556e47e0a0530bc2c1d68ebdd070899875201bde966d7c`. No wording substitution was needed:
+**`--noEmit` is in the printed command on p392**, sourced from
+`book/04-the-real-world/04-performance-vs-safety.md:35` (`--noEmit false`).
+
+The key occupies **pages 5–6**, after the contents. At body size **11/16 pt**,
+its measured unpaginated height is **1005.04 pt**, against **620.64 pt**
+of page body. It cannot fit on one page without shrinking. Page 5 contains the
+intro and **Comparison and logic**. Page 6 contains **Functions and types**,
+**Comments**, then **Punctuation that only looks joined**. The break falls between
+groups. All group memberships, row orders and unsplit groups are asserted.
+
+All **26** combinations have separate printed-glyph and typing cells; shared
+meanings span their paired rows. The inventory is re-derived from actual glyph
+substitutions in rendered manuscript fences and inline code, not from the font's
+feature list. Any new fused combination without a row fails; unused/duplicate
+rows fail too. A single contextual colon and the blank-line placeholder are not
+multi-character combinations. The first column's glyph IDs must match actual
+source occurrences. The typing column uses individually isolated characters with
+ligatures disabled, verified against each character's font glyph ID. The intro's
+`=>` and `===` examples are explicitly fused and checked against the same actual
+source glyphs. I inspected both key page images. The font's original manuscript
+code shaping is retained; the author replaced the earlier removal requirement.
+
+### Target pages: first proof to final proof
+
+Each mapping below follows the original source file/line or fence identity into
+the fresh render, rather than assuming a fixed folio offset.
+
+| First proof | Final proof | Heading/introduction result |
 | --- | --- | --- |
-| 121 | 126 | “The Debate” starts the scene with its subheading, dialogue and examples. |
-| 89 | 92 | `In practice — the four shapes, side by side:` stays with its table or first code fragment. |
-| 116 | 121 | `The Accepted Standard:` stays with its table or first code fragment. |
-| 363 | 373 | `The exports field in both package manifests` stays with its table or first code fragment. |
-| 369 | 379 | `tsconfig.json` stays with its table or first code fragment. |
-| 377 | 387 | `tsconfig.json — replace include` stays with its table or first code fragment. |
-| 71 | 73 | The Turn keeps its complete setup. The example follows on the next page; the heading is not stranded. |
-| 103 | 107 | The Turn keeps its setup and following material on the page. |
-| 216 | 221 | The Turn keeps its setup and following material on the page. |
-| 254 | 260 | The Turn keeps its setup and following material on the page. |
-| 266 | 271 | The Turn keeps its complete setup. The example follows on the next page; the heading is not stranded. |
-| 336 | 346 | The Turn keeps its setup and following material on the page. |
+| 121 | 127 | The Debate starts with its subheading, dialogue and examples. |
+| 89 | 93 | `In practice — the four shapes, side by side:` stays with its table or code. |
+| 116 | 122 | `The Accepted Standard:` stays with its table or code. |
+| 363 | 374 | `The exports field in both package manifests` stays with its table or code. |
+| 369 | 380 | `tsconfig.json` stays with its table or code. |
+| 377 | 388 | `tsconfig.json — replace include` stays with its table or code. |
+| 71 | 74 | The Turn keeps its complete setup; the example follows on the next page. |
+| 103 | 108 | The Turn retains its setup and following material. |
+| 216 | 222 | The Turn retains its setup and following material. |
+| 254 | 261 | The Turn retains its setup and following material. |
+| 266 | 272 | The Turn keeps its complete setup; the example follows on the next page. |
+| 336 | 347 | The Turn retains its setup and following material. |
 
-### Code tails: every named target
-
-Counts below are source lines, with wrapped display lines still attributed to
-their original source line. A single folio means the complete fence stays whole.
-
-| First proof tail folio | Old tail lines | Current fence placement |
+| First proof code-tail folio | Old tail lines | Final whole fence / fragments |
 | --- | --- | --- |
-| 37 | 1 | p39: 11 lines |
-| 97 | 1 | p100: 10 lines |
-| 158 | 2 | p162: 12 lines |
-| 192 | 2 | p196: 11 lines |
-| 290 | 1 | p296: 10 lines |
-| 305 | 1 | p312: 9 lines |
-| 338 | 1 | p346: 9 lines; p347: 7 lines |
-| 341 | 2 | p350: 11 lines |
-| 347 | 2 | p356: 12 lines |
-| 348 | 2 | p357: 10 lines |
-| 383 | 1 | p391: 11 lines; p392: 4 lines |
-| 409 | 1 | p418: 14 lines; p419: 12 lines |
-| 413 | 3 | p422: 23 lines; p423: 11 lines |
-| 420 | 1 | p429: 25 lines; p430: 4 lines |
+| 37 | 1 | p40: 11 lines |
+| 97 | 1 | p101: 10 lines |
+| 158 | 2 | p163: 12 lines |
+| 192 | 2 | p197: 11 lines |
+| 290 | 1 | p297: 10 lines |
+| 305 | 1 | p313: 9 lines |
+| 338 | 1 | p347: 9 lines; p348: 7 lines |
+| 341 | 2 | p351: 11 lines |
+| 347 | 2 | p357: 12 lines |
+| 348 | 2 | p358: 10 lines |
+| 383 | 1 | p392: 11 lines; p393: 4 lines |
+| 409 | 1 | p419: 14 lines; p420: 12 lines |
+| 413 | 3 | p423: 23 lines; p424: 11 lines |
+| 420 | 1 | p430: 25 lines; p431: 4 lines |
+
+Fences of 12 source lines or fewer do not split; longer split fences have at
+least four source lines on each page. Display wraps do not alter source counts.
 
 ### Sparse endings
 
-After the heading/fence rules, three endings had three source lines or fewer.
-Generated captions are excluded from that count. Only their earlier break choices
-were changed; the source, type sizes and spacing settings were preserved.
+Only the three measured endings of three source lines or fewer received extra
+balancing. Generated captions are excluded. No wording, font or spacing was
+changed to fill a page; earlier break choices bring useful context forward.
 
-| Chapter / current folio | Before balancing | After | Break choice |
-| --- | --- | --- | --- |
-| Ch13 / 226 | 2 lines | 6 lines | Keep Dima's preceding explanation with Oded's reply. |
-| Ch20 / 315 | 3 lines | 4 lines | Keep Linoy's setup with the two-line example and Daniel's answer. |
-| Ch21 / 328 | 3 lines | 7 lines | Bring the preceding fence's last four lines forward with Guy's conclusion. |
+| Chapter | Final folio | Before balancing | Final source lines | Earlier break choice |
+| --- | --- | --- | --- | --- |
+| 13 | 227 | 2 | 6 | Dima's explanation stays with Oded's reply. |
+| 20 | 316 | 3 | 4 | Linoy's setup stays with the example and Daniel's answer. |
+| 21 | 329 | 3 | 7 | The preceding fence's last four lines stay with Guy's conclusion. |
 
-Every chapter now ends with more than three source lines. The one-line dedication
-is intentional front matter. Ch13/20/21 still have generous end-space; this pass
-fixes the orphan-sized ending without trying to fill every page. The other light
-endings were left alone. For the original review's named ending targets:
+All chapters end with more than three source lines. The one-line dedication is
+intentional. Generous end-space remains on these three pages; the other light
+endings were deliberately left alone. Original review targets:
 
-| First proof ending folio | Current ending folio | Current source lines | Disposition |
-| --- | --- | --- | --- |
-| 46 | 48 | 28 | No separate balancing; exceeds the settled three-line threshold. |
-| 61 | 63 | 16 | No separate balancing; exceeds the settled three-line threshold. |
-| 138 | 142 | 5 | No separate balancing; exceeds the settled three-line threshold. |
-| 196 | 200 | 6 | No separate balancing; exceeds the settled three-line threshold. |
-| 210 | 214 | 20 | No separate balancing; exceeds the settled three-line threshold. |
-| 247 | 252 | 4 | No separate balancing; exceeds the settled three-line threshold. |
-| 106 | 109 | 10 | No separate balancing; exceeds the settled three-line threshold. |
-| 153 | 157 | 11 | No separate balancing; exceeds the settled three-line threshold. |
-| 235 | 240 | 12 | No separate balancing; exceeds the settled three-line threshold. |
-| 272 | 277 | 12 | No separate balancing; exceeds the settled three-line threshold. |
-| 285 | 291 | 11 | No separate balancing; exceeds the settled three-line threshold. |
-| 379 | 388 | 17 | No separate balancing; exceeds the settled three-line threshold. |
-
-### Openers
-
-| First proof | Current | Result |
+| First proof ending | Final ending | Final source lines |
 | --- | --- | --- |
-| 5 | 7 | Label, rule and title remain; numeral ornament/box removed. |
-| 7 | 9 | Label, rule and title remain; numeral ornament/box removed. |
-| 12 | 14 | Label, rule and title remain; numeral ornament/box removed. |
-| 391 | 400 | BONUS and title remain; the 5 and its box are gone. |
+| 46 | 49 | 28 |
+| 61 | 64 | 16 |
+| 138 | 143 | 5 |
+| 196 | 201 | 6 |
+| 210 | 215 | 20 |
+| 247 | 253 | 4 |
+| 106 | 110 | 10 |
+| 153 | 158 | 11 |
+| 235 | 241 | 12 |
+| 272 | 278 | 12 |
+| 285 | 292 | 11 |
+| 379 | 389 | 17 |
 
-Bonus chapter openers retain **1, 2 and 3**, on **401, 414 and 426**. No forced
-recto blanks were introduced.
+### Openers and visual evidence
 
-### Ambiguous quotes held for the author
-
-These five paragraphs are printed as supplied, including their straight quotes.
-The table gives exact source lines and current proof folios. The converter does
-not decide the ambiguous apostrophe/opening-quote role. Ordinary contractions and
-possessives such as inline-code-plus-`'s` are handled outside the protected code.
-
-| Source | Folio | Candidate |
+| First proof | Final proof | Result |
 | --- | --- | --- |
-| `book/02-advanced-typescript/01-conditional-types.md:71` | 127 | `— "that's a ternary..."`: opening quotation after an em dash. |
-| `book/03-patterns-and-design/02-branded-types.md:191` | 247 | `consumers' order check`: word-final apostrophe. |
-| `book/03-patterns-and-design/03-runtime-validation.md:330` | 262 | `consumers' needs`: word-final apostrophe. |
-| `book/04-the-real-world/02-monorepo-type-sharing.md:276` | 373 | `packages' source`: word-final apostrophe. |
-| `book/04-the-real-world/02-monorepo-type-sharing.md:324` | 375 | `packages' dist` and `dependencies' manifests`: word-final apostrophes. |
+| 5 | 7 | Label, rule and title retained; numeral and box removed. |
+| 7 | 10 | Label, rule and title retained; numeral and box removed. |
+| 12 | 15 | Label, rule and title retained; numeral and box removed. |
+| 391 | 401 | Label, rule and title retained; numeral and box removed. |
 
-The machine-readable evidence (including complete affected paragraphs) is
-`design/print/output/whole-book-proof-layout/layout-review.json`; each run also
-records its quote audit. No leading-apostrophe or parenthesis-opening candidate
-remains outside these reported cases.
+The Bonus chapter openers keep 1, 2 and 3, on **402, 415, 427**.
+No forced recto blanks were introduced.
 
-### Still open
+The current images are `a/pages/page-001.png` through `page-439.png`;
+`a/contact-sheets/spreads-01.png` through `spreads-28.png` cover every spread.
+At the 33-file checkpoint I inspected all 39 focused target pages; the new key,
+acknowledgments, Ch7 debate and final pages were checked again. The new baseline
+correspondence check confirms all 3,483 existing text blocks retain their
+pagination, shifted only by the inserted acknowledgment page. Fresh fragment and
+keep checks cover the code and labels. `layout-review.json` records current target
+folios, endings and complete ambiguous paragraphs; `baseline-correspondence.json`
+records the unchanged source hashes and text pagination.
 
-1. Editorial decisions for those five quote paragraphs; the build preserves them
-   until settled.
-2. Editorial review of the symbol-key draft already sent through `aoe`. The two
-   pages are a working proof using the existing table style, not a new fine-design
-   direction.
-3. Acknowledgments PR #40 was still **OPEN** at the final status check. The source
-   remains **517e0fc / 33 files**; no acknowledgment placeholder was added. After
-   merge, the authorized main merge and 34-file baseline will require new clean
-   proofs with the one-page acknowledgment layout, contents entry and bookmark.
+### Still open: five ambiguous quote paragraphs
 
-No specified heading/fence defect or three-or-fewer-line chapter ending remains.
-The deliberately retained light endings, printer/recto decisions and placeholder
-release metadata are not silently resolved by this proof.
+These are printed as supplied, including straight quotes, pending the author's
+decision. The converter does not guess at the marked apostrophe/quote role.
+
+| Source | Final folio | Candidate |
+| --- | --- | --- |
+| `book/02-advanced-typescript/01-conditional-types.md:71` | 128 | Opening quote after the em dash in `— "that's a ternary..."`. |
+| `book/03-patterns-and-design/02-branded-types.md:191` | 248 | `consumers' order check` |
+| `book/03-patterns-and-design/03-runtime-validation.md:330` | 263 | `consumers' needs` |
+| `book/04-the-real-world/02-monorepo-type-sharing.md:276` | 374 | `packages' source` |
+| `book/04-the-real-world/02-monorepo-type-sharing.md:324` | 376 | `packages' dist` and `dependencies' manifests` |
+
+No leading-apostrophe or parenthesis-opening candidate remains outside the audit.
+All specified heading/fence defects and three-or-fewer-line chapter endings are
+resolved. The symbol-key wording and acknowledgment baseline are now settled.
+The remaining quote decisions, placeholder release metadata and printer/recto
+choices are explicit, not silently resolved by this proof.
