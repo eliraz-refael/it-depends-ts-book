@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Daniel Compiler**: "Judge a staged API by what each call establishes for its caller. Partial application supplies some arguments now and leaves a function for the rest. Currying expresses a multi-argument function as successive calls taking one argument each. Those are descriptions of the call structure. They don't decide which arguments belong together, or what work belongs to each call. Splitting the parentheses doesn't make those decisions for you."
+**Daniel Compiler**: "Judge a staged API by what each call establishes for its caller. Partial application supplies some arguments now and leaves a function for the rest. Currying expresses a multi-argument function as successive calls taking one argument each. Splitting the parentheses doesn't decide which arguments belong together, or what work each call does."
 
 ## The Debate
 

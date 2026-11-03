@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Gilad Stacktrace**: "When this job says failed, can you tell me how many texts went out? A wrapper is acceptable only if the operation still does what its caller agreed to. That's what I'll need to explain when someone brings me the log."
+**Gilad Stacktrace**: "When this job says failed, what do I tell the customer? A wrapper is acceptable only if the operation still does what its caller agreed to."
 
-"Follow the request through the wrapper and into the operation. Keep following it after the job reports its result. I want to know who has the request now and what they can still do with it. If the log stops too soon, fix that before using it to explain the incident. The operation's owner has to account for its part of the trace."
+"I start with the operation's contract and the incident log. Which entries explain the result, and which only tell me that a function ran? If I have to guess what an entry means, I ask whoever owns that operation. Then I can say what we know and what we still need to investigate."
 
 ## The Debate
 

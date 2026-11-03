@@ -314,7 +314,7 @@ A scalar brand can distinguish roles without promising a relationship between fi
 
 **Noam**: "What about restoring From and To from a shared link? I'd give that feature a `CheckedRange` to keep the accepted endpoints. The method version handles the copying problem. A renderer request makes it calculate To again."
 
-**Eden**: "Those link parameters are input again. The link hasn't stored the brands. We can parse its endpoints into a draft and use `requestFrom` for Preview and Export. The class works too, but we'd have to adapt the old helpers and readers. This request has a checked positive count, with no endpoints to reverse. The renderer keeps its overflow and document checks."
+**Eden**: "The link hasn't stored the brands. We can parse its endpoints into a draft and use `requestFrom` for both actions. The renderer then gets a checked positive count, with no endpoints to reverse. It keeps its overflow and document checks."
 
 "If another consumer needs to retain an accepted selection, we'll revisit the class."
 

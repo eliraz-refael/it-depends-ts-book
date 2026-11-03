@@ -25,6 +25,7 @@ type KnownUpdate = z.infer<typeof KnownUpdate>;
 type RefundDecision = "issue" | "skip" | "review";
 // skip: finished without a refund.
 // review: a work item for fulfilment on-call, linked to the stored update.
+// refundForKnown handles every known status with issue or skip, so it needs no review.
 ```
 
 ```typescript
@@ -68,7 +69,7 @@ async function receive(body: unknown, inbox: Inbox): Promise<number> {
 }
 ```
 
-**Eden**: "We acknowledge after saving the parsed update. No acknowledgement or a non-2xx response gets two retries."
+**Eden**: "We acknowledge after saving the parsed update. If the carrier gets no acknowledgement, or a non-2xx, it retries twice."
 
 **Oded**: "And after those?"
 

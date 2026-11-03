@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Before replacing a call with a saved answer, establish that the caller gets the same answer and that no required work disappears. That is what makes substitution useful. A pure calculation gives the same result for the same input values without doing work someone else relies on."
+**Prof. Eli Typeworth**: "Before replacing a call with a saved answer, establish that the caller gets the same answer and that no required work disappears. A pure calculation gives the same result for the same input values without doing work someone else relies on."
 
 "Suppose I give you yesterday's answer instead of doing the calculation again. You might say it is still correct. Good. Now suppose doing the calculation was also how somebody learned that you had asked. The answer could be correct and the substitution still wrong. We have to account for the whole operation."
 
@@ -370,7 +370,7 @@ console.log(evaluate(record.deadline, record.evaluatedAt).status); // at-risk
 
 ## The Verdict
 
-> Reuse a calculation only while its relevant inputs stay the same. Read changing inputs fresh and keep required effects outside the cache.
+> Reuse only the part of a calculation whose inputs you have named. Read changing inputs fresh and keep required effects outside the cache.
 
 Gilad has checked with the lead: status as of the last thirty-second refresh is acceptable; an extra cache delay is not.
 

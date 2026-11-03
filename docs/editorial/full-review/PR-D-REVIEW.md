@@ -75,3 +75,19 @@ Implements every item in [PR-D-REVISION.md](PR-D-REVISION.md), including “Also
 The four benchmarks remain within 5% of **1562054**, including all earlier PR D repairs: Ch14 **2,350 (−4.9%)**, Ch15 **2,230 (+1.4%)**, Ch17 **2,377 (+1.4%)**, Ch23 **2,334 (−2.4%)**. All executable fence text and fence order match **2a9429d** after excluding full-line comments. The diagnostic comments newly shown in Ch15 are extracted by its check and asserted against the actual compiler message, including the marker detail. No fixture or runtime expectation changed. Coverage documentation records the diagnostic extraction.
 
 Targeted checks for Ch15, Ch16, Ch18 and Ch19 pass. Clean `npm ci` reports zero vulnerabilities; the full `npm run check` passes on TypeScript 7.0.2, Node 22.23.4 and Zod 4.6.6: **483 fences, 891 compiler cases and 382 runtime groups**, unchanged. Act III remains **146 fences, 212 compiler cases and 180 runtime groups**. Protected refuted passages and once-only catchphrases pass the audit, no dialogue contains a link, and all three supplied reports retain their original SHA-256 hashes. The edited files pass `git diff --check`; the unchanged supplied `PR-D-RECHECK.md` contains two trailing-whitespace lines (84 and 118), retained with the report. Logs: `/private/tmp/pr-d-revision-install.log`, `/private/tmp/pr-d-revision-full.log` and the four `pr-d-revision-ch*.log` files; the length/fence audit is `/private/tmp/pr-d-revision-audit.json`. None is staged. Voice differentiation is an editorial judgment; the checks verify the examples and claims, not the success of that judgment.
+
+
+## Final polish after the revision recheck
+
+Base: **482b1d5**. Took all six numbered items and all requested minors; no disagreement. Included `PR-D-REVISION-RECHECK.md` unchanged.
+
+- Ch23 now explicitly distinguishes wrapping a returned Result from passing it on: outer success reports the first step, inner failure the next refusal. “Ordinary” means not another Result. Eli's protocol line follows “Neither happened,” leaving Dafna's two callback arguments directly beside Linoy's one-argument observation.
+- Ch14's bridge attributes the formatter only to `submit`.
+- Ch21 asks what to tell the customer, preserving “Which copy?” for the scene. The second Principle paragraph concerns interpreting the incident log, without describing after-completion delivery or cancellation. Removed the dangling “That's what…” sentence.
+- Ch20 goes straight from definitions to the parentheses rule, removing both the repeated decision and its shared closing shape with Ch18. Ch18 loses the substitution filler and its Verdict names the inputs.
+- Ch16 states the retry condition positively and explains in a fence comment why `refundForKnown` needs no `review` outcome.
+- Gil's Ch19 result uses the shorter approved wording; Dafna agrees the filling rule with support. Eden's Ch15 reply is shorter and identifies what the renderer receives. Dafna's Ch22 line names the risk team and trims the org chart.
+
+Only one fence changes, by the Ch16 comment; all executable fence text and order remain unchanged. Its targeted check passes, including the existing loop that exercises every known status through `refundForOpen`/`refundForKnown` and expects `issue` or `skip`. No new compiler or runtime claim requires a harness change. Benchmark counts against **1562054** remain: Ch14 **2,355 (−4.7%)**, Ch15 **2,209 (+0.5%)**, Ch17 **2,377 (+1.4%)**, Ch23 **2,345 (−2.0%)**. The new report's SHA-256 is unchanged; edited files pass `git diff --check`.
+
+Clean `npm ci` reports **zero vulnerabilities**. Full `npm run check` passes on TypeScript 7.0.2, Node 22.23.4 and Zod 4.6.6: **483 fences, 891 compiler cases, 382 runtime groups**. Logs: `/private/tmp/pr-d-polish-ch16.log`, `/private/tmp/pr-d-polish-install.log`, `/private/tmp/pr-d-polish-full.log`; the benchmark/fence audit is `/private/tmp/pr-d-polish-audit.json`. No temporary artifacts are staged.

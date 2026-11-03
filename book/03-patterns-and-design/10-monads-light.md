@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Choose the chaining operation by what the next step returns, then check the shape the caller receives. A step returning an ordinary payload needs `map`. Ordinary means outside this particular container: an array can be a payload inside a Result. If the step already returns a Result, use the operation that passes that result on rather than wrapping it again. Otherwise the outer success may contain an inner failure. Neither is a contradiction. They answer different questions, and the caller has to reach the one it needs."
+**Prof. Eli Typeworth**: "Choose the chaining operation by what the next step returns, then check the shape the caller receives. A step returning an ordinary payload needs `map`. Ordinary means not another Result. An array can be a payload inside a Result. If the step already returns a Result, use the operation that passes that result on rather than wrapping it again. Wrap it again and the outer success can hold an inner failure. They don't contradict each other: one says the first step worked, the other says the next one refused. The caller has to reach the one it needs."
 
 ## The Debate
 
@@ -195,8 +195,6 @@ const refusedJob = runJob(() => loadPreview("7"));
 
 **Dafna**: "Yes. When the async function resolves with your object, JavaScript gets its `then` property. It's callable. JavaScript calls it with a resolve function and a reject function."
 
-**Eli**: "No registration required. You can join a language protocol just by choosing a method name."
-
 **Linoy**: "And my method takes one function."
 
 She follows the success branch with her cursor.
@@ -208,6 +206,8 @@ She follows the success branch with her cursor.
 **Linoy**: "The error branch returns another `Res`. It never calls the function. It doesn't use the second argument either."
 
 **Dafna**: "The promise ignores what your `then` returns. It needs a call to resolve or reject. Neither happened."
+
+**Eli**: "No registration required. You can join a language protocol just by choosing a method name."
 
 **Guy**: "So the stock check has answered. The worker is waiting for an answer about whether it answered."
 

@@ -251,7 +251,7 @@ For the replay, yesterday is day 1. Gil removes each day's released payouts and 
 
 Gil runs all 78,125 combinations of four opening payouts and one arrival on each of the next three days. Each amount is one of 100, 200, 300, 400 or 500, and the allowance resets to 500, so every amount fits a fresh day. He compares the payment day of every ID, not just the time it takes to empty the queue.
 
-**Gil**: "With a fresh allowance every day and every payout fitting one, no payout paid later under skip in that set. Some paid earlier."
+**Gil**: "Fresh allowance every day, every payout fits one: no payout paid later under skip. Some paid earlier."
 
 **Dafna**: "Then I'd like a different rule: scan in queue order, pay what fits, leave the rest for tomorrow."
 
@@ -274,7 +274,7 @@ const fillAvailable = skipping;
 
 **Gil**: "P2's date wasn't delayed yesterday. We still broke the queue-order promise we gave its seller."
 
-**Dafna**: "Restore that promise first. Then agree on filling with support as a policy change and update their reply."
+**Dafna**: "Restore that promise first. Then agree the filling rule with support as a policy change and update their reply."
 
 **Chen**: "And filling could use a loop too?"
 

@@ -14,7 +14,7 @@
 
 **Eden Legacy**: "Refunds. That account had three refunds."
 
-**Dafna**: "Then why does the record say we only checked the total? Risk edits and activates the policy in my console. They decide what gets held. Your service is supposed to carry that out."
+**Dafna**: "Then why does the record say we only checked the total? The risk team edits the policy in my console. Your service is supposed to carry it out."
 
 **Eden**: "Through the interface we both own. Let's see what it handed the logger."
 

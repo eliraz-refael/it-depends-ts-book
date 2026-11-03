@@ -63,7 +63,7 @@ function failureMessage(failure: Failure): string {
 }
 ```
 
-The service and the page's `submit` handler use that formatter:
+The page's `submit` handler calls the service and uses that formatter for a known refusal:
 
 ```typescript
 async function bookParty(store: Store, seats: readonly string[]): Promise<Booking> {
