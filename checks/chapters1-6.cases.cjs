@@ -26,6 +26,36 @@ function checkWebhook({handleWebhook, effects}, validates) {
     }
   } finally { delete globalThis.chargeUser; }
 }
+const fs = require("node:fs");
+const path = require("node:path");
+const genericsChapter = fs.readFileSync(path.join(process.env.BOOK_ROOT || path.resolve(__dirname, ".."),
+  "book/01-the-type-system/06-generics-basics.md"), "utf8");
+const collisionChapter = fs.readFileSync(path.join(process.env.BOOK_ROOT || path.resolve(__dirname, ".."),
+  "book/01-the-type-system/03-interface-vs-type.md"), "utf8");
+const collisionFence = [...collisionChapter.matchAll(/```typescript\n([\s\S]*?)\n```/g)][5][1];
+const widgetFiles = Object.fromEntries([...collisionFence.matchAll(
+  /\/\/ file: (node_modules\/[^\n]+)\n([\s\S]*?)(?=\/\/ file:|$)/g,
+)].map(([, filename, source]) => [filename, source]));
+assert.equal(Object.keys(widgetFiles).length, 2);
+// Model installed packages: the page prints their declarations, not packaging boilerplate.
+for (const declaration of Object.keys(widgetFiles)) {
+  const directory = path.posix.dirname(declaration);
+  widgetFiles[`${directory}/package.json`] = JSON.stringify({
+    name: path.posix.basename(directory), version: "1.0.0", type: "module",
+    main: "./index.js", types: "./index.d.ts",
+  });
+  widgetFiles[`${directory}/index.js`] = "export {};\n";
+}
+const badConfigInput = genericsChapter.match(/const config = parseConfig<\{ retries: number \}>\('([^']+)'\);/)[1];
+function checkUncheckedConfig({parseConfig}) {
+  const config = parseConfig(badConfigInput);
+  assert.deepEqual(config, {retires: 3});
+  assert.throws(() => config.retries.toFixed(1), {
+    name: "TypeError", message: "Cannot read properties of undefined (reading 'toFixed')",
+  });
+  const valid = parseConfig('{"retries":3}');
+  assert.equal(valid.retries.toFixed(1), "3.0", "A valid input still works after the bad call");
+}
 const api = `declare const api: { get<T = any>(url: string): Promise<T> };`;
 const expressApp = `import express from "express";
 const app = express();
@@ -64,37 +94,36 @@ type Returned = Expect<Equal<ReturnType<typeof firstElement<number>>, number | u
           assert.equal(firstElement([]), undefined);
           assert.equal(firstElement([42]), 42);
         }},
-      {name: "unwrap-any", fence: 14, after: `
+      {name: "unwrap-any", fence: 23, after: `
 type AIsString = Expect<Equal<A, string>>;
 type BIsAny = Expect<IsAny<B>>;`},
-      {name: "any-versus-assertion", fence: 15, before: `
+      {name: "any-versus-assertion", fence: 14, before: `
 declare function fetchData(): unknown;
 interface User { id: string; process(): void }`},
-      {name: "any-spreads", fence: 16, lines: [1, 8], before: `
+      {name: "any-spreads", fence: 15, lines: [1, 8], before: `
 declare const rawConfig: string;
 declare function startServer(port: number, host: string): void;`, after: `
 type PortIsAny = Expect<IsAny<typeof port>>;`},
-      {name: "assertion-contained", fence: 16, lines: [10, 14], before: `
+      {name: "assertion-contained", fence: 15, lines: [10, 14], before: `
 declare const rawConfig: string;
 interface ServerConfig { server: { port: number; host: string } }
 declare function startServer(port: number, host: string): void;`, after: `
 type PortIsNumber = Expect<Equal<typeof port, number>>;`},
-      {name: "express-body-any", fence: 17, before: `declare function createUser(email: string, name: string): void;`, after: `
+      {name: "express-body-any", fence: 16, before: `declare function createUser(email: string, name: string): void;`, after: `
 type BodyIsAny = Expect<IsAny<express.Request["body"]>>;`},
-      {name: "parse-at-boundary", fence: 18, before: expressApp + `
+      {name: "parse-at-boundary", fence: 17, before: expressApp + `
 class ValidationError extends Error {}`, after: `
 type Parsed = Expect<Equal<ReturnType<typeof parseCreateUserRequest>, CreateUserRequest>>;`},
-      {name: "any-event-handlers", fence: 19},
+      {name: "any-event-handlers", fence: 18},
       // Continues the registry declared in the previous fence.
-      {name: "generic-event-handlers", fence: 20, before: `
+      {name: "generic-event-handlers", fence: 19, before: `
 type EventHandler = (payload: any) => void;
 const handlers: Map<string, EventHandler[]> = new Map();`},
-      {name: "interface-event-contract", fence: 21},
-      {name: "overload-event-handlers", fence: 22},
-      {name: "webhook-before", fence: 23, before: webhookEffects + `
+      {name: "overload-event-handlers", fence: 20},
+      {name: "webhook-before", fence: 21, before: webhookEffects + `
 declare function chargeUser(method: any, amount: number): Promise<void>;`,
         after: `export {handleWebhook, effects};`, runtime: async m => checkWebhook(m, false)},
-      {name: "webhook-after", fence: 24, before: webhookEffects,
+      {name: "webhook-after", fence: 22, before: webhookEffects,
         after: `export {handleWebhook, effects};`, runtime: async m => checkWebhook(m, true)},
     ],
   },
@@ -134,6 +163,19 @@ const inferred = candidates.filter(value => value !== undefined);
 inferred.map(value => value.name);`, expect: [["after", 4, 18048]]},
       {name: "map-has-get", fence: 17, before: `interface User { id: string }
 declare const userId: string;`},
+      {name: "factory-hides-optional-response", fence: [{fence: 3, lines: [1, 5]}, 7, 10, 18, {fence: 4, lines: [1, 7]}],
+        after: `export {receiptAddress, receiptTest, response, createMockUser, ApiUser};`,
+        runtime: async ({receiptAddress, receiptTest, response, createMockUser, ApiUser}, printed) => {
+          assert.deepEqual(printed, ["true", "response failed"]);
+          assert.equal(receiptTest(), true, "The unchanged factory test still passes");
+          assert.throws(() => receiptAddress(response), TypeError);
+          const supplied = createMockUser({email: "ADA@example.com"});
+          assert.equal(receiptAddress(supplied), "ada@example.com");
+          assert.equal(ApiUser.safeParse(response).success, false, "The receipt parser rejects missing email");
+          assert.equal(receiptAddress(ApiUser.parse(supplied)), "ada@example.com");
+        }},
+      {name: "response-before-email-became-optional", fence: [{fence: 3, lines: [1, 5]}, 7, 10, 18],
+        edit: [["email?: string", "email: string"]], expect: [[18, 16, 2741]]},
     ],
   },
   "01-the-type-system/03-interface-vs-type.md": {
@@ -144,35 +186,45 @@ type Merged = Expect<Equal<Config, { port: number; host: string }>>;
 type Settings = { host: string };`,
         expect: [[3, 11, 2300], ["after", 3, 2300, "Duplicate identifier 'Settings'", 3]]},
       {name: "interface-hierarchy", fence: 4},
-      {name: "interface-extends-conflict", fence: [4, 5], expect: [[5, 1, 2430,
+      {name: "interface-extends-conflict", fence: [4, 17], expect: [[17, 1, 2430,
         "Interface 'Employee' incorrectly extends interface 'Base'. Types of property 'id' are incompatible. Type 'number' is not assignable to type 'string'."]]},
-      {name: "intersection-conflict", fence: [6, 7], after: `type Impossible = Expect<Equal<Employee["id"], never>>;`,
-        expect: [[7, 2, 2322, "Type 'string' is not assignable to type 'never'"]]},
-      {name: "intersection-composition", fence: [8, 9]},
-      {name: "express-global-augmentation", fence: 10, separate: true, after: `
+      {name: "intersection-conflict", fence: [15, 16], after: `type Impossible = Expect<Equal<Employee["id"], never>>;`,
+        expect: [[16, 2, 2322, "Type 'string' is not assignable to type 'never'"]]},
+      {name: "interface-conflict-restored", fence: [4, 17],
+        edit: [["id: number;", "id: string;"]]},
+      {name: "intersection-conflict-restored", fence: [15, 16],
+        edit: [["id: number;", "id: string;"]], after: `type Usable = Expect<Equal<Employee["id"], string>>;`},
+      {name: "intersection-composition", fence: [18, 19]},
+      {name: "express-global-augmentation", fence: 5, separate: true, after: `
 app.get("/profile", (req) => {
   type Augmented = Expect<Equal<typeof req.user, AuthenticatedUser | undefined>>;
 });`},
       // The prose claims augmenting only the Request exported by "express" misses handler parameters.
-      {name: "express-exported-request-only", fence: 10, separate: true, after: `
+      {name: "express-exported-request-only", fence: 5, separate: true, after: `
 import type * as core from "express-serve-static-core";
 declare module "express" {
   interface Request<P = core.ParamsDictionary, ResBody = any, ReqBody = any, ReqQuery = core.Query,
     Locals extends Record<string, any> = Record<string, any>> { exportedOnly?: string }
 }
 app.get("/profile", (req) => req.exportedOnly);`, expect: [["after", 7, 2339]]},
-      {name: "global-interface-merge", fence: 11, separate: true, after: `
-type Merged = Expect<Equal<User, { id: string; name: string; email: string; role: "admin" | "user" }>>;`},
-      {name: "type-only-constructs", fence: 12, after: `
+      {name: "global-interface-merge", fence: 6, lines: [20, 24], files: widgetFiles, after: `
+type Merged = Expect<Equal<User, { id: string; name: string; email: string; role: "admin" | "user" }>>;`,
+        expect: [[6, 22, 2739, "Type '{ id: string; name: string; }' is missing the following properties from type 'User': email, role"]]},
+      {name: "badge-widget-without-admin", fence: 6, lines: [20, 24],
+        edit: [['import "admin-widget";', ""]],
+        files: widgetFiles},
+      {name: "merged-widget-user-complete", fence: 6, lines: [20, 24], files: widgetFiles,
+        edit: [['{ id: "u1", name: "Ada" }', '{ id: "u1", name: "Ada", email: "ada@example.com", role: "user" }']]},
+      {name: "type-only-constructs", fence: 7, after: `
 type Names = Expect<Equal<EventName, "onClick" | "onHover" | "onFocus">>;
 type Unwrapped = Expect<Equal<UnwrapPromise<Promise<number>>, number>>;`},
-      {name: "discriminated-state", fence: 13, before: `interface User { name: string }`},
-      {name: "state-classes", fence: 14},
-      {name: "state-class-use", fence: [14, 15]},
-      {name: "interface-extends-props", fence: 16, before: `interface BaseProps { id: string }`},
-      {name: "intersection-props", fence: 17, before: `interface BaseProps { id: string }`},
-      {name: "interface-default", fence: 18},
-      {name: "type-default", fence: 19},
+      {name: "discriminated-state", fence: [4, 8]},
+      {name: "state-classes", fence: 9},
+      {name: "state-class-use", fence: [9, 10]},
+      {name: "interface-extends-props", fence: 11, before: `interface BaseProps { id: string }`},
+      {name: "intersection-props", fence: 12, before: `interface BaseProps { id: string }`},
+      {name: "interface-default", fence: 13},
+      {name: "type-default", fence: 14},
       {name: "convention-summary", fence: 20},
     ],
   },
@@ -239,16 +291,34 @@ function sameNarrowing(input: string | null | undefined) {
   if (input !== null) { type Strict = Expect<Equal<typeof input, string | undefined>>; }
 }`},
       {name: "typeof-instanceof-array", fence: 3},
-      {name: "in-operator-prototype", fence: 4, after: `export {};`, runtime: async (_, printed) => {
-        if (printed.join() !== "true,false") throw new Error(`printed ${printed}`);
+      {name: "in-operator-prototype", fence: 4, after: `export {isResponse};`, runtime: async ({isResponse}, printed) => {
+        assert.deepEqual(printed, ["true", "false"]);
+        for (const candidate of [{error: 42}, Object.create({error() {}})]) {
+          assert.equal(isResponse(candidate), true);
+          assert.throws(() => candidate.error.toLowerCase(), TypeError);
+        }
       }},
-      {name: "checked-predicate", fence: 5},
-      {name: "lying-predicate", fence: 6, before: `type User = { id: string; email: string; displayName: string };`},
-      {name: "assertion-function", fence: 7, before: `type User = { id: string; email: string; displayName: string };`},
-      {name: "parse-result", fence: 8, before: `type User = { id: string; email: string; displayName: string };`},
-      {name: "parse-or-throw", fence: [8, 9], before: `type User = { id: string; email: string; displayName: string };`},
-      {name: "request-state-switch", fence: 10},
-      {name: "parse-event", fence: [{fence: 8, lines: [1, 3]}, 10, 11],
+      {name: "truthy-primitive-in", fence: 5, options: {noEmitOnError: false},
+        expect: [[5, 3, 2638, "Type '{}' may represent a primitive value, which is not permitted as the right operand of the 'in' operator."]],
+        after: `export {hasError};`, runtime: async ({hasError}) => {
+          for (const value of ["abc", 42]) assert.throws(() => hasError(value), TypeError);
+          assert.equal(hasError({error: "bad"}), true);
+          assert.equal(hasError({}), false);
+        }},
+      {name: "object-guard-restored", fence: 5,
+        edit: [["if (value)", 'if (typeof value === "object" && value !== null)']],
+        after: `export {hasError};`, runtime: async ({hasError}) => {
+          for (const value of ["abc", 42, null, undefined, 0, ""]) assert.equal(hasError(value), false);
+          assert.equal(hasError({error: "bad"}), true);
+          assert.equal(hasError({}), false);
+        }},
+      {name: "checked-predicate", fence: 6},
+      {name: "lying-predicate", fence: 7, before: `type User = { id: string; email: string; displayName: string };`},
+      {name: "assertion-function", fence: 8, before: `type User = { id: string; email: string; displayName: string };`},
+      {name: "parse-result", fence: 9, before: `type User = { id: string; email: string; displayName: string };`},
+      {name: "parse-or-throw", fence: [9, 10], before: `type User = { id: string; email: string; displayName: string };`},
+      {name: "request-state-switch", fence: 11},
+      {name: "parse-event", fence: [{fence: 9, lines: [1, 3]}, 11, 12],
         after: `export {parseEvent, describeRequest};`, runtime: async ({parseEvent, describeRequest}) => {
           const states = [{status: "idle"}, {status: "loading"},
             {status: "success", data: 42}, {status: "error", error: new Error("failed")}];
@@ -262,9 +332,9 @@ function sameNarrowing(input: string | null | undefined) {
             assert.equal(parseEvent(invalid).ok, false);
           }
         }},
-      {name: "zod-parser", fence: [{fence: 8, lines: [1, 3]}, 12], after: `
+      {name: "zod-parser", fence: [{fence: 9, lines: [1, 3]}, 13], after: `
 type Inferred = Expect<Equal<User, { id: string; email: string; displayName: string }>>;`},
-      {name: "result-and-exception-reasons", fence: [8, 9, 13],
+      {name: "result-and-exception-reasons", fence: [9, 10, 14],
         before: `type User = { id: string; email: string; displayName: string };`, after: `export {};`,
         runtime: async (_, printed) => {
           if (printed.join("|") !== "id missing or not a string|id missing or not a string") throw new Error(`printed ${printed}`);
@@ -296,11 +366,14 @@ type Size = Expect<Equal<typeof size, number>>;`, expect: [[8, 10, 2345,
       {name: "explicit-type-argument", fence: [{fence: 9, lines: [1, 7]}, 10], after: `
 userStore.set({ id: "u1" });
 userStore.set(null);`},
-      {name: "asserted-generic-return", fence: 11},
-      {name: "any-to-generic-return", fence: 12},
-      {name: "honest-parse", fence: 13, after: `export { result };`, runtime: async ({result}) => {
+      {name: "cast-free-generic-caller", fence: [11, 12]},
+      {name: "cast-free-generic-runtime", fence: 11,
+        after: `export {parseConfig};`, runtime: checkUncheckedConfig},
+      {name: "honest-parse", fence: 13, after: `export {result, parseRetryConfig, parseJson};`, runtime: async ({result, parseRetryConfig, parseJson}) => {
         const expected = {ok: false, reason: "retries missing or not a number", input: {retires: 3}};
         if (JSON.stringify(result) !== JSON.stringify(expected)) throw new Error(JSON.stringify(result));
+        assert.deepEqual(parseRetryConfig(parseJson(badConfigInput)), expected);
+        assert.deepEqual(parseRetryConfig(parseJson('{"retries":3}')), {ok: true, value: {retries: 3}});
       }},
       {name: "pluck", fence: [{fence: 7, lines: [1, 6]}, 14], after: `
 type Departments = Expect<Equal<typeof departments, string[]>>;`},

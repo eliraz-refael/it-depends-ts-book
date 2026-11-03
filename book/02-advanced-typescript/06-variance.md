@@ -2,13 +2,19 @@
 
 ## The Principle
 
+**Daniel Compiler**: "Before passing an object through a broader type, ask what that reference permits its holder to do. Being able to read the broader value is not enough if the contract also allows writing one back. The original owner may still be using the same object under a more specific promise."
+
+"Follow the permitted operations through both references. If one caller can make another caller's promised result impossible, the assignment isn't safe just because the values were compatible when you made it. This is a question about the contract's members, not how similar the type names look. Start with the reads and writes the consumers actually need; then check the assignments against those operations."
+
+## The Debate
+
 **Noam Kiperman**: "The receipt says `rows` is a number. It just called `toFixed` on `undefined`."
 
 **Eden Legacy**: "It was a number when the export finished."
 
 **Guy Singleton**: "Who wrote to the cache afterward?"
 
-The export runner consumes the job records `ExportBuilder` produces. When a CSV export finishes, it records the output path and row count in the team's `createCache` helper. In a `CsvResult`, the path identifies the CSV described by the row count. The cache holds one result. Writing replaces it; reading returns the current value.
+Guy has brought the export runner's cache, as promised. The runner consumes the records `ExportBuilder` produces. Each CSV result pairs its file path with its row count.
 
 ```typescript
 interface ExportResult {
@@ -24,6 +30,7 @@ interface ResultCache<T> {
   write(value: T): void;
 }
 
+// One current result. Writing replaces it; reading returns it.
 function createCache<T>(initial: T): ResultCache<T> {
   let current = initial;
   return {
@@ -54,12 +61,11 @@ dashboard(csvCache).label(); // "orders.csv"
 
 **Noam**: "And the receipt was written by the reporting team. They don't import the dashboard."
 
-Eden opens the archive change. The archiver moves the CSV out of hot storage and provides a ZIP download. The panel must point at that ZIP afterward. Its new action records the archive path in the cache it already receives.
-
-This replaces the dashboard function:
+Eden opens the archive change the team is testing before release. The archiver moves the CSV out of hot storage and provides a ZIP download. The panel must point at that ZIP afterward. Its new action records the archive path in the cache it already receives.
 
 ```typescript
 function dashboard(cache: ResultCache<ExportResult>) {
+  // Replaces the label-only dashboard.
   return {
     label: () => cache.read().path,
     useArchive(path: string) {
@@ -84,11 +90,9 @@ receipt(csvCache);                 // Throws a TypeError.
 
 **Noam**: "The cache fits the dashboard's parameter. The ZIP it let through doesn't fit what the receipt was promised."
 
-**Daniel Compiler**: "Whether one cache type can stand in for another depends on what its holder can do. The compiler checks the members. Here the dashboard may write any `ExportResult`, while the receipt expects every read to return a `CsvResult`. Those promises conflict on the same object."
+**Daniel**: "Whether one cache type can stand in for another depends on what its holder can do. The compiler checks the members. Here the dashboard may write any `ExportResult`, while the receipt expects every read to return a `CsvResult`. Those promises conflict on the same object."
 
 **Guy**: "So the assignment at the dashboard call shouldn't have been accepted. We let one reference grant a write the other reference can't survive."
-
-## The Debate
 
 ### "Keep the type the caller supplied"
 
@@ -125,13 +129,15 @@ function genericDashboard<T extends ExportResult>(cache: ResultCache<T>) {
 
 **Linoy**: "Treating the CSV cache as a general cache. Or going the other way. An owner that accepts arbitrary results can't promise every read has rows either."
 
-Linoy starts a scratch file with the original CSV result. They recreate the cache before each experiment. She changes only the interface; the factory and both dashboard definitions stay available for comparison.
+Linoy opens a scratch file with the factory and both dashboards.
 
 ```typescript
 interface ResultCache<in out T> {
   read(): T;
   write(value: T): void;
 }
+// Only the interface changes. Start each experiment with a fresh csvCache:
+// createCache<CsvResult>({ path: "orders.csv", rows: 120 })
 ```
 
 The archive dashboard now rejects the CSV cache.
@@ -147,7 +153,7 @@ dashboard(csvCache); // Error: TS2345.
 
 **Eden**: "Try the UI test harness. It copies the operations so a test can replace `read` without changing the runner's object."
 
-He replaces the direct dashboard call with that plain object. Its type is inferred.
+Eden replaces the direct call with the inferred adapter:
 
 ```typescript
 const forwarded = {
@@ -188,13 +194,15 @@ panel.useArchive("orders.zip");
 receipt(csvCache);              // Throws a TypeError.
 ```
 
-**Linoy**: "We could annotate the copy too. We'd need every copy to keep that named type."
+**Eden**: "I added a counter, Linoy. I wasn't trying to write a compiler test."
+
+**Linoy**: "We could annotate the copy too. And the next copy. No, I don't want to approve every test fixture to keep this working."
 
 **Guy**: "These are SDK consumers. The contract should check what they pass, without requiring that convention at every construction site."
 
 **Daniel**: "The annotation affected a comparison between two `ResultCache` instantiations. Here the source is an object type with `read` and `write`. The compiler compares those members. Your annotation doesn't change their signatures."
 
-The handbook limits [variance annotations](https://www.typescriptlang.org/docs/handbook/2/generics.html#variance-annotations) to comparisons between instantiations of the same generic type. They do not change structural comparisons. This factory's methods close over `current`, so forwarding them also preserves the runtime behavior; no lost receiver explains the failure.
+**Eden**: "Those functions close over `current`. Copying them didn't lose a receiver or give us a new cache."
 
 ### "But we're using strict mode"
 
@@ -210,7 +218,7 @@ The handbook limits [variance annotations](https://www.typescriptlang.org/docs/h
 
 **Daniel**: "It doesn't repeal the method exception."
 
-The [`strictFunctionTypes` rule](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-6.html#strict-function-types) checks ordinary function parameters contravariantly. Methods and constructors are exceptions, retained for compatibility with existing generic classes and interfaces. The exception is part of strict checking, not evidence that this repository forgot to enable it.
+"`strictFunctionTypes` checks ordinary function parameters contravariantly. Methods and constructors are exceptions kept for compatibility. This is what strict checking allows, not a flag either package forgot."
 
 **Noam**: "Then write the function type we want callers checked against."
 
@@ -229,8 +237,6 @@ interface ResultCache<T> {
 
 **Noam**: "It can. We're changing the contract's member type. We haven't changed the object it returns."
 
-The direct call and the inferred forwarding adapter are now both rejected. Copying a named cache also fails.
-
 ```typescript
 dashboard(csvCache);  // Error: TS2345.
 dashboard(forwarded); // Error: TS2345.
@@ -238,15 +244,15 @@ dashboard(forwarded); // Error: TS2345.
 dashboard({ ...csvCache }); // Error: TS2345.
 ```
 
-**Eden**: "Now run the old dashboard. Before the archive button."
-
-He brings back the version that only returns a label. Its parameter is still `ResultCache<ExportResult>`. The CSV call gets the same error.
-
-**Eden**: "That one didn't break a receipt. You've broken its callers too."
+**Eden**: "I ran the old dashboard, before the archive button. Its parameter is still `ResultCache<ExportResult>`. Same error at `dashboard(csvCache)`, even though this body only reads a path. That one didn't break a receipt. You've broken its callers too."
 
 **Noam**: "Its parameter asks for a write it never uses."
 
 **Eden**: "I know. So the change isn't finished at the interface. I have to find those consumers and change their parameters."
+
+**Noam**: "You're right. My repair rejects a caller we still support. I'll change its parameter and keep that call in the checks."
+
+**Eden**: "Thank you. Your one-line fix was getting expensive for everyone else."
 
 **Guy**: "Give the label a reader. It shouldn't receive the write operation through its declared contract."
 
@@ -331,10 +337,11 @@ const useArchive = archiveAction(latestDownload); // Accepted.
 
 **Linoy**: "TypeScript infers it from the members. `out` would describe the reader, `in` the writer. We don't have to write them."
 
-The receipt now takes only its reader, and the panel gets its label and archive action from the download cache. These replace the earlier receipt definition and panel binding.
+**Guy**: "Now wire the receipt to the CSV reader and the panel to the download cache:"
 
 ```typescript
 function receipt(reader: ResultReader<CsvResult>): string {
+  // Replaces the earlier receipt; the panel binding below replaces the old panel.
   return `${reader.read().rows.toFixed(0)} rows`;
 }
 
@@ -358,13 +365,13 @@ receipt(lastCsv);  // "140 rows"
 
 ## The Verdict
 
-**Guy**: "The runner keeps the full caches. Receipts get a CSV reader. Labels get a general reader. The CSV publisher gets a CSV writer, and the archive action gets a writer that accepts general results. That's the boundary I'd publish."
+> Give each consumer a contract for the operations it needs. For these writers, use function-property signatures under `strictFunctionTypes` so structural comparisons reject the unsafe writes. Migrate consumer parameters with that contract, and preserve the meaning of the values shared between owners. A reader view limits operations through that reference; it does not stop another owner writing.
 
-**Eden**: "I'll migrate the consumers with it. The old label-only callers need narrower parameters, and the archive action needs the download cache. A one-line interface diff doesn't do that work for us."
+**Guy**: "The runner owns the full caches. The archive action can write to the download cache, but it mustn't get a writer for the receipt's CSV record."
+
+**Eden**: "Noam has the label-only caller. I'll migrate the remaining consumers and move the archive action to the download cache."
 
 **Noam**: "Every writer contract needs `write` as a function property, including the views. Keep the failed calls in the checks. And check the old method-shaped adapters on the way out. If one has already widened a CSV cache, putting our new type on the result won't recover the information it lost."
-
-Eden leaves the adapter reproduction in the check suite and removes the CSV cache from the panel's setup.
 
 ## Additional Takes
 
@@ -383,9 +390,10 @@ interface MethodCache<out T> {
 
 **Guy**: "What about Chen's assignment? The configured builder that became a bare `ExportBuilder`?"
 
-In a copy of the earlier builder, Linoy changes the type parameter to `in out S extends Partial<ExportSpec> = {}`. The methods and runtime guards stay as written.
-
 ```typescript
+// In a copy of ExportBuilder, replace the type parameter with:
+// in out S extends Partial<ExportSpec> = {}
+// Keep the methods and runtime guards unchanged.
 const selected = ExportBuilder.start().source("orders");
 const lessSpecific: ExportBuilder = selected; // Error: TS2322.
 
@@ -401,4 +409,4 @@ withDestination(selected.destination("exports/manual.csv")); // Error: TS2345.
 
 **Linoy**: "A preserving generic helper can keep that call. But I wouldn't call this annotation a replacement for the guard. We just saw what happens when the next boundary compares members instead."
 
-**Guy**: "Keep the guard. And put both assignments in the builder review, not just the one we wanted to reject."
+**Guy**: "Keep the guard. We still need to change the destination on a completed builder. Rejecting one bad assignment doesn't pay for rejecting that call."

@@ -172,7 +172,11 @@ const nullTest = f8(11, "// @ts-expect-error:");
 example("ch8-null-test-derived", base + nullTest);
 example("ch8-null-test-explicit", base + nullTest.replace("const cannotClearEmail: DerivedUpdateWithOverride", "const cannotClearEmail: UpdateUserRequest"));
 example("ch8-null-test-detects-widening", base.replace('readonly email?: string;', 'readonly email?: string | null;') + nullTest.replace("const cannotClearEmail: DerivedUpdateWithOverride", "const cannotClearEmail: UpdateUserRequest"), [2578]);
-example("ch8-readonly-preserved", model + f8(12, "const selected"), [2540]);
+const readonlySelection = f8(12, "const selected");
+const readonlyMessage = readonlySelection.match(/\/\/ Error TS2540: (.*)/)?.[1];
+assert(readonlyMessage, "The mutation should print the diagnostic behind Daniel's objection");
+example("ch8-readonly-preserved", model + readonlySelection, [2540], {},
+  [{code: 2540, text: readonlyMessage}]);
 example("ch8-modifiers-removed", base + equal + 'type Check = Expect<Equal<FormValues, {displayName: string; email: string; bio: string}>>;');
 example("ch8-form-and-changed-fields", base + startForm + changes);
 example("ch8-field-error-typo", base + errors, [2551]);
