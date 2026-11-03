@@ -16,7 +16,7 @@ declare function sortByName<T extends { name: string }>(items: T[]): T[];
 type Reply<T> = T extends string ? "it was a string" : "it was not";
 ```
 
-"In a constraint, `extends` states a requirement: no `T` may enter without a `name`. In a conditional type, `extends` asks a question — *is the type on the left assignable to the type on the right?* The answer selects a branch: the first if assignable, the second otherwise."
+"In a constraint, `extends` states a requirement: no `T` may enter without a `name`. In a conditional type, `extends` asks a question — *is the type on the left assignable to the type on the right?* The compiler answers, and the answer selects a branch. That is the whole of the syntax. If a value of type `T` would be accepted where a `string` is required, the result is the first branch. Otherwise it is the second."
 
 "The branches describe types. They are evaluated during type checking and erased before the program runs."
 
@@ -226,7 +226,7 @@ function slugify<T extends string | string[]>(
 
 **Linoy**: "There's an RFC for that."
 
-She opens the long-open [suggestion to relate control flow to conditional return types](https://github.com/microsoft/TypeScript/issues/33912), with the rejected body still in the other tab.
+She opens the long-open [suggestion to relate control flow to conditional return types](https://github.com/microsoft/TypeScript/issues/33912), and starts copying its example into a scratch tab.
 
 **Daniel**: "A suggestion. It doesn't make this body pass."
 
@@ -519,8 +519,6 @@ type NonNullable<T> = T & {};
 
 "For ordinary unions with `null` and `undefined`, yes. For `unknown`, the old definition returned `unknown`. The new one returns `{}`. It excludes the nullish values there too."
 
-The change and its effect on generic assignability are described in the [TypeScript 4.8 release notes](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-8.html).
-
 ## The Turn
 
 **Dafna Functor** points to `Exclude`, still on the whiteboard.
@@ -600,11 +598,11 @@ She leaves a comment on the PR, then returns to the conditional signature in her
 | Comparing a union as a whole | `[T] extends [U]` | Tuple wrapping prevents distribution over `T` |
 | An implementation sits beneath overloads | Runtime tests for the promised input/output cases | Type tests check what callers see; they cannot prove the body returns the right branch |
 
-Eden prefers to list the cases while there are only a few. Linoy prefers to name the relationship once, especially when other generic signatures use it. A union caller alone does not settle their disagreement. The [handbook's conditional-type example](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html) starts with the same three-overload alternative.
+Eden prefers to list the cases while there are only a few. Linoy prefers to name the relationship once, especially when other generic signatures use it. A union caller alone does not settle their disagreement.
 
 ## Additional Takes
 
-**Linoy Nightly**: "We still owe `Unwrap` an explanation. The `infer U` part extracts the type inside `Promise<U>`. `ReturnType` uses the same mechanism for functions. It shipped with conditional types in 2.8. Idan wants to derive the courier wrapper's signatures from the SDK. Bring `Unwrap` back when we open that one."
+**Linoy Nightly**: "We still owe `Unwrap` an explanation. The `infer U` part extracts the type inside `Promise<U>`. `ReturnType` uses the same mechanism for functions. It shipped with conditional types in 2.8. I'm going to need the board for that one. Idan wants to derive the courier wrapper's signatures from the SDK. Bring `Unwrap` back when we open that one."
 
 **Noam Kiperman**: "And test the type-only utilities too. `Exclude<Channel, "smss">` compiles. A check that the resulting union is exactly what you intended catches that typo. Different test from calling `slugify`, but it belongs in the PR."
 

@@ -85,7 +85,7 @@ type SettingsEvents = ChangeEvents<Settings>;
 // Same three properties and value types as ExistingEvents.
 ```
 
-**Linoy**: "`as` makes the new key; `T[K]` looks up the old one's value type. Add a setting and the map follows."
+**Linoy**: "`as` makes the new key. `T[K]` looks up the old one's value type, so `fontSizeChanged` gets the type of `fontSize`. Add a setting and the map follows."
 
 **Oded**: "Provided we want an event for it."
 
@@ -135,7 +135,7 @@ on("fontSizeChanged", (value) => value.toUpperCase());
 
 **Oded**: "The old map caught those too."
 
-**Linoy**: "Yes. I'm removing the duplicate list."
+**Linoy**: "It did. I want to stop maintaining the list beside the list it came from."
 
 ### "That found the person listening"
 
@@ -180,7 +180,7 @@ export function setSetting<K extends SettingKey>(key: K, value: Settings[K]) {
 
 **Gilad**: "Which callers?"
 
-Linoy opens the controls and restore. Restore receives `saved` already parsed into `Settings`.
+Linoy opens the control handlers, then the restore function. Restore receives `saved` already parsed into `Settings`.
 
 ```typescript
 // src/controls.ts
@@ -214,13 +214,11 @@ export function restore(saved: Settings) {
 
 **Linoy**: "Restore has a different job. The helper only builds the name."
 
-**Gilad**: "Now I have two places to inspect. I still don't know which one produced my line."
+**Oded**: "Writing out the event name wouldn't tell you which path ran either."
 
-**Oded**: "Writing out the event name wouldn't tell you which one ran either."
+**Gilad**: "That takes logs or a reproduction. The old literal names got the search to the producers faster."
 
-**Gilad**: "I still need logs or a reproduction. First I need to find the code."
-
-**Linoy**: "Restore lists the fields. The setter can publish any of them. What would you search for inside it?"
+**Linoy**: "For restore. The setter can publish any field. What would you search for inside it?"
 
 ### "Put the names somewhere"
 
@@ -253,71 +251,9 @@ function restoreWithNames(saved: Settings) {
 
 **Gilad**: "Useful if the producers use it. I can follow the entry's references."
 
-**Linoy**: "And `eventNames[key]` still takes you to a generic caller."
+**Linoy**: "And `eventNames[key]` still takes you to a generic caller. It won't list every write for you."
 
 **Oded**: "I wasn't asking it to. I want somewhere to start."
-
-### "Do we have a paid profile?"
-
-**Linoy**: "The audit viewer groups names by entity. That was going to be next."
-
-```typescript
-type Entity = "profile" | "invoice";
-type Action = "created" | "paid";
-type AuditEvent = `${Entity}:${Action}`;
-
-const event: AuditEvent = "profile:paid"; // Compiles.
-```
-
-**Oded**: "Do we have a paid profile?"
-
-**Linoy**: "No. That combination shouldn't be there."
-
-**Daniel**: "Two choices in each position. You asked for four combinations."
-
-```typescript
-type ExpandedAuditEvent =
-  | "profile:created"
-  | "profile:paid"
-  | "invoice:created"
-  | "invoice:paid";
-```
-
-**Oded**: "Can you make it stop at the three we use?"
-
-**Linoy**: "With the allowed actions attached to their entities."
-
-```typescript
-type ActionsByEntity = {
-  profile: "created";
-  invoice: "created" | "paid";
-};
-
-type AllowedAuditEvent = {
-  [E in keyof ActionsByEntity]: `${E}:${ActionsByEntity[E]}`;
-}[keyof ActionsByEntity];
-
-const wrongEvent: AllowedAuditEvent = "profile:paid"; // Error.
-```
-
-**Oded**: "The brackets at the end?"
-
-**Linoy**: "The mapping gives each entity its events. Indexing with all the keys collects those values into a union."
-
-Oded writes the result underneath.
-
-```typescript
-type ListedAuditEvent =
-  | "profile:created"
-  | "invoice:created"
-  | "invoice:paid";
-```
-
-**Oded**: "Three names. I might just keep this."
-
-**Linoy**: "If we only use the flat list, fine. The filter menu picks an entity first. I want to check its props before throwing the grouped type away."
-
-**Oded**: "After this one. Your settings all have `Changed`. The audit events already needed a different rule."
 
 ## The Turn
 
@@ -378,17 +314,13 @@ src/restore.ts:7:  publish("fontSizeChanged", saved.fontSize);
 
 **Linoy**: "I'd still use the wrapper in both. Once you know where settings writes live, this is one extra naming choice to explain."
 
-**Oded**: "One naming choice for three calls. I'll take it. I'm not making you write a second setter."
+**Oded**: "One naming choice for three calls. I'll pay that. I'm not making you write a second setter."
 
 ## The Debate Continues
 
 A type can check a naming rule without requiring a runtime name-building helper. Choose that indirection by what callers share and how maintainers find them; neither choice identifies which producer ran in a particular session.
 
-The controls keep `setSetting`. Restore updates the complete state before its three literal emissions. For these literal calls, the preview still receives a number for `fontSizeChanged`.
-
-**Linoy**: "I'd use the wrapper for restore too. One route for every settings write."
-
-**Oded**: "I'm keeping the names on the calls that already list the fields. We can find those without knowing your route first."
+**Gilad**: "With literal names, that log gets me straight to restore. For a control change, I still have to follow `publish` through the setter. One wrapper throughout would give me one route to learn; these literals save me that detour for restore. I can trace either. I'd keep the literals."
 
 ## Additional Takes
 
@@ -433,6 +365,70 @@ const nextSize: DefaultEvents["fontSizeChanged"] = 16; // Error: expected 14.
 **Daniel**: "You made fourteen part of the type. It has been very loyal to fourteen."
 
 **Linoy**: "`as const` was useful for our fixed status codes. These are starting values for settings that change. That's why I used the `Settings` type instead of deriving everything from the initializer."
+
+---
+
+### "Do we have a paid profile?"
+
+**Linoy**: "The audit viewer groups names by entity. That was going to be next."
+
+```typescript
+type Entity = "profile" | "invoice";
+type Action = "created" | "paid";
+type AuditEvent = `${Entity}:${Action}`;
+
+const event: AuditEvent = "profile:paid"; // Compiles.
+```
+
+**Oded**: "Do we have a paid profile?"
+
+**Linoy**: "No. That combination shouldn't be there."
+
+**Daniel**: "Two choices in each position. You asked for four combinations."
+
+```typescript
+type ExpandedAuditEvent =
+  | "profile:created"
+  | "profile:paid"
+  | "invoice:created"
+  | "invoice:paid";
+```
+
+**Oded**: "Can you make it stop at the three we use?"
+
+**Linoy**: "With the allowed actions attached to their entities."
+
+```typescript
+type ActionsByEntity = {
+  profile: "created";
+  invoice: "created" | "paid";
+};
+
+type AllowedAuditEvent = {
+  [E in keyof ActionsByEntity]: `${E}:${ActionsByEntity[E]}`;
+}[keyof ActionsByEntity];
+
+const wrongEvent: AllowedAuditEvent = "profile:paid"; // Error.
+```
+
+**Oded**: "Am I maintaining an object or a list now?"
+
+**Linoy**: "The object groups the events by entity. Indexing with all its keys gives you the flat union too."
+
+Oded writes the result underneath.
+
+```typescript
+type ListedAuditEvent =
+  | "profile:created"
+  | "invoice:created"
+  | "invoice:paid";
+```
+
+**Oded**: "Three names. I might just keep this."
+
+**Linoy**: "If we only use the flat list, fine. The filter menu picks an entity first. I want to check its props before throwing the grouped type away."
+
+**Oded**: "Keep that out of the settings change. Those all have `Changed`. The audit events already need a different rule."
 
 ---
 

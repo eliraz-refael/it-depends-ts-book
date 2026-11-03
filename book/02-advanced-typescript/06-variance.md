@@ -14,7 +14,7 @@
 
 **Guy Singleton**: "Who wrote to the cache afterward?"
 
-Guy has brought the export runner's cache, as promised. The runner consumes the records `ExportBuilder` produces. Each CSV result pairs its file path with its row count; the receipt and download panel share the latest result.
+Guy has brought the export runner's cache, as promised. The runner consumes the records `ExportBuilder` produces. Each CSV result pairs its file path with its row count.
 
 ```typescript
 interface ExportResult {
@@ -61,7 +61,7 @@ dashboard(csvCache).label(); // "orders.csv"
 
 **Noam**: "And the receipt was written by the reporting team. They don't import the dashboard."
 
-Eden opens the archive change. The archiver moves the CSV out of hot storage and provides a ZIP download. The panel must point at that ZIP afterward. Its new action records the archive path in the cache it already receives.
+Eden opens the archive change they are testing before release. The archiver moves the CSV out of hot storage and provides a ZIP download. The panel must point at that ZIP afterward. Its new action records the archive path in the cache it already receives.
 
 ```typescript
 function dashboard(cache: ResultCache<ExportResult>) {
@@ -204,8 +204,6 @@ receipt(csvCache);              // Throws a TypeError.
 
 **Eden**: "Those functions close over `current`. Copying them didn't lose a receiver or give us a new cache."
 
-**Daniel**: "Right. `in out` governs the same-generic comparison. It doesn't change this structural one."
-
 ### "But we're using strict mode"
 
 **Noam**: "Why is the member comparison allowing the write? A function that needs rows can't accept every result."
@@ -220,7 +218,7 @@ receipt(csvCache);              // Throws a TypeError.
 
 **Daniel**: "It doesn't repeal the method exception."
 
-"`strictFunctionTypes` checks ordinary function parameters contravariantly. Methods and constructors are exceptions kept for compatibility. This is what strict checking allows, not a flag your other package forgot."
+"`strictFunctionTypes` checks ordinary function parameters contravariantly. Methods and constructors are exceptions kept for compatibility. This is what strict checking allows, not a flag either package forgot."
 
 **Noam**: "Then write the function type we want callers checked against."
 
@@ -239,8 +237,6 @@ interface ResultCache<T> {
 
 **Noam**: "It can. We're changing the contract's member type. We haven't changed the object it returns."
 
-The direct call and the inferred forwarding adapter are now both rejected. Copying a named cache also fails.
-
 ```typescript
 dashboard(csvCache);  // Error: TS2345.
 dashboard(forwarded); // Error: TS2345.
@@ -250,9 +246,7 @@ dashboard({ ...csvCache }); // Error: TS2345.
 
 **Eden**: "Now run the old dashboard. Before the archive button."
 
-He brings back the version that only returns a label. Its parameter is still `ResultCache<ExportResult>`. The CSV call gets the same error.
-
-**Eden**: "That one didn't break a receipt. You've broken its callers too."
+"The old parameter is still `ResultCache<ExportResult>`. Same error at `dashboard(csvCache)`, even though this body only reads a path. That one didn't break a receipt. You've broken its callers too."
 
 **Noam**: "Its parameter asks for a write it never uses."
 
@@ -375,13 +369,11 @@ receipt(lastCsv);  // "140 rows"
 
 > Give each consumer a contract for the operations it needs. For these writers, use function-property signatures under `strictFunctionTypes` so structural comparisons reject the unsafe writes. Migrate consumer parameters with that contract, and preserve the meaning of the values shared between owners. A reader view limits operations through that reference; it does not stop another owner writing.
 
-**Guy**: "The runner keeps the full caches. Receipts get a CSV reader. Labels get a general reader. The CSV publisher gets a CSV writer, and the archive action gets a writer that accepts general results. That's the boundary I'd publish."
+**Guy**: "The runner owns the full caches. The archive action can write to the download cache, but it mustn't get a writer for the receipt's CSV record."
 
-**Eden**: "I'll migrate the consumers with it. The old label-only callers need narrower parameters, and the archive action needs the download cache."
+**Eden**: "Noam has the label-only caller. I'll migrate the remaining consumers and move the archive action to the download cache."
 
 **Noam**: "Every writer contract needs `write` as a function property, including the views. Keep the failed calls in the checks. And check the old method-shaped adapters on the way out. If one has already widened a CSV cache, putting our new type on the result won't recover the information it lost."
-
-**Eden**: "The archive action gets the download cache. The receipt keeps its rows. That's the change I can release."
 
 ## Additional Takes
 
@@ -400,9 +392,10 @@ interface MethodCache<out T> {
 
 **Guy**: "What about Chen's assignment? The configured builder that became a bare `ExportBuilder`?"
 
-In a copy of the earlier builder, Linoy changes the type parameter to `in out S extends Partial<ExportSpec> = {}`. The methods and runtime guards stay as written.
-
 ```typescript
+// In a copy of ExportBuilder, replace the type parameter with:
+// in out S extends Partial<ExportSpec> = {}
+// Keep the methods and runtime guards unchanged.
 const selected = ExportBuilder.start().source("orders");
 const lessSpecific: ExportBuilder = selected; // Error: TS2322.
 

@@ -16,7 +16,7 @@ Linoy's pull request deletes three type definitions from the account settings fe
 
 They're reviewing the diff on the meeting-room display. Oded has checked out the branch and left the settings page open on his laptop.
 
-Eli had promised we could "walk an object's keys." **Daniel** opens the mapped type behind the first line of Linoy's replacement, in the standard library.
+Eli had promised a way to "walk an object's keys." **Daniel** opens the mapped type behind the first line of Linoy's replacement, in the standard library.
 
 ```typescript
 type Partial<T> = {
@@ -110,9 +110,7 @@ type Pick<T, K extends keyof T> = {
 
 **Guy**: "I might need it to sit there. Clients could still be sending `email`."
 
-**Oded** has the handler open on his laptop.
-
-"The parser still selects what goes into the write?"
+**Oded**: "Keep the parser that selects what goes into the write. I'm not turning three deleted types into a permissions project."
 
 **Linoy**: "I haven't touched it."
 
@@ -131,7 +129,7 @@ console.log(Object.keys(request)); // ["displayName", "roles"]
 
 **Guy**: "And keep its rules. Omit a field to leave it alone. Send a string to replace it. An empty biography clears the biography."
 
-**Oded**: "What about `{}`?"
+**Eden**: "What about `{}`?"
 
 **Guy**: "Nothing to change. We accept it."
 
@@ -238,7 +236,9 @@ Guy restores the published request and runs the same null-rejection check agains
 
 **Linoy**: "Then the selected fields should do."
 
-**Oded**: "I tried using your `EditableFields`. I can't edit them."
+Daniel types an assignment and turns his laptop toward Linoy.
+
+**Daniel**: "The compiler disagrees."
 
 ```typescript
 const selected: EditableFields = {
@@ -250,7 +250,7 @@ selected.displayName = "Ada Lovelace";
 // Error TS2540: Cannot assign to 'displayName' because it is a read-only property.
 ```
 
-**Daniel**: "The compiler disagrees. `Pick` preserves the modifiers, and `Partial` keeps `readonly` when it makes a property optional. You selected those fields out of a readonly record. They arrived readonly."
+"`Pick` preserves the modifiers, and `Partial` keeps `readonly` when it makes a property optional. You selected those fields out of a readonly record. They arrived readonly."
 
 **Linoy**: "For the draft, take it off. And every input holds a string, even when it's empty, so take off the optional modifier as well."
 
@@ -294,7 +294,7 @@ console.log(user.bio); // undefined: the record hasn't changed.
 
 **Guy**: "That function makes the copy. Removing `readonly` alone wouldn't give us another object."
 
-Eden gives Oded an imported-account fixture to load in the local preview. Oded changes the biography and clicks Save. The email input turns red.
+Eden loads an imported account in the preview. Oded edits the biography and clicks Save. The email input turns red.
 
 **Oded**: "I haven't touched email."
 

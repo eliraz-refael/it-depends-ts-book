@@ -101,6 +101,9 @@ function example(name, files, {roots = Object.keys(files), codes = {}, options =
   return test;
 }
 const initial = {"label-frame.d.ts": initialPatch, "badge.ts": badge, "web.ts": web, "batch.ts": batch};
+const projectFiles = web.match(/\/\/ Project files: ([^\n]+)\./)?.[1].split(", ");
+assert(projectFiles, "The initial project file list must be printed");
+assert.deepEqual([...projectFiles].sort(), Object.keys(initial).sort(), "Initial fixture matches the printed program");
 const namedBridge = {"labels.ts": bridge, "badge.ts": badge, "web.ts": repairedEntry, "batch.ts": repairedEntry};
 const typeEdge = {"labels.ts": bridge, "badge.ts": typedBadge, "batch.ts": bypass};
 const guarded = {"labels.ts": optionalBridge, "badge.ts": guardedBadge, "web.ts": repairedEntry, "batch.ts": repairedEntry};
@@ -110,7 +113,7 @@ import "label-kit/frame";
 import {Label} from "label-kit";
 new Label("Ada").frame("*"); // Error: the plugin declarations omit frame.
 `}, {codes: {"main.ts": [2339]}});
-const whole = example("one-program-two-entrypoints", initial);
+const whole = example("one-program-two-entrypoints", initial, {roots: projectFiles});
 const patched = example("runtime-bridge-both-entrypoints", namedBridge);
 example("isolated-raw-call", {"isolated.ts": isolated}, {codes: {"isolated.ts": [2339]}});
 const typeOnly = example("type-edge-admits-raw-entry", typeEdge, {roots: ["batch.ts"]});

@@ -59,11 +59,11 @@ declare module "label-kit" {
 
 **Gilad**: "In that process. A declaration tells the compiler what to expect. For this one, the expectation depends on which JavaScript has run."
 
-### The other way in
+### "Both pass the build"
 
 **Oded**: "The import makes this file a module. So `declare module` patches the package we imported. `Label` is a class, but the interface merges with its instance type. We still have one constructor."
 
-The [module augmentation rules](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation) resolve the name like an import. Once the augmentation is in the compiler's program, other files using that `Label` see the added member too.
+The [module augmentation rules](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation) resolve the name like an import.
 
 **Chen Override**: "Like the two widget packages merging `User`? Does a file see this member even if it doesn't import the patch?"
 
@@ -80,10 +80,9 @@ export function renderBadge(label: Label): string {
 }
 ```
 
-The two entry points are in the same TypeScript project. Its configuration includes both of them, the shared function, and `label-frame.d.ts`.
-
 ```typescript
 // web.ts
+// Project files: web.ts, batch.ts, badge.ts, label-frame.d.ts.
 import "label-kit/frame";
 import { Label } from "label-kit";
 import { renderBadge } from "./badge";
@@ -101,7 +100,7 @@ console.log(renderBadge(new Label("Ada")));
 
 **Oded**: "Both pass the build. The test imports the web setup before it checks badge formatting. That passes too."
 
-Chen runs the batch entry on its own.
+Dima runs the batch entry on its own.
 
 ```text
 TypeError: label.frame is not a function
@@ -109,7 +108,11 @@ TypeError: label.frame is not a function
 
 **Gilad**: "Show me the stack trace."
 
-**Chen**: "First line in `renderBadge`. The batch never loads the plugin."
+**Dima**: "First line in `renderBadge`."
+
+**Chen**: "Which file loads the plugin in this process?"
+
+**Gilad**: "None. The batch imports the constructor and the formatter, but not the plugin."
 
 **Oded**: "Then put the import in the batch."
 
@@ -117,10 +120,11 @@ TypeError: label.frame is not a function
 
 **Oded**: "It won't need to. We'll put the import with the thing everyone imports."
 
-He replaces the separate declaration patch with an integration module. It loads the plugin and exports the constructor. The old `label-frame.d.ts` is removed.
+Oded opens the integration module:
 
 ```typescript
 // labels.ts
+// Replaces label-frame.d.ts; remove that old declaration file.
 import "label-kit/frame";
 import { Label } from "label-kit";
 
@@ -156,11 +160,9 @@ Gilad runs each in a fresh process. Both print the framed name.
 
 **Chen**: "You're past twelve. And can the next entry still import the original constructor?"
 
-### A smaller program
+### "Check each entry separately"
 
 **Dima**: "We could check each entry separately. That would at least catch a caller with no path to the augmentation."
-
-With just this file and its imports in the program, the compiler objects:
 
 ```typescript
 // isolated.ts — checked without labels.ts or label-frame.d.ts
@@ -171,7 +173,7 @@ new Label("Ada").frame("*"); // Error TS2339: Property 'frame' does not exist on
 
 **Oded**: "Good. If they go around the integration module, the build tells them."
 
-**Chen**: "Try the entry that calls our formatter."
+**Chen**: "Does `renderBadge` know which constructor its label came from?"
 
 ## The Turn
 
@@ -186,7 +188,7 @@ export function renderBadge(label: Label): string {
 }
 ```
 
-Chen restores the batch's original constructor import and checks only the batch and its dependencies:
+Dima restores the batch's original constructor import and checks only the batch and its dependencies:
 
 ```typescript
 // batch.ts — bypassing the integration module again
@@ -210,18 +212,17 @@ The build passes. In a fresh process, the same `TypeError` returns.
 
 **Oded**: "The integration module still works when they use its constructor."
 
-**Chen**: "It does. The types don't enforce that choice."
+**Chen**: "What makes the next entry use that constructor?"
 
 **Oded**: "Then restrict imports of the raw package. We do that for database connections."
 
 **Idan**: "We can. But we wrote this declaration ourselves. Why does it say every label has `frame` when we've just passed it one that doesn't?"
 
-### A declaration they can keep
-
-Idan changes the member in `labels.ts`. This replaces the required member; they aren't merging both spellings.
+### "Why does it say every label?"
 
 ```typescript
 // Replacement augmentation in labels.ts.
+// Replace the required member; do not merge both spellings.
 declare module "label-kit" {
   interface Label {
     frame?(marker: string): this;
@@ -251,7 +252,7 @@ export function renderBadge(label: Label): string {
 
 Dima runs both entries through `./labels`: each prints `* Ada *`. In a scratch copy of the batch, he tries the raw constructor again.
 
-**Dima**: "The bypass reaches our missing-plugin error now. Delete the guard and I get `TS2722: Cannot invoke an object which is possibly 'undefined'.` The type makes us account for that path."
+**Dima**: "The bypass still compiles. It reaches our missing-plugin error now. Delete the guard and I get `TS2722: Cannot invoke an object which is possibly 'undefined'.` The type makes us account for that path."
 
 **Gilad**: "And nothing gets sent to the printer on that path. Don't turn the check into optional chaining and quietly print a different badge."
 
@@ -274,8 +275,6 @@ Dima runs both entries through `./labels`: each prints `* Ada *`. In a scratch c
 **Dima**: "Keep the augmentation. Keep it optional, and keep the check in `renderBadge`. Both entries import the constructor through `labels`, so they actually get the plugin. The type also accounts for a label that arrives without it."
 
 **Oded**: "And test that both entries print a badge. A nicer error message isn't the feature."
-
-**Gilad**: "Two fresh processes, then. No web setup doing the batch's work for it."
 
 ## Additional Takes
 
@@ -335,4 +334,8 @@ console.log(prefix);
 
 **Chen**: "Who removes our patch when the plugin ships its own declarations?"
 
-**Oded**: "Whoever upgrades it. If their declaration requires `frame`, our optional one conflicts. That error is in `labels.ts`, so `skipLibCheck` won't hide it. But two required method signatures can merge as overloads without an error. A clean build isn't a reminder to remove the patch."
+**Oded**: "Whoever upgrades it."
+
+**Dima**: "If their declaration requires `frame`, our optional one conflicts. That error is in `labels.ts`, so `skipLibCheck` won't hide it. But two required method signatures can merge as overloads without an error. A clean build isn't a reminder to remove the patch."
+
+**Oded**: "I'll put it on the upgrade ticket. My twelve-line patch has a retirement plan before I do."

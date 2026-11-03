@@ -453,7 +453,7 @@ safeRequests(raw); // Error: Type '(text: string) => boolean' is not assignable 
 
 **Idan**: "I'll switch tracking to `safeRequests`. You can replace the courier export."
 
-**Noam**: "And `bad` stays rejected in both. We are not celebrating a green tracking page that accepts every parcel."
+**Noam**: "And `bad` stays rejected through the courier adapter and the repaired courier wrapper. We are not celebrating a green tracking page that accepts every parcel."
 
 ## Additional Takes
 

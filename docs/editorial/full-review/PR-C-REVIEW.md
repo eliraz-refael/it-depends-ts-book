@@ -55,3 +55,39 @@ All TypeScript executable statements and fence order are unchanged. Ch8 changes 
 Targeted checks passed for Ch7–8, Ch12 and Ch13. The fresh-install full-suite result is recorded below. The mechanical audit verifies one Principle/Turn per chapter, the two open-ending headings, exact catchphrase counts, no dialogue links, and Ch7's length bound; it does not decide voice or whether a concession feels earned.
 
 **Final validation:** clean `npm ci` passed with **zero vulnerabilities**. Full `npm run check` passed on **TypeScript 7.0.2**, **Node 22.23.4**, **Zod 4.6.6**: **484 fences, 892 compiler cases, 387 runtime groups**, plus the unchanged default cases, source searches and file-list queries. Act II contributes **144 fences, 211 compiler cases and 64 runtime groups**. Logs: `/private/tmp/pr-c-install.log` and `/private/tmp/pr-c-full.log`. `git diff --check` passes. No settlement deviation beyond the explicitly recorded Ch7 link-scope interpretation.
+
+## Revision after the two Opus readers
+
+Follows every Must fix in [PR-C-REVISION.md](PR-C-REVISION.md). Both reader reports and the settled brief are included unchanged in this commit.
+
+| Finding | Revision and evidence |
+|---|---|
+| 1 — Ch7 benchmark | Restored the entire constraint/conditional explanation word for word from 77fc1c4, including the concrete string reading. Restored Linoy's board line beside the courier pointer. Under the widened closer ruling, removed both source-only closing sentences; this resolves the earlier scope qualification. Linoy starts copying the suggestion into a scratch tab before Daniel corrects her. Chen's protected passage and all 29 TypeScript fences remain byte-identical. |
+| 2 — Ch8 catchphrase | Linoy claims the selection will do; Daniel types the assignment, turns the laptop and says the catchphrase before the diagnostic fence. His explanation continues afterward. Removed the narrator's “we.” Oded defends the permissions scope rather than testing the parser; Eden asks about the empty request and loads the imported account. The biography-save complaint stays. |
+| 3 — Ch9 structure | Moved all four audit fences and the paid-profile exchange into Additional Takes immediately before `Capitalize`; changed its closing line so it no longer postpones the already completed settings discussion. Collapsed the “which path ran” exchange, restored Gilad's literal-search comparison and the clauses behind Oded's reply. Restored the concrete remapped-field explanation and “the list beside the list.” Oded explicitly pays the mixed-approach cost. The open ending drops the state recap and repeated disagreement, giving Gilad his tracing costs and preference without inventing consensus. |
+| 4 — Ch11 closer | Eli now asks them to follow what each reference can do. Guy's cache handoff stays; Eli no longer promises a conversation he does not attend. |
+| 5 — Ch12 | Removed narration duplicating the rejected-call fence. Eden states the old label-only call's error; the builder annotation is printed in a fence comment and extracted by the check. Cut Daniel's repeated structural-comparison explanation. Guy names the archive/CSV boundary without the five-part list. Noam owns the label caller; Eden explicitly owns the remaining migration. The Verdict ends on Noam's information-loss warning. Removed the repeated opening summary and corrected “either package.” Clarified that the archive change is being tested before release. |
+| 6 — Ch13 | Dima runs the two reproductions and reads the trace; Chen asks which file loads the plugin, whether the formatter knows its label's constructor, and what makes later callers use the integration constructor. Project membership and declaration replacement instructions now live in fence comments. Restored “still compiles” for the optional bypass. The Verdict ends on Oded's printing requirement. Dima delivers the conflict/skipLibCheck/overload explanation unchanged, followed by Oded's retirement-plan joke. CONSOLIDATED records the explanation's new speaker and location. |
+| 7 — Ch10 | Noam names the courier adapter and repaired courier wrapper, excluding the generated tracking client from the ambiguous “both.” |
+
+Optional choices taken: Ch7's typing beat; one Ch9 learner question becomes an object-versus-list maintenance question; Ch12's pre-release timeline; quoted, scene-specific Ch13 headings. Kept the variance definitions and remaining mid-scene stage directions rather than expanding the polish beyond these fixes. No disagreement with the settled brief.
+
+### State, voice and checks
+
+Ch9's main sequence now runs from the two producers to the registry candidate and directly into the literal-call Turn. The audit remains useful optional teaching, paired with another naming transformation. Before Additional Takes, the chapter is **1,524 words rather than 1,756** (including fences); whole-chapter length is nearly unchanged because the examples moved rather than disappeared. The two recorded searches and literal/widened-key controls remain in the check.
+
+Ch7 is **3,671 words**, **2.2% above 77fc1c4**, within the settled 5% bound. All three Act II catchphrases still occur exactly once outside bios. Noam's Ch12 concession and both Eden smile lines survive. Ch13 closes with Oded's twelve-line patch having a retirement plan before he does; its correctness explanation stays with Dima.
+
+The executable statements are unchanged in every chapter. Ch9's fence multiset is byte-identical, with the four audit fences relocated. Ch12's check now extracts the replacement builder type parameter from the printed comment. Ch13's check extracts the printed initial project file list, verifies that it matches the fixture, and compiles those roots. The plugin-import order behind TS2386 remains untouched. Targeted checks for Ch9, Ch12 and Ch13 passed; no case or runtime-group counts changed. `checks/README.md` describes the new extraction and move.
+
+| Chapter | b5c68ec words | Revision words |
+|---|---:|---:|
+| 7 | 3,659 | 3,671 |
+| 8 | 2,772 | 2,773 |
+| 9 | 2,072 | 2,077 |
+| 10 | 2,839 | 2,846 |
+| 11 | 2,784 | 2,781 |
+| 12 | 2,590 | 2,513 |
+| 13 | 2,052 | 2,020 |
+
+**Revision validation:** clean `npm ci` passed with **zero vulnerabilities**, followed by a successful full `npm run check` on TypeScript 7.0.2, Node 22.23.4 and Zod 4.6.6. Counts remain **484 fences, 892 compiler cases and 387 runtime groups**; Act II remains **144 fences, 211 compiler cases and 64 runtime groups**. Logs: `/private/tmp/pr-c-revision-install.log` and `/private/tmp/pr-c-revision-full.log`. `git diff --check` passes. The three supplied review documents match their original SHA-256 hashes.
