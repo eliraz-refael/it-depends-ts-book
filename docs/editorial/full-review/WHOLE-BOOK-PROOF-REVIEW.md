@@ -1,8 +1,8 @@
 # Whole-book PROOF review
 
-The current **439-page layout proof** and its before/after tables are in
-[Settled layout pass](#settled-layout-pass). The first-proof record below is retained
-as the accepted comparison baseline.
+The current **438-page proof** is reviewed in
+[Part and prologue openers](#part-and-prologue-openers). Earlier records and
+before/after tables below retain their original folios as accepted baselines.
 
 ## First proof (1f2a36a)
 
@@ -131,13 +131,17 @@ conceal a layout problem.
 
 ## Settled layout pass
 
+Historical record of accepted proof `6b3a8b8` (439 pages), before the opener
+redesign below. Its artifacts are preserved in `accepted-6b3a8b8-a/` and
+`accepted-6b3a8b8-b/`; the current `a/` and `b/` now contain the 438-page proof.
+
 **PASS: 439 pages from frozen main `d03727a0947a8434ac36e3978533152dc93a2e0f`.**
 Layout checkpoint `406b86a` passed before the authorized main merge. The final
 proof incorporates PR #40's approved acknowledgments and the author's approved,
 grouped symbol-key text. The source manifest, hashes, counts and target folios
 below were regenerated from this tree; they are not edited old totals.
 
-Current PDF: `design/print/output/whole-book-proof-d03727a/a/It-Depends-PROOF.pdf`.
+Accepted baseline PDF: `design/print/output/whole-book-proof-d03727a/accepted-6b3a8b8-a/It-Depends-PROOF.pdf`.
 
 SHA-256: `7320df7b3572f1743b37e99b778e0fcfddb4cef24d1037c5e3fdd3530341fc44`.
 
@@ -354,3 +358,157 @@ No requested layout or quote item remains open. Printer, paper/binding and
 recto-start choices remain unsettled; the public repository URL/tag, license and
 imprint remain placeholders. The print README now separates the proof commands
 from this outstanding release work. This proof is not a printer-ready release.
+
+
+## Part and prologue openers
+
+**PASS: 438 pages.** Branch `codex/print-openers` starts from merged main
+`256fb78` (PR #41). Its manuscript is byte-identical to frozen `d03727a`, so the
+34-file source baseline remains unchanged. No `book/` edits, dependency changes,
+font replacements or release-metadata changes were made.
+
+Current PDF: `design/print/output/whole-book-proof-d03727a/a/It-Depends-PROOF.pdf`.
+
+SHA-256: `3e20c77c56c3c4c32175fb4481a6df1f3e61809f0f3946257adfb9500ec64075`.
+
+### Design and measured folios
+
+| Opener | Accepted proof | Current proof | Result |
+| --- | --- | --- | --- |
+| Prologue / Before the debates | 9 | Removed | Contents and top-level Prologue bookmark target How to Read, p9. |
+| How to Read This Book | 10 | 9 | Title alone, centred on the paper; text starts p10. |
+| Meet the Cast | 15 | 14 | Title alone, centred on the paper; text starts p15. |
+| Act I | 29 | 28 | Small ACT, large solid I, The Type System. |
+| Chapter 1 | 30 | 29 | Existing Arabic 1 and chapter layout unchanged. |
+| Act II | 124 | 123 | Small ACT, large solid II, Advanced TypeScript. |
+| Act III | 228 | 227 | Small ACT, large solid III, Patterns & Design. |
+| Act IV | 354 | 353 | Small ACT, large solid IV, The Real World. |
+| Bonus part | 401 | 400 | Centred BONUS and AI & TypeScript; no numeral. |
+| Bonus chapters 1–3 | 402, 415, 427 | 401, 414, 426 | Existing Arabic 1, 2, 3 and chapter layouts unchanged. |
+
+The bundled Oxanium face contains I and V; the build verifies glyph coverage
+before using the solid Roman numerals. The parts use their own centred
+composition, with no chapter top rule, side rule or bottom title strip. Their
+numeral size, spacing and vertical position differ from the chapter numerals.
+Prologue openers have no eyebrow, numeral, rule or subtitle. Running heads are
+suppressed on these seven title pages; continuous folios and PROOF footers stay.
+The design centres on the physical page, compensating for the mirrored margins.
+
+All 30 numbered chapter opener headers are **byte-identical generated markup**
+to the accepted proof, including the bonus chapter eyebrows. Dedicated CSS for
+chapters is unchanged. The dedication, acknowledgments and symbol-key page
+images are byte-identical to their accepted counterparts, still on 3, 4 and
+7–8. Contents remains on 5–6. The symbol key now leads directly to How to Read.
+
+### Assertions and validation
+
+All previous content, quote, keep, code-fragment, note, table, font, symbol-key
+and navigation checks remain. The old prologue-part ordering assertion now
+requires its removal and the new shared Prologue/How to Read destination.
+New assertions verify:
+
+- Exactly five part pages, their ACT labels, Roman numerals I–IV, BONUS and
+  titles, with the expected title text present in the PDF.
+- Each part/prologue composition is centred horizontally and vertically within
+  one CSS pixel of the physical page centre. No chapter furniture or printed
+  running head appears on these title pages.
+- Part numeral typography and vertical positions differ from every chapter
+  numeral; chapters retain the Arabic sequence 1–27, then 1, 2, 3.
+- No prologue part destination or “Before the debates” page remains. The
+  Prologue bookmark points to How to Read, which immediately follows the key.
+- Each prologue opener contains only its title; its first body text is on the
+  following page. Contents/bookmark destinations are measured and checked.
+
+Both independent clean renders pass and match on all **438 pages**: text,
+character geometry, links, bookmarks and page rasters. Volatile metadata/object
+IDs are excluded; raw PDF byte identity is not claimed. The source remains
+**34 files, 3,487 text blocks, 490 fences, 4,759 code lines and 1,507 inline-code
+values**. All 17 tables remain unsplit; 191 bookmarks, 40 contents entries,
+26 symbol-key combinations and seven transcript boxes survive. Quote balance
+and exact reverse checks pass for 2,527 converted paragraphs, with no ambiguity.
+All heading/introduction keeps and minimum code-fragment sizes pass.
+
+Seven notes match their callouts and reset per chapter, on **13, 67, 131, 248,
+398, 405 and 437**. The final note precedes the final Verdict; the exact last
+narrative line is on **438**, followed only by its proof footer and folio.
+All 8,246 source text/code-line page memberships match the accepted proof after
+subtracting the removed page; dedication and acknowledgments remain in place.
+There is no additional source reflow.
+
+The nine trial specimens pass again. Clean `npm ci` reports **0 vulnerabilities**
+and the full `npm run check` passes. Logs, both `validation.json` reports,
+`comparison.json` and `opener-baseline-comparison.json` remain in ignored output.
+The current gallery has **438 page images and 28 spread contact sheets**.
+
+### Visual review and remaining work
+
+I inspected the final images for both prologue openers, all five part pages,
+Chapter 1 and Bonus 1. The Roman part pages read distinctly from the Arabic
+chapter pages, and the title-only prologue pages have no empty ornamental area.
+The images are under `a/pages/`: `page-009.png`, `page-014.png`, `page-028.png`,
+`page-029.png`, `page-123.png`, `page-227.png`, `page-353.png`, `page-400.png` and
+`page-401.png`. The first contact sheet shows the new front-matter sequence.
+
+No requested opener item is outstanding. This remains a proof with continuous
+folios and next-page starts. Public repository URL/tag, license, imprint and
+printer/paper/binding/recto decisions still await the author; release approval
+is separate from this layout change.
+
+
+### Solid numeral and title correction after 09b0b99
+
+The author found the outlined I too much like an empty rectangle. Acts I–IV
+now use solid Oxanium at the same **140/156 pt**, spacing and measured position.
+The spaced ACT label stays. Chapter numerals remain outlined and unchanged.
+The Bonus title is **AI & TypeScript**, taken directly from `ACTS`, the same
+data that generates its contents entry. Every part title is asserted equal to
+the title portion of its rendered contents entry, and that entry's title is
+checked in PDF text. New paint assertions require solid dark part numerals
+with no outline stroke.
+
+I inspected all five final part-page images. Comparing all 438 images with
+`09b0b99` finds differences **only on 28, 123, 227, 353 and 400**. All opener
+sizes and positions match the previous layout exactly; every source text/code
+page membership is unchanged. Evidence is in `solid-openers-baseline.json`.
+The previous proof is retained in `accepted-09b0b99-a/` and `accepted-09b0b99-b/`.
+
+Both new renders pass every existing check and match all page rasters, text,
+geometry, links and bookmarks. All nine trial specimens pass. A fresh `npm ci`
+reports zero vulnerabilities; the full `npm run check` passes. Logs are saved
+in ignored output under `solid-openers-*`. No manuscript or margin changes
+were made.
+
+### Margin and no-bleed report — no layout changes
+
+For this **438-page, 7 × 10 inch, no-bleed paperback**, KDP's official table
+places the book in the **301–500 page** band. The inside minimum is **0.625″**;
+top, bottom and outside minima are **0.25″**.
+[KDP: Set Trim Size, Bleed, and Margins](https://kdp.amazon.com/en_US/help/topic/GVBQ3CMEQW3W2VL6).
+
+| Body margin | Current inches | KDP minimum inches | Above minimum |
+| --- | --- | --- | --- |
+| Inside / gutter | 0.82 | 0.625 | 0.195 |
+| Outside | 0.68 | 0.25 | 0.43 |
+| Top | 0.68 | 0.25 | 0.43 |
+| Bottom | 0.70 | 0.25 | 0.45 |
+
+These are the existing `@page` margins in `proof.css`, mirrored on left pages.
+They are not additional gutter padding. Running heads and footers sit within
+those margins: PDF text bounds across all 438 pages have a minimum top
+clearance of **0.27587″** and bottom clearance of **0.28334″**. The minimum
+text clearances inside/outside are approximately **0.81999″ / 0.67985″**.
+Thus the page furniture also clears the stated minimums.
+
+**No bleed or crop/trim marks are present.** Every PDF MediaBox, CropBox and
+effective TrimBox/BleedBox is **504 × 720 pt**, exactly 7 × 10 inches. There is
+no extra bleed area. The renderer does not add printer marks, and inspection
+of every PDF page finds no non-white vector drawing within 0.25″ of an edge
+and no raster images. The generated page images show no crop marks.
+`pdf-margin-inspection.json` records these measurements.
+
+This is a margin/bleed/mark assessment, not approval to upload this proof. KDP's
+submission rules also exclude bookmarks, annotations and placeholders; the
+current proof deliberately retains navigation, proof furniture and placeholder
+metadata. Those need a separate release export when authorized. No release
+cleanup was applied here.
+[KDP: Paperback Submission Guidelines](https://kdp.amazon.com/en_US/help/topic/G201857950).
