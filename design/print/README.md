@@ -160,7 +160,9 @@ notes without restarting page numbers.
 The authorized repair changes the note-marker counter to `footnote-marker`.
 `chapter-counters.js` is a small local Paged.js Handler that preserves the folio
 increment on a footnote-reset page; the pinned renderer otherwise disables that
-increment. There are no new dependencies.
+increment. The whole-book build also carries the chapter note count across later
+pages, so a first note several pages after its opener still starts at 1. There
+are no new dependencies.
 
 Every actual Markdown table is parsed from the frozen source, identified, hashed
 and rendered twice: at a fresh-page placement and near a page boundary. Book
@@ -176,5 +178,58 @@ collects the 17 natural-height table pages, and `all-pages.png` includes all 60
 pages, including near-boundary placements. The initial failing artifacts are
 preserved in `output/footnote-trial-before-b757e2e/`.
 
-No whole-book assembler, renderer replacement, endnote fallback, printer setup
-or manuscript rewrite is included. The trial's success is not release approval.
+The trial itself does not assemble the book. Its success is not release approval.
+The authorized whole-book proof follows below; it uses the same renderer and
+page-bottom notes, with no manuscript rewrite or printer setup.
+
+
+## Whole-book proof
+
+Step 2 assembles the frozen **517e0fc** manuscript through the approved 33-file
+manifest. The current proof has **428 pages**, all marked **PROOF**, and passes
+content, navigation and reproducibility checks. It still needs layout polish;
+see the page-specific [spread review](../../docs/editorial/full-review/WHOLE-BOOK-PROOF-REVIEW.md).
+This is not release approval.
+
+Use the pinned environment installed for the trial, from the repository root:
+
+```sh
+# Each render requires its own absent output directory; archive prior runs first.
+design/print/.venv/bin/python design/print/build_proof.py --run a
+design/print/.venv/bin/python design/print/build_proof.py --run b
+design/print/.venv/bin/python design/print/build_proof.py --compare
+
+# Revalidate saved DOM/PDF artifacts and regenerate the final PDF/images:
+design/print/.venv/bin/python design/print/build_proof.py --run a --inspect-existing
+```
+
+Outputs live in ignored `output/whole-book-proof/`. The review PDF is
+`a/It-Depends-PROOF.pdf`; `a/pages/page-001.png` through `page-428.png` are the
+individual pages. `a/contact-sheets/spreads-01.png` through `spreads-27.png`
+show consecutive facing pages. The independent `b/` render supplies comparison
+evidence without duplicating the image gallery. Each run saves input hashes,
+HTML, paginated DOM, layout metrics, extracted text, toolchain/font hashes and
+`validation.json`; the pair produces `comparison.json`.
+
+The proof uses continuous Arabic folios and starts each act/chapter on the next
+page, without forced recto blanks. These are explicit proof settings, not final
+pagination decisions. Generated contents and 190 hierarchical bookmarks use
+measured destinations. All five fence languages are selectable, highlighted
+text; continuation captions are generated, not inserted into the manuscript.
+Assistant requests/transcripts have a distinct box style. All 17 book tables
+must remain unsplit. Repeated table headers remain deferred as in the trial.
+
+Validation covers the frozen source hashes, every rendered fence hash and source
+text block, PDF text completeness, chapter note numbering, selectable URLs,
+clickable callout and contents destinations, embedded fonts, trim, source bounds
+and body/note separation. The pair comparison checks every page's text and
+character geometry, link targets, bookmarks and raster hash; it also checks PDF
+text bounds against trim. It excludes volatile PDF metadata/object IDs rather
+than asserting raw file-byte identity. Layout observations such as sparse pages
+and short code continuations are reported separately from lost/clipped content.
+
+The source's final note stays before the final Verdict. The exact final narrative
+line is asserted, and no generated appendix or notes follow it. The only page
+furniture below it is the required proof footer and folio. Rendering remains
+local with HTTP(S) requests blocked. Publication placeholders remain in the
+single metadata file; the release metadata gate continues to reject them.

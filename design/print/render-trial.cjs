@@ -33,6 +33,7 @@ async function main() {
     socket = new WebSocket(target.webSocketDebuggerUrl);
     await new Promise((resolve, reject) => { socket.onopen = resolve; socket.onerror = reject; });
     let id = 0;
+    let commandTimeout = 60000;
     const external = [];
     const errors = [];
     socket.onmessage = ({ data }) => {
@@ -43,13 +44,17 @@ async function main() {
         if (msg.error) task.reject(new Error(JSON.stringify(msg.error)));
         else task.resolve(msg.result);
       }
+      if (msg.method === 'Runtime.consoleAPICalled') {
+        const value = msg.params.args[0]?.value;
+        if (typeof value === 'string' && value.startsWith('PROOF_PROGRESS')) console.log(value);
+      }
       if (msg.method === 'Network.requestWillBeSent' && /^https?:/.test(msg.params.request.url)) external.push(msg.params.request.url);
       if (msg.method === 'Runtime.exceptionThrown') errors.push(msg.params.exceptionDetails);
     };
     function cdp(method, params = {}) {
       return new Promise((resolve, reject) => {
         const key = ++id;
-        const timer = setTimeout(() => { pending.delete(key); reject(new Error(`${method} timed out`)); }, 60000);
+        const timer = setTimeout(() => { pending.delete(key); reject(new Error(`${method} timed out`)); }, commandTimeout);
         pending.set(key, { resolve, reject, timer });
         socket.send(JSON.stringify({ id: key, method, params }));
       });
@@ -62,6 +67,7 @@ async function main() {
     await cdp('Page.enable'); await cdp('Runtime.enable'); await cdp('Network.enable');
     await cdp('Network.setBlockedURLs', { urls: ['http://*', 'https://*'] });
     for (const fixture of spec) {
+      commandTimeout = fixture.timeoutMs || 60000;
       await cdp('Page.navigate', { url: pathToFileURL(fixture.html).href });
       let ready = false;
       for (let n = 0; n < 300; n++) {
@@ -77,7 +83,7 @@ async function main() {
         await document.fonts.ready;
         return { pages: flow.total, fonts: [...document.fonts].map(f => ({ family: f.family, status: f.status })) };
       })()`);
-      const layout = await evaluate(`(() => {
+      const layout = fixture.kind === 'book' ? await evaluate('window.collectProof()') : await evaluate(`(() => {
         const rect = e => { const r = e.getBoundingClientRect(); return { x:r.x, y:r.y, width:r.width, height:r.height, right:r.right, bottom:r.bottom }; };
         return [...document.querySelectorAll('.pagedjs_page')].map((p,i) => ({
           page:i+1, rect:rect(p), body:rect(p.querySelector('.pagedjs_page_content')),
