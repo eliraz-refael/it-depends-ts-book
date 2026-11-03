@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Last time, Noam called an assertion a localized lie, and Dima pointed out what it lets through: a value under a type that may be false. Before we argue about where that is acceptable, be clear about what an assertion does. It changes the type the compiler uses for an expression. It doesn't convert the value, and nothing checks it at runtime."
+**Prof. Eli Typeworth**: "Write an assertion only where you can say what you know that the compiler can't check, and how you know it. It changes the type the compiler uses for an expression. It doesn't convert the value or check it at runtime."
 
 He writes two examples on the whiteboard.
 
@@ -16,9 +16,9 @@ const input2: unknown = 42;
 const len2 = (input2 as string).length; // Also compiles. No runtime check. Undefined.
 ```
 
-"Both lines compile. Both lines produce JavaScript with zero type checking at runtime. The first happens to work. The second silently produces `undefined` — and the compiler will never tell you, because you told *it* to be quiet."
+"Both compile. The first works. The second silently produces `undefined` — and the compiler will never tell you, because you told *it* to be quiet."
 
-"An annotation would have been refused here: `const text: string = input` doesn't compile while `input` is `unknown`. The assertion stops the compiler from asking. So write an assertion only where you can say what you know that the compiler can't check, and how you know it."
+"An annotation would have been refused here: `const text: string = input` doesn't compile while `input` is `unknown`. The assertion stops the compiler from asking."
 
 ## The Debate
 
@@ -47,15 +47,15 @@ const config2 = { env: "production" } as Config;
 
 **Noam Kiperman**: "This is a language design problem, and it's a real one. Developers learn that `as const` is safe — because it is — and then assume `as SomeType` is equally benign. I see it in code reviews constantly. *'But I used `as` and it worked fine before!'* Yes, because last time you used `as const`. This time you're lying."
 
-**Chen Override**: "Doesn't `satisfies` already solve this? It checks a value against a type without replacing the type. Why does anyone still reach for `as Type`?"
+**Linoy**: "For values we write here, try `satisfies`. It checks against the type without replacing it."
 
-**Linoy**: "Because `satisfies` was added in TypeScript 4.9. Millions of lines of code predate it. And it doesn't cover every case."
+**Oded Shipley**: "Our API client asserts the shape of a fetch result. `satisfies` won't establish what came back."
 
 ---
 
 ### "Assertions at system boundaries"
 
-**Oded Shipley**: "Take an endpoint we haven't put a parser around yet. You call it. You get JSON back. The compiler knows *nothing* about the shape, and the code calling it still needs a type:"
+**Oded**: "Take an endpoint we haven't put a parser around yet. You call it. You get JSON back. The compiler knows *nothing* about the shape, and the code calling it still needs a type:"
 
 ```typescript
 interface ApiUser {
@@ -69,7 +69,7 @@ const user = (await response.json()) as ApiUser;
 // Is this a lie? Only if the API lied first.
 ```
 
-"I'm not making this up. I'm asserting a contract. The API documentation says this is a `User`. I'm telling the compiler what the docs tell me."
+"I'm not making this up. I'm asserting a contract. The API documentation says this is an `ApiUser`. I'm telling the compiler what the docs tell me."
 
 **Noam**: "You're trusting documentation. Documentation written by humans who may or may not have updated it since the last API change. The parser you agreed to on the critical paths doesn't take their word for it. Here's one for this response:"
 
@@ -113,7 +113,7 @@ class ApiClient {
 
 ### "The double assertion — `as unknown as Type`"
 
-**Chen**: "Okay, what about this? When a direct assertion fails — TypeScript says the types don't sufficiently overlap — I've seen developers do this:"
+**Chen Override**: "If a rejected assertion compiles after we put `unknown` in the middle, what exactly have we fixed?"
 
 ```typescript
 interface Cat { meow(): void; whiskers: number; }
@@ -131,7 +131,9 @@ const dog = cat as unknown as Dog; // No error. Total fiction.
 dog.bark(); // Runtime: dog.bark is not a function
 ```
 
-"You route through `unknown` — the type that means 'I don't know what this is' — and then immediately assert 'I know exactly what this is.' It's type laundering."
+**Oded**: "Well, the error's gone."
+
+**Chen**: "Through `unknown`: 'I don't know what this is.' Then straight to 'I know exactly.' It's type laundering. The cat still has no bark."
 
 **Noam**: "This is putting a fake mustache on a bug and walking it past the type checker. If TypeScript tells you two types don't overlap, *listen*."
 
@@ -145,7 +147,7 @@ dog.bark(); // Runtime: dog.bark is not a function
 
 **Oded**: "One `&` and a comment saying where the extra fields come from."
 
-**Daniel**: "It's still an assertion. Your knowledge is the evidence, so that comment matters. Where you can, fix the declaration, or validate the actual runtime shape in a wrapper. A wrapper that merely hides the same assertion has not established anything new. Module augmentation can add declarations; it cannot repair every incompatible property type."
+**Daniel**: "Keep the comment until the declaration is fixed. Or check those properties in a wrapper. Moving the assertion into a wrapper just gives it an office."
 
 ---
 
@@ -201,7 +203,7 @@ const mockUser: User = {
 
 "Nobody reads those extra six fields. They're noise. The assertion is saying 'I only care about these two fields for this test.' That's honest."
 
-**Noam**: "You're right that the noise is a problem. You're wrong that assertions are the solution. Factory functions are:"
+**Noam**: "Over my dead type definition. I'll give you the one-field call. The factory can supply the rest:"
 
 ```typescript
 function createMockUser(overrides: Partial<User> = {}): User {
@@ -232,9 +234,11 @@ const mockUser = createMockUser({ name: "Test User" });
 
 **Noam**: "Then I still want a complete fixture. The library may start reading another field."
 
-**Oded**: "And the defaults may let that new dependency pass without anyone noticing. That's what I'm trying to make visible."
+**Oded**: "And the defaults may let that new dependency pass without anyone noticing. I'll use the complete fixture, but I'm naming the fields this test exercises in a comment."
 
-Noam leaves the factory on the screen. Oded leaves a comment beside the test naming the fields it is supposed to exercise.
+**Noam**: "Fine."
+
+**Oded**: "I'd like that in writing too."
 
 ---
 
@@ -288,7 +292,7 @@ const invalidColor = "purple" as Color;
 
 ### "The non-null assertion (`!`) — the assertion people forget is an assertion"
 
-**Chen**: "We've spent the whole meeting on `as`. There's an assertion hiding in plain sight that developers use far more casually, because it's a single character:"
+**Chen**: "Would this get the same review if we spelled it with `as`?"
 
 ```typescript
 // These are equivalent:
@@ -299,11 +303,11 @@ const name2 = (user as NonNullable<typeof user>).name;
 // TypeError: Cannot read properties of null (reading 'name')
 ```
 
-"The `!` is just `as NonNullable` in disguise. It tells the compiler 'this isn't null, trust me' — with exactly as much evidence as a bare `as`. But because it's one character instead of a keyword, developers treat it like punctuation rather than an assertion."
+**Daniel**: "Same claim. `NonNullable` removes `null` and `undefined` from the type. Neither spelling checks the value."
 
 **Noam**: "The exclamation mark is the most dangerous character in TypeScript. It's an assertion disguised as punctuation. I ban it in code reviews with exactly one exception: immediately after assignment in test `beforeEach` blocks."
 
-**Chen**: "Optional chaining changes the type, though. `user?.name` gives you `string | undefined`, not `string`. Sometimes you genuinely *know* the value exists — after `filter(Boolean)` drops nulls and undefined, or after a check inside a callback the compiler can't follow."
+**Oded**: "Optional chaining changes the type, though. `user?.name` gives you `string | undefined`, not `string`. Sometimes you genuinely *know* the value exists — after `filter(Boolean)` drops nulls and undefined, or after a check inside a callback the compiler can't follow."
 
 ```typescript
 // Optional chaining: safe but changes the type
@@ -322,8 +326,6 @@ const assertedName = user!.name;
 //    ^? const assertedName: string
 // Only safe if you can PROVE user isn't null.
 ```
-
-**Oded** jumps in:
 
 "Here's one Noam can't wiggle out of. You check a `Map` with `.has()`, then access it. The compiler doesn't narrow through `.has()` — it's a known limitation:"
 
@@ -355,25 +357,58 @@ if (cache.has(userId)) {
 
 ## The Turn
 
-**Gilad Stacktrace**: "What happens at 3 AM when one of these assertions is wrong?"
+**Gilad Stacktrace**: "Who tests the response after the API changes?"
 
-He draws a timeline on the whiteboard.
+**Noam**: "The client tests use the same factory. It supplies a complete user."
 
-"An API boundary assertion. Correct for two years. The API provider changes a field from required to optional. Your assertion still compiles — it doesn't know anything changed. Your types still say the field is there. Your tests pass — because your tests use mock data that still has the field. The error surfaces three months later as `Cannot read properties of undefined` in a function four layers deep from the assertion. The stack trace never mentions the API call. The on-call engineer has no idea where to look."
+**Oded**: "Including fields the test didn't ask for."
 
-"An unchecked assumption can fail far from where it entered the program. The stack trace may tell you which field was used without telling you why the compiler believed it existed."
+**Gilad**: "The provider now allows `email` to be absent. Your client still asserts the old `ApiUser`."
 
-"Every assertion is a bet that the world outside your program still matches your model of it. You knew it was true when you wrote it. How will you find out when it stops being true?"
+He writes the provider's new type, reruns the receipt test, then feeds it the response without email.
 
-**Noam**: "That's what a parser at the boundary is for. When the field goes optional, the error names the response, not a function four layers down."
+```typescript
+// Provider's new contract; the client's ApiUser still requires email.
+type UserResponse = { id: string; name: string; email?: string };
 
-**Eden**: "And until that parser exists, every claim about that response lives in one client. That's where the type came from."
+function receiptAddress(raw: unknown): string {
+  const user = raw as ApiUser;
+  return user.email.toLowerCase();
+}
 
-**Gilad**: "Then put that in the runbook. The on-call engineer won't know it otherwise."
+function receiptTest(): boolean {
+  const user = createMockUser({ name: "Test User" });
+  return receiptAddress(user) === "default@test.com";
+}
+
+console.log(receiptTest()); // true: the factory still supplies email
+
+const response: UserResponse = { id: "u1", name: "Ada" };
+try {
+  receiptAddress(response);
+} catch (error) {
+  if (!(error instanceof TypeError)) throw error;
+  console.log("response failed"); // response failed
+}
+```
+
+**Noam**: "My test reads email. Its setup only names the user. The factory hid the dependency."
+
+**Oded**: "That's the comment I wanted. Name the fields this test exercises."
+
+**Noam**: "And pass the email explicitly for this case. Add the response without it too. The comment won't run that test for us."
+
+**Gilad**: "Good. Who rejects the missing email?"
+
+**Noam**: "A parser, once this path has one. Receipts still require it. The provider allowing less doesn't mean we can use less."
+
+**Gilad**: "An assertion is a bet that the other side still sends what you expect. Your factory was betting with you."
 
 ## The Verdict
 
-> An assertion that overrides the compiler is a bet against runtime reality. Justify it by what you know that the compiler can't check, and by answering: "When this stops being true, how will I find out?"
+> Justify an assertion by the evidence the compiler cannot check, and arrange to find out when that evidence stops holding. A test fixture that always supplies the asserted shape cannot test what happens when the boundary sends something else.
+
+The team keeps complete fixtures, names the fields each test exercises, and adds missing-field cases at the client boundary. The receipt path will reject responses without email in its parser; the remaining assertions stay centralized and tracked.
 
 **Choosing an approach:**
 
@@ -383,7 +418,7 @@ He draws a timeline on the whiteboard.
 | API response / JSON parse | Runtime validation (Zod, etc.) | As stepping stone only, centralized |
 | Narrowing a literal | `as const` | Yes (always safe) |
 | Checking shape without widening | `satisfies` | Not needed — use `satisfies` |
-| Test mocks / partial objects | Complete factory fixture with the exercised fields named beside the test; narrow the tested function's parameter when you own it | A partial assertion can expose field dependencies, but does not satisfy the full contract |
+| Test mocks / partial objects | Complete factory; name the exercised fields. Ask for fewer fields when you own the function | A partial assertion exposes dependencies but leaves the full contract unmet |
 | Non-null after proven init | Control flow narrowing | Only when the proof is outside the compiler's view; comment where it lives |
 | Library types are wrong | Fix the types / PR upstream | `as` with documented justification |
 | Double assertion (`as unknown as X`) | Redesign the approach | Almost never |
@@ -401,6 +436,4 @@ He draws a timeline on the whiteboard.
 
 **Oded Shipley**: "I'll use `satisfies` for new code. I'm not rewriting two hundred existing assertions for a theoretical improvement." — **Gilad Stacktrace**, without looking up: "You will when one of them pages you at 3 AM."
 
-**Linoy Nightly**: "`satisfies` is TypeScript's apology for `as`. They just can't deprecate `as` without breaking the internet."
-
-**Chen Override**: "If the answer to 'how will I find out?' is a check, you can usually narrow with that check and delete the assertion."
+**Linoy Nightly**: "I'll replace `as Color` with `satisfies Color`. Purple can appeal to the design team."
