@@ -4,7 +4,7 @@
 
 **Prof. Eli Typeworth**: "Two values can have the same representation and different jobs. A page number and a count of pages are both numbers, but putting one where the other belongs changes the result. A brand adds a type-level marker so the compiler can distinguish them."
 
-**Eli**: "Some brands make a further promise: this value passed a check. Before relying on that promise, examine how code can create and change values of that type without bypassing the compiler with assertions or `any`. Those operations must preserve what the check established, or the brand can outlive the fact it claims."
+"Some brands make a further promise: this value passed a check. Before relying on that promise, examine how code can create and change values of that type without bypassing the compiler with assertions or `any`. Those operations must preserve what the check established, or the brand can outlive the fact it claims."
 
 ## The Debate
 
@@ -83,7 +83,7 @@ function pageCount(raw: number): PageCount {
 
 **Noam**: "There isn't even a symbol created by that declaration. `declare` emits nothing. The key belongs to this declaration, and the two types require different values at that key. Both are ordinary numbers when this runs."
 
-This is the intersection technique in TypeScript's [nominal-typing example](https://www.typescriptlang.org/play/typescript/language-extensions/nominal-typing.ts.html). The [symbol documentation](https://www.typescriptlang.org/docs/handbook/symbols.html#unique-symbol) describes the declaration-specific identity of a `unique symbol` key.
+"Our `UserId` used `__brand`. Another module can share that marker by writing the same name and value. This key can't be shared by spelling. Neither marker checks a value."
 
 Noam keeps the numbering function and puts a typed entry point in front of it:
 
@@ -96,9 +96,9 @@ function preview(span: PageSpan): number[] {
 
 const selection = { first: pageNumber(3), last: pageNumber(4) };
 preview({ first: selection.first, count: selection.last }); // Error TS2322
+// Type 'PageNumber' is not assignable to type 'PageCount'.
+// Marker detail: Type '"PageNumber"' is not assignable to type '"PageCount"'.
 ```
-
-The error starts with `Type 'PageNumber' is not assignable to type 'PageCount'`. Its detail ends at the incompatible marker values, `"PageNumber"` and `"PageCount"`.
 
 **Oded**: "That is the line I wanted it to catch. Fine. What's the correct call?"
 
@@ -216,11 +216,12 @@ class CheckedRange {
 
 const selected = CheckedRange.create(pageNumber(3), pageNumber(4));
 const copied: CheckedRange = { ...selected, first: pageNumber(5) }; // Error TS2741
+// Diagnostic starts: Property 'checked' is missing
 ```
 
-`Property 'checked' is missing` is the start of this diagnostic.
-
 **Noam**: "The private member distinguishes instances of this class. A spread copies the public data, so it loses that member in its type. An update has to give the consumers another `CheckedRange`."
+
+TypeScript's [object-type documentation](https://www.typescriptlang.org/docs/handbook/2/objects.html#readonly-properties) notes that `readonly` does not affect compatibility with a mutable property. Freezing the original object brand alone would not reject a spread: it creates a new object.
 
 **Eden**: "Our old dialog helper takes a mutable shape. It used to update the state object in place."
 
@@ -241,8 +242,6 @@ moveStart(selected, pageNumber(5)); // Compiles; throws TypeError in this strict
 **Eden**: "Then every reader changes too. They all read `range.first` today."
 
 **Noam**: "Rebuild through `CheckedRange.create`, retire `moveStart`, and update the readers. I'd pay that to keep an accepted selection intact."
-
-TypeScript's [object-type documentation](https://www.typescriptlang.org/docs/handbook/2/objects.html#readonly-properties) notes that `readonly` does not affect compatibility with a mutable property. Freezing the original object brand alone would not reject a spread: it creates a new object.
 
 ### Keeping a count instead
 
@@ -307,19 +306,19 @@ function exportDraft(draft: PageDraft, render: (request: PageSpan) => void): str
 
 **Oded**: "And Export never calls the renderer for that draft. Two callers, one comparison."
 
-## The Verdict
+## The Debate Continues
+
+A scalar brand can distinguish roles without promising a relationship between fields. A checked object needs operations that preserve its check. Whether to retain that object or rebuild a request depends on what its consumers need to keep.
 
 **Eden**: "I'll put `PageNumber` and `PageCount` on the renderer's entry points. The dialog keeps endpoint drafts. Both actions go through `requestFrom`; there's no range brand to maintain."
 
-**Noam**: "I'd still give the export API a `CheckedRange`. I don't want every future consumer converting back from the renderer's request shape. The method version handles the copying problem."
+**Noam**: "What about restoring From and To from a shared link? I'd give that feature a `CheckedRange` to keep the accepted endpoints. The method version handles the copying problem. A renderer request makes it calculate To again."
 
-**Eden**: "The class works, and we'd have to adapt the old helpers and every reader to it. Here the dialog edits a draft and rebuilds the request. That request has a positive count from the scalar constructor, with no pair of endpoints to reverse. The renderer keeps its overflow and document checks."
+**Eden**: "The link hasn't stored the brands. We can parse its endpoints into a draft and use `requestFrom` for both actions. The renderer then gets a checked positive count, with no endpoints to reverse. It keeps its overflow and document checks."
 
-He leaves `requestFrom` in the patch.
+"If another consumer needs to retain an accepted selection, we'll revisit the class."
 
-**Eden**: "If another consumer needs to retain an accepted selection, we'll revisit the class."
-
-Oded adds the five-to-four edit to both action tests. He leaves the test of `count: selection.last` in the compiler checks.
+**Oded**: "Five to four gives no preview and never reaches the exporter. And passing the last page as the count still fails the compiler check. I'll keep those tests with the draft conversion."
 
 ## Additional Takes
 
@@ -331,7 +330,3 @@ const count: SoftPageCount = 4; // Accepted.
 ```
 
 **Noam**: "Then existing callers keep compiling. Including the one that passed the last page."
-
----
-
-**Eli**: "If the dialog restores From and To from a shared link, those parameters are input again. The link hasn't stored the brands. You still have to establish what its values mean."

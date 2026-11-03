@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Liron Closure**: "Before you turn configuration into a function, find everyone who uses it. If every caller only calls it, a function is fine. But someone may need to save, edit or explain it later. Lisp let me treat code as data. JSON won't keep a JavaScript function. Save a description and let code read it and make the decision. That code is your evaluator. If the decision has to stay in code, record the name of the exact code that made it, plus its parameters, and keep that code so you can rerun old decisions. Then test the round trip: save it, load it, and apply the same recorded input with the same evaluator version. Does it make the same decision?"
+**Liron Closure**: "If you promise to keep a policy, save enough to make its decision again. Think of a recipe with a note saying 'cook it the usual way.' Everyone in the kitchen knows what that means today. The person opening the notebook next year may not."
 
-"For the next change, ask what kind of change it is. A new parameter value? Its author can edit the data. A combination the format already permits? A rule's author can write it. If engineers write the combinations as named templates, another combination needs an engineer. Or a new operation? An engineer must implement it either way. When you load old stored values, parse them and preserve their old meaning or reject them. Editing a type won't do that job."
+"In Lisp I could work with code as data. Here we must decide what the saved description means and keep that meaning available. It might live in an evaluator, or in the particular code that made the decision. Load an old policy and apply its recorded input after the live policy has changed. If you cannot recover its answer without asking the cook, something is missing from the record."
 
 ## The Debate
 
@@ -14,9 +14,9 @@
 
 **Eden Legacy**: "Refunds. That account had three refunds."
 
-**Dafna**: "Then why does the record say we only checked the total?"
+**Dafna**: "Then why does the record say we only checked the total? The risk team edits the policy in my console. Your service is supposed to carry it out."
 
-Dafna maintains the risk team's console. Analysts use it to edit review settings and activate revisions. Eden owns the orders service, which decides whether an order can ship or needs manual review. They jointly own the interface between the console and the service. The risk team decides which orders should be held.
+**Eden**: "Through the interface we both own. Let's see what it handed the logger."
 
 The audit log promises a complete account of the active policy alongside the order facts and the decision. On the third, the console had selected the total template; the logger received its live policy object, shown below. The refund ages were measured at that decision, not when Dafna opened the record:
 
@@ -333,6 +333,8 @@ Gil has the policy requests from the past three months, including the open ticke
 **Dafna**: "I haven't promised that. It triggers the work. We still have to build it."
 
 ## The Verdict
+
+> Choose the authoring power the policy's owners need, while retaining its meaning and inputs for replay. Correct decisions alone do not settle who should be able to write the next policy.
 
 **Dafna**: "I'll add the template and ask about the requests they held back. The third regrouping starts the editor work. Let's put that in our backlog agreement, so the next request doesn't become this meeting again."
 

@@ -2,13 +2,11 @@
 
 ## The Principle
 
-**Sahar Firstclass**: "If each item can be selected or transformed on its own, start with `filter` and `map`. They tell the reader what you're doing. Before replacing a loop, ask what carries from one item to the next, where processing stops, and what must happen in order. The loop's callers depend on all three. If the rewrite hides the stopping point behind a flag you have to chase, keep the loop. An early return, or splitting at the first item that fails, can show the stopping point without that flag."
-
-"Check the type after each stage of the chain, too. A check inside one callback may not narrow the value in the next. Keep the check and its use together if that narrowing gets lost. And returning from a `reduce` callback ends that call, not the `reduce`. If you turn a stop into a skip, the code calling your function gets a different answer. Shorter code doesn't excuse that."
+**Sahar Firstclass**: "Choose the simplest expression of the behavior the caller needs, and check that behavior before calling a rewrite a refactor. What would we lose if we deleted this rewrite? If all we'd lose is a shorter spelling, I'd keep the version where I can see why an item is included or left out."
 
 ## The Debate
 
-**Dafna Functor**: "Three eligibility checks and a running total in one loop. I wanted to test the eligibility rules without arranging a treasury balance."
+**Dafna Functor**: "Three eligibility checks and a running total in one loop. I wanted to test the eligibility rules without setting up an allowance."
 
 The payouts team is looking at yesterday's batch. Dafna's refactor ran for the first time, and a seller has contacted support. The planner selects payouts for another service to submit; it doesn't move money itself. Its input queue is oldest first.
 
@@ -58,7 +56,7 @@ console.log(batch.total); // 900
 
 **Chen Override**: "Does unused allowance carry over?"
 
-**Gil**: "Each batch gets a fresh daily allowance. Finance has a proposal to deposit a smaller amount each day and let the balance accumulate. That hasn't been approved. These tests use the current reset."
+**Gil**: "No. Each batch gets a fresh daily allowance. Unused allowance expires."
 
 Dafna scrolls to the eligibility stages in her refactor.
 
@@ -227,7 +225,7 @@ console.log(heldBatch.stop); // { kind: 'limit', id: 'R2' }
 
 **Gil**: "Nobody would be paid. H would close the batch. I've added a test that would catch that move. Empty queue, exact allowance, yesterday's queue: all three repairs agree on the IDs, total and stop reason."
 
-Dafna replaces the deployed `skipping` body with the loop after the filters, under `planPayouts`. The patch will ship before today's batch.
+**Dafna**: "I'll replace `skipping` with the loop after the filters and call it `planPayouts`. That repair ships before today's batch."
 
 ## The Turn
 
@@ -253,17 +251,7 @@ For the replay, yesterday is day 1. Gil removes each day's released payouts and 
 
 Gil runs all 78,125 combinations of four opening payouts and one arrival on each of the next three days. Each amount is one of 100, 200, 300, 400 or 500, and the allowance resets to 500, so every amount fits a fresh day. He compares the payment day of every ID, not just the time it takes to empty the queue.
 
-**Gil**: "No payout paid later under skip in that set. Some paid earlier."
-
-**Chen**: "Can skip ever leave a payout unpaid that stop has already paid?"
-
-**Liron**: "Look at the queues left each morning. They start identical. After that, skip may have paid extra payouts early. Cross those out of stop's queue and you have skip's queue, still in the same order."
-
-**Chen**: "But can that stop being true at the next batch?"
-
-**Liron**: "If stop can pay a payout today, it can afford everything before it too. Skip has at most those same earlier payouts left to pay. So it can afford that payout as well, unless it already paid it. That leaves skip's unpaid queue inside stop's again tonight."
-
-**Gil**: "Append the same arrivals and give both a fresh allowance tomorrow, and the same argument works again. Fixed amounts, same order, daily reset: skipping pays no payout later."
+**Gil**: "Fresh allowance every day, every payout fits one: no payout paid later under skip. Some paid earlier."
 
 **Dafna**: "Then I'd like a different rule: scan in queue order, pay what fits, leave the rest for tomorrow."
 
@@ -271,70 +259,9 @@ Gil runs all 78,125 combinations of four opening payouts and one arrival on each
 
 **Dafna**: "Yes. We wrote that promise. We can change it, with support, as a policy change. Today's patch still restores the old rule."
 
-Gil opens finance's proposal. The deposit would be 500 a day, and unused funds would stay in the treasury. Under that proposal, payouts can need more than one day's deposit. P2, for 900, and S1, for 400, both arrive on day 1, with P2 first. A payout for 450 joins each day from day 2 through day 8: S2 through S8. All are eligible on arrival and stay eligible.
-
-**Gil**: "Start with no balance. First deposit on day 1. Stop pays P2 on day 2. Fill pays it on day 8. Each smaller payout spends funds we could have saved for P2."
-
-**Dafna**: "Now give me the other sellers. You compared every ID for the reset."
-
-**Gil**: "Thirteen payout-days across seven payouts, to pay P2 six days sooner."
-
-**Dafna**: "Then I don't want to call stopping the safe answer and hide those thirteen days."
-
-**Gil**: "Change the new arrivals from 450 to 500. Fill leaves 100 each night. Next morning there are 600, still not enough for P2. It pays the new 500 and leaves 100 again. I ran thirty days and P2 was still unpaid on day 30. The balance never gets above 600. As long as those arrivals continue, P2 never gets paid."
-
-**Dafna**: "Then give filling a waiting limit. At a payout that doesn't fit, check how long it's waited. If it's reached N days, stop there and reserve for it. Otherwise keep filling. The queue is oldest first, so we reach the oldest unpaid payout first. We don't have to stop the queue on that payout's first day."
-
-**Gil**: "Show me that against both arrival sizes."
-
-Dafna gives the planner already-eligible payouts with arrival days, and passes in today's day number and the waiting threshold:
-
-```typescript
-type WaitingPayout = Ready & { arrivedOn: number };
-
-function fillThenReserve(
-  queue: readonly WaitingPayout[], balance: number,
-  today: number, waitDays: number,
-): Batch {
-  const released: Ready[] = [];
-  let total = 0;
-  for (const payout of queue) {
-    if (total + payout.amount > balance) {
-      if (today - payout.arrivedOn >= waitDays) {
-        return { released, total, stop: { kind: "limit", id: payout.id } };
-      }
-      continue;
-    }
-    released.push(payout);
-    total += payout.amount;
-  }
-  return { released, total, stop: { kind: "end" } };
-}
-```
-
-Gil runs it with N = 2. Each cell below is the payment day for the original 450-arrival case, with arrivals ending on day 8.
-
-| Payout | Stop | Fill | Fill, then reserve after 2 days |
-|---|---:|---:|---:|
-| P2 | 2 | 8 | 4 |
-| S1 | 3 | 1 | 1 |
-| S2 | 4 | 2 | 2 |
-| S3 | 5 | 3 | 5 |
-| S4 | 6 | 4 | 6 |
-| S5 | 7 | 5 | 7 |
-| S6 | 8 | 6 | 8 |
-| S7 | 8 | 7 | 8 |
-| S8 | 9 | 9 | 9 |
-
-**Gil**: "Against stopping immediately, P2 waits two more days. S1 and S2 each get paid two days sooner. Nobody else changes day. With the continuing 500 arrivals, this still pays P2 on day 4."
-
-**Chen**: "So two days isn't a promise that the payout arrives within two days?"
-
-**Dafna**: "It's when we stop spending past it. We may still need more deposits to fund it."
-
-**Gil**: "I can work with a stated reservation threshold. We own that number. Two is a test value, not something to leave in the code because it made this table look good."
-
 ## The Verdict
+
+> A refactor preserves the caller's policy; changing that policy needs its own agreement. Once the policy is settled, choose the implementation that makes its decisions easiest to follow.
 
 **Sahar**: "I called it `planPayouts` too soon. Now we have different rules. Name today's repair `stopAtFirstBlocker`. Filling gets `fillAvailable`."
 
@@ -347,9 +274,7 @@ const fillAvailable = skipping;
 
 **Gil**: "P2's date wasn't delayed yesterday. We still broke the queue-order promise we gave its seller."
 
-**Dafna**: "Restore that promise first. Then adopt filling for the reset as a policy change, with support's reply updated. If accumulation is approved, use `fillThenReserve` with a waiting threshold we set for it."
-
-**Sahar**: "Keep the reservation rule as a proposal until finance approves accumulation. We have one funding model to ship today."
+**Dafna**: "Restore that promise first. Then agree the filling rule with support as a policy change and update their reply."
 
 **Chen**: "And filling could use a loop too?"
 

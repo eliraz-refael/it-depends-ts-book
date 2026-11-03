@@ -20,8 +20,6 @@ Guy starts with `bookParty`, the service function the page calls.
 
 **Guy**: "The page already reports the refusals, and the transaction rolls back. Why change `bookParty`'s contract?"
 
-The application uses a store library whose `hold` operation reserves one seat in a transaction. For an unknown or occupied seat, `hold` rejects with the library's `SeatRefused`, carrying its `Failure` union. Other failures, such as a broken connection, can also reject the operation. `Booking` is the application's record of the seats it reserved.
-
 ```typescript
 type Failure =
   | { kind: "occupied"; seat: string }
@@ -37,15 +35,20 @@ class SeatRefused extends Error {
 }
 
 interface Tx {
+  // Reserves one seat; rejects with SeatRefused for an unknown or occupied seat.
+  // Other failures, such as a broken connection, can also reject.
   hold(seat: string): Promise<void>;
 }
 
 interface Store {
+  // Fulfillment commits; rejection rolls back, then rejects with the same error.
   transaction<T>(work: (tx: Tx) => Promise<T>): Promise<T>;
 }
 ```
 
-The library commits the transaction if the callback's promise fulfills. If it rejects, the library rolls back before rejecting with the same error. The booking team uses that contract; it doesn't maintain the library.
+**Dafna**: "The library owns commit and rollback. We only supply the callback."
+
+**Guy**: "And it decides by whether that callback fulfills or rejects."
 
 The page uses one formatter for the two refusals:
 
@@ -60,7 +63,7 @@ function failureMessage(failure: Failure): string {
 }
 ```
 
-The current `bookParty` throws on refusal. `submit` is the page's handler: it shows the booking or the specific refusal, and lets unexpected failures reach the application's error handler.
+The page's `submit` handler calls the service and uses that formatter for a known refusal:
 
 ```typescript
 async function bookParty(store: Store, seats: readonly string[]): Promise<Booking> {
@@ -81,7 +84,7 @@ async function submit(store: Store, seats: readonly string[]): Promise<string> {
 }
 ```
 
-Gil Benchmark brings up `testStore`, the booking team's small in-memory stand-in for the library. It takes seat names and their initial held flags. Its extra `isHeld` method lets tests inspect committed state. It makes changes in a private copy, committing that draft if the callback fulfills and discarding it if the callback rejects. The examples run one transaction at a time; this copy-and-replace model does not provide concurrent transaction isolation.
+**Gil Benchmark**: "Here's our test store. Give it the seats and whether they're already held. `isHeld` reads what was committed."
 
 ```typescript
 const store = testStore([["A1", false], ["A2", false]]);
@@ -94,7 +97,7 @@ console.log(store.isHeld("A2")); // true
 
 ### Put the refusal in the signature
 
-Dafna's patch adds the application's result type:
+**Dafna**: "The courier wrapper caught an `unknown` error. Booking's `Result` names the refusals we return."
 
 ```typescript
 type Result<T, E> =
@@ -103,6 +106,8 @@ type Result<T, E> =
 ```
 
 **Dafna**: "The catch is next to `hold`. I wanted it handling the seat operation, not errors from starting or committing the transaction."
+
+**Guy**: "We argued about who catches the parser's failure. There the handler owned the response. Here the store has to see it too."
 
 Her replacement `bookParty` catches the known refusal inside the callback:
 
@@ -149,8 +154,6 @@ Guy follows the failure branch back to `failureMessage`.
 
 **Dafna**: "I'm not claiming exceptions can't carry a union. I want the function to say it can return that union."
 
-The [`never` check](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#exhaustiveness-checking) tests the cases in `Failure`. How the value reached that switch doesn't change the check.
-
 **Gil**: "I'll give them the same seats. A1 is free. A2 is already held."
 
 **Guy**: "Your callback fulfills even when it returns the refusal. Check A1 afterward."
@@ -161,7 +164,7 @@ The [`never` check](https://www.typescriptlang.org/docs/handbook/2/narrowing.htm
 
 Gil runs the original pair of functions against a fresh store, then Dafna's pair against another. Both pages show `"A2 is taken."`. Neither returns a booking message. Both compile.
 
-Gil adds the committed-state check below the response check.
+**Gil**: "Now let's see what the store kept."
 
 ## The Turn
 
@@ -181,6 +184,7 @@ He opens the complete test implementation:
 
 ```typescript
 function testStore(entries: readonly (readonly [string, boolean])[]) {
+  // Serial test stand-in: private drafts, not concurrent transaction isolation.
   let committed = new Map(entries);
   return {
     async transaction<T>(work: (tx: Tx) => Promise<T>): Promise<T> {
@@ -258,7 +262,9 @@ async function bookParty(
 
 **Dafna**: "Suppose the steps already return results. You'd have me unwrap each one and throw its failure so the transaction understands it. We can do that once."
 
-The existing library has no result-returning step. To test that alternative, Dafna wraps `hold` in `tryHold`. This wrapper returns the library's known refusals and lets other errors escape:
+**Guy**: "Our library's steps don't return results."
+
+**Dafna**: "Then I'll wrap `hold` to try it. It returns the known refusal and lets anything else escape:"
 
 ```typescript
 async function tryHold(tx: Tx, seat: string): Promise<Result<void, Failure>> {
@@ -272,7 +278,7 @@ async function tryHold(tx: Tx, seat: string): Promise<Result<void, Failure>> {
 }
 ```
 
-She names the adapter `transactionResult`. Its callback returns a `Result`. Success commits and comes back as success; refusal must roll back and come back as refusal. It delegates to the existing store, so it must translate a refusal into rejection while the store is still deciding what to do.
+**Dafna**: "The adapter is `transactionResult`. It makes a returned refusal reject the store's callback, then returns that refusal after rollback."
 
 ```typescript
 async function transactionResult<T, E>(
@@ -364,9 +370,11 @@ Guy compares the two transaction calls.
 
 ## The Verdict
 
-Dafna removes the catch from the transaction callback. She keeps the Result-returning `bookParty` with Guy's outer catch, and leaves the page's explicit branch in place.
+> Convert a failure into a returned value after the operations that depend on its rejection have acted, or give those operations an explicit result-aware contract.
 
-**Dafna**: "`tryHold` and the adapter can wait until we have result-returning steps worth sharing. I still want the page to see a refused booking in the type."
+**Dafna**: "I'll keep the outer catch and the page's result branch. The transaction sees the rejection first."
+
+"`tryHold` and the adapter can wait until we have result-returning steps worth sharing. I still want the page to see a refused booking in the type."
 
 **Guy**: "And when we do add it, expose one transaction contract to those callers. I don't want them picking by autocomplete."
 
@@ -384,8 +392,7 @@ try {
 } catch (error: SeatRefused) { // Error TS1196: Catch clause variable type annotation must be 'any' or 'unknown' if specified.
   console.log(error);
 }
+// Omit the catch annotation to get unknown under strict checking.
 ```
-
-With strict checking, an unannotated catch binding is [`unknown`](https://www.typescriptlang.org/tsconfig/useUnknownInCatchVariables.html). The outer catch and `tryHold` use `instanceof` to identify the library refusal. The transaction adapter uses identity to recognize its own signal. Other thrown values keep going to a handler that can deal with them.
 
 **Liron**: "Suppose a queue retries a job whenever its handler rejects, and finishes it whenever the handler fulfills. If this job is supposed to report an occupied seat and stop, we need the transaction to roll back, then the job handler to record the refusal and finish. The store decides whether to commit. The queue decides whether to retry. They need to see different outcomes here."

@@ -63,16 +63,19 @@ function example(name, source, codes = []) {
 }
 const original = example("plain-named-options-still-mix-meanings", opening);
 const mistaken = example("last-is-not-count", numbersFn + brands + span, [2322]);
-assert(mistaken.checked.diagnostics[0].message.startsWith("Type 'PageNumber' is not assignable to type 'PageCount'."));
-assert(mistaken.checked.diagnostics[0].message.includes('Type \'"PageNumber"\' is not assignable to type \'"PageCount"\'.'));
-assert(chapter.includes("Type 'PageNumber' is not assignable to type 'PageCount'"));
+const brandReason = span.match(/^\/\/ (Type 'PageNumber'.+)$/m)?.[1];
+const markerReason = span.match(/^\/\/ Marker detail: (.+)$/m)?.[1];
+assert(brandReason && markerReason, "Quoted brand diagnostic comments");
+assert(mistaken.checked.diagnostics[0].message.startsWith(brandReason));
+assert(mistaken.checked.diagnostics[0].message.includes(markerReason));
 example("arithmetic-drops-brand", numbersFn + brands + withoutErrors(span) + arithmetic, [2322]);
 const correct = example("converted-count", numbersFn + brands + withoutErrors(span) + withoutErrors(arithmetic));
 const stale = example("object-copy-keeps-stale-brand", base + range + copy);
 const rebuilt = example("constructor-rechecks-order", base + range + reconstruction);
 const privateCopy = example("class-copy-loses-private-marker", brands + frozen, [2741]);
-assert(privateCopy.checked.diagnostics[0].message.startsWith("Property 'checked' is missing"));
-assert(chapter.includes("Property 'checked' is missing"));
+const privateReason = frozen.match(/^\/\/ Diagnostic starts: (.+)$/m)?.[1];
+assert(privateReason, "Quoted private-member diagnostic comment");
+assert(privateCopy.checked.diagnostics[0].message.startsWith(privateReason));
 const mutation = example("mutable-alias-still-accepts-frozen-class", brands + withoutErrors(frozen) + alias);
 const shifted = example("count-copy-preserves-length", base + moved);
 const conversion = example("endpoint-conversion", base + request);

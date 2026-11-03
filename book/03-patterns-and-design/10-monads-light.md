@@ -2,9 +2,7 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Before admiring the chain, look at what its next step returns. If it returns a plain value, use `map`. By plain I mean not the container you're already in: inside Result, even an array is a plain value. If it returns another Result, you need the operation arrays call `flatMap`, which hands back the step's Result as it is instead of wrapping it in a second one. Arrays show the difference plainly: `map` keeps an extra array level and `flatMap` joins it. Then write the early-return version as well, and compare. If later steps need earlier values, you may find those checks easier to follow than callbacks nested to keep the values available."
-
-"The lovely complication is promises. Their `then` does both jobs: it maps a plain return value and unwraps a returned promise, including an object with a callable `then`. No registration required. You can join a language protocol just by choosing a method name. Don't give an object a `then` method unless it keeps the promise contract. Give a different chaining operation a different name."
+**Prof. Eli Typeworth**: "Choose the chaining operation by what the next step returns, then check the shape the caller receives. A step returning an ordinary payload needs `map`. Ordinary means not another Result. An array can be a payload inside a Result. If the step already returns a Result, use the operation that passes that result on rather than wrapping it again. Wrap it again and the outer success can hold an inner failure. They don't contradict each other: one says the first step worked, the other says the next one refused. The caller has to reach the one it needs."
 
 ## The Debate
 
@@ -30,7 +28,7 @@ Guy has the preview result open beside the worker's counters. The catalogue team
 
 **Linoy**: "The same check as the screens. There are six screen callers, all synchronous. I only added an async entry point for the batch."
 
-The previews only read a stock snapshot. It has five units available:
+The previews only read a stock snapshot with five units available. Their result uses the same union shape as booking:
 
 ```typescript
 type Result<T, E> =
@@ -209,6 +207,8 @@ She follows the success branch with her cursor.
 
 **Dafna**: "The promise ignores what your `then` returns. It needs a call to resolve or reject. Neither happened."
 
+**Eli**: "No registration required. You can join a language protocol just by choosing a method name."
+
 **Guy**: "So the stock check has answered. The worker is waiting for an answer about whether it answered."
 
 **Linoy**: "And I taught it to say nothing on no."
@@ -293,6 +293,8 @@ console.log(JSON.stringify(offered));
 
 **Dafna**: "That's the same refusal rule, without a wrapper object. We can map the offer into the preview after it."
 
+**Sahar**: "Simple made better."
+
 **Guy**: "And the six screens?"
 
 **Sahar**: "Their chains become function calls."
@@ -349,6 +351,8 @@ async function checkRepair() {
 
 ## The Verdict
 
+> A callable `then` makes an object participate in the promise protocol. Give a different chaining operation its own name.
+
 **Guy**: "Ship the rename with those checks. The unwrap worked, but gave the batch a union and the screens a class. With the rename, all of them receive the same `Res`. Both jobs close without turning no stock into a worker failure. The screens keep their chains, and other callers keep their early returns."
 
 **Linoy**: "I picked `then` so people could start chaining without learning another word. It bought six callers that knew how to read the expression. It also bought JavaScript a way to call it. I'll explain `andThen`."
@@ -369,5 +373,3 @@ const pendingInside = new Res(parseQty("2")).map(availabilityAsync);
 ```
 
 **Dafna**: "That has already called `availabilityAsync`. Awaiting `pendingInside` after our rename gives you the same `Res`, with a promise still in its value. If the job needs the answer, await `availabilityAsync` and inspect the Result it gives back. `map` hasn't done that work for you."
-
-The promise protocol used in the incident is specified in ECMAScript's [resolving functions](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-createresolvingfunctions) and [thenable job](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-newpromiseresolvethenablejob).
