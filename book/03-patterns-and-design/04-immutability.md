@@ -4,7 +4,7 @@
 
 **Liron Closure**: "Before you change an object, ask what each holder expects to keep. Some want the current state. Others need the value you handed them earlier. Those are different promises, even if both holders only read."
 
-"A holder that needs history must receive a value that won't change. The snapshot can be made by the owner or captured at the handoff. For current state, keep changes behind an owner and keep writable references inside that boundary. Having just one writer doesn't make a live view into a snapshot. That writer can still change what everyone sees."
+"A holder that needs history must receive a value that won't change. The snapshot can be made by the owner or captured at the handoff. For current state, keep changes behind an owner and keep writable references inside that boundary."
 
 "You can build something by mutation while nobody else can observe it. The question comes when you hand it over: what have you promised its next holder?"
 
@@ -63,7 +63,7 @@ console.log(receipt(before, cart)); // Was 80. Now 80.
 
 **Dafna Functor**: "And our readonly cart satisfies their writable parameter?"
 
-**Daniel Compiler**: "It does. `readonly` on an object property doesn't prevent that assignment. It prevents a write through the readonly type."
+**Daniel Compiler**: "It does. Same hole as Eden's `moveStart`: `readonly` on an object property doesn't prevent that assignment. It prevents a write through the readonly type."
 
 **Liron**: "A river looks like it stays in place. The water you saw a minute ago—"
 
@@ -345,13 +345,13 @@ function chooseDiscount(checkout: CartPricing, amount: number): string {
 
 ## The Verdict
 
-> Keep the price calculation as a value-returning function. Let the checkout owner publish the current price. Expose live access through a call; give the receipt stable values.
+> Give a holder that needs history a value that can't change, and a holder that needs the current state a call to its owner. Freezing a live view doesn't make it a record.
 
 **Guy**: "I'd put `PriceView` in the panel's constructor. If the panel also needs change notifications, `current` and `subscribe` can come from the same owner through one interface."
 
 **Dafna**: "Then I'd group them too. This panel only asks for the current price. I'd take `ReadPrice` until it needs more."
 
-**Eden**: "Both reject the receipt's bad argument. I'll replace the promotion call and the panel and receipt bindings together. Adding `readonly` was a smaller diff. It just didn't do this job."
+**Eden**: "Both reject the receipt's bad argument. Keep the value-returning calculation, checkout's ownership and the receipt's stable values. I'll replace the promotion call and the panel and receipt bindings together. Adding `readonly` was a smaller diff. It just didn't do this job."
 
 ## Additional Takes
 

@@ -53,14 +53,11 @@ export function badge(order: Order): string {
 
 **Noam**: "And the badge?"
 
-"Still says the same things. I checked."
-
-Node 22.23.4 runs these TypeScript files directly; the project has `"type": "module"` in `package.json`.
-
-**Oded**: "These cases were here before the refactor. I kept them."
+**Oded**: "Still says the same things. I checked. These cases were here before the refactor. I kept them."
 
 ```typescript
 // cases.ts
+// Runtime: Node 22.23.4; package.json has "type": "module".
 export const cases: { refundedCents: number; status: string; badge: string }[] = [
   { refundedCents: 0, status: "paid", badge: "Paid" },
   { refundedCents: 500, status: "partial", badge: "Partially refunded" },

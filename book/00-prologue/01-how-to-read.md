@@ -24,11 +24,15 @@ Every chapter follows a debate structure:
 
 **The Principle** — An expert states a TypeScript principle. Something that sounds reasonable, maybe even obvious. Something you might nod along to in a conference talk.
 
-**The Debate** — Then the practitioners tear it apart. They challenge it with real-world experience, edge cases, production war stories, and strong opinions. They argue with each other. They show code. They get heated.
+**The Debate** — Then the practitioners take it to their own code. They challenge it with real-world experience, edge cases, production war stories, and strong opinions. They argue with each other. They show code. They get heated.
 
 **The Turn** — Sometimes another caller, a changed input, or a question sends the discussion in a different direction. A rule that seemed settled may need an exception.
 
 **The Verdict** — Some chapters land on a clear answer. A practical ruling with code you can adopt tomorrow. Others end honestly: *it depends* — and we tell you on what.
+
+**The Debate Continues** marks a disagreement that remains open after the evidence, with the choice depending on what the callers need.
+
+**Additional Takes** explore related cases after the main argument; a chapter with only one has an **Additional Take**.
 
 Not every debate has a winner. That's not a cop-out. Some questions in software engineering are genuinely contextual, and pretending otherwise would be dishonest. When we say "it depends," we'll tell you exactly what it depends *on*.
 

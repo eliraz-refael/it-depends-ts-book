@@ -72,9 +72,8 @@ const signatures={
 };
 function moduleFor(kind){const v=signatures[kind];return catalogue+v.helpers+v.signature+body;}
 const initialBanner=replace(banner,'t(...pending)','t(pending[0], pending[1])');
-const probeFiles=JSON.parse(manuscript.match(/with `files: (\[[^`]+\])`/)[1]);
-const probeProject={extends:'./tsconfig.json',files:probeFiles,include:[]};
-assert.deepEqual(probeFiles,['src/i18n.ts','src/probe.ts']);assert(manuscript.includes('`include: []`'));
+const probeProject=JSON.parse(badSelection.match(/^\/\/ probe.json: (.+)$/m)[1]);
+assert.deepEqual(probeProject,{extends:'./tsconfig.json',files:['src/i18n.ts','src/probe.ts'],include:[]});
 write('package.json',{type:'module'});write('tsconfig.json',options);write('probe.json',probeProject);
 write('src/i18n.ts',loose);write('src/banner.ts',initialBanner);write('src/probe.ts',badLiteral);
 compile('PR-accepts-mistakes');

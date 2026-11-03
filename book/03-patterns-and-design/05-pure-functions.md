@@ -329,7 +329,7 @@ Eden updates `makeSla`:
 
 ```typescript
 function makeSla(policy: SlaPolicy) {
-  // Replaces the earlier makeSla; the export below is rebuilt with it.
+  // Replaces the earlier makeSla; the exported `slaStatus` is rebuilt with it.
   const fixedPolicy = { timeZone: policy.timeZone };
   const cachedDeadline = memoizeBy(ticketKey,
     (ticket: Ticket) => deadlineFor(ticket, fixedPolicy));

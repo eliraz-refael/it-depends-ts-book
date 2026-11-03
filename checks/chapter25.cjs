@@ -53,9 +53,10 @@ assert(text.includes('"references": [{ "path": "../money" }]'));
 assert(text.includes('three relative imports'));
 assert(text.includes('only one failing call'));
 assert(text.includes('already-emitted JavaScript'));
-assert(text.includes("Clean both dist directories and the API's out first"));
-assert(text.includes('And the incremental build files, so the clean outputs get rebuilt'));
-assert(text.includes('They clean those directories and metadata, then run `tsc -b apps/api`'));
+assert(text.includes("clean both packages' dist directories, the API's out and the incremental build files"));
+assert(text.includes('Clean the incremental build files too, so the outputs get rebuilt'));
+assert(text.includes('then run `tsc -b apps/api`'));
+assert(text.includes('Restore the `.js` imports and `default` targets'));
 const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'ts-book-ch25-'));
 const executable=path.join(path.dirname(require.resolve('typescript/package.json')),'bin/tsc');
 const results=[]; let cases=0, groups=0, queries=0;
@@ -236,7 +237,7 @@ const refusal=fails('story-image-refuses-type-stripping',sourceDeploy,'ERR_UNSUP
 assert.equal(refusal.stdout,''); assert(refusal.output.includes('node_modules/@shop/money/src/index.ts'));
 // Return from the branch; runtime defaults and internal imports are restored, not the old source.
 installFiles(story,saved);
-assert(text.includes('removing `allowImportingTsExtensions` from the dev base'));
+assert(text.includes('remove `allowImportingTsExtensions` from the dev base'));
 for(const [file,body] of Object.entries(saved)) assert.equal(read(story,file),body);
 assert.equal(JSON.parse(read(story,'tsconfig.dev-base.json')).compilerOptions.allowImportingTsExtensions,undefined);
 assert.equal(read(story,money),currentMoney);

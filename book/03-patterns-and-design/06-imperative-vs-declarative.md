@@ -10,7 +10,7 @@
 
 The payouts team is looking at yesterday's batch. Dafna's refactor ran for the first time, and a seller has contacted support. The planner selects payouts for another service to submit; it doesn't move money itself. Its input queue is oldest first.
 
-Gil opens the reply sent to the seller: *“Eligible payouts are released in queue order. Newer eligible payouts won't go ahead of yours.”* The payouts team supplied that wording.
+Gil opens the reply sent to the seller: *"Eligible payouts are released in queue order. Newer eligible payouts won't go ahead of yours."* The payouts team supplied that wording.
 
 **Gil Benchmark**: "The old tests checked that we stayed under the allowance. We did. Let's compare which payouts got selected."
 
@@ -280,7 +280,7 @@ const fillAvailable = skipping;
 
 **Dafna**: "Of course. We just wrote stopping three ways. For `stopAtFirstBlocker`, I want the loop's return beside the failed allowance check. For `fillAvailable`, I'll keep the fold: it considers every payout, with no closed state to carry. That body was wrong as a replacement for stopping. It does implement filling."
 
-## Additional Takes
+## Additional Take
 
 **Chen**: "The status filter narrowed. Will this one? I'm collecting refund amounts for the batch report."
 

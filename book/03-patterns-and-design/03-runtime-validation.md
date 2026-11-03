@@ -4,6 +4,8 @@
 
 **Gilad Stacktrace**: "At a boundary, choose which input to reject, which to preserve and which to translate. A successful parse doesn't by itself tell every caller that it's safe to act on the result."
 
+## The Debate
+
 **Oded Shipley**: "I'd settle for getting the tracking page to move again."
 
 **Idan Greenfield**: "Start with what it was receiving when it worked."
@@ -86,8 +88,6 @@ if (!parsed.success) console.log(parsed.error.issues[0].message);
 ```
 
 **Oded**: "One parcel stuck at customs. So naturally we stopped hearing about all the parcels that arrived."
-
-## The Debate
 
 ### "Receive it, then decide"
 

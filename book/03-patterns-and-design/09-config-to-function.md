@@ -73,6 +73,8 @@ console.log(holds(restored, order)); // false
 
 ### Something the logger can accept
 
+**Liron**: "In Clojure, we solved this in 2009 by saving the rules as data."
+
 **Dafna**: "Make the saved policy data. If I put a function back in it, I'd like the compiler to complain before another analyst has to explain the order."
 
 ```typescript

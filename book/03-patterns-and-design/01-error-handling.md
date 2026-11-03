@@ -2,7 +2,9 @@
 
 ## The Principle
 
-**Liron Closure**: "When you catch a failure and return an error value, you make two decisions: what to report, and that the function can finish normally. In an async function, returning an ordinary value fulfills its promise. Whoever awaits it no longer gets a rejection to act on. Before returning, check whether they still need that rejection to stop or undo the work."
+**Liron Closure**: "When you catch a failure and return an error value, you make two decisions: what to report, and that the function can finish normally. Before returning, check whether the caller still needs to see the failure to stop or undo the work."
+
+## The Debate
 
 The booking page reserves seats for a whole party: every requested seat or none of them. Dafna's patch turns an occupied seat from a rejected operation into a returned refusal that the page can display. Guy has opened the current implementation beside her diff.
 
@@ -11,8 +13,6 @@ The booking page reserves seats for a whole party: every requested seat or none 
 **Guy Singleton**: "And the seats we already held?"
 
 **Dafna**: "The transaction releases them. That's what the current version does."
-
-## The Debate
 
 ### The booking they already have
 

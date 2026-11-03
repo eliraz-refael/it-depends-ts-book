@@ -2,9 +2,9 @@
 
 ## The Principle
 
-**Prof. Eli Typeworth**: "Two values can have the same representation and different jobs. A page number and a count of pages are both numbers, but putting one where the other belongs changes the result. A brand adds a type-level marker so the compiler can distinguish them."
+**Prof. Eli Typeworth**: "When two values share a representation but not a job, give each job its own type, and convert where someone decides which job a number has. A page number and a count of pages are both numbers, but putting one where the other belongs changes the result. A brand adds a type-level marker so the compiler can distinguish them."
 
-"Some brands make a further promise: this value passed a check. Before relying on that promise, examine how code can create and change values of that type without bypassing the compiler with assertions or `any`. Those operations must preserve what the check established, or the brand can outlive the fact it claims."
+"Some brands make a further promise: this value passed a check. Before relying on that promise, examine how code can create and change values of that type without bypassing the compiler with assertions or `any`. Those operations must preserve what the check established."
 
 ## The Debate
 
@@ -83,7 +83,7 @@ function pageCount(raw: number): PageCount {
 
 **Noam**: "There isn't even a symbol created by that declaration. `declare` emits nothing. The key belongs to this declaration, and the two types require different values at that key. Both are ordinary numbers when this runs."
 
-"Our `UserId` used `__brand`. Another module can share that marker by writing the same name and value. This key can't be shared by spelling. Neither marker checks a value."
+"The `UserId` in our style guide used `__brand`. Another module can share that marker by writing the same name and value. This key can't be shared by spelling. Neither marker checks a value."
 
 Noam keeps the numbering function and puts a typed entry point in front of it:
 
@@ -318,9 +318,11 @@ A scalar brand can distinguish roles without promising a relationship between fi
 
 "If another consumer needs to retain an accepted selection, we'll revisit the class."
 
+**Noam**: "Then every restore path repeats the conversion. I'd still rather keep the accepted object than rebuild it at each caller."
+
 **Oded**: "Five to four gives no preview and never reaches the exporter. And passing the last page as the count still fails the compiler check. I'll keep those tests with the draft conversion."
 
-## Additional Takes
+## Additional Take
 
 **Chen**: "What if I make the marker optional so existing callers keep compiling?"
 

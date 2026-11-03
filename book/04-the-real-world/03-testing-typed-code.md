@@ -118,6 +118,8 @@ TS2578: `Unused '@ts-expect-error' directive.`
 
 **Eden**: "Before currency. The comment hid the stale fixture. Now the missing field hides the bad signature."
 
+**Noam**: "Like my user factory. It hid the dependency too."
+
 **Oded**: "I have accidentally passed two different tests with one comment."
 
 ### "Give it a draft"
@@ -266,9 +268,9 @@ type Status = Expect<Equal<typeof row.status, "paid">>;
 
 **Noam**: "A function annotated `User[]` can return `JSON.parse(raw)` and pass an exact return-type test. Run it, and you get whatever the string held. These tests believe the annotation."
 
-**Guy**: "Add a runtime assertion for the card text too."
-
 ### "It shipped"
+
+**Guy**: "Add a runtime assertion for the card text too."
 
 Oded runs the tests again, then reads the draft test's callback.
 
@@ -278,15 +280,13 @@ Oded runs the tests again, then reads the draft test's callback.
 
 **Oded**: "It's also calling `ship`."
 
-He clears `shipped` before the callback's `ship(draft)` and logs it afterwards. `node --test --test-reporter=spec` prints `shipped: [ 'o2' ]`. The test called “can't ship a draft” passes.
+He clears `shipped` before the callback's `ship(draft)` and logs it afterwards. `node --test --test-reporter=spec` prints `shipped: [ 'o2' ]`. The test called "can't ship a draft" passes.
 
 **Noam** reads the output twice.
 
 **Oded**: "No courier. Just the fake's array. But our test of the forbidden call is making the forbidden call."
 
 **Eden**: "The comment objects to the call's type. It doesn't cancel the call."
-
-Node's [type stripping](https://nodejs.org/docs/latest-v22.x/api/typescript.html#type-stripping) removes type syntax, leaving the call to execute.
 
 **Oded**: "I'll take the compile-only bits out of the runtime file."
 
@@ -369,13 +369,7 @@ type DeliberatelyWrong = Expect<Equal<1, 2>>;
 
 **Noam**: "Don't."
 
-`tsc -p tsconfig.json --listFilesOnly` lists the runtime test, but not `type-tests/ship.types.ts`.
-
-**Eden**: "We taught the runner to leave it alone. We haven't told the compiler where we put it."
-
-The original `"include": ["src", "test/**/*.test.ts"]` misses it; no included file imports it.
-
-**Eden**: "It wasn't checked in `test/ship.types.ts` either. We moved it before anyone asked."
+**Eden**: "The `tsc -p tsconfig.json --listFilesOnly` result has the runtime test, but not `type-tests/ship.types.ts`. Our include only names `src` and `test/**/*.test.ts`, and no included file imports the type test. We taught the runner to leave it alone. We haven't told the compiler where we put it. It wasn't checked in `test/ship.types.ts` either. We moved it before anyone asked."
 
 He replaces the include:
 

@@ -4,7 +4,7 @@
 
 **Prof. Eli Typeworth**: "Use a state parameter to carry evidence that later operations require. Each operation must establish what its return type says is now known. If a helper promises to preserve earlier work, its signature must preserve that evidence too. Follow one value through the calls; don't stop at the fluent expression that makes the API look attractive."
 
-"Then ask what the protocol buys its callers. Requiring a complete object and restricting the steps used to construct it are different jobs. Either can be useful, but a builder should earn the machinery it asks people to carry between them. I want to see the operation we must forbid, the one we must still allow, and what happens to the object in each case."
+"Then ask what the protocol buys its callers. A builder should earn the machinery it asks people to carry. I want to see the operation we must forbid, the one we must still allow, and what happens to the object in each case."
 
 ## The Debate
 
@@ -196,8 +196,6 @@ const fromDestination = forNightlyExport(ExportBuilder.start())
 
 **Oded**: "The application team now needs to understand the state parameter to write a wrapper around one method. Put this example in the quickstart. People will write my annotation."
 
-**Guy**: "It goes in the quickstart. Both orders, including your annotation and why it loses the source."
-
 ### "Here's the function we already had"
 
 Dafna opens the existing constructor function. It accepts a complete configuration and returns a fresh job record. Like the builder, it keeps its runtime completeness check for JavaScript callers.
@@ -270,7 +268,7 @@ const sourcePreset = ExportBuilder.start().source("orders");
 const configured = sourcePreset.destination("exports/nightly.csv");
 
 configured.build();
-sourcePreset.build(); // Error: TS2684, as with incomplete above.
+sourcePreset.build(); // Error: TS2684, as with `incomplete`.
 ```
 
 **Chen**: "Does supplying a destination change the preset?"
@@ -293,7 +291,7 @@ const configuredOptions = {
 };
 
 createExport(configuredOptions);
-createExport(sourceOptions); // Error: TS2741, as with the incomplete object above.
+createExport(sourceOptions); // Error: TS2741, as with `createExport({ source: "orders" })`.
 ```
 
 **Dafna**: "I also have to use the new value. At least the spread tells the reader where it was made."
