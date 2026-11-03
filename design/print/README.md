@@ -259,8 +259,9 @@ least four source lines. Saved-DOM checks assert the keeps and fragment counts.
 Three measured tiny endings (Ch13, Ch20 and Ch21) receive earlier break choices;
 the verifier counts their source lines separately from generated captions. Other
 light ending pages are left alone. Acts I–IV now have centred part title pages
-with a small ACT label and outlined Roman numeral; the Bonus part uses BONUS
-and AI and TypeScript. Chapter openers keep their Arabic numerals and existing
+with a small ACT label and solid Roman numeral; the Bonus part uses BONUS
+and AI & TypeScript. The part title comes from the same `ACTS` data as its
+contents entry; the build asserts that they agree. Chapter openers keep their Arabic numerals and existing
 layout. How to Read and Meet the Cast have centred title-only openers, followed
 by body text on the next page. These seven title pages have no running head or
 chapter rules. The build asserts their contents and physical-page centring, and

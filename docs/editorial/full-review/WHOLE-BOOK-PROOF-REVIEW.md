@@ -369,7 +369,7 @@ font replacements or release-metadata changes were made.
 
 Current PDF: `design/print/output/whole-book-proof-d03727a/a/It-Depends-PROOF.pdf`.
 
-SHA-256: `734f6147deb8a3cf16155e95ad219e73a62b8384a051f58b574259e587763f80`.
+SHA-256: `3e20c77c56c3c4c32175fb4481a6df1f3e61809f0f3946257adfb9500ec64075`.
 
 ### Design and measured folios
 
@@ -378,16 +378,16 @@ SHA-256: `734f6147deb8a3cf16155e95ad219e73a62b8384a051f58b574259e587763f80`.
 | Prologue / Before the debates | 9 | Removed | Contents and top-level Prologue bookmark target How to Read, p9. |
 | How to Read This Book | 10 | 9 | Title alone, centred on the paper; text starts p10. |
 | Meet the Cast | 15 | 14 | Title alone, centred on the paper; text starts p15. |
-| Act I | 29 | 28 | Small ACT, large outlined I, The Type System. |
+| Act I | 29 | 28 | Small ACT, large solid I, The Type System. |
 | Chapter 1 | 30 | 29 | Existing Arabic 1 and chapter layout unchanged. |
-| Act II | 124 | 123 | Small ACT, large outlined II, Advanced TypeScript. |
-| Act III | 228 | 227 | Small ACT, large outlined III, Patterns & Design. |
-| Act IV | 354 | 353 | Small ACT, large outlined IV, The Real World. |
-| Bonus part | 401 | 400 | Centred BONUS and AI and TypeScript; no numeral. |
+| Act II | 124 | 123 | Small ACT, large solid II, Advanced TypeScript. |
+| Act III | 228 | 227 | Small ACT, large solid III, Patterns & Design. |
+| Act IV | 354 | 353 | Small ACT, large solid IV, The Real World. |
+| Bonus part | 401 | 400 | Centred BONUS and AI & TypeScript; no numeral. |
 | Bonus chapters 1–3 | 402, 415, 427 | 401, 414, 426 | Existing Arabic 1, 2, 3 and chapter layouts unchanged. |
 
 The bundled Oxanium face contains I and V; the build verifies glyph coverage
-before using the outlined Roman numerals. The parts use their own centred
+before using the solid Roman numerals. The parts use their own centred
 composition, with no chapter top rule, side rule or bottom title strip. Their
 numeral size, spacing and vertical position differ from the chapter numerals.
 Prologue openers have no eyebrow, numeral, rule or subtitle. Running heads are
@@ -453,3 +453,62 @@ No requested opener item is outstanding. This remains a proof with continuous
 folios and next-page starts. Public repository URL/tag, license, imprint and
 printer/paper/binding/recto decisions still await the author; release approval
 is separate from this layout change.
+
+
+### Solid numeral and title correction after 09b0b99
+
+The author found the outlined I too much like an empty rectangle. Acts I–IV
+now use solid Oxanium at the same **140/156 pt**, spacing and measured position.
+The spaced ACT label stays. Chapter numerals remain outlined and unchanged.
+The Bonus title is **AI & TypeScript**, taken directly from `ACTS`, the same
+data that generates its contents entry. Every part title is asserted equal to
+the title portion of its rendered contents entry, and that entry's title is
+checked in PDF text. New paint assertions require solid dark part numerals
+with no outline stroke.
+
+I inspected all five final part-page images. Comparing all 438 images with
+`09b0b99` finds differences **only on 28, 123, 227, 353 and 400**. All opener
+sizes and positions match the previous layout exactly; every source text/code
+page membership is unchanged. Evidence is in `solid-openers-baseline.json`.
+The previous proof is retained in `accepted-09b0b99-a/` and `accepted-09b0b99-b/`.
+
+Both new renders pass every existing check and match all page rasters, text,
+geometry, links and bookmarks. All nine trial specimens pass. A fresh `npm ci`
+reports zero vulnerabilities; the full `npm run check` passes. Logs are saved
+in ignored output under `solid-openers-*`. No manuscript or margin changes
+were made.
+
+### Margin and no-bleed report — no layout changes
+
+For this **438-page, 7 × 10 inch, no-bleed paperback**, KDP's official table
+places the book in the **301–500 page** band. The inside minimum is **0.625″**;
+top, bottom and outside minima are **0.25″**.
+[KDP: Set Trim Size, Bleed, and Margins](https://kdp.amazon.com/en_US/help/topic/GVBQ3CMEQW3W2VL6).
+
+| Body margin | Current inches | KDP minimum inches | Above minimum |
+| --- | --- | --- | --- |
+| Inside / gutter | 0.82 | 0.625 | 0.195 |
+| Outside | 0.68 | 0.25 | 0.43 |
+| Top | 0.68 | 0.25 | 0.43 |
+| Bottom | 0.70 | 0.25 | 0.45 |
+
+These are the existing `@page` margins in `proof.css`, mirrored on left pages.
+They are not additional gutter padding. Running heads and footers sit within
+those margins: PDF text bounds across all 438 pages have a minimum top
+clearance of **0.27587″** and bottom clearance of **0.28334″**. The minimum
+text clearances inside/outside are approximately **0.81999″ / 0.67985″**.
+Thus the page furniture also clears the stated minimums.
+
+**No bleed or crop/trim marks are present.** Every PDF MediaBox, CropBox and
+effective TrimBox/BleedBox is **504 × 720 pt**, exactly 7 × 10 inches. There is
+no extra bleed area. The renderer does not add printer marks, and inspection
+of every PDF page finds no non-white vector drawing within 0.25″ of an edge
+and no raster images. The generated page images show no crop marks.
+`pdf-margin-inspection.json` records these measurements.
+
+This is a margin/bleed/mark assessment, not approval to upload this proof. KDP's
+submission rules also exclude bookmarks, annotations and placeholders; the
+current proof deliberately retains navigation, proof furniture and placeholder
+metadata. Those need a separate release export when authorized. No release
+cleanup was applied here.
+[KDP: Paperback Submission Guidelines](https://kdp.amazon.com/en_US/help/topic/G201857950).

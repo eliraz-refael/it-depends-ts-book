@@ -127,6 +127,7 @@ window.collectProof = () => {
           title:e.querySelector('h1').textContent.trim(),label:e.querySelector('.part-label,.eyebrow')?.textContent || '',mark:mark?.textContent || '',
           center:rect(e.querySelector('.opener-center') || e),text_align:getComputedStyle(e.querySelector('.opener-center') || e).textAlign,
           chapter_furniture:!!e.querySelector('.opener-art,.eyebrow,.opener-bottom'),
+          mark_color:style?.color,mark_stroke:style?.webkitTextStrokeWidth,
           mark_style:style ? [style.fontFamily,style.fontSize,style.lineHeight,style.letterSpacing] : [],
           mark_relative_y:mark ? mark.getBoundingClientRect().y-p.getBoundingClientRect().y : null};
       }),
@@ -136,7 +137,7 @@ window.collectProof = () => {
       symbol_groups:[...p.querySelectorAll('[data-symbol-group]')].map(e=>({id:e.dataset.symbolGroup,title:e.querySelector('h2')?.textContent,rows:[...e.querySelectorAll('[data-symbol-sequence]')].map(r=>r.dataset.symbolSequence)})),
       symbol_intro:[...p.querySelectorAll('[data-key-intro-glyph]')].map(e=>({sequence:e.dataset.keyIntroGlyph,rect:rect(e)})),
       symbols:[...p.querySelectorAll('[data-symbol-sequence]')].map(e=>({sequence:e.dataset.symbolSequence,glyph:rect(e.querySelector('[data-key-glyph]')),literal:rect(e.querySelector('[data-key-literal]'))})),
-      contents:[...p.querySelectorAll('[data-toc-target]')].map(e=>({target:e.dataset.tocTarget,page:e.querySelector('.toc-page').textContent,rect:rect(e)})),
+      contents:[...p.querySelectorAll('[data-toc-target]')].map(e=>({target:e.dataset.tocTarget,title:e.querySelector('span').textContent,page:e.querySelector('.toc-page').textContent,rect:rect(e)})),
       text:p.innerText
     }))
   };

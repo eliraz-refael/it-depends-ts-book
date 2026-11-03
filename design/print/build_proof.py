@@ -132,8 +132,7 @@ def assemble(data, directory):
                 display_font = pymupdf.Font(fontfile=str(HERE/'fonts/Oxanium-Regular.ttf'))
                 trial.require(all(display_font.has_glyph(ord(c)) for c in mark), 'Display face lacks part-title glyphs')
                 label = '<div class="part-label">ACT</div>' if act < 5 else ''
-                print_title = 'AI and TypeScript' if act == 5 else act_title
-                articles.append(f'<section class="act-opener centered-opener running-title" data-act="{act}" data-running="{html.escape(heading, quote=True)}" data-destination="{aid}" id="{aid}"><div class="opener-center">{label}<div class="part-mark {"roman" if act < 5 else "bonus"}">{mark}</div><h1>{html.escape(print_title)}</h1></div></section>')
+                articles.append(f'<section class="act-opener centered-opener running-title" data-act="{act}" data-running="{html.escape(heading, quote=True)}" data-destination="{aid}" id="{aid}"><div class="opener-center">{label}<div class="part-mark {"roman" if act < 5 else "bonus"}">{mark}</div><h1>{html.escape(act_title)}</h1></div></section>')
             last_act = act
         first_h1 = next((i for i, t in enumerate(tokens) if t.type == 'heading_open' and t.tag == 'h1'), None)
         title = plain(tokens[first_h1 + 1].children) if first_h1 is not None else 'Dedication'
@@ -360,6 +359,7 @@ def validate(directory, manifest):
             check(row['page']==str(targets[row['target']]), f'p{number}: contents page mismatch')
             text = norm(pdf.get_text(clip=pdf_rect(row['rect'],origin,1)))
             check(text.endswith(row['page']), f'p{number}: printed contents folio missing')
+            check(norm(row['title']) in text, f'p{number}: printed contents title missing')
         # Review aids, not failures: short continuation pages, low fill, late headings.
         chunks = p['texts'] + p['code']
         if chunks:
@@ -418,7 +418,7 @@ def validate(directory, manifest):
     check('act-0' not in targets and not any('Before the debates' in p['text'] for p in pages), 'Prologue part page remains')
     check(next(n for n in manifest['navigation'] if n['title']=='Prologue')['id']==how['id'], 'Prologue bookmark must target How to Read')
     check(targets[how['id']]==max(p['page'] for p in pages if 'symbol-key' in p['front_parts'])+1, 'Prologue opener must immediately follow the symbol key')
-    expected_parts = {'1':('I','The Type System'), '2':('II','Advanced TypeScript'), '3':('III','Patterns & Design'), '4':('IV','The Real World'), '5':('BONUS','AI and TypeScript')}
+    expected_parts = {str(i):(mark,ACTS[i][1]) for i,mark in enumerate(('I','II','III','IV','BONUS'),start=1)}
     part_pages, prologue_pages, chapter_pages = {}, {}, []
     for page in pages:
         for opener in page['openers']:
@@ -433,6 +433,9 @@ def validate(directory, manifest):
             if opener['kind']=='act':
                 expected_mark, expected_title = expected_parts[opener['act']]
                 check((opener['mark'],opener['title'])==(expected_mark,expected_title), 'Wrong act numeral/title')
+                entry = next(row for p in pages for row in p['contents'] if row['target']==f'act-{opener["act"]}')
+                check(entry['title']==f'{ACTS[int(opener["act"])][0]} / {opener["title"]}', 'Part title differs from its contents entry')
+                check(opener['mark_color']=='rgb(24, 24, 24)' and opener['mark_stroke']=='0px', 'Part numeral is not solid display type')
                 check(opener['label']==('ACT' if opener['act']!='5' else ''), 'Wrong part label')
                 check(not page['texts'] and not page['code'], 'Manuscript text on a part title page')
                 check(norm(expected_mark+expected_title) in norm(document[page['page']-1].get_text()), 'Part title missing in PDF')
