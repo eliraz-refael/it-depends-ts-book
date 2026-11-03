@@ -1,7 +1,7 @@
 # Acknowledgments
 
-This book was written with the help of AI. It helped draft, check and revise the prose and the code.
+I wrote this book over almost a year, with AI as a patient collaborator. It helped me draft, check and revise, and it never once complained about the fifth rewrite of the same chapter.
 
-The book itself is mine: its structure and the rules every chapter follows, the core ideas behind each debate, and the voices of everyone who argues in them.
+The ideas are mine, and so is the way the book is built: the debates, the shape every chapter follows, and the voices of the team who argue in them.
 
-It took almost a year to finish. Thank you to my wife, Dafna, for pushing me through it.
+Most of all, thank you to my wife, Dafna. On the days I was ready to put this aside, you pushed me to keep going. This book is finished because of you.
