@@ -50,7 +50,7 @@ The checks read the manuscript's TypeScript examples, supply their surrounding c
 
 ## License
 
-[TBD]
+The code, including every example in the book, is licensed under the [MIT License](LICENSE-CODE). The book's text is licensed under [CC BY-NC-SA 4.0](LICENSE-TEXT). See [LICENSE.md](LICENSE.md) for exactly what each covers.
 
 ## Disclaimer
 
