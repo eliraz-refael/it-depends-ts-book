@@ -1,0 +1,85 @@
+{
+  "reason": "Author rulings after proof adaa2f6; offsets address parsed prose, with code left protected.",
+  "decisions": [
+    {
+      "source": "book/02-advanced-typescript/01-conditional-types.md",
+      "line": 71,
+      "markdown_sha256": "fe460b62b5bad548f5861484bd6fc20eb8d7c4891a604b8f45385602bda7f73d",
+      "marks": [
+        {
+          "offset": 0,
+          "expected": "\"",
+          "role": "open"
+        },
+        {
+          "offset": 13,
+          "expected": "\"",
+          "role": "close"
+        },
+        {
+          "offset": 76,
+          "expected": "\"",
+          "role": "open"
+        },
+        {
+          "offset": 135,
+          "expected": "\"",
+          "role": "close"
+        }
+      ]
+    },
+    {
+      "source": "book/03-patterns-and-design/02-branded-types.md",
+      "line": 191,
+      "markdown_sha256": "849181064cc64919bac0a3c396f89add2ce4aeb71008afd4b8879814696e48b6",
+      "marks": [
+        {
+          "offset": 165,
+          "expected": "'",
+          "role": "apostrophe"
+        }
+      ]
+    },
+    {
+      "source": "book/03-patterns-and-design/03-runtime-validation.md",
+      "line": 330,
+      "markdown_sha256": "feb7c85cd5b4c7edc8b716c02800fa4027359e06a09ec5e89cedf83ee46fd21c",
+      "marks": [
+        {
+          "offset": 56,
+          "expected": "'",
+          "role": "apostrophe"
+        }
+      ]
+    },
+    {
+      "source": "book/04-the-real-world/02-monorepo-type-sharing.md",
+      "line": 276,
+      "markdown_sha256": "2a29ae1023b3a60d2daeac007bb3d4f49b0a05b092515ca54c1be04807ac602d",
+      "marks": [
+        {
+          "offset": 203,
+          "expected": "'",
+          "role": "apostrophe"
+        }
+      ]
+    },
+    {
+      "source": "book/04-the-real-world/02-monorepo-type-sharing.md",
+      "line": 324,
+      "markdown_sha256": "6165bf68400f8ecf32a08c3c6d00baf08aa0cfc2156e4b1160a7063359db7465",
+      "marks": [
+        {
+          "offset": 46,
+          "expected": "'",
+          "role": "apostrophe"
+        },
+        {
+          "offset": 190,
+          "expected": "'",
+          "role": "apostrophe"
+        }
+      ]
+    }
+  ]
+}

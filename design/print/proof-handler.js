@@ -121,6 +121,8 @@ window.collectProof = () => {
       blocks:[...p.querySelectorAll('.pagedjs_page_content [data-ref]')].map(e=>({ref:e.dataset.ref,tag:e.tagName,rect:rect(e)})),
       headings:[...p.querySelectorAll('h1,h2,h3,h4')].map(e=>({text:e.textContent,rect:rect(e)})),
       figures:[...p.querySelectorAll('figure.source')].map(e=>({id:e.dataset.fenceId,continued:e.hasAttribute('data-split-from'),rect:rect(e)})),
+      front_parts:[...p.querySelectorAll('[data-front-part]')].map(e=>e.dataset.frontPart).filter(Boolean),
+      key_code:[...p.querySelectorAll('.symbol-key code')].map(e=>({text:e.textContent,rects:[...e.getClientRects()].map(r=>({x:r.x,y:r.y,right:r.right,bottom:r.bottom}))})),
       quiet_frontmatter:[...p.querySelectorAll('[data-quiet-frontmatter="true"]')].map(e=>({id:e.id,paragraphs:e.querySelectorAll('main > p').length,headings:e.querySelectorAll('h1').length,opener:!!e.querySelector('.chapter-opener,.opener-art')})),
       symbol_groups:[...p.querySelectorAll('[data-symbol-group]')].map(e=>({id:e.dataset.symbolGroup,title:e.querySelector('h2')?.textContent,rows:[...e.querySelectorAll('[data-symbol-sequence]')].map(r=>r.dataset.symbolSequence)})),
       symbol_intro:[...p.querySelectorAll('[data-key-intro-glyph]')].map(e=>({sequence:e.dataset.keyIntroGlyph,rect:rect(e)})),

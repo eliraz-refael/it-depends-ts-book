@@ -98,3 +98,6 @@ thead { display:table-header-group; }
 
 .acknowledgments { padding-top:150pt; }
 .acknowledgments h1 { font:500 24pt/30pt Oxanium; margin:0 0 20pt; }
+
+/* Keep literal examples such as != null together in the generated key only. */
+.symbol-key code { white-space:nowrap; overflow-wrap:normal; word-break:normal; }

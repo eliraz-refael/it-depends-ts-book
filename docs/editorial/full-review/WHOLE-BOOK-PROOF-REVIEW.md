@@ -139,7 +139,7 @@ below were regenerated from this tree; they are not edited old totals.
 
 Current PDF: `design/print/output/whole-book-proof-d03727a/a/It-Depends-PROOF.pdf`.
 
-SHA-256: `5267622e4f1de910b6d117224589527138e569d443643725f33f2f5f7d909396`.
+SHA-256: `7320df7b3572f1743b37e99b778e0fcfddb4cef24d1037c5e3fdd3530341fc44`.
 
 Two independent clean renders pass the comparison: all 439 pages have identical
 text, character geometry, link destinations, bookmarks and raster hashes. Only
@@ -166,9 +166,10 @@ and next-page starts. No dependencies, renderer or body/fence sizes changed.
   The last note precedes the final Verdict. Page **439** ends with the exact
   frozen narrative sentence (using typographic quotes), with only the required
   footer and folio below it. No source appendix or added narrative follows it.
-- **2,522 prose blocks** have verified, balanced typographic delimiters. Five
-  ambiguous paragraphs remain unchanged for the author; see their exact locations
-  below. The approved key prose is generated separately from manuscript counts.
+- **2,527 prose blocks** have verified, balanced typographic delimiters. The five
+  formerly ambiguous paragraphs now use the author's explicit decisions below;
+  **zero ambiguities remain**. The approved key prose is generated separately
+  from manuscript counts.
 - Clean `npm ci` on the new main source: **0 vulnerabilities**. Full
   `npm run check`: **PASS**. All nine trial specimens, rerun against the new source
   and shared renderer: **PASS**. Placeholder metadata still rejects release mode.
@@ -176,8 +177,8 @@ and next-page starts. No dependencies, renderer or body/fence sizes changed.
 
 ### Acknowledgments
 
-The title and three approved paragraphs occupy **page 9**, immediately after the
-dedication on 8, with no opener page or numeral box. The title appears in contents
+The title and three approved paragraphs occupy **page 4**, immediately after the
+dedication on 3, with no opener page or numeral box. The title appears in contents
 and as a bookmark. The build checks one-page membership, paragraph count, absence
 of opener artwork, and position after the dedication. I inspected the page image.
 
@@ -191,10 +192,10 @@ four headings in the supplied order. Approved input SHA-256:
 **`--noEmit` is in the printed command on p392**, sourced from
 `book/04-the-real-world/04-performance-vs-safety.md:35` (`--noEmit false`).
 
-The key occupies **pages 5–6**, after the contents. At body size **11/16 pt**,
-its measured unpaginated height is **1005.04 pt**, against **620.64 pt**
-of page body. It cannot fit on one page without shrinking. Page 5 contains the
-intro and **Comparison and logic**. Page 6 contains **Functions and types**,
+The key occupies **pages 7–8**, after the contents. At body size **11/16 pt**,
+its measured unpaginated height is **1021.03 pt**, against **620.64 pt**
+of page body. It cannot fit on one page without shrinking. Page 7 contains the
+intro and **Comparison and logic**. Page 8 contains **Functions and types**,
 **Comments**, then **Punctuation that only looks joined**. The break falls between
 groups. All group memberships, row orders and unsplit groups are asserted.
 
@@ -285,7 +286,7 @@ endings were deliberately left alone. Original review targets:
 
 | First proof | Final proof | Result |
 | --- | --- | --- |
-| 5 | 7 | Label, rule and title retained; numeral and box removed. |
+| 5 | 9 | Label, rule and title retained; numeral and box removed. |
 | 7 | 10 | Label, rule and title retained; numeral and box removed. |
 | 12 | 15 | Label, rule and title retained; numeral and box removed. |
 | 391 | 401 | Label, rule and title retained; numeral and box removed. |
@@ -295,29 +296,61 @@ No forced recto blanks were introduced.
 
 The current images are `a/pages/page-001.png` through `page-439.png`;
 `a/contact-sheets/spreads-01.png` through `spreads-28.png` cover every spread.
-At the 33-file checkpoint I inspected all 39 focused target pages; the new key,
-acknowledgments, Ch7 debate and final pages were checked again. The new baseline
-correspondence check confirms all 3,483 existing text blocks retain their
-pagination, shifted only by the inserted acknowledgment page. Fresh fragment and
-keep checks cover the code and labels. `layout-review.json` records current target
-folios, endings and complete ambiguous paragraphs; `baseline-correspondence.json`
-records the unchanged source hashes and text pagination.
+At the 33-file checkpoint I inspected all 39 focused target pages. For this final
+polish I inspected the first contact sheet, acknowledgments p4, the key p7 and
+the corrected Ch7 paragraph p128. The prior accepted proof is retained in
+`accepted-adaa2f6-a/` and `accepted-adaa2f6-b/`. Comparing source memberships
+against that proof finds only five moved text blocks: the dedication and the
+acknowledgments heading/paragraphs. All later source-text and code-line folios
+are unchanged, including every repaired target above. Fresh keeps and fragment
+checks pass throughout both renders.
 
-### Still open: five ambiguous quote paragraphs
+### Final polish after adaa2f6
 
-These are printed as supplied, including straight quotes, pending the author's
-decision. The converter does not guess at the marked apostrophe/quote role.
-
-| Source | Final folio | Candidate |
+| Item | Before | Current result |
 | --- | --- | --- |
-| `book/02-advanced-typescript/01-conditional-types.md:71` | 128 | Opening quote after the em dash in `— "that's a ternary..."`. |
-| `book/03-patterns-and-design/02-branded-types.md:191` | 248 | `consumers' order check` |
-| `book/03-patterns-and-design/03-runtime-validation.md:330` | 263 | `consumers' needs` |
-| `book/04-the-real-world/02-monorepo-type-sharing.md:276` | 374 | `packages' source` |
-| `book/04-the-real-world/02-monorepo-type-sharing.md:324` | 376 | `packages' dist` and `dependencies' manifests` |
+| Ch7 dash/quote roles | Ambiguous paragraph left straight | p128: open, close after first dash, open after second dash, close at end. |
+| Plural possessives | Four paragraphs left straight | U+2019 in all five specified plural possessives; locations below. |
+| Key inline code | `!= null` broke across lines | p7: whole span stays together; all key code spans assert one line and no horizontal overflow. |
+| Front matter | Contents and key preceded dedication/acknowledgments | Title 1, proof information 2, dedication 3, acknowledgments 4, contents 5–6, key 7–8, Prologue 9, How to Read 10, Meet the Cast 15. |
 
-No leading-apostrophe or parenthesis-opening candidate remains outside the audit.
-All specified heading/fence defects and three-or-fewer-line chapter endings are
-resolved. The symbol-key wording and acknowledgment baseline are now settled.
-The remaining quote decisions, placeholder release metadata and printer/recto
-choices are explicit, not silently resolved by this proof.
+Dedication and acknowledgments remain in contents and now have top-level
+bookmarks, before the Prologue. Front-matter order and running heads are checked
+against the rendered pages; contents destinations, bookmark destinations and
+continuous folios all pass. The key retains all 26 fused combinations, separate
+typing cells and the same body size; no manuscript text was changed.
+
+### Explicit quote decisions: none outstanding
+
+`design/print/quote-decisions.json` records the author's decisions by exact source
+path, line, original Markdown SHA-256, character offset and expected character.
+There are nine explicit mark roles in five paragraphs. The general converter has
+not been relaxed to guess at other plural possessives or dash-separated speech.
+A changed source paragraph, a missing decision or a remaining ambiguity fails.
+
+| Source | Folio | Applied decision |
+| --- | --- | --- |
+| `book/02-advanced-typescript/01-conditional-types.md:71` | 128 | `“No, I mean —” he points ... return position — “that’s a ternary ... goes.”` |
+| `book/03-patterns-and-design/02-branded-types.md:191` | 248 | `consumers’ order check` |
+| `book/03-patterns-and-design/03-runtime-validation.md:330` | 263 | `consumers’ needs` |
+| `book/04-the-real-world/02-monorepo-type-sharing.md:276` | 374 | `packages’ source` |
+| `book/04-the-real-world/02-monorepo-type-sharing.md:324` | 376 | `packages’ dist` and `dependencies’ manifests` |
+
+All five pass the printed balance and exact reverse checks. Twenty additional
+controls confirm conversion/reversal, original ambiguity without the decision,
+no decision at a different line, and rejection after changing the Markdown.
+Evidence: `quote-decision-controls.json` in ignored proof output. No leading
+apostrophe, dash/parenthesis quote or plural-apostrophe ambiguity remains.
+
+### Final verification and remaining release work
+
+Both clean 439-page renders pass all source/fence/text, note, no-split table,
+font, overflow, keep, navigation, symbol-inventory and exact-last-line checks.
+Their text, geometry, links, bookmarks and every page raster match. The nine
+trial specimens pass again; clean `npm ci` reports zero vulnerabilities and the
+full `npm run check` passes. Evidence logs are in the ignored proof output.
+
+No requested layout or quote item remains open. Printer, paper/binding and
+recto-start choices remain unsettled; the public repository URL/tag, license and
+imprint remain placeholders. The print README now separates the proof commands
+from this outstanding release work. This proof is not a printer-ready release.

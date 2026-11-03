@@ -1,12 +1,28 @@
 """Conservative, reversible prose typography. No changes to code or link targets."""
 import re
+import json
+import hashlib
+from pathlib import Path
 
 STRAIGHT = str.maketrans({'“':'"', '”':'"', '‘':"'", '’':"'"})
 
 def straight(text):
     return text.translate(STRAIGHT)
 
-def convert(children):
+DECISIONS = json.loads((Path(__file__).with_name('quote-decisions.json')).read_text())['decisions']
+
+def decision_for(source, line, markdown):
+    matches = [d for d in DECISIONS if (d['source'],d['line'])==(source,line)]
+    if not matches:
+        return None
+    assert len(matches)==1
+    decision = matches[0]
+    if hashlib.sha256(markdown.encode()).hexdigest()!=decision['markdown_sha256']:
+        raise ValueError(f'Quote decision source changed: {source}:{line}')
+    return decision
+
+
+def convert(children, decision=None):
     # Track positions across emphasis tokens, while protecting code and whole links
     # whose labels contain code. Preserve literal URLs even outside Markdown links.
     protected = set()
@@ -26,6 +42,8 @@ def convert(children):
                 chars.append(c if not literal and j not in urls else '\ufffc')
                 places.append((i,j) if not literal and j not in urls else None)
     text = ''.join(chars)
+    explicit = {m['offset']:m for m in decision['marks']} if decision else {}
+    applied = []
     stack = []
     replacements = {}
     roles = {}
@@ -36,7 +54,23 @@ def convert(children):
             continue
         prev = text[pos-1] if pos else ''
         nxt = text[pos+1] if pos+1<len(text) else ''
-        if c == "'" and (prev.isalnum() or prev == '\ufffc') and nxt.isalnum():
+        if pos in explicit:
+            mark = explicit[pos]
+            if c != mark['expected'] or places[pos] is None:
+                raise ValueError('Source-located quote decision no longer matches prose')
+            role = mark['role']
+            if role == 'open':
+                stack.append(c); replacements[pos] = pairs[c][0]
+            elif role == 'close':
+                if not stack or stack.pop()!=c:
+                    raise ValueError('Explicit closing quote is unbalanced')
+                replacements[pos] = pairs[c][1]
+            elif role == 'apostrophe' and c == "'":
+                replacements[pos] = '’'
+            else:
+                raise ValueError('Invalid explicit quote role')
+            roles[pos] = role; applied.append(pos)
+        elif c == "'" and (prev.isalnum() or prev == '\ufffc') and nxt.isalnum():
             replacements[pos] = '’'; roles[pos] = 'apostrophe'  # contractions and internal possessives
         elif stack and stack[-1] == c:
             stack.pop(); replacements[pos] = pairs[c][1]; roles[pos] = 'close'
@@ -50,6 +84,8 @@ def convert(children):
             if prior.endswith(('—','–','-','(')):
                 ambiguous.append({'offset':pos,'reason':'opening quote after dash or parenthesis'})
             stack.append(c); replacements[pos] = pairs[c][0]; roles[pos] = 'open'
+    if set(applied)!=set(explicit):
+        raise ValueError('An explicit quote decision was not applied')
     if stack:
         ambiguous.append({'reason':'unbalanced source quote delimiters','open':stack})
     if ambiguous:
@@ -64,7 +100,7 @@ def convert(children):
         original = children[i].content
         children[i].content = ''.join(chars)
         assert straight(children[i].content) == straight(original)
-    return {'converted':bool(replacements),'balanced':True,'replacements':len(replacements), 'marks':[{'offset':i,'character':c,'role':roles[i]} for i,c in replacements.items()]}
+    return {'explicit_decision':{'source':decision['source'],'line':decision['line'],'offsets':applied} if decision else None, 'converted':bool(replacements),'balanced':True,'replacements':len(replacements), 'marks':[{'offset':i,'character':c,'role':roles[i]} for i,c in replacements.items()]}
 
 
 def verify_printed(text, audit):

@@ -1,5 +1,8 @@
 # Print design study
 
+For the current complete-book build, see [Whole-book proof](#whole-book-proof).
+The Chapter 10 study below is historical.
+
 A minimal sci-fi direction for **It Depends — TypeScript Principles, Debated**.
 The study renders the complete Chapter 10 in 6 × 9 and 7 × 10 inches. It reads
 the manuscript directly; it does not maintain a second copy of the chapter.
@@ -187,13 +190,18 @@ page-bottom notes, with no manuscript rewrite or printer setup.
 
 Step 2 assembles the frozen **d03727a** manuscript through the approved 34-file
 manifest. The current proof has **439 pages**, all marked **PROOF**, and passes
-content, navigation and reproducibility checks. It still needs layout polish;
+content, navigation, layout and reproducibility checks;
 see the page-specific [spread review](../../docs/editorial/full-review/WHOLE-BOOK-PROOF-REVIEW.md).
 This is not release approval.
 
-Use the pinned environment installed for the trial, from the repository root:
+Use the pinned environment installed for the trial, from the repository root.
+A complete verification run is:
 
 ```sh
+npm ci
+npm run check
+design/print/.venv/bin/python design/print/footnote_trial.py
+
 # Each render requires its own absent output directory; archive prior runs first.
 design/print/.venv/bin/python design/print/build_proof.py --run a
 design/print/.venv/bin/python design/print/build_proof.py --run b
@@ -257,9 +265,12 @@ longer get a numeral box; Bonus chapter numbers remain.
 labels containing code are protected. The actual printed delimiters are checked
 for balance, and mapping curly punctuation back to straight must reconstruct each
 source text block exactly, including whitespace. All 1,507 inline-code values
-are checked unchanged in addition to the fence hashes. Five ambiguous paragraphs
-are left unchanged and listed with source lines and proof folios in the review;
-no guessed typography is applied to them.
+are checked unchanged in addition to the fence hashes. `quote-decisions.json`
+records the author's nine explicit mark decisions in five paragraphs, keyed by
+source path, line, original Markdown SHA-256 and character offset. A changed
+paragraph or missing decision fails the build. These decisions do not loosen the
+general rules. All converted paragraphs balance and reverse exactly; any
+unsettled ambiguity fails validation. None remains in this source.
 
 The author replaced the proposed ligature removal with a print-only symbol key.
 The code keeps its existing shaping. `symbol_key.py` joins the PDF character text
@@ -269,20 +280,42 @@ actual fused combinations. Single-character contextual alternates and the blank
 line placeholder are not multi-character ligatures. The key must cover exactly
 that inventory: **26 sequences**, not the font's complete substitution list.
 `symbol-key.json` holds the approved introduction and four ordered groups,
-with a SHA-256 of the supplied text. The key uses body-size text on pages 5–6;
-its 1,005-point natural height exceeds the 621-point page body. Breaks are allowed
+with a SHA-256 of the supplied text. The key uses body-size text on pages 7–8;
+its 1,021-point natural height exceeds the 621-point page body. Breaks are allowed
 only between whole groups. The intro's two inline examples must paint the fused
 source glyphs. Paired meanings may share a cell; all 26 combinations retain
 their own printed-glyph and typing cells. The key is generated after the contents, separately
 from the manuscript manifest and text count. Its printed column must use glyphs
 observed in the book; its typing column must use the individual character glyphs.
 Both checks run against the saved PDF. Only that typing column isolates glyphs.
+Every inline-code span in the key stays unbroken; validation checks its single
+line rectangle and horizontal bounds, including `!= null`.
 
 PR #40 is merged. The frozen source is main `d03727a0947a8434ac36e3978533152dc93a2e0f`,
-with 34 files. Acknowledgments immediately follows the dedication as a single
+with 34 files. The physical order is title (1), proof information (2), dedication
+(3), acknowledgments (4), contents (5–6), symbol key (7–8), Prologue opener (9),
+How to Read (10) and Meet the Cast (15). Dedication and acknowledgments are
+front matter before the Prologue, with their own top-level bookmarks and contents
+entries. Order, running heads and measured navigation are asserted.
+Acknowledgments immediately follows the dedication as a single
 quiet page, with its heading and three paragraphs, no opener or numeral box,
 and an entry in contents and bookmarks. Manifest coverage is checked against
 the frozen Git tree, not a hard-coded file count. Output directories derive
 their suffix from the frozen commit; the 33-file layout checkpoint is preserved
 in `output/whole-book-proof-layout/`. All new hashes and counts come from fresh
 source parsing and rendering.
+
+
+### What release still needs
+
+The whole-book command currently builds a **proof only**. Keep its PROOF marks
+and placeholder metadata until the release settings are approved. The author
+must supply the public repository URL and release tag, license and imprint in
+`release-metadata.json`. The existing release metadata gate rejects placeholders;
+passing that gate alone does not create a release PDF.
+
+A printer still needs to be selected. Its paper, binding, gutter, bleed/file
+requirements and recto-start policy must be settled before production pagination
+and a physical proof. Continuous folios and next-page starts remain the approved
+proof settings. Production output and removal of proof furniture require a
+separate release step after these decisions, followed by the same validation.

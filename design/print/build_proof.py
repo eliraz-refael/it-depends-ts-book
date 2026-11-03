@@ -102,7 +102,7 @@ def symbol_key_html():
                 rows.append(f'<tr data-symbol-sequence="{html.escape(sequence,quote=True)}"><td><code data-key-glyph>{html.escape(sequence)}</code></td><td><code data-key-literal>{literal}</code></td>{meaning}</tr>')
         groups.append(f'<section class="symbol-group" data-symbol-group="{i}"><h2>{html.escape(group["title"])}</h2><table><thead><tr><th>Printed glyph</th><th>Characters to type</th><th>Meaning</th></tr></thead><tbody>{"".join(rows)}</tbody></table></section>')
     intro = f'<h1>{html.escape(key["title"])}</h1><p>{key_markup(key["intro"],intro=True)}</p>'
-    return f'<section class="front-page symbol-key running-title" data-running="Reading the code symbols"><div class="symbol-first">{intro}{groups[0]}</div>{"".join(groups[1:])}</section>'
+    return f'<section class="front-page symbol-key running-title" data-front-part="symbol-key" data-running="Reading the code symbols"><div class="symbol-first">{intro}{groups[0]}</div>{"".join(groups[1:])}</section>'
 
 
 def assemble(data, directory):
@@ -112,30 +112,32 @@ def assemble(data, directory):
     tables_by_location = {(t['source'], t['line']): t for t in source_tables}
     manifest = {'manuscript_commit':data['manuscript_commit'], 'source_sha256': hashes, 'links': links, 'texts': {}, 'code': {}, 'fences': [], 'tables': [], 'notes': [], 'navigation': [], 'transcripts': [], 'documents': [], 'quote_audit': [], 'inline_code': {},
                 'proof_settings': {'folios': 'continuous Arabic', 'starts': 'next page; no forced recto blanks'}}
-    articles, toc = [], []
+    articles, toc, front_docs = [], [], []
     last_act = None
     prologue_notes = 0
     for doc_index, name in enumerate(order):
         source = (ROOT / name).read_text()
         tokens = MD.parse(source)
         act = int(name.split('/')[1].split('-')[0])
-        if act != last_act:
+        preface = name in ('book/00-prologue/00-dedication.md','book/00-prologue/00a-acknowledgments.md')
+        article_start = len(articles)
+        if not preface and act != last_act:
             aid = f'act-{act}'
             act_name, act_title = ACTS[act]
             heading = f'{act_name} / {act_title}'
             manifest['navigation'].append({'level': 1, 'id': aid, 'title': heading})
             toc.append((aid, heading, 'toc-act'))
-            articles.append(f'<section class="act-opener running-title" data-running="{html.escape(heading, quote=True)}" data-destination="{aid}" id="{aid}"><div class="eyebrow">{act_name.upper()}</div>{opener_art(act if act in (1,2,3,4) else None)}<h1>{html.escape(act_title)}</h1><div class="opener-bottom">IT DEPENDS / {html.escape(data["subtitle"])}</div></section>')
+            articles.append(f'<section class="act-opener running-title" data-front-part="{'prologue' if act == 0 else ''}" data-running="{html.escape(heading, quote=True)}" data-destination="{aid}" id="{aid}"><div class="eyebrow">{act_name.upper()}</div>{opener_art(act if act in (1,2,3,4) else None)}<h1>{html.escape(act_title)}</h1><div class="opener-bottom">IT DEPENDS / {html.escape(data["subtitle"])}</div></section>')
             last_act = act
         first_h1 = next((i for i, t in enumerate(tokens) if t.type == 'heading_open' and t.tag == 'h1'), None)
         title = plain(tokens[first_h1 + 1].children) if first_h1 is not None else 'Dedication'
         quiet = name == 'book/00-prologue/00a-acknowledgments.md'
         doc_id = f'document-{doc_index}'
-        manifest['navigation'].append({'level': 2, 'id': doc_id, 'title': title})
+        manifest['navigation'].append({'level': 1 if preface else 2, 'id': doc_id, 'title': title})
         toc.append((doc_id, title, 'toc-doc'))
         manifest['documents'].append({'source': name, 'id': doc_id, 'title': title, 'act': act, 'quiet':quiet, 'paragraphs':sum(t.type=='paragraph_open' for t in tokens)})
         reset = act > 0 or doc_index == 0
-        articles.append(f'<article id="{doc_id}" data-document="{doc_index}" data-quiet-frontmatter="{str(quiet).lower()}" data-final-chapter="{str(name == order[-1]).lower()}" data-tail-balance="{str(name in TAIL_BALANCE).lower()}" data-destination="{doc_id}" class="source-chapter {"chapter" if reset else "prologue"}">')
+        articles.append(f'<article id="{doc_id}" data-document="{doc_index}" data-front-part="{'acknowledgments' if quiet else 'dedication' if preface else ''}" data-quiet-frontmatter="{str(quiet).lower()}" data-final-chapter="{str(name == order[-1]).lower()}" data-tail-balance="{str(name in TAIL_BALANCE).lower()}" data-destination="{doc_id}" class="source-chapter {"chapter" if reset else "prologue"}">')
         if first_h1 is None:
             articles.append('<div class="dedication running-title" data-running="Dedication">')
         if quiet:
@@ -172,7 +174,8 @@ def assemble(data, directory):
                 text_id = f'text-{doc_index}-{i}'
                 manifest['texts'][text_id] = {'text': plain(token.children), 'source': name, 'line': token.map[0] + 1}
                 children = token.children or []
-                audit = prose_quotes.convert(children)
+                decision = prose_quotes.decision_for(name,token.map[0]+1,token.content)
+                audit = prose_quotes.convert(children,decision)
                 if audit.get('converted') or audit.get('ambiguous'):
                     manifest['quote_audit'].append({'id':text_id, 'source':name, 'line':token.map[0]+1, **audit})
                 bits, pending = [], None
@@ -231,15 +234,20 @@ def assemble(data, directory):
                 trial.require(token.type not in ('html_block', 'html_inline', 'image'), f'Unreviewed raw markup: {name}')
                 articles.append(MD.renderer.render([token], MD.options, {}))
         articles.append('</main></article>' if first_h1 is not None else '</div></article>')
+        if preface:
+            front_docs.extend(articles[article_start:])
+            del articles[article_start:]
         if act == 0:
             prologue_notes = note_number
+    applied_decisions = {(a['explicit_decision']['source'],a['explicit_decision']['line']) for a in manifest['quote_audit'] if a.get('explicit_decision')}
+    trial.require(applied_decisions=={(d['source'],d['line']) for d in prose_quotes.DECISIONS}, 'Missing source-located quote decision')
     trial.require(list(manifest['texts'].values())[-1]['text'] == FINAL_LINE, 'Final narrative line changed')
     trial.require(len(manifest['notes']) == 7 and len(manifest['tables']) == 17 and len(manifest['transcripts']) == 7, 'Lost links/tables/transcripts')
     contents = ''.join(f'<li class="{kind}"><a href="#{target}" data-toc-target="{target}"><span>{html.escape(title)}</span><span class="toc-page">000</span></a></li>' for target, title, kind in toc)
     metadata = ''.join(f'<dt>{label}</dt><dd>{html.escape(data[key])}</dd>' for key, label in [('public_repository_url', 'Public repository (placeholder)'), ('release_tag','Release tag (placeholder)'), ('license','License (placeholder)'), ('imprint','Imprint (placeholder)'), ('manuscript_commit','Frozen manuscript commit')])
-    front = f'''<section class="front-page cover running-title" data-running="IT DEPENDS / PROOF"><div class="eyebrow">WHOLE-BOOK PROOF</div><h1>{html.escape(data['title'])}</h1><h2>{html.escape(data['subtitle'])}</h2><div class="opener-bottom">PROOF / NOT FOR RELEASE</div></section>
-<section class="front-page metadata"><h1>Proof information</h1><p>This proof uses placeholder publication metadata. It is not for release.</p><dl>{metadata}</dl><p>Continuous Arabic folios. Acts and chapters start on the next page; no recto blanks have been inserted.</p></section>
-<nav class="contents"><h1>Contents</h1><ol class="toc">{contents}</ol></nav>{symbol_key_html()}'''
+    front = f'''<section class="front-page cover running-title" data-front-part="title" data-running="IT DEPENDS / PROOF"><div class="eyebrow">WHOLE-BOOK PROOF</div><h1>{html.escape(data['title'])}</h1><h2>{html.escape(data['subtitle'])}</h2><div class="opener-bottom">PROOF / NOT FOR RELEASE</div></section>
+<section class="front-page metadata running-title" data-running="Proof information" data-front-part="proof-info"><h1>Proof information</h1><p>This proof uses placeholder publication metadata. It is not for release.</p><dl>{metadata}</dl><p>Continuous Arabic folios. Acts and chapters start on the next page; no recto blanks have been inserted.</p></section>
+{"".join(front_docs)}<nav class="contents running-title" data-running="Contents" data-front-part="contents"><h1>Contents</h1><ol class="toc">{contents}</ol></nav>{symbol_key_html()}'''
     document = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><title>It Depends — whole-book PROOF</title><link rel="stylesheet" href="{(HERE/'proof.css').as_uri()}"><script>window.PagedConfig={{auto:false}};</script><script src="{(HERE/'node_modules/pagedjs/dist/paged.polyfill.js').as_uri()}"></script><script src="{(HERE/'chapter-counters.js').as_uri()}"></script><script src="{(HERE/'proof-handler.js').as_uri()}"></script></head><body>{front}{''.join(articles)}</body></html>'''
     directory.mkdir(parents=True, exist_ok=True)
     (directory / 'book.html').write_text(document)
@@ -362,6 +370,7 @@ def validate(directory, manifest):
         total = sum(f['lines'] for f in fragments)
         check(len(fragments)==1 or total>12, f'Short fence split: {fid}')
         check(len(fragments)==1 or all(f['lines']>=4 for f in fragments), f'Fence fragment under four lines: {fid}: {fragments}')
+    check(not any(a.get('ambiguous') for a in manifest['quote_audit']), 'Unsettled prose quote ambiguity')
     for audit in manifest['quote_audit']:
         check(not audit.get('converted') or prose_quotes.verify_printed(''.join(text_pieces[audit['id']]),audit), f'Unbalanced converted paragraph: {audit["id"]}')
     for key, expected in manifest['code'].items():
@@ -381,6 +390,22 @@ def validate(directory, manifest):
     final_body = document[-1].get_text(clip=pdf_rect(pages[-1]['body'],pages[-1]['rect']))
     check(norm(final_body).endswith(norm(FINAL_LINE)), 'PDF final narrative line not exact / material follows it')
     check(not pages[-1]['notes'], 'A footnote follows final narrative')
+    front_headers = {'title':'IT DEPENDS / PROOF','proof-info':'Proof information','dedication':'Dedication','acknowledgments':'Acknowledgments','contents':'Contents','symbol-key':'Reading the code symbols','prologue':'Prologue / Before the debates'}
+    front_sequence = []
+    for page in pages:
+        for kind in page['front_parts']:
+            header = document[page['page']-1].get_text(clip=pymupdf.Rect(0,0,504,42))
+            check(norm(front_headers[kind]) in norm(header), 'Wrong front-matter running head: '+kind)
+            if not front_sequence or kind!=front_sequence[-1]:
+                front_sequence.append(kind)
+    check(front_sequence==['title','proof-info','dedication','acknowledgments','contents','symbol-key','prologue'], 'Front matter order changed')
+    how = next(d for d in manifest['documents'] if d['source'].endswith('/01-how-to-read.md'))
+    cast = next(d for d in manifest['documents'] if d['source'].endswith('/02-meet-the-cast.md'))
+    check(targets['act-0']<targets[how['id']]<targets[cast['id']], 'Prologue reading order changed')
+    for page in pages:
+        for code in page['key_code']:
+            check(len(code['rects'])==1, 'Key inline code wrapped: '+code['text'])
+            check(all(r['x']>=page['body']['x']-1 and r['right']<=page['body']['right']+1 for r in code['rects']), 'Key inline code overflow: '+code['text'])
     last_doc = len(manifest['documents'])-1
     check(note_pages.get(f'note-{last_doc}-1',0)<targets[next(n['id'] for n in manifest['navigation'] if n['level']==3 and n['title']=='The Verdict' and n['id'].startswith(f'heading-{last_doc}-'))], 'Final source note must precede final Verdict')
     for i, doc in enumerate(manifest['documents']):
