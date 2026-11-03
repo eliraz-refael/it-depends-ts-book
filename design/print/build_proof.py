@@ -19,9 +19,9 @@ from pygments.token import STANDARD_TYPES
 import footnote_trial as trial
 import prose_quotes
 import symbol_key
+import release_export
 
 HERE, ROOT = trial.HERE, trial.ROOT
-OUT = HERE / 'output' / ('whole-book-proof-' + trial.read_json(HERE/'release-metadata.json')['manuscript_commit'][:7])
 MD = trial.MD
 FINAL_LINE = 'Oded: "Good. Now I have a green pull request and a meeting four minutes ago."'
 ACTS = [
@@ -105,13 +105,16 @@ def symbol_key_html():
     return f'<section class="front-page symbol-key running-title" data-front-part="symbol-key" data-running="Reading the code symbols"><div class="symbol-first">{intro}{groups[0]}</div>{"".join(groups[1:])}</section>'
 
 
-def assemble(data, directory):
+def assemble(data, directory, mode="proof"):
     links, hashes = trial.inputs(data)
+    readme_tokens = MD.parse((ROOT/'README.md').read_text())
+    headings = [readme_tokens[i+1].content for i,t in enumerate(readme_tokens) if t.type=='heading_open']
+    trial.require(headings.count('Checking the Examples')==1 and re.sub(r'\s+','-', 'Checking the Examples'.lower())=='checking-the-examples', 'README anchor changed')
     order = list(hashes)
     source_tables = trial.book_tables()
     tables_by_location = {(t['source'], t['line']): t for t in source_tables}
     manifest = {'manuscript_commit':data['manuscript_commit'], 'source_sha256': hashes, 'links': links, 'texts': {}, 'code': {}, 'fences': [], 'tables': [], 'notes': [], 'navigation': [], 'transcripts': [], 'documents': [], 'quote_audit': [], 'inline_code': {},
-                'proof_settings': {'folios': 'continuous Arabic', 'starts': 'next page; no forced recto blanks'}}
+                'mode':mode, 'proof_settings': {'folios': 'continuous Arabic', 'starts': 'next page; no forced recto blanks'}}
     articles, toc, front_docs = [], [], []
     last_act = None
     prologue_notes = 0
@@ -201,7 +204,7 @@ def assemble(data, directory):
                         label = MD.renderer.renderInline(children[j + 1:end], MD.options, {})
                         href = child.attrGet('href')
                         if href.startswith('../../README.md'):
-                            href = data['public_repository_url'].rstrip('/') + '/blob/' + quote(data['release_tag'], safe='') + '/README.md#checking-the-examples'
+                            href = data['public_repository_url'].rstrip('/') + ('#checking-the-examples' if mode=='release' else '/blob/' + quote(data['release_tag'], safe='') + '/README.md#checking-the-examples')
                             child.attrSet('href', href)
                         note_number += 1
                         nid = f'note-{doc_index}-{note_number}'
@@ -256,11 +259,15 @@ def assemble(data, directory):
     trial.require(list(manifest['texts'].values())[-1]['text'] == FINAL_LINE, 'Final narrative line changed')
     trial.require(len(manifest['notes']) == 7 and len(manifest['tables']) == 17 and len(manifest['transcripts']) == 7, 'Lost links/tables/transcripts')
     contents = ''.join(f'<li class="{kind}"><a href="#{target}" data-toc-target="{target}"><span>{html.escape(title)}</span><span class="toc-page">000</span></a></li>' for target, title, kind in toc)
-    metadata = ''.join(f'<dt>{label}</dt><dd>{html.escape(data[key])}</dd>' for key, label in [('public_repository_url', 'Public repository (placeholder)'), ('release_tag','Release tag (placeholder)'), ('license','License (placeholder)'), ('imprint','Imprint (placeholder)'), ('manuscript_commit','Frozen manuscript commit')])
+    metadata = ''.join(f'<dt>{label}</dt><dd>{html.escape(data[key])}</dd>' for key, label in [('public_repository_url', 'Public repository'), ('release_tag','Release tag'), ('license','License'), ('imprint','Imprint'), ('manuscript_commit','Frozen manuscript commit')])
     front = f'''<section class="front-page cover running-title" data-front-part="title" data-running="IT DEPENDS / PROOF"><div class="eyebrow">WHOLE-BOOK PROOF</div><h1>{html.escape(data['title'])}</h1><h2>{html.escape(data['subtitle'])}</h2><div class="opener-bottom">PROOF / NOT FOR RELEASE</div></section>
-<section class="front-page metadata running-title" data-running="Proof information" data-front-part="proof-info"><h1>Proof information</h1><p>This proof uses placeholder publication metadata. It is not for release.</p><dl>{metadata}</dl><p>Continuous Arabic folios. Acts and chapters start on the next page; no recto blanks have been inserted.</p></section>
+<section class="front-page metadata running-title" data-running="Proof information" data-front-part="proof-info"><h1>Proof information</h1><p>This proof is not for release.</p><dl>{metadata}</dl><p>Continuous Arabic folios. Acts and chapters start on the next page; no recto blanks have been inserted.</p></section>
 {"".join(front_docs)}<nav class="contents running-title" data-running="Contents" data-front-part="contents"><h1>Contents</h1><ol class="toc">{contents}</ol></nav>{symbol_key_html()}'''
-    document = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><title>It Depends — whole-book PROOF</title><link rel="stylesheet" href="{(HERE/'proof.css').as_uri()}"><script>window.PagedConfig={{auto:false}};</script><script src="{(HERE/'node_modules/pagedjs/dist/paged.polyfill.js').as_uri()}"></script><script src="{(HERE/'chapter-counters.js').as_uri()}"></script><script src="{(HERE/'proof-handler.js').as_uri()}"></script></head><body>{front}{''.join(articles)}</body></html>'''
+    if mode == 'release':
+        split = front.index(''.join(front_docs))
+        front = release_export.front(data) + front[split:]
+    release_style = f'<link rel="stylesheet" href="{(HERE/"release.css").as_uri()}">' if mode == 'release' else ''
+    document = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><title>It Depends{' — whole-book PROOF' if mode=='proof' else ''}</title><link rel="stylesheet" href="{(HERE/'proof.css').as_uri()}">{release_style}<script>window.PagedConfig={{auto:false}};</script><script src="{(HERE/'node_modules/pagedjs/dist/paged.polyfill.js').as_uri()}"></script><script src="{(HERE/'chapter-counters.js').as_uri()}"></script><script src="{(HERE/'proof-handler.js').as_uri()}"></script></head><body>{front}{''.join(articles)}</body></html>'''
     directory.mkdir(parents=True, exist_ok=True)
     (directory / 'book.html').write_text(document)
     write_json(directory / 'source-manifest.json', manifest)
@@ -275,11 +282,14 @@ def link_signature(link):
     return {k: list(v) if isinstance(v, (pymupdf.Point, pymupdf.Rect)) else v for k, v in link.items() if k not in ('xref','id')}
 
 
-def validate(directory, manifest):
+def validate(directory, manifest, mode="proof"):
+    is_release = mode == "release"
+    trial.require(manifest.get("mode","proof")==mode, "Render mode mismatch")
     result = trial.read_json(directory / 'layout.json')
     layout = result['layout']
     pages, targets = layout['pages'], layout['targets']
     document = pymupdf.open(directory / 'raw.pdf')
+    colour_audit = release_export.greyscale(document) if is_release else None
     failures, observations = [], []
     def check(ok, message):
         if not ok:
@@ -295,7 +305,8 @@ def validate(directory, manifest):
         pdf = document[number-1]
         check(abs(pdf.rect.width-504)<.1 and abs(pdf.rect.height-720)<.1, f'p{number}: trim')
         all_text = pdf.get_text()
-        check('PROOF' in pdf.get_text(clip=pymupdf.Rect(0,680,504,720)), f'p{number}: missing proof footer')
+        if not is_release:
+            check('PROOF' in pdf.get_text(clip=pymupdf.Rect(0,680,504,720)), f'p{number}: missing proof footer')
         check(re.findall(r'(?m)^\d+$', pdf.get_text(clip=pymupdf.Rect(0,680,504,720))) == [str(number)], f'p{number}: wrong folio')
         check(bool(pdf.get_text(clip=pymupdf.Rect(0,42,504,678)).strip()), f'p{number}: unintended blank page')
         for font in pdf.get_fonts(full=True):
@@ -320,7 +331,8 @@ def validate(directory, manifest):
             note_pages[n['id']] = number
             expected = next(x for x in manifest['notes'] if x['id']==n['id'])
             check(expected['href'] in norm(pdf.get_text(clip=pdf_rect(p['footnotes'],origin,1))), f'p{number}: note URL not selectable')
-            check(any(l.get('uri')==expected['href'] for l in pdf.get_links()), f'p{number}: external URL not clickable')
+            if not is_release:
+                check(any(l.get('uri')==expected['href'] for l in pdf.get_links()), f'p{number}: external URL not clickable')
             check(n['rect']['bottom']<=p['footnotes']['bottom']+1, f'p{number}: footnote overflow')
         for kind, expected, accumulator in [('texts',manifest['texts'],text_pieces),('code',manifest['code'],code_pieces)]:
             for item in p[kind]:
@@ -404,6 +416,7 @@ def validate(directory, manifest):
     check(norm(final_body).endswith(norm(FINAL_LINE)), 'PDF final narrative line not exact / material follows it')
     check(not pages[-1]['notes'], 'A footnote follows final narrative')
     front_headers = {'title':'IT DEPENDS / PROOF','proof-info':'Proof information','dedication':'Dedication','acknowledgments':'Acknowledgments','contents':'Contents','symbol-key':'Reading the code symbols'}
+    if is_release:front_headers.update({'title':'IT DEPENDS','copyright':'Copyright'})
     front_sequence = []
     for page in pages:
         for kind in page['front_parts']:
@@ -411,7 +424,7 @@ def validate(directory, manifest):
             check(norm(front_headers[kind]) in norm(header), 'Wrong front-matter running head: '+kind)
             if not front_sequence or kind!=front_sequence[-1]:
                 front_sequence.append(kind)
-    check(front_sequence==['title','proof-info','dedication','acknowledgments','contents','symbol-key'], 'Front matter order changed')
+    check(front_sequence==['title','copyright' if is_release else 'proof-info','dedication','acknowledgments','contents','symbol-key'], 'Front matter order changed')
     how = next(d for d in manifest['documents'] if d['source'].endswith('/01-how-to-read.md'))
     cast = next(d for d in manifest['documents'] if d['source'].endswith('/02-meet-the-cast.md'))
     check(targets[how['id']]<targets[cast['id']], 'Prologue reading order changed')
@@ -474,37 +487,54 @@ def validate(directory, manifest):
     write_json(directory/'content-validation.json', {'failures': failures, 'observations': observations})
     # Build-owned navigation uses measured destinations, not inferred page offsets.
     bookmarks = [[n['level'],n['title'],targets[n['id']]] for n in manifest['navigation']]
-    document.set_toc(bookmarks)
-    for p in pages:
-        pdf = document[p['page']-1]
-        for call in p['calls']:
-            box = pdf_rect(call['rect'],p['rect'])
-            note = next(n for n in p['notes'] if n['ref']==call['ref'])
-            for link in pdf.get_links():
-                if link['kind'] != pymupdf.LINK_URI and box.intersects(link['from']):
-                    pdf.delete_link(link)
-            pdf.insert_link({'kind':pymupdf.LINK_GOTO,'from':box,'page':p['page']-1,'to':pdf_rect(note['rect'],p['rect']).tl})
-        for row in p['contents']:
-            box = pdf_rect(row['rect'],p['rect'])
-            for link in pdf.get_links():
-                if box.intersects(link['from']):
-                    pdf.delete_link(link)
-            pdf.insert_link({'kind':pymupdf.LINK_GOTO,'from':box,'page':targets[row['target']]-1,'to':pymupdf.Point(0,0)})
-    document.set_metadata({'title':'It Depends — whole-book PROOF','subject':f'Frozen manuscript {manifest["manuscript_commit"]}; placeholder metadata; not for release','creator':'Pinned local Paged.js proof build','producer':'Chrome / PyMuPDF'})
-    final_path = directory / 'It-Depends-PROOF.pdf'
+    if is_release:
+        release_export.clean(document)
+    else:
+        document.set_toc(bookmarks)
+        for p in pages:
+            pdf = document[p['page']-1]
+            for call in p['calls']:
+                box = pdf_rect(call['rect'],p['rect'])
+                note = next(n for n in p['notes'] if n['ref']==call['ref'])
+                for link in pdf.get_links():
+                    if link['kind'] != pymupdf.LINK_URI and box.intersects(link['from']):
+                        pdf.delete_link(link)
+                pdf.insert_link({'kind':pymupdf.LINK_GOTO,'from':box,'page':p['page']-1,'to':pdf_rect(note['rect'],p['rect']).tl})
+            for row in p['contents']:
+                box = pdf_rect(row['rect'],p['rect'])
+                for link in pdf.get_links():
+                    if box.intersects(link['from']):
+                        pdf.delete_link(link)
+                pdf.insert_link({'kind':pymupdf.LINK_GOTO,'from':box,'page':targets[row['target']]-1,'to':pymupdf.Point(0,0)})
+        document.set_metadata({'title':'It Depends — whole-book PROOF','subject':f'Frozen manuscript {manifest["manuscript_commit"]}; not for release','creator':'Pinned local Paged.js proof build','producer':'Chrome / PyMuPDF'})
+    final_path = directory / pdf_name(mode)
     document.save(final_path, garbage=3, deflate=True)
     document.close()
     final = pymupdf.open(final_path)
-    check(final.get_toc()==bookmarks, 'Bookmarks changed on save')
-    for p in pages:
-        saved_links = final[p['page']-1].get_links()
-        for call in p['calls']:
-            box = pdf_rect(call['rect'],p['rect'])
-            note = next(n for n in p['notes'] if n['ref']==call['ref'])
-            destination = pdf_rect(note['rect'],p['rect']).tl
-            check(any(l.get('page')==p['page']-1 and box.intersects(l['from']) and abs(l.get('to',pymupdf.Point(-1,-1))-destination)<.1 for l in saved_links), f'p{p["page"]}: callout destination is not its note')
-        for row in p['contents']:
-            check(any(l.get('page')==targets[row['target']]-1 and pdf_rect(row['rect'],p['rect']).intersects(l['from']) for l in saved_links), f'p{p["page"]}: contents link target')
+    if is_release:
+        failures.extend(release_export.errors(final))
+        term_audit=release_export.publication_terms(final,manifest,pages,ROOT)
+        failures.extend(term_audit['failures'])
+        write_json(directory/'publication-terms.json',term_audit)
+        lines = [(p,item) for p in pages for item in p['copyright_lines']]
+        check(len(lines)==len(release_export.COPYRIGHT), 'Copyright line count')
+        for i,(page,item) in enumerate(lines):
+            expected = release_export.COPYRIGHT[i]
+            check(page['page']==2 and item['index']==str(i) and item['text'].replace('\xa0','')==expected, 'Copyright source line mismatch')
+            actual = final[1].get_text(clip=pdf_rect(item['rect'],page['rect'],.2)).strip()
+            check(actual==expected, f'Copyright PDF line {i+1}: {actual!r}')
+        check(manifest['manuscript_commit'] not in ''.join(p.get_text() for p in final), 'Release prints frozen hash')
+    else:
+        check(final.get_toc()==bookmarks, 'Bookmarks changed on save')
+        for p in pages:
+            saved_links = final[p['page']-1].get_links()
+            for call in p['calls']:
+                box = pdf_rect(call['rect'],p['rect'])
+                note = next(n for n in p['notes'] if n['ref']==call['ref'])
+                destination = pdf_rect(note['rect'],p['rect']).tl
+                check(any(l.get('page')==p['page']-1 and box.intersects(l['from']) and abs(l.get('to',pymupdf.Point(-1,-1))-destination)<.1 for l in saved_links), f'p{p["page"]}: callout destination is not its note')
+            for row in p['contents']:
+                check(any(l.get('page')==targets[row['target']]-1 and pdf_rect(row['rect'],p['rect']).intersects(l['from']) for l in saved_links), f'p{p["page"]}: contents link target')
     ligatures = symbol_key.inventory(final_path, pages, HERE/'fonts')
     write_json(directory/'symbol-inventory.json', ligatures)
     check(set(ligatures)==set(key_meanings(trial.read_json(HERE/'symbol-key.json'))), 'Symbol key differs from actual rendered code ligatures')
@@ -557,15 +587,19 @@ def validate(directory, manifest):
     report = {'status':'PASS' if not failures else 'FAIL','pages':len(final),'failures':failures,'observations':observations,'notes':printed_notes,
               'opener_pages':{'acts':part_pages,'prologue':prologue_pages,'chapters':[{ 'title':o['title'],'page':o['page'],'numeral':o['mark']} for o in chapter_pages]},
               'symbol_key_measure':measure,'symbol_group_pages':dict(group_pages),'endings':endings, 'ligature_sequences':list(ligatures), 'fences':len(manifest['fences']),'fence_languages':dict(Counter(f['language'] for f in manifest['fences'])),
-              'source_text_blocks':len(manifest['texts']),'code_lines':len(manifest['code']),'tables':dict(table_pages),'bookmarks':len(bookmarks),
+              'source_text_blocks':len(manifest['texts']),'code_lines':len(manifest['code']),'tables':dict(table_pages),'bookmarks':len(final.get_toc()),'mode':mode,'colour_audit':colour_audit,'pdf_version':final.metadata.get('format'),'file_size_bytes':final_path.stat().st_size,
               'fence_fragments':dict(fence_pages), 'quote_audit':manifest['quote_audit'], 'source_pages':dict(source_pages),'targets':targets,'pdf':str(final_path),'pdf_sha256':trial.digest(final_path.read_bytes())}
     write_json(directory/'validation.json',report)
     (directory/'extracted-text.txt').write_text('\n\f\n'.join(p.get_text() for p in final))
     return report
 
 
-def artifacts(directory):
-    doc = pymupdf.open(directory/'It-Depends-PROOF.pdf')
+def pdf_name(mode):
+    return "It-Depends-KDP-interior.pdf" if mode=="release" else "It-Depends-PROOF.pdf"
+
+
+def artifacts(directory, mode="proof"):
+    doc = pymupdf.open(directory/pdf_name(mode))
     image_dir = directory/'pages'; image_dir.mkdir(exist_ok=True)
     for i,p in enumerate(doc):
         p.get_pixmap(matrix=pymupdf.Matrix(1.5,1.5),alpha=False).save(image_dir/f'page-{i+1:03d}.png')
@@ -582,13 +616,13 @@ def artifacts(directory):
                 box=pymupdf.Rect(x,y,x+246,y+351.43)
                 page.draw_rect(box,fill=(1,1,1),color=None)
                 page.show_pdf_page(box,doc,i)
-                page.insert_text((x,y+365),f'PROOF / {i+1}',fontsize=8)
+                page.insert_text((x,y+365),f'{mode.upper()} / {i+1}',fontsize=8)
         page.get_pixmap(alpha=False).save(sheets/f'spreads-{start//8+1:02d}.png')
     return len(doc), len(list(sheets.glob('*.png')))
 
 
-def compare(a,b):
-    da,db = pymupdf.open(a/'It-Depends-PROOF.pdf'),pymupdf.open(b/'It-Depends-PROOF.pdf')
+def compare(a,b,mode='proof'):
+    da,db = pymupdf.open(a/pdf_name(mode)),pymupdf.open(b/pdf_name(mode))
     failures=[]
     for directory, pdf in [(a,da),(b,db)]:
         failures.extend(symbol_key.text_errors(pdf,trial.read_json(directory/'layout.json')['layout']['pages'],trial.read_json(HERE/'symbol-key.json'),norm,key_plain))
@@ -621,32 +655,34 @@ def compare(a,b):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--mode',choices=['proof','release'],default='proof')
     parser.add_argument('--run',choices=['a','b'],default='a')
     parser.add_argument('--inspect-existing',action='store_true')
     parser.add_argument('--compare',action='store_true')
     args=parser.parse_args()
     data=trial.read_json(HERE/'release-metadata.json')
-    placeholders=trial.metadata('proof',data)
+    placeholders=trial.metadata(args.mode,data)
+    out=HERE/'output'/f'whole-book-{args.mode}-{data["manuscript_commit"][:7]}'
     subprocess.run([str(HERE/'.venv/bin/python'),str(HERE/'footnote_trial.py'),'--validate-only'],check=True)
-    directory=OUT/args.run
+    directory=out/args.run
     if args.compare:
-        report=compare(OUT/'a',OUT/'b'); write_json(OUT/'comparison.json',report)
+        report=compare(out/'a',out/'b',args.mode); write_json(out/'comparison.json',report)
         print(json.dumps({k:v for k,v in report.items() if k!='raster_sha256'},indent=2)); sys.exit(bool(report['failures']))
     if args.inspect_existing:
         manifest=trial.read_json(directory/'source-manifest.json')
     else:
         trial.require(not directory.exists(),f'Clean render requires a new run directory: {directory}')
-        manifest=assemble(data,directory)
+        manifest=assemble(data,directory,args.mode)
         spec={'name':f'whole-book-{args.run}','kind':'book','html':str(directory/'book.html'),'pdf':str(directory/'raw.pdf'),
               'dom':str(directory/'rendered.html'),'layout':str(directory/'layout.json'),'timeoutMs':600000}
         write_json(directory/'render-spec.json',[spec])
         print(f'Rendering {len(manifest["source_sha256"])} files; {len(manifest["fences"])} fences; {len(manifest["texts"])} text blocks',flush=True)
         subprocess.run(['node',str(HERE/'render-trial.cjs'),str(directory/'render-spec.json')],check=True,timeout=1200)
-    report=validate(directory,manifest)
+    report=validate(directory,manifest,args.mode)
     trial.require(trial.inputs(data)[1]==manifest['source_sha256'],'Manuscript changed during build')
-    write_json(directory/'toolchain.json',{'versions':trial.read_json(HERE/'trial-toolchain.json'),'metadata':data,'placeholders':placeholders,'fonts':{p.name:trial.digest(p.read_bytes()) for p in sorted((HERE/'fonts').glob('*.ttf'))},'styles':{p.name:trial.digest(p.read_bytes()) for p in [HERE/'proof.css',HERE/'proof-handler.js',HERE/'chapter-counters.js']}})
+    write_json(directory/'toolchain.json',{'versions':trial.read_json(HERE/'trial-toolchain.json'),'metadata':data,'placeholders':placeholders,'fonts':{p.name:trial.digest(p.read_bytes()) for p in sorted((HERE/'fonts').glob('*.ttf'))},'styles':{p.name:trial.digest(p.read_bytes()) for p in [HERE/'proof.css',HERE/'proof-handler.js',HERE/'chapter-counters.js',HERE/'release.css']}})
     if args.run=='a':
-        count,sheets=artifacts(directory); print(f'{count} page images; {sheets} spread contact sheets',flush=True)
+        count,sheets=artifacts(directory,args.mode); print(f'{count} page images; {sheets} spread contact sheets',flush=True)
     print(json.dumps({k:v for k,v in report.items() if k not in ('source_pages','targets','observations','fence_fragments','quote_audit')},indent=2),flush=True)
     sys.exit(bool(report['failures']))
 

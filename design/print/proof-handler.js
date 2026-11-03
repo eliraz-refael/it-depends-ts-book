@@ -131,6 +131,7 @@ window.collectProof = () => {
           mark_style:style ? [style.fontFamily,style.fontSize,style.lineHeight,style.letterSpacing] : [],
           mark_relative_y:mark ? mark.getBoundingClientRect().y-p.getBoundingClientRect().y : null};
       }),
+      copyright_lines:[...p.querySelectorAll('[data-copyright-line]')].map(e=>({index:e.dataset.copyrightLine,text:e.textContent,rect:rect(e)})),
       front_parts:[...p.querySelectorAll('[data-front-part]')].map(e=>e.dataset.frontPart).filter(Boolean),
       key_code:[...p.querySelectorAll('.symbol-key code')].map(e=>({text:e.textContent,rects:[...e.getClientRects()].map(r=>({x:r.x,y:r.y,right:r.right,bottom:r.bottom}))})),
       quiet_frontmatter:[...p.querySelectorAll('[data-quiet-frontmatter="true"]')].map(e=>({id:e.id,paragraphs:e.querySelectorAll('main > p').length,headings:e.querySelectorAll('h1').length,opener:!!e.querySelector('.chapter-opener,.opener-art')})),

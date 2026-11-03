@@ -1,0 +1,4 @@
+/* Release-only furniture. All manuscript typography remains in proof.css. */
+@page { @bottom-left { content:none; } }
+.copyright { padding-top:135pt; font:9.5pt/14pt Plex; }
+.copyright-line { height:14pt; white-space:pre; }

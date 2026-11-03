@@ -1,6 +1,7 @@
 # Print design study
 
-For the current complete-book build, see [Whole-book proof](#whole-book-proof).
+For the current print-ready interior, see [Release export](#release-export).
+[Whole-book proof](#whole-book-proof) remains available for review.
 The Chapter 10 study below is historical.
 
 A minimal sci-fi direction for **It Depends — TypeScript Principles, Debated**.
@@ -128,13 +129,13 @@ design/print/.venv/bin/python design/print/footnote_trial.py
 # Inspect saved artifacts again without running Chrome/pagination:
 design/print/.venv/bin/python design/print/footnote_trial.py --inspect-existing
 
-# Must reject the committed placeholders before rendering:
+# Validate the committed real publication metadata:
 design/print/.venv/bin/python design/print/footnote_trial.py --mode release --validate-only
 ```
 
 `release-metadata.json` is the only source of publication metadata. Proof mode
-permits its placeholders and prints the README's `example.invalid` destination;
-release mode rejects them. The fixtures always carry a proof footer. A passing
+permits placeholders for development; release mode rejects publication
+placeholders. The committed metadata now contains the approved real values. The fixtures always carry a proof footer. A passing
 release metadata gate would not turn these synthetic pages into a release.
 
 The inventory is parsed from Markdown inline tokens in the approved reading
@@ -188,7 +189,8 @@ page-bottom notes, with no manuscript rewrite or printer setup.
 
 ## Whole-book proof
 
-Step 2 assembles the frozen **d03727a** manuscript through the approved 34-file
+The current build assembles the frozen **c37c3ea** manuscript (byte-identical
+`book/` content to the accepted **d03727a** proof) through the approved 34-file
 manifest. The current proof has **438 pages**, all marked **PROOF**, and passes
 content, navigation, layout and reproducibility checks;
 see the page-specific [spread review](../../docs/editorial/full-review/WHOLE-BOOK-PROOF-REVIEW.md).
@@ -211,7 +213,7 @@ design/print/.venv/bin/python design/print/build_proof.py --compare
 design/print/.venv/bin/python design/print/build_proof.py --run a --inspect-existing
 ```
 
-Outputs live in ignored `output/whole-book-proof-d03727a/`. The review PDF is
+Current outputs live in ignored `output/whole-book-proof-c37c3ea/`. The review PDF is
 `a/It-Depends-PROOF.pdf`; `a/pages/page-001.png` through `page-438.png` are the
 individual pages. `a/contact-sheets/spreads-01.png` through `spreads-28.png`
 show consecutive facing pages. The independent `b/` render supplies comparison
@@ -239,8 +241,8 @@ and short code continuations are reported separately from lost/clipped content.
 The source's final note stays before the final Verdict. The exact final narrative
 line is asserted, and no generated appendix or notes follow it. The only page
 furniture below it is the required proof footer and folio. Rendering remains
-local with HTTP(S) requests blocked. Publication placeholders remain in the
-single metadata file; the release metadata gate continues to reject them.
+local with HTTP(S) requests blocked. Publication metadata lives in one file;
+the release gate rejects placeholder values.
 
 
 ### Settled layout pass
@@ -313,16 +315,74 @@ in `output/whole-book-proof-layout/`. All new hashes and counts come from fresh
 source parsing and rendering.
 
 
-### What release still needs
+## Release export
 
-The whole-book command currently builds a **proof only**. Keep its PROOF marks
-and placeholder metadata until the release settings are approved. The author
-must supply the public repository URL and release tag, license and imprint in
-`release-metadata.json`. The existing release metadata gate rejects placeholders;
-passing that gate alone does not create a release PDF.
+The release mode uses the same frozen manuscript, renderer, typography and
+pagination as proof mode. It changes only the title-page furniture, copyright
+page, README note destination and PDF publication properties. No `book/` edits
+are made. Metadata is approved for KDP paperback, black ink on white paper,
+7 × 10 inches, no bleed. Continuous folios and next-page starts are retained.
 
-A printer still needs to be selected. Its paper, binding, gutter, bleed/file
-requirements and recto-start policy must be settled before production pagination
-and a physical proof. Continuous folios and next-page starts remain the approved
-proof settings. Production output and removal of proof furniture require a
-separate release step after these decisions, followed by the same validation.
+Use the pinned tools installed above, from the repository root:
+
+```sh
+npm ci
+npm run check
+design/print/.venv/bin/python design/print/check_release.py
+design/print/.venv/bin/python design/print/footnote_trial.py
+
+# Archive existing a/ and b/ directories before starting clean renders.
+design/print/.venv/bin/python design/print/build_proof.py --mode release --run a
+design/print/.venv/bin/python design/print/build_proof.py --mode release --run b
+design/print/.venv/bin/python design/print/build_proof.py --mode release --compare
+
+# Proof mode remains separate, with PROOF marks and navigation.
+design/print/.venv/bin/python design/print/build_proof.py --mode proof --run a
+```
+
+Release output is ignored under `output/whole-book-release-c37c3ea/`:
+`a/It-Depends-KDP-interior.pdf`, `a/pages/`, `a/contact-sheets/`, per-run
+`validation.json`, `publication-terms.json`, and the pair's `comparison.json`.
+Images `page-001.png`, `page-002.png`, `page-013.png` and `page-438.png` show
+the title, copyright, README note and last page. The complete image set also
+includes page 10. The release is 438 pages; the independently built proof is
+also 438 pages. The build only prints `v1.0.0`; it does not create or publish a tag.
+
+All manuscript/source, fence, inline-code, quote, note, table, keep, symbol-key,
+opener, font, overflow and last-line checks apply in both modes. Release replaces
+clickable-navigation checks with absence checks for outlines, annotations, form
+fields and JavaScript. Cleanup removes structural references to discarded links
+and garbage-collects unreachable objects. Contents folios and note URLs stay
+printed and selectable. No PROOF mark or frozen commit is printed. Copyright
+text is asserted line by line against `copyright.txt` and publication metadata.
+
+The settled publication-term rule is source-based: every occurrence of
+`placeholder`, `TBD` or `example.invalid` must match the frozen source's exact
+spelling, file and line, with equal PDF/source counts. Word rectangles must lie
+inside the corresponding source block. Build-generated furniture, notes and
+metadata cannot introduce occurrences. The current source has four instances of
+`placeholder` (including compounds/plurals), and zero of the other two terms.
+The report lists all four PDF pages and source lines. `check_release.py` exercises
+allowed source terms, added terms and changed-source controls.
+
+Document Info and XMP carry the real title **It Depends**, author **Eliraz
+Kedmi**, subtitle as Subject/description and descriptive Keywords. Both formats
+are asserted against the approved values; they contain no publication
+placeholders. This is the author's settled metadata policy. The title/copyright
+copy and approved metadata values live in `copyright.txt` and
+`release-metadata.json`; the build verifies their agreement.
+
+All pages are 504 × 720 points, with effective crop/trim/bleed boxes equal to
+that rectangle and no crop or printer marks. Font programs (or Type 3 glyph
+programs for the outlined chapter numerals) are embedded. Release normalizes
+paint to DeviceGray, audits any original non-grey paint and verifies the saved
+PDF's text/vector colours. Synthetic red paint is a negative control. Original
+book paint is already grey; code contrast is unchanged. The weakest token
+contrast is 7.14:1 (comments on the code background).
+
+Two clean release renders must have identical extracted text, character
+positions and every page raster; only volatile PDF IDs/metadata are excluded
+from the reproducibility comparison. See [release evidence](../../docs/editorial/full-review/RELEASE-EXPORT.md).
+The PDF hygiene checks follow [KDP's Paperback Submission Guidelines](https://kdp.amazon.com/en_US/help/topic/G201857950).
+This build does not upload to KDP or create a release tag. Final platform preview
+and a physical proof remain publishing steps, not manuscript/build changes.

@@ -1,0 +1,21 @@
+It Depends: TypeScript Principles, Debated
+First edition, 2026
+
+Copyright © 2026 Eliraz Kedmi
+
+Text licensed under CC BY-NC-SA 4.0.
+Code examples licensed under the MIT License.
+
+ISBN 9798167618534
+
+All characters in this book are fictional.
+Any resemblance to real persons, living or
+dead, is coincidental.
+
+TypeScript is a trademark of Microsoft
+Corporation.
+
+Source and examples (release v1.0.0):
+github.com/eliraz-refael/it-depends-ts-book
+
+Independently published
