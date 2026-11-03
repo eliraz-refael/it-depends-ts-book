@@ -120,7 +120,7 @@ TypeError: label.frame is not a function
 
 **Oded**: "It won't need to. We'll put the import with the thing everyone imports."
 
-Oded opens the integration module:
+Oded writes the integration module:
 
 ```typescript
 // labels.ts
@@ -162,7 +162,7 @@ Gilad runs each in a fresh process. Both print the framed name.
 
 ### "Check each entry separately"
 
-**Dima**: "We could check each entry separately. That would at least catch a caller with no path to the augmentation."
+**Dima**: "Here's a caller with no path to the augmentation."
 
 ```typescript
 // isolated.ts — checked without labels.ts or label-frame.d.ts
@@ -220,9 +220,11 @@ The build passes. In a fresh process, the same `TypeError` returns.
 
 ### "Why does it say every label?"
 
+**Idan**: "Then make it say *may*."
+
 ```typescript
 // Replacement augmentation in labels.ts.
-// Replace the required member; do not merge both spellings.
+// Replace the required member; keep only the optional member.
 declare module "label-kit" {
   interface Label {
     frame?(marker: string): this;

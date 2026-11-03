@@ -602,7 +602,7 @@ Eden prefers to list the cases while there are only a few. Linoy prefers to name
 
 ## Additional Takes
 
-**Linoy Nightly**: "We still owe `Unwrap` an explanation. The `infer U` part extracts the type inside `Promise<U>`. `ReturnType` uses the same mechanism for functions. It shipped with conditional types in 2.8. I'm going to need the board for that one. Idan wants to derive the courier wrapper's signatures from the SDK. Bring `Unwrap` back when we open that one."
+**Linoy Nightly**: "We still owe `Unwrap` an explanation. The `infer U` part extracts the type inside `Promise<U>`. `ReturnType` uses the same mechanism for functions. It shipped with conditional types in 2.8. I'm going to need the board for that one. Idan wants to derive the courier wrapper's signatures from the SDK. Bring `Unwrap` back when we open the wrapper."
 
 **Noam Kiperman**: "And test the type-only utilities too. `Exclude<Channel, "smss">` compiles. A check that the resulting union is exactly what you intended catches that typo. Different test from calling `slugify`, but it belongs in the PR."
 

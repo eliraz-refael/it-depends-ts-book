@@ -125,11 +125,11 @@ const request: DerivedUpdate = incoming; // Compiles.
 console.log(Object.keys(request)); // ["displayName", "roles"]
 ```
 
-**Daniel**: "Same object. A fresh literal with `roles` would get an excess-property error. This variable passes. `Pick` hasn't removed anything at runtime. Keep the parser with either definition."
+**Daniel**: "Same object. A fresh literal with `roles` would get an excess-property error. This variable passes. `Pick` hasn't removed anything at runtime. The parser does the removing, whichever definition we use."
 
 **Guy**: "And keep its rules. Omit a field to leave it alone. Send a string to replace it. An empty biography clears the biography."
 
-**Eden**: "What about `{}`?"
+**Eden Legacy**: "What about `{}`?"
 
 **Guy**: "Nothing to change. We accept it."
 
@@ -148,7 +148,7 @@ const explicitUndefined: DerivedUpdate = { email: undefined };
 
 **Daniel**: "`strict` alone accepts that last one. With `exactOptionalPropertyTypes` on, a present `email` has to be a string. Put `undefined` in the value type if you want to allow it. Reading a missing property still gives `undefined`. Both request definitions behave the same way."
 
-**Eden Legacy**: "Our service tests call the function directly. They don't serialize anything. Keep an absent property and a present `undefined` as separate cases."
+**Eden**: "Our service tests call the function directly. They don't serialize anything. Keep an absent property and a present `undefined` as separate cases."
 
 ### "The same field changes"
 

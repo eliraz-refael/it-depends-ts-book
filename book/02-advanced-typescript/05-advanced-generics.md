@@ -460,5 +460,3 @@ const lessSpecific: ExportBuilder = sourcePreset; // Accepted.
 **Chen**: "Should we allow that assignment, given what `source` does with the result?"
 
 **Guy**: "The export runner shares a cache through a broader type too. I'll bring that. We need to know what the other reference is allowed to do."
-
-**Eli**: "Then follow what each reference can do with it."

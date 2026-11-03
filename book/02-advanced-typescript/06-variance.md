@@ -61,7 +61,7 @@ dashboard(csvCache).label(); // "orders.csv"
 
 **Noam**: "And the receipt was written by the reporting team. They don't import the dashboard."
 
-Eden opens the archive change they are testing before release. The archiver moves the CSV out of hot storage and provides a ZIP download. The panel must point at that ZIP afterward. Its new action records the archive path in the cache it already receives.
+Eden opens the archive change the team is testing before release. The archiver moves the CSV out of hot storage and provides a ZIP download. The panel must point at that ZIP afterward. Its new action records the archive path in the cache it already receives.
 
 ```typescript
 function dashboard(cache: ResultCache<ExportResult>) {
@@ -244,9 +244,7 @@ dashboard(forwarded); // Error: TS2345.
 dashboard({ ...csvCache }); // Error: TS2345.
 ```
 
-**Eden**: "Now run the old dashboard. Before the archive button."
-
-"The old parameter is still `ResultCache<ExportResult>`. Same error at `dashboard(csvCache)`, even though this body only reads a path. That one didn't break a receipt. You've broken its callers too."
+**Eden**: "I ran the old dashboard, before the archive button. Its parameter is still `ResultCache<ExportResult>`. Same error at `dashboard(csvCache)`, even though this body only reads a path. That one didn't break a receipt. You've broken its callers too."
 
 **Noam**: "Its parameter asks for a write it never uses."
 

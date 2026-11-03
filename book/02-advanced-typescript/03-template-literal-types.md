@@ -214,6 +214,8 @@ export function restore(saved: Settings) {
 
 **Linoy**: "Restore has a different job. The helper only builds the name."
 
+**Gilad**: "Two places now. My log line doesn't say which."
+
 **Oded**: "Writing out the event name wouldn't tell you which path ran either."
 
 **Gilad**: "That takes logs or a reproduction. The old literal names got the search to the producers faster."
@@ -320,7 +322,9 @@ src/restore.ts:7:  publish("fontSizeChanged", saved.fontSize);
 
 A type can check a naming rule without requiring a runtime name-building helper. Choose that indirection by what callers share and how maintainers find them; neither choice identifies which producer ran in a particular session.
 
-**Gilad**: "With literal names, that log gets me straight to restore. For a control change, I still have to follow `publish` through the setter. One wrapper throughout would give me one route to learn; these literals save me that detour for restore. I can trace either. I'd keep the literals."
+**Gilad**: "With literal names, that log gets me straight to restore. For a control change, I still have to follow `publish` through the setter."
+
+**Linoy**: "Or follow the same helper in both, if restore uses it too. I'd still make that trade."
 
 ## Additional Takes
 
@@ -336,7 +340,7 @@ publish<SettingKey>("fontSizeChanged", false); // Compiles.
 
 **Oded**: "And for a queue where the event is one value?"
 
-**Linoy**: "Keep the name and payload together as a discriminated union."
+**Linoy**: "Keep the name and payload together as a discriminated union. Map each key to its pair, then index with all the keys to get the union."
 
 ```typescript
 type SettingsChange = {
@@ -367,8 +371,6 @@ const nextSize: DefaultEvents["fontSizeChanged"] = 16; // Error: expected 14.
 **Linoy**: "`as const` was useful for our fixed status codes. These are starting values for settings that change. That's why I used the `Settings` type instead of deriving everything from the initializer."
 
 ---
-
-### "Do we have a paid profile?"
 
 **Linoy**: "The audit viewer groups names by entity. That was going to be next."
 
@@ -428,7 +430,7 @@ type ListedAuditEvent =
 
 **Linoy**: "If we only use the flat list, fine. The filter menu picks an entity first. I want to check its props before throwing the grouped type away."
 
-**Oded**: "Keep that out of the settings change. Those all have `Changed`. The audit events already need a different rule."
+**Oded**: "Keep that out of the settings change. The settings all have `Changed`. The audit events already need a different rule."
 
 ---
 

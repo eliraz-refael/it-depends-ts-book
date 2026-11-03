@@ -91,3 +91,18 @@ The executable statements are unchanged in every chapter. Ch9's fence multiset i
 | 13 | 2,052 | 2,020 |
 
 **Revision validation:** clean `npm ci` passed with **zero vulnerabilities**, followed by a successful full `npm run check` on TypeScript 7.0.2, Node 22.23.4 and Zod 4.6.6. Counts remain **484 fences, 892 compiler cases and 387 runtime groups**; Act II remains **144 fences, 211 compiler cases and 64 runtime groups**. Logs: `/private/tmp/pr-c-revision-install.log` and `/private/tmp/pr-c-revision-full.log`. `git diff --check` passes. The three supplied review documents match their original SHA-256 hashes.
+
+## Final polish after the revision recheck
+
+Follows the six requested fixes and every requested minor from [PR-C-REVISION-RECHECK.md](PR-C-REVISION-RECHECK.md), included unchanged. No disagreement with the final polish brief.
+
+- **Ch9 ending:** Gilad now gives two plain sentences on the tracing costs without voting. Linoy replies in favor of the shared helper, keeping the debate open. Gilad's one-line setup restores the complaint Oded answers earlier.
+- **Ch9 teaching order:** Linoy explains mapping each key to a pair and indexing with all keys before `SettingsChange`. Removed the audit take's lone heading so it no longer contains the `Capitalize` take. “The settings all have `Changed`” names its subject.
+- **Ch12 state and pronouns:** Eden reports having run the old dashboard in one attributed line, preserving the parameter and diagnostic behind Noam's concession. The archive change is explicitly one the team is testing.
+- **Ch8 names and repetition:** Eden's first line carries Legacy; his later line uses Eden. Daniel says the parser removes properties instead of adding a third “keep.”
+- **Ch13 staging:** Oded writes the new integration module; Dima introduces the isolated caller without repeating the heading. Idan owns the optional change with “Then make it say *may*.” The fence instruction says to keep only the optional member.
+- **Ch7/11 closers:** The courier pointer names the wrapper, avoiding the second “that one.” Ch11 ends on Guy's cache handoff, without Eli's echo.
+
+All Act II fences retain their order and executable contents. Only the Ch13 replacement-instruction comment changes. Existing checks extract that fence unchanged and already exercise the mapped/indexed pair union, old dashboard rejection, optional member and runtime bypass; no harness edits or new cases are needed for this prose pass.
+
+**Final polish validation:** clean `npm ci` passed with **zero vulnerabilities**. Full `npm run check` passed on TypeScript 7.0.2, Node 22.23.4 and Zod 4.6.6: **484 fences, 892 compiler cases and 387 runtime groups**. Act II counts remain **144 / 211 / 64**. Logs: `/private/tmp/pr-c-polish-install.log` and `/private/tmp/pr-c-polish-full.log`. `git diff --check` passes; the supplied revision recheck is byte-identical to the received file.
