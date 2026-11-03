@@ -1,0 +1,212 @@
+{
+  "status": "draft 2 frozen; Principle-only follow-up and targeted recheck pending",
+  "date": "2026-11-02",
+  "settled_plan_commit": "6167870",
+  "review_commit": "f8da36e",
+  "base_commit": "f8da36e88228514fa6db0b723b6b22a00e9b22f8",
+  "path": "book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md",
+  "sha256": "b119ec588cbfb9e63867a6debfba7ea1205bfdf8f15eb8c2f510ab579ef1b0da",
+  "manuscript_mtime_utc": "2026-11-02T19:18:27.582425+00:00",
+  "words": 2349,
+  "word_count_method": "Whitespace-delimited words in the complete Markdown, including code fences.",
+  "code_fences": 10,
+  "fences_by_language": {
+    "typescript": 4,
+    "json": 2,
+    "diff": 4
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "typescript",
+      "sha256": "35bc748408e15b9d3c4098818e791cdfc770c31bcb14c069488f75228a55f6b5"
+    },
+    {
+      "ordinal": 2,
+      "language": "json",
+      "sha256": "e3d5a4a2d8551aa52c5a01d2a0efb2e06a2d9711b4f5c5f1d20de6e21807e2cd"
+    },
+    {
+      "ordinal": 3,
+      "language": "json",
+      "sha256": "004c17aac57f221b72d892d047f2d3d7a762c6aea4f94cf7cd7547da92730a54"
+    },
+    {
+      "ordinal": 4,
+      "language": "typescript",
+      "sha256": "695bfc6b05c8d272027400bb998691049d28f056d1d6e78b995e07c759c5eab7"
+    },
+    {
+      "ordinal": 5,
+      "language": "diff",
+      "sha256": "df32c78d0126c7cf2e86e44d0aaed80ac37549305cbbfe3ca7e22f9855d1948d"
+    },
+    {
+      "ordinal": 6,
+      "language": "diff",
+      "sha256": "69da4d5bc3cb0c86ef86db1662a7d0544bb5ae54d37606a0737f9f681bcfe088"
+    },
+    {
+      "ordinal": 7,
+      "language": "typescript",
+      "sha256": "8efadb86e17be69f16c0d7fe438106e9279281162d635cfa865f339c79649ead"
+    },
+    {
+      "ordinal": 8,
+      "language": "diff",
+      "sha256": "dc4b19da018930e4bcc107a3ef0e6c0aed81b70fda6bcbc1e6dcb9a911da9f8a"
+    },
+    {
+      "ordinal": 9,
+      "language": "diff",
+      "sha256": "9aa1082425c62120a5e39045fe91f692bae6dbd20420e628641d9d3fe8ae4983"
+    },
+    {
+      "ordinal": 10,
+      "language": "typescript",
+      "sha256": "794346966f637f8d75ba03481d8a87e3818d394f15c9a8d4dda608239ecfb1ae"
+    }
+  ],
+  "previous_fences_byte_identical": true,
+  "retained_fence_ordinals": [
+    {
+      "draft1": 1,
+      "draft2": 1
+    },
+    {
+      "draft1": 2,
+      "draft2": 4
+    },
+    {
+      "draft1": 3,
+      "draft2": 5
+    },
+    {
+      "draft1": 4,
+      "draft2": 6
+    },
+    {
+      "draft1": 5,
+      "draft2": 7
+    },
+    {
+      "draft1": 6,
+      "draft2": 8
+    },
+    {
+      "draft1": 7,
+      "draft2": 9
+    },
+    {
+      "draft1": 8,
+      "draft2": 10
+    }
+  ],
+  "new_fence_ordinals": [
+    2,
+    3
+  ],
+  "validator_sha256": "f3573022dc76d2c0b454b5ab62cdb9824ecf29661741d64b847286aab5d0e979",
+  "suite_runner_sha256": "7bdc6147d17a78fbeeec2827a63ff8c94266fc4ffc98c3c67aa598b09f11dc88",
+  "compiler_profile_sha256": "3fbee0de1a72de52e3288a05c3682ba614932b91f56b237e570dfaec6ab99375",
+  "typescript": "7.0.2",
+  "node": "v22.23.4",
+  "validation": {
+    "installation": "Existing locked npm ci installation in the b3 worktree; no fresh-export claim.",
+    "targeted_suite": "Exit 0; 10 fences / 45 compiler cases / 22 runtime groups / 1 file-list query.",
+    "full_suite": "npm run check: exit 0; 483 fences / 877 compiler cases / 376 runtime groups, plus 2 compiler-default cases, 2 searches and 11 file-list queries.",
+    "full_log": ".probe/codex/draft2/full-check.log",
+    "full_log_sha256": "2fcd4fda70956c4dab59951c32560e98dac85d921bb6abb1684864ddb21bf429",
+    "full_attempts": 1,
+    "bonus3_summary": {
+      "typescript": "7.0.2",
+      "node": "v22.23.4",
+      "fences": 10,
+      "compilerCases": 45,
+      "runtimeGroups": 22,
+      "fileListQueries": 1,
+      "ownedSha256": {
+        "order.ts": "aa2811aef9bf9ab44eeb84123406ba3481e04207d992497c9f911e2f06cb7b3f",
+        "cases.ts": "0bb4fc7f2a4860d1f8cb3da43786778fb1bf688de37099ba510fea16fba5d93b",
+        "check.ts": "179dd7c8412e0e9aa2e91ef389bbc88afca9dfda1f006e7104a43e48ecdb0f39"
+      },
+      "assistantArtifactSha256": "f8a9a96ae6c5cb95185daf608335bf1e678e3bac6d336f7e4d81df6fe6aaf9c1",
+      "scratch": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-bonus3-NsQ0xX"
+    },
+    "source_hashes_verified_before_and_after_full_run": true,
+    "verified_source_hashes": {
+      "book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md": "b119ec588cbfb9e63867a6debfba7ea1205bfdf8f15eb8c2f510ab579ef1b0da",
+      "checks/bonus3.cjs": "f3573022dc76d2c0b454b5ab62cdb9824ecf29661741d64b847286aab5d0e979",
+      "checks/run.cjs": "7bdc6147d17a78fbeeec2827a63ff8c94266fc4ffc98c3c67aa598b09f11dc88",
+      "checks/compiler.cjs": "3fbee0de1a72de52e3288a05c3682ba614932b91f56b237e570dfaec6ab99375",
+      "checks/README.md": "dc25416a4417156f7fca99d75f182955673245103d05aade8bb4c61c755b35b2",
+      "docs/editorial/README.md": "6f0881f881cdeb4387b94beaeee3efe3d3da8649426ecb9a4ca8d9067bedd13a"
+    },
+    "post_validation_editorial_changes": [
+      {
+        "path": "PLAN.md",
+        "sha256": "dccf492184862f31e4251383dc4fda0ebe936e2ff7afaa2c160d3bee5e073b8a",
+        "reason": "Clarify which independent reader reproduced claims and which applied the four Principle cases."
+      }
+    ],
+    "results_sha256": "d90bc7eb5a76a9de6a5a633ffcfc90fd4afc298c288db1d647273096d1d139cb",
+    "declarations_before_sha256": "4a4969c0771259d5d23488e387224463fdc1d5006f59d7671f13435dd6215405",
+    "declarations_after_sha256": "10432934d4f8e7fc301af0892fc4bfc02fb6007268b4bf8f698ae00059829b1f",
+    "quoted_diagnostics": [
+      2345,
+      2322,
+      2678,
+      2820,
+      9007
+    ],
+    "validation_only_diagnostics": [
+      2724,
+      9013,
+      6133
+    ],
+    "repository_states": [
+      "original and fixed runtime cases",
+      "submitted two-file patch",
+      "new provider with old caller",
+      "restored submitted caller and before/after declaration report",
+      "unchanged mobile consumer against original and submitted providers",
+      "scratch typo on submitted and original implementations",
+      "scratch reset to submitted patch",
+      "as const with original caller",
+      "explicit private alias and satisfies with original caller",
+      "final typo rejected and undone; unchanged mobile compiles",
+      "isolated-declaration scratch experiment; explicit string still widened",
+      "chosen version restored; additional controls individually removed"
+    ],
+    "controls": [
+      "same immutable owned order/cases/harness throughout",
+      "apply source diff hunks and the exact complete declaration diff",
+      "old consumer compatibility green/red/green",
+      "typo compile-green but runtime-red; original compile-red; reset green",
+      "as const restores original declarations byte for byte",
+      "satisfies alone restores original declarations",
+      "named alias remains non-exported",
+      "explicit string satisfies isolated declarations without preserving API",
+      "trivial inferred exports change under isolated declarations",
+      "referenced alias changes behind identical entry declaration",
+      "typeof derived export widens without alias edit",
+      "narrowed parameter excludes old string caller while local calls pass",
+      "identical declarations can accompany swapped runtime labels",
+      "all final files and compiler membership restored",
+      "printed package.json and tsconfig.json parsed and used directly",
+      "named order.d.ts comparison tied to the manuscript",
+      "orphaned assertNever under temporary noUnusedLocals; normal profile restored",
+      "explicit string with original caller under isolatedDeclarations rejects; assistant fallback restored"
+    ],
+    "configuration_scope": "Book profile unchanged; noUnusedLocals and isolatedDeclarations overrides are separate controls.",
+    "no_real_model_claims": true,
+    "declared_scope": "Compatibility of the shown TypeScript API and asserted runtime cases; no automatic semantic compatibility or universal behavior guarantee."
+  },
+  "settlement_deviations": [],
+  "review_disagreements": [],
+  "review_deviations": [],
+  "principle_words": 170,
+  "verdict_words": 141,
+  "independent_readers_run_by_codex": false
+}

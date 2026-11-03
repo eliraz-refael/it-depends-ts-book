@@ -1,0 +1,167 @@
+{
+  "status": "draft 1 frozen; independent readers and formal review pending",
+  "date": "2026-11-02",
+  "settled_plan_commit": "6167870",
+  "base_commit": "61678706cf08624081f37a64ff9e4e38a53d880d",
+  "path": "book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md",
+  "sha256": "5c85d8ca7a141f3e05c29a084ff76decc2368f52309e587746efa19d8778344b",
+  "manuscript_mtime_utc": "2026-11-02T19:04:00.798644+00:00",
+  "words": 2448,
+  "word_count_method": "Whitespace-delimited words in the complete Markdown, including code fences.",
+  "code_fences": 8,
+  "fences_by_language": {
+    "typescript": 4,
+    "diff": 4
+  },
+  "fence_hash_scope": "Fence contents excluding delimiters and the newline before the closing delimiter; UTF-8.",
+  "fences": [
+    {
+      "ordinal": 1,
+      "language": "typescript",
+      "sha256": "35bc748408e15b9d3c4098818e791cdfc770c31bcb14c069488f75228a55f6b5"
+    },
+    {
+      "ordinal": 2,
+      "language": "typescript",
+      "sha256": "695bfc6b05c8d272027400bb998691049d28f056d1d6e78b995e07c759c5eab7"
+    },
+    {
+      "ordinal": 3,
+      "language": "diff",
+      "sha256": "df32c78d0126c7cf2e86e44d0aaed80ac37549305cbbfe3ca7e22f9855d1948d"
+    },
+    {
+      "ordinal": 4,
+      "language": "diff",
+      "sha256": "69da4d5bc3cb0c86ef86db1662a7d0544bb5ae54d37606a0737f9f681bcfe088"
+    },
+    {
+      "ordinal": 5,
+      "language": "typescript",
+      "sha256": "8efadb86e17be69f16c0d7fe438106e9279281162d635cfa865f339c79649ead"
+    },
+    {
+      "ordinal": 6,
+      "language": "diff",
+      "sha256": "dc4b19da018930e4bcc107a3ef0e6c0aed81b70fda6bcbc1e6dcb9a911da9f8a"
+    },
+    {
+      "ordinal": 7,
+      "language": "diff",
+      "sha256": "9aa1082425c62120a5e39045fe91f692bae6dbd20420e628641d9d3fe8ae4983"
+    },
+    {
+      "ordinal": 8,
+      "language": "typescript",
+      "sha256": "794346966f637f8d75ba03481d8a87e3818d394f15c9a8d4dda608239ecfb1ae"
+    }
+  ],
+  "validator_sha256": "0d8c61275bd85eebe412a0204c665951ff576042342c7cd4fdfef79b25c957f4",
+  "suite_runner_sha256": "7bdc6147d17a78fbeeec2827a63ff8c94266fc4ffc98c3c67aa598b09f11dc88",
+  "compiler_profile_sha256": "3fbee0de1a72de52e3288a05c3682ba614932b91f56b237e570dfaec6ab99375",
+  "typescript": "7.0.2",
+  "node": "v22.23.4",
+  "validation": {
+    "installation": "Existing locked npm ci installation from the Bonus 3 plan challenge in this worktree; no new clean-export claim.",
+    "targeted_suite": "Exit 0; 8 fences / 41 compiler cases / 22 runtime groups / 1 file-list query.",
+    "full_suite": "npm run check: exit 0; 481 fences / 873 compiler cases / 376 runtime groups, plus 2 compiler-default cases, 2 searches and 11 file-list queries.",
+    "full_log": ".probe/codex/draft1/full-check.log",
+    "full_log_sha256": "f540be3e75cb1280174a3aa4fa97b7508439522beeed65a69dbbc39e3fe010af",
+    "bonus3_summary": {
+      "typescript": "7.0.2",
+      "node": "v22.23.4",
+      "fences": 8,
+      "compilerCases": 41,
+      "runtimeGroups": 22,
+      "fileListQueries": 1,
+      "ownedSha256": {
+        "order.ts": "aa2811aef9bf9ab44eeb84123406ba3481e04207d992497c9f911e2f06cb7b3f",
+        "cases.ts": "0bb4fc7f2a4860d1f8cb3da43786778fb1bf688de37099ba510fea16fba5d93b",
+        "check.ts": "179dd7c8412e0e9aa2e91ef389bbc88afca9dfda1f006e7104a43e48ecdb0f39"
+      },
+      "assistantArtifactSha256": "f8a9a96ae6c5cb95185daf608335bf1e678e3bac6d336f7e4d81df6fe6aaf9c1",
+      "scratch": "/private/var/folders/m3/37sf37s579d9mfnqfs6wz88w0000gn/T/ts-book-bonus3-caWsYQ"
+    },
+    "source_hashes_verified_before_and_after_full_run": true,
+    "verified_source_hashes": {
+      "book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md": "5c85d8ca7a141f3e05c29a084ff76decc2368f52309e587746efa19d8778344b",
+      "checks/bonus3.cjs": "0d8c61275bd85eebe412a0204c665951ff576042342c7cd4fdfef79b25c957f4",
+      "checks/run.cjs": "7bdc6147d17a78fbeeec2827a63ff8c94266fc4ffc98c3c67aa598b09f11dc88",
+      "checks/compiler.cjs": "3fbee0de1a72de52e3288a05c3682ba614932b91f56b237e570dfaec6ab99375",
+      "checks/README.md": "4b33963d0ccc45c53e2e20e28968f93effc83a29d64890ac67e0bb8888f2dca7",
+      "PLAN.md": "d40277c76e0d9497047a82d56136a40250f42210f650a6a879510eae28b996e6",
+      "docs/editorial/README.md": "54ef7827a5f61d66fc2ec95f508e3181363f93f81718f0612e7bc94b223b1ba0"
+    },
+    "results_sha256": "85ab3e78636f8e49916a62abeccf1c37e2294be56338c86b89ceda559becd29d",
+    "declarations_before_sha256": "4a4969c0771259d5d23488e387224463fdc1d5006f59d7671f13435dd6215405",
+    "declarations_after_sha256": "10432934d4f8e7fc301af0892fc4bfc02fb6007268b4bf8f698ae00059829b1f",
+    "quoted_diagnostics": [
+      2345,
+      2322,
+      2678,
+      2820,
+      9007
+    ],
+    "validation_only_diagnostics": [
+      2724,
+      9013
+    ],
+    "repository_states": [
+      "original and fixed runtime cases",
+      "submitted two-file patch",
+      "new provider with old caller",
+      "restored submitted caller and before/after declaration report",
+      "unchanged mobile consumer against original and submitted providers",
+      "scratch typo on submitted and original implementations",
+      "scratch reset to submitted patch",
+      "as const with original caller",
+      "explicit private alias and satisfies with original caller",
+      "final typo rejected and undone; unchanged mobile compiles",
+      "isolated-declaration scratch experiment; explicit string still widened",
+      "chosen version restored; additional controls individually removed"
+    ],
+    "controls": [
+      "same immutable owned order/cases/harness throughout",
+      "apply source diff hunks and the exact complete declaration diff",
+      "old consumer compatibility green/red/green",
+      "typo compile-green but runtime-red; original compile-red; reset green",
+      "as const restores original declarations byte for byte",
+      "satisfies alone restores original declarations",
+      "named alias remains non-exported",
+      "explicit string satisfies isolated declarations without preserving API",
+      "trivial inferred exports change under isolated declarations",
+      "referenced alias changes behind identical entry declaration",
+      "typeof derived export widens without alias edit",
+      "narrowed parameter excludes old string caller while local calls pass",
+      "identical declarations can accompany swapped runtime labels",
+      "all final files and compiler membership restored"
+    ],
+    "full_attempts": 3,
+    "prior_full_attempts": [
+      {
+        "log": ".probe/codex/draft1/full-check-before-final-read.log",
+        "sha256": "9a35790a4de89fc3f2b9661ff84d047a4a13c8ec3164cd4dcae85f39e09434db",
+        "exit_code": 0,
+        "note": "Passed before the final state-wording corrections and two explicit report re-emissions; Bonus 3 then had 39 compiler cases."
+      },
+      {
+        "log": ".probe/codex/draft1/full-check-before-diff-format.log",
+        "sha256": "e74cac2704f17a2bb665a82c1b474ff17106a681bd2421d505d4828947300504",
+        "exit_code": 0,
+        "note": "Passed with 41 Bonus 3 compiler cases before shortening unchanged context in one printed diff hunk; the applied source patch is identical."
+      }
+    ],
+    "initial_targeted_failure": "Private OrderStatus import reports TS2724, not the initially expected TS2459. Validation-only expectation corrected from observed output.",
+    "no_real_model_claims": true,
+    "declared_scope": "Compatibility of the shown TypeScript API and asserted runtime cases; no automatic semantic compatibility or universal behavior guarantee."
+  },
+  "settlement_deviations": [],
+  "principle_words": 152,
+  "verdict_words": 154,
+  "editorial_choices": [
+    "Private OrderStatus and RefundLevel aliases; no added named type export.",
+    "Retained short isolatedDeclarations beat; broader counterexamples remain off-page.",
+    "Four TypeScript fences and four unified-diff fences."
+  ],
+  "independent_readers_run_by_codex": false
+}
