@@ -2,9 +2,7 @@
 
 ## The Principle
 
-**Daniel Compiler**: "When a patch says the API stayed the same, I emit declarations before and after, with the same compiler and project settings, and compare the public types. That includes the types a signature refers to: an unchanged alias can name a changed type. If the patch changes a caller to make it compile, I put the old caller back and find what required the repair. A green compile speaks only for the revised program. So I check whether the old version of the caller we just edited still compiles, and whether the caller in someone else's repo does. Then the API's owner has to say which contract we're offering."
-
-"For each changed signature, I ask which old calls it rejects or which results it no longer guarantees. If a new spelling accepts the same inputs and promises the same results, the type contract is unchanged. Even with identical declarations, I run the runtime tests to check the values and effects. An explicit type gives the implementation a promise to meet; the compiler checks that promise, but it can't choose the right one for us."
+**Daniel Compiler**: "I review an API-preserving patch against the public types it produces and the old callers that depend on them. Emit declarations before and after with the same compiler and settings, including the types their signatures refer to. Then compare the contracts, not just the spelling: different declarations can promise the same inputs and results. A caller edited in the patch cannot speak for the unedited callers elsewhere. Put it back and find why it needed changing. The API's owner decides whether to keep that change. Even when the contracts agree, runtime tests still have to check the values and effects."
 
 ## The Debate
 
@@ -212,7 +210,7 @@ He puts the submitted badge back. Then he emits declarations from the original c
 +export declare function orderStatus(order: Order): string;
 ```
 
-**Daniel**: "Only `status.d.ts` changed. I checked `order.d.ts` too. It's unchanged. An identical import line doesn't tell me whether `Order` still means the same thing."
+**Daniel**: "Only `status.d.ts` changed. I checked `order.d.ts` too. It's unchanged. An identical import line doesn't tell me whether `Order` still means the same thing. If an exported alias uses `typeof`, follow it to the value too. An unchanged alias line can acquire a different meaning."
 
 **Oded** leans forward. "We didn't write `string` anywhere in that function."
 
@@ -242,7 +240,7 @@ export function mobileStatus(order: Order): "paid" | "partial" | "refunded" {
 
 With the original provider it compiles. With the submitted provider, the return gets **TS2322**: `Type 'string' is not assignable to type '"paid" | "partial" | "refunded"'.`
 
-**Eden**: "The app relies on those three states. We don't get to widen its return because this repo's badge found a fallback."
+**Eden**: "The app relies on those three states. We don't get to widen its return because this repo's badge found a fallback. Narrowing a parameter can break a caller elsewhere that still passes a `string`, too. A search here won't find it."
 
 **Oded**: "Fine. That is a caller I hadn't checked."
 
@@ -387,9 +385,9 @@ He restores `"refunded"`. The program and all six assertions pass. Eden puts the
 
 **Daniel**: "Here, yes. Choosing it is still our job."
 
-In scratch work, he enables `isolatedDeclarations` on the original project. It reports **TS9007** on `orderStatus`: `Function must have an explicit return type annotation with --isolatedDeclarations.`
+In scratch work, he enables [`isolatedDeclarations`](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html#isolated-declarations) on the original project. It reports **TS9007** on `orderStatus`: `Function must have an explicit return type annotation with --isolatedDeclarations.`
 
-**Daniel**: "The original wasn't broken because it inferred a type. The [flag](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html#isolated-declarations) even allows some simple inferred exports. It doesn't require a return annotation on every export."
+**Daniel**: "The original wasn't broken because it inferred a type. The flag even allows some simple inferred exports. It doesn't require a return annotation on every export."
 
 He then uses the submitted patch and annotates its function `orderStatus(order: Order): string`. The annotation satisfies the flag. With the assistant's fallback, the project compiles.
 
@@ -398,6 +396,8 @@ He then uses the submitted patch and annotates its function `orderStatus(order: 
 **Daniel** discards the experiment. "Exactly."
 
 ## The Verdict
+
+> A repair that changes the public contract needs an explicit contract decision. A refactor claiming to preserve that contract must still support its existing callers.
 
 **Eden**: "Keep the table, the explicit return and the checked labels. Keep the original badge. This refactor promised the existing status API; the mobile caller still gets it."
 
@@ -412,9 +412,3 @@ Oded replaces the summary: *Move labels into a table. Preserve the status return
 Noam approves the revised patch.
 
 **Oded**: "Good. Now I have a green pull request and a meeting four minutes ago."
-
-## Additional Takes
-
-**Eden Legacy**: "Narrowing a parameter can break a caller elsewhere that still passes a `string`, even if every caller in this repo compiles. A search here won't find that caller."
-
-**Daniel Compiler**: "And if an exported alias uses `typeof`, follow it to the value. An unchanged alias line can acquire a different meaning. The declaration report is there to show you what the compiler made of the whole change."

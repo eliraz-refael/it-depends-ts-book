@@ -2,9 +2,7 @@
 
 ## The Principle
 
-**Gilad Stacktrace**: "Before you trust a type shared between packages, ask three questions. Which declarations is this caller being checked against? Which implementation will its import load when you run it? What rebuilds that implementation when the source changes? A build only follows the dependencies it has been told about. A green check against yesterday's `dist` doesn't tell you whether today's package will accept the call."
-
-"Use the package's public exports, including subpaths listed in its exports map. If a type or function is missing, ask for an export instead of reaching into the source directory. When two types have the same name but won't assign, read the declarations in the error. If they point to separate source and built copies, fix the import instead of asserting them equal. Development can check source through the package's own exports. For the build you package and deploy, rebuild the dependencies and run what you're shipping, laid out the way it will be installed. I want the failure on this laptop, not in the image someone wakes me up to fix."
+**Gilad Stacktrace**: "For a release, I check that the program we're packaging honors the contract our callers were checked against. Run the caller with those packages and keep the error with the files that produced it. If the development run succeeds and the release run fails, I need both setups long enough to explain the difference. Rebuilding might remove the evidence without explaining it. Once we've found the cause, the release check must reproduce enough of that setup to catch it coming back."
 
 ## The Debate
 
@@ -14,11 +12,9 @@
 
 **Idan**: "The shipping charge. The request says a thousand cents, the cart says five hundred. The quote should say fifteen dollars."
 
-The shop keeps its money code, cart and API in three packages. The repository root and all three packages have `"type": "module"` in their manifests. Workspace links under `node_modules/@shop` point to the package directories.
+**Dima**: "Root, money, cart and API all use `"type": "module"`. Our `node_modules/@shop` links point to the packages. Node runs the emitted API; the release job copies it and its dependencies into an image. The links stay here."
 
-Node runs the API's emitted JavaScript. The release job copies that output and the dependencies into an image; the workspace links stay in the checkout.
-
-Money's public manifest currently looks like this. Cart has the same export mapping, with the name `@shop/cart`.
+Money's manifest follows; cart has the same mapping under `@shop/cart`.
 
 **packages/money/package.json**
 
@@ -121,7 +117,7 @@ console.log(buildId, amount.plus(shipping()).format());
 
 **Gil Benchmark**: "Both declarations have that text. Look at the paths."
 
-He opens cart's generated declaration. Its shipping result imports Money from `@shop/money`, which leads to `money/dist/index.d.ts`. The parser imports its adjacent source index. He leaves both files open.
+Cart's generated declaration imports Money from `@shop/money`, leading to `money/dist/index.d.ts`. The parser imports its adjacent source index.
 
 **Idan**: "We can export the parser. I'm still asking why these two amounts can't be added. The fields haven't changed. If it's only the import path, forcing the call should still give fifteen. I'll try it here before I change the export."
 
@@ -142,7 +138,7 @@ The API compiles. The run throws `TypeError: Cannot read private member #cents f
 
 **Gil**: "It was there before your change. I rebuilt the old API: two emitted implementations, only one loaded. The type imports pulled money's source into the compile, even though those imports disappear from the JavaScript. Your parser is the first thing that loads that copy."
 
-He opens `packages/money/dist/index.js` beside the stack trace.
+Gil follows cart's import to `packages/money/dist/index.js`.
 
 **Gil**: "Cart loads this one through the package name. The stack identifies the one doing the addition. Cart's object came from the other one."
 
@@ -204,9 +200,7 @@ format(currency: "USD"): string {
 
 **Gil**: "I tried `tsc -b apps/api` too. Still green. Money's declaration hasn't changed."
 
-**Dima**: "We haven't told it what to build first."
-
-Money and cart already emit declarations from composite projects, with `src` as `rootDir` and `dist` as `outDir`. Dima adds `"references": [{ "path": "../money" }]` to cart's config and puts both packages in the API's `references`.
+**Dima**: "We haven't told it what to build first. Money and cart are composite: `rootDir` is `src`, `outDir` is `dist`, with declarations emitted. I'll add `"references": [{ "path": "../money" }]` to cart, and these to the API."
 
 **The new references in apps/api/tsconfig.json**
 
@@ -217,7 +211,7 @@ Money and cart already emit declarations from composite projects, with `src` as 
 ]
 ```
 
-He runs `tsc -b apps/api` again, in the same tree. This time it builds money, then cart, and reports TS2554 at the API's call: `Expected 1 arguments, but got 0.`
+**Gil**: "Now `tsc -b apps/api` builds money, then cart. TS2554 at `format()`: `Expected 1 arguments, but got 0.`"
 
 **Idan**: "There it is. I was starting to feel redundant. I could delete my arguments and nobody would notice."
 
@@ -230,7 +224,7 @@ console.log(buildId, amount.plus(shipping()).format("USD"));
 
 The dependency build passes, and the API prints `release-42 USD 15.00`.
 
-**Dima**: "I'll put that build behind the existing check command. And I'll own the graph. When we add a package dependency, the review needs its reference too. Otherwise I'm promising you a build order I never described."
+**Dima**: "That build becomes our check command. I'll own the graph; a new package dependency needs its reference too."
 
 **Linoy**: "Why keep dist at all? We had two Moneys because one came from source and one from the build. Then the build was old. Node 22 can strip these types. Let the checker and the runtime both use source."
 
@@ -242,7 +236,7 @@ The dependency build passes, and the API prints `release-42 USD 15.00`.
 
 **Linoy**: "That's the first part. Give both packages a source condition for development. Then we'll try making source the runtime target as well."
 
-She changes the `exports` field in both manifests. The source condition comes before the existing declaration and JavaScript targets.
+She puts the source condition first in both manifests:
 
 **The exports field in both package manifests**
 
@@ -281,15 +275,15 @@ The API's `tsconfig.dev.json` contains `{"extends":"../../tsconfig.dev-base.json
 
 **Linoy**: "That's the dev check. Nothing to build before it. Now the runtime."
 
-Linoy makes an experimental branch and turns the laptop towards Dima.
+Linoy starts an experimental branch.
 
 **Linoy**: "Both manifests: `default` becomes `./src/index.ts`. Money's internal relative imports: `.js` becomes `.ts`. And `allowImportingTsExtensions` goes in the dev base on this branch."
 
 **Dima**: "You changed the imports as well?"
 
-**Linoy**: "Node needs the actual .ts filenames when it runs the source. It doesn't do the compiler's .js-to-.ts lookup. The noEmit check allows those extensions. I'm not asking the release build to emit them."
+**Linoy**: "Node needs actual .ts filenames, without the compiler's .js-to-.ts lookup. This noEmit check allows them; the release build won't emit them."
 
-The source check passes. They run the API's already-emitted JavaScript, whose package imports still say `@shop/money` and `@shop/cart`. Node follows the new runtime targets into the linked source directories. The quote prints `release-42 USD 15.00`.
+The source check passes. The already-emitted JavaScript API still imports `@shop/money` and `@shop/cart`; Node now loads their linked source. It prints `release-42 USD 15.00`.
 
 **Linoy**: "One Money. The formatter we just edited. We can stop maintaining a second set of files for the application to read."
 
@@ -323,17 +317,19 @@ Node refuses `node_modules/@shop/money/src/index.ts` with `ERR_UNSUPPORTED_NODE_
 
 They leave the experimental branch, restoring the `.js` imports and `default` targets and removing `allowImportingTsExtensions` from the dev base.
 
-**Dima**: "We'll package JavaScript. First, clean the output directories. The old relative-import build left a money copy in the API's out directory. Building again doesn't delete it."
+**Dima**: "Package JavaScript. Clean both dist directories and the API's out first. A rebuild won't delete the stray money copy."
 
 **Gil**: "And the incremental build files, so the clean outputs get rebuilt."
 
-They remove money's `dist`, cart's `dist`, the API's `out` and the build metadata, then run `tsc -b apps/api` through Dima's reference graph. The release job copies the fresh API output and its manifest, plus each dependency's manifest and `dist` into a fresh image layout. The copied program prints `release-42 USD 15.00`.
+They clean those directories and metadata, then run `tsc -b apps/api`. The API output and manifest, plus both dependencies' manifests and `dist`, go into a fresh image layout. The copy prints `release-42 USD 15.00`.
 
 **Gil**: "Two emitted from the start. One loaded until the parser arrived, then two. This image ships one."
 
 **Idan**: "The total hasn't changed. We have spent quite a while agreeing on fifteen dollars."
 
 ## The Verdict
+
+> Use public package entry points and test the rebuilt release in its installed layout. A development source check answers a different question.
 
 **Dima**: "The copied-program test goes into the check command after the dependency build. I'll maintain that with the release job."
 

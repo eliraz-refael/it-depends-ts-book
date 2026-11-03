@@ -2,9 +2,7 @@
 
 ## The Principle
 
-**Daniel Compiler**: "A migration changes an implementation while its callers are still using it. Keep their contract—what they get back from `require`, what arguments they pass and what results they receive—or change and verify the callers too. If they expect `require("./slug")` to give them a function, a test rewritten to use a default import doesn't check that old call."
-
-"The compiler will happily emit a file without checking the calls inside it. `allowJs` lets JavaScript into the program. Only `checkJs` or `@ts-check` makes the compiler report that file's errors. So a caller counts as checked only when this compile includes it and checks it. A file outside `include` that nothing inside imports isn't in the compile at all, even with `@ts-check` at the top. For every caller that isn't checked, keep the contract it relies on, bring it into the check, or execute its old call. TypeScript 7 is strict by default, so the first JavaScript check can report untyped parameters. If that's too much at once, check fewer files. Switching `noImplicitAny` off for the whole program weakens the TypeScript too."
+**Daniel Compiler**: "An unchanged caller must still work after a conversion that claims to preserve its contract. I keep that caller in the test before looking at the new types. If we edit the caller too, we have another change to justify. A successful compilation covers the program we gave the compiler, under its settings. It doesn't establish compatibility with every program using the exported function. We can migrate those programs deliberately, but until we do, their old calls are part of the job."
 
 ## The Debate
 
@@ -19,8 +17,6 @@
 Eden opens the storefront's build configuration. The team is eight months into the migration.
 
 **Eden**: "The package still says `"type": "commonjs"`. Node runs what's in `dist`. We haven't changed that."
-
-There is no `strict` setting. On their TypeScript 7 compiler, it defaults to true.
 
 **tsconfig.json**
 
@@ -137,7 +133,11 @@ Both tests pass. The route returns `/products/green-chair` again. The emit ends 
 
 **Eden**: "Found it, inferred from it, emitted it. We haven't asked it to report the route's body errors."
 
-Noam changes `checkJs` to true and tries the failed default-export version again. The call to `slug(title)` reports TS2349: `This expression is not callable.` The diagnostic says the imported module has no call signatures. The route's untyped `title` also reports TS7006: `Parameter 'title' implicitly has an 'any' type.`
+Noam enables `checkJs` and retries the failed default export.
+
+**Noam**: "TS2349 at `slug(title)`: `This expression is not callable.` No call signatures. And TS7006: `Parameter 'title' implicitly has an 'any' type.`"
+
+**Daniel**: "You omitted `strict`; TypeScript 7 defaults it to true. Checking this file now exposes its untyped parameter too."
 
 **Noam**: "There. Before deployment. I want this on for JavaScript too."
 
@@ -196,11 +196,11 @@ console.log(price(1250));
 
 **Eden**: "And the existing exceptions need a next step. Lookup's owner can confirm its IDs separately. Sum needs its callers examined before we write a contract for it. Neither belongs to the slugger."
 
-Eden records `lookup.js` and `sum.js` on the exception list with their owners. Each gets `// @ts-nocheck`. Oded adds `/** @param {number} cents */` above `price` in `money.js`.
+Eden lists owners for `lookup.js` and `sum.js` and adds `// @ts-nocheck` to each. Oded annotates `price` with `/** @param {number} cents */`.
 
 **Eden**: "The sitemap is already on the exception list. The catalogue team left it opted out while they replace its footer callback. Their PR owns that work."
 
-Eden links the catalogue team's work beside the two new exceptions. Global `checkJs` stays on.
+**Noam**: "Those three stay opted out. Global `checkJs` stays on."
 
 **Chen**: "Does the route give its callers a string requirement yet?"
 
@@ -223,7 +223,7 @@ module.exports = function handle(title) {
 };
 ```
 
-The same `handle(42)` now reports TS2345: `Argument of type 'number' is not assignable to parameter of type 'string'.`
+**Noam**: "Now `handle(42)` gets TS2345: `Argument of type 'number' is not assignable to parameter of type 'string'.`"
 
 **Oded**: "A useful type for its caller, and the route is still JavaScript."
 
@@ -265,7 +265,7 @@ Chen runs the files emitted by that failed check, in the scratch build. The rout
 
 **Noam**: "Now the route and both tests would agree. Nobody updated the sitemap, and its old opt-out wouldn't be a new change for me to review."
 
-**Eden**: "The catalogue team isn't changing its call in this PR. Give it the function it still expects."
+**Eden**: "I've seen this fail at scale. The catalogue team isn't changing its call in this PR. Give it the function it still expects."
 
 **Oded**: "I'd rather leave their footer work alone. Restore `export =`?"
 
@@ -317,7 +317,9 @@ The unchanged `price-label.js` passes the global check and still prints `12.5`.
 
 ## The Verdict
 
-**Eden**: "A caller left on the exception list keeps its interface in a conversion PR. Here that's the sitemap, so merge `export =`, both tests and the annotated route, with the checking changes we've just tried. Add the backfill to the compiler's inputs and stop copying it separately. I'll maintain the exception list with its owners. The catalogue team keeps the footer work."
+> Preserve the calls a conversion claims to support. If those calls must change, migrate and verify their callers as part of the change.
+
+**Eden**: "Merge `export =`, both tests and the annotated route, with these checking changes. Include the backfill instead of copying it separately. I'll maintain the exception list with its owners; the catalogue team keeps the footer work."
 
 **Noam**: "Strictness stays on. Money stays JavaScript with its parameter annotation until Oded's next PR."
 

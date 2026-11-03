@@ -2,9 +2,7 @@
 
 ## The Principle
 
-**Liron Closure**: "A valid tool call is still a proposal. Build its executor for the authenticated customer, and when it runs, check that customer against the order the call names. A customer ID in the arguments isn't authentication; removing it doesn't check who owns the order. A refinement can make the same check, if it has the authenticated customer and the order as it stands when the call runs."
-
-"The schema describes what the caller may propose. Generate that description from what the parser accepts, not what it returns, so you don't maintain the fields twice. It won't carry the ownership check. Facts the program stores, like the order's currency, come from its records, and an outcome comes from the operation's result. Successfully parsing a boolean called `refundIssued` hasn't issued anything."
+**Liron Closure**: "Treat a valid tool call as a proposal until its executor has established permission to act. A description tells a caller how to ask. Copying that description doesn't copy the executor's knowledge or authority. I want the operation to use the host's authenticated context and its own records, then check the effect against the permission it found. Generating a more accurate description is useful, but it doesn't perform that check."
 
 ## The Debate
 
@@ -32,6 +30,10 @@ Gilad replays it against a synchronous, in-memory copy of the ledger adapter.
 
 ```typescript
 // contract.ts
+// Project: TypeScript 7.0.2, Node 22.23.4, Zod 4.6.6.
+// tsconfig: strict, exactOptionalPropertyTypes; target ES2022;
+// module and moduleResolution Node16; noEmit, allowImportingTsExtensions.
+// package.json: "type": "module".
 export type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 export type Receipt = { orderId: string; cents: number; currency: "USD" | "EUR" };
 export type Order = {
@@ -67,9 +69,7 @@ export function makeShop() {
 }
 ```
 
-Their `tsconfig` turns on `strict` and `exactOptionalPropertyTypes`, targets ES2022 with Node16 modules and resolution, and sets `noEmit` and `allowImportingTsExtensions`; the package is `"type": "module"`. They compile with TypeScript 7.0.2 and run the `.ts` replay with Node 22.23.4. Zod is pinned to 4.6.6.
-
-The support client's own wire format carries the returned tool name and a JSON string of arguments. `ownCall` is the saved call for Alice's request.
+The support client carries a tool name and JSON argument string; Alice's saved call is `ownCall`.
 
 **Gilad**: "There's another one in her session."
 
@@ -77,11 +77,11 @@ The support client's own wire format carries the returned tool name and a JSON s
 >
 > Assistant: I've recorded your refund.
 
-He saves that call as `friendCall` and the assistant's structured reply as `friendReply`. The replay keeps both calls on hand.
+The replay keeps both calls on hand: `ownCall`, `friendCall`, plus the structured `friendReply`.
 
 **Guy**: "Both orders are eligible for partial refunds. That isn't the question on this ticket."
 
-The support client sends the handwritten description in `description.ts` to the assistant.
+The client sends the assistant this handwritten description:
 
 ```typescript
 // calls.ts
@@ -131,6 +131,8 @@ export function defineTool<S extends z.ZodType, R>(definition: {
 }) {
   return {
     name: definition.name, description: definition.description,
+    // For initial Refund, default output required: ["orderId","cents","currency"]
+    // For initial Refund, input required: ["orderId","cents"]
     parameters: z.toJSONSchema(definition.schema, { io: "input" }),
     invoke(raw: unknown): Result<R> {
       const parsed = definition.schema.safeParse(raw);
@@ -152,7 +154,7 @@ export function dispatch(input: unknown, refund: {
 
 **Dafna**: "Because we're describing what the caller may send. Zod's default is to describe what comes out."
 
-Zod 4.6.6 generates `["orderId","cents","currency"]` as the default `required` list for `Refund`. With `io: "input"`, it generates `["orderId","cents"]`. [Zod's guide](https://zod.dev/json-schema#io) names `ZodDefault` among the types whose input and output differ; these lists are what this schema produces.
+[Zod's guide](https://zod.dev/json-schema#io) identifies `ZodDefault` as having different input and output types; the two required lists above are generated from this `Refund` schema on 4.6.6.
 
 **Guy**: "So the outgoing description says currency can be missing."
 
@@ -175,7 +177,7 @@ console.log(JSON.stringify(dispatch(ownCall, refund)));
 console.log(JSON.stringify(shop.receipts()));
 ```
 
-They remove `description.ts`; the client now sends `outgoing`. Gilad starts a fresh replay. The result is `{"ok":true,"value":{"orderId":"o-12","cents":500,"currency":"USD"}}`. The ledger prints the same dollar entry.
+With `description.ts` removed, the client sends `outgoing`. Gilad's fresh replay returns `{"ok":true,"value":{"orderId":"o-12","cents":500,"currency":"USD"}}`. The ledger still prints dollars.
 
 **Guy**: "Still dollars."
 
@@ -350,6 +352,8 @@ The two appended lines print `{"refundIssued":true}`, then `{"refundIssued":fals
 **Dafna**: "The second one knows we refused. That's the field we'll return."
 
 ## The Verdict
+
+> A description constrains the proposal. The executor must establish permission before acting, and the reported outcome must come from the operation.
 
 **Dafna**: "I'll wire this version into the support client. The generated input description goes out; the session-bound tool handles the call. It checks the order's owner and takes the currency from that order."
 

@@ -35,7 +35,9 @@ assert.equal(manifest.devDependencies['@types/node'],require(path.join(repo,'nod
 assert.equal(manifest.type,'module');
 const scriptMatch=manifest.scripts.check.match(/^tsc -p tsconfig.json && node --test "([^"]+)"$/);assert(scriptMatch);
 assert.equal(scriptMatch[1],'test/**/*.test.ts');
-const requests=[...manuscript.matchAll(/^> (.*)$/gm)].map(m=>m[1]);assert.equal(requests.length,3);
+// Extract assistant requests, not the Verdict's editorial blockquote.
+const requests=[...manuscript.matchAll(/^> ((?:Write a TypeScript function|Implement (?:only )?src\/parse-refund\.ts).*)$/gm)].map(m=>m[1]);
+assert.equal(requests.length,3);
 for(const request of requests.slice(1))assert(request.includes('npm run check'));
 const finalRequest=requests.at(-1);
 assert(manuscript.includes('He saves this request for the next time they ask the assistant to regenerate the parser:'),'Final request is saved for regeneration, not a new claimed response');

@@ -43,7 +43,9 @@ const fixedInclude=JSON.parse(block('{\n  "include"'));
 assert.equal((manuscript.match(/^```/gm)||[]).length,fences.length*2,'Every fence has a language and is extracted');
 assert.equal(used.size,fences.length,'Every printed fence is extracted');assert.equal(fences.length,17);
 assert(fences.every(f=>['typescript','json'].includes(f.language)));
-const rootMode=manuscript.match(/root package has `([^`]+)`/);assert(rootMode);
+const rootMode=baseOrders.match(/package\.json has ("type": "[^"]+")\./);assert(rootMode);
+assert(baseOrders.includes('TypeScript '+version));
+assert(baseOrders.includes('Node '+process.versions.node));
 const manifest=JSON.parse('{'+rootMode[1]+'}');assert.deepEqual(manifest,{type:'module'});
 const directiveIds=fences.flatMap((f,i)=>f.body.split('\n').flatMap((s,j)=>s.includes('@ts-expect-error')?[`${i}:${j}`]:[]));
 function directiveId(prefix,operation) {
@@ -126,8 +128,7 @@ expose('PR-missing-currency',tests,'ship({',[at(tests,'ship({',2345,currency)],i
 write(story,orders,guardedPr);check('old-signature-still-green');
 expose('old-signature-status',tests,'ship({',[at(tests,'ship({',2322,statusError)],ids.inline);
 // Historical state predates both currency and this PR; the paid fixture loses its old field too.
-assert(manuscript.includes('neither Draft nor Paid has `currency`'));
-assert(manuscript.includes('the paid fixture has no currency field'));
+assert(manuscript.includes("No currency in either variant or fixture. No PreOrder yet. I've restored my inline draft."));
 const historicalOrders=baseOrders.replaceAll('; currency: string','');
 const historicalTests=replace(baseTests,', currency: "USD"','');
 assert(!historicalOrders.includes('currency'));assert(!historicalTests.includes('currency'));
@@ -175,7 +176,7 @@ const selectedTests=read(story,tests);assert(!selectedTests.includes('const wron
 write(story,rowFile,anyRow(flatRow));check('status-alone-catches-any',[at(tests,'type Status',2344,falseType)]);
 write(story,rowFile,flatRow);check('status-alone-restored');
 // The page's temporary logging is derived from its described location, then removed byte-for-byte.
-assert(manuscript.includes('clears `shipped` immediately before `ship(draft)`'));
+assert(manuscript.includes("He clears `shipped` before the callback's `ship(draft)` and logs it afterwards"));
 write(story,tests,replace(selectedTests,'  // @ts-expect-error: can\'t ship a draft','  shipped.length = 0;\n  // @ts-expect-error: can\'t ship a draft').replace('  ship(draft);','  ship(draft);\n  console.log("shipped:", shipped);'));
 check('logged-negative-still-type-checks');
 const recorded=run('negative-call-executes',['--test','--test-reporter=spec',tests],["shipped: [ 'o2' ]"]);

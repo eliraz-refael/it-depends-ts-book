@@ -242,7 +242,7 @@ Dima runs `npm run check` again. Same contract, same two tests, same project set
 
 **Idan**: "Either one passes those cases."
 
-**Dima**: "I heard a distinction arriving."
+**Dima**: "I can afford two tests. I'm not maintaining two parsers. What haven't we decided?"
 
 He puts the assistant's `Number(value.cents)` line back. He wants to finish checking the actual answer before they choose.
 
@@ -338,6 +338,8 @@ Dima runs `npm run check` with the returned, coercing implementation. It compile
 **Dima**: "You can say handles the cases in that file. I'll even let you say it confidently."
 
 ## The Verdict
+
+> The owner decides what the implementation must satisfy. Revise that contract when the requirement changes, not merely because a returned implementation fails it.
 
 ### The next request
 

@@ -159,3 +159,16 @@ Other Tier 1 items, Tier 2 #1/#4 and Tier 3 #3 concern earlier acts; leave those
 During drafting, update extraction when a quoted diagnostic, command or config moves; don't preserve brittle narrator wording just to satisfy a regex. In particular, Ch27 extracts its emit command, benchmark config, probe file list and trace figures from prose, and Bonus 2 checks the printed settings and schema lists. Keep those facts checked at their new locations. Preserve Ch24's old require caller and flag controls; Ch25's two physical layouts and clean build graph; Ch26's every-directive unsuppressed reason, runtime selection, file membership and separate restored regressions; Ch27's exact pinned counters, emit identity, accepted/rejected calls and separate profile evidence. Times remain evidence only, with the visible no-Go skip. Bonus 1's owned-file/reset/always-reject controls and Bonus 2's ownership/strict-schema/refinement controls remain. Bonus 3's typo, alias, declaration and flag controls remain.
 
 Expected coverage stays **82 fences, 344 compiler cases, 122 runtime groups** for these seven chapters, within the existing full **483 / 891 / 382**. Run affected checks and a clean `npm ci` + full `npm run check` after drafting; update coverage only for actual changes. This planning turn runs no compiler or timing probes. Before committing the draft, remeasure lengths, compare benchmark diffs, audit catchphrase counts/links/closers and record every departure from this plan in the self-review.
+
+
+## Settlement
+
+The author approved the plan with these governing rulings:
+
+1. **Principle shapes.** Gilad's Ch21 already opens on a question, so Ch25 must not: lead with his rule, phrased as what he checks on a release, with no question mark in the first sentence. Sahar's Ch26 must not echo Ch19's “What would we lose…”; use a plain statement or short instruction. Read Daniel's Ch20, Ch24, Ch27 and Bonus 3 Principles consecutively before committing; no two may share an opening or closing move.
+2. **Catchphrases.** Eden's Ch24 line answers Noam's specific sitemap discovery, with no gloss; the next sentence moves to the caller. Gil's Ch27 line answers an unmeasured claim just made on the page. If :113 lacks one, give the preceding speaker one short guess. Neither phrase gets an explanation.
+3. **Bonus 3 reorder.** Approved. Fold both takes into dialogue from their existing speakers, not narrator paragraphs. Keep the net chapter change within 5%. The book's last section is the Verdict and its last line is Oded's exact “Good. Now I have a green pull request and a meeting four minutes ago.” Nothing follows it.
+4. **Cuts.** Approved as budgets. Miss and report a target rather than lose a state, check or laugh.
+5. **Ch26.** Replace Oded's congratulation line with another joke.
+6. **Bonus 2.** Liron's conceptual distinction is approved; no parable.
+7. **Remainder.** Everything else stands, including the five footnote candidates and CONSOLIDATED dispositions. Update extraction wherever prose containing checked facts moves, run clean `npm ci` and the full suite, remeasure lengths and record departures in `PR-E-REVIEW.md`. Commit locally on `codex/release-act-4`, without pushing, and notify via aoe.
