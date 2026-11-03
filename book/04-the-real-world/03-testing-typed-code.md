@@ -110,7 +110,7 @@ Noam restores the directive and opens the history.
 
 **Eden**: "Restore the source and tests from then. Both variants, both fixtures."
 
-**Noam**: "No currency in either variant or fixture. No PreOrder yet. I've restored my inline draft. Now widen Paid to the old `Draft | Paid` union."
+**Noam**: "No currency in either variant or fixture. No PreOrder yet. I've restored my inline draft. Now widen `ship`'s parameter to the old `Draft | Paid` union."
 
 TS2578: `Unused '@ts-expect-error' directive.`
 
@@ -141,9 +141,9 @@ Now the check reports TS2578. Noam turns the screen towards Oded.
 
 **Eden**: "The fixture has its own check now. Add another required Draft field, and its declaration fails outside the directive."
 
-**Noam**: "One probe. Paid-only parameter: green. Remove the directive… TS2741:" `Property 'paidAt' is missing in type 'Draft' but required in type 'Paid'.`
+**Noam**: "I'll try the paid-only parameter first. The check passes with the directive. Without it, I get TS2741:" `Property 'paidAt' is missing in type 'Draft' but required in type 'Paid'.`
 
-**Noam**: "Missing paidAt this time. Still a valid Draft being refused. Comment back, green."
+**Noam**: "It's missing paidAt this time, but it's still a valid Draft being refused. With the comment back, the check passes."
 
 **Oded**: "Probe finished? Paid-only doesn't do my feature. Let me add the call we actually want and set the parameter to `Paid | PreOrder`."
 
@@ -162,7 +162,7 @@ test("ships a pre-order", () => {
 });
 ```
 
-**Oded**: "Both ids are right. I tried removing PreOrder from the parameter: the new call fails. Put it back, green. Now the tests object if I ship too much or too little. That seems fair."
+**Oded**: "Both ids are right. I tried removing PreOrder from the parameter, and the new call failed. Putting it back made the check pass. Now the tests object if I ship too much or too little. That seems fair."
 
 ### "What are we promising?"
 
@@ -234,7 +234,7 @@ TS2578: the directive is unused. Noam removes `: any`; the test passes with the 
 
 **Guy**: "Keep the comparison for now. It tells me the result I promised without making me read a deliberately wrong assignment."
 
-Noam removes `wrong` and its directive, then restores Row. Green. Sahar points at the helper's `Object.assign`.
+Noam removes `wrong` and its directive, then restores Row. The check passes. Sahar points at the helper's `Object.assign`.
 
 **Sahar**: "Why are we assembling two objects to get two fields?"
 
@@ -262,7 +262,7 @@ Row fails with TS2344. With Row removed, the admin caller compiles; a Node `-e` 
 type Status = Expect<Equal<typeof row.status, "paid">>;
 ```
 
-**Noam**: "Status accepts both forms. Add `: any`: TS2344 here; `expected` and the card still compile. Remove it: green. Flat return stays."
+**Noam**: "Status accepts both forms. With `: any` added, I get TS2344 here, although `expected` and the card still compile. Removing the annotation makes the check pass. I'll keep the flat return."
 
 **Noam**: "A function annotated `User[]` can return `JSON.parse(raw)` and pass an exact return-type test. Run it, and you get whatever the string held. These tests believe the annotation."
 
@@ -308,7 +308,7 @@ He adds Guy's card test beside the two shipment tests and runs plain `node --tes
 
 **Eden**: "The test directory gets discovered too. The suffix isn't an instruction to leave it alone. Put these under `type-tests`."
 
-**Oded**: "Moved to `type-tests/ship.types.ts`. Reset and log removed. Running `node --test test/ship.test.ts` while we finish. Here's the whole runtime file:"
+**Oded**: "I've moved it to `type-tests/ship.types.ts` and removed the reset and log. I'm running `node --test test/ship.test.ts` while we finish. Here's the whole runtime file:"
 
 ```typescript
 // test/ship.test.ts — runtime tests after the split
@@ -387,7 +387,7 @@ He replaces the include:
 }
 ```
 
-Both files now appear. The false assertion gives TS2344; Noam deletes it. Green.
+The file list now includes the runtime test and `type-tests/ship.types.ts`. Noam gets TS2344 at the false assertion. Once he deletes it, the check passes.
 
 **Noam**: "Now widen `ship` again."
 
@@ -395,13 +395,15 @@ Both files now appear. The false assertion gives TS2344; Noam deletes it. Green.
 
 **Noam**: "We just moved its test."
 
-Oded tries Order: TS2578 at the moved draft directive. Back to `Paid | PreOrder`: green.
+Oded widens the parameter to `Order`, and the moved draft directive reports TS2578. With `Paid | PreOrder` restored, the check is green again.
 
 **Noam**: "And the row?"
 
-Oded adds `: any` to `orderRow`: TS2344 at the moved Status; `expected` and the admin caller still compile. Annotation off: green.
+Oded adds `: any` to `orderRow`. Status reports TS2344 in its new file, although `expected` and the admin caller still compile. He removes the annotation and the check passes.
 
 With the false assertion back, `node --test type-tests/ship.types.ts` passes: Node erases it. Noam removes it again.
+
+**Noam**: "The runner executed that file without checking its types. It doesn't get to be our type check."
 
 ## The Verdict
 
@@ -413,7 +415,7 @@ With the false assertion back, `node --test type-tests/ship.types.ts` passes: No
 
 Eden adds a temporary failing card test in `test/admin.test.ts`.
 
-**Eden**: "Single file: green. Glob: it runs the new test and fails. Correct the expected text: both files pass. Now I'll remove the temporary test."
+**Eden**: "The single-file command passes. The glob runs the new test and fails. Once I correct the expected text, both files pass. Now I'll remove the temporary test."
 
 **Noam**: "Next time, show me the reds before you send me the green."
 

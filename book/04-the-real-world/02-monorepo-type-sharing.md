@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Gilad Stacktrace**: "For a release, I check that the program we're packaging honors the contract our callers were checked against. Run the caller with those packages and keep the error with the files that produced it. If the development run succeeds and the release run fails, I need both setups long enough to explain the difference. Rebuilding might remove the evidence without explaining it. Once we've found the cause, the release check must reproduce enough of that setup to catch it coming back."
+**Gilad Stacktrace**: "A release check runs the program we ship, from the place it will ship. Anything else is a rehearsal. When the two disagree, keep the failing setup intact until someone can say why. At 3 AM nobody is running your checkout."
 
 ## The Debate
 
@@ -12,7 +12,9 @@
 
 **Idan**: "The shipping charge. The request says a thousand cents, the cart says five hundred. The quote should say fifteen dollars."
 
-**Dima**: "Root, money, cart and API all use `"type": "module"`. Our `node_modules/@shop` links point to the packages. Node runs the emitted API; the release job copies it and its dependencies into an image. The links stay here."
+**Dima**: "Node runs the built API. The release job copies it and its packages into an image. The links stay here."
+
+Root, money, cart and API all use `"type": "module"`; the checkout's `node_modules/@shop` links point to the packages.
 
 Money's manifest follows; cart has the same mapping under `@shop/cart`.
 
@@ -115,7 +117,7 @@ console.log(buildId, amount.plus(shipping()).format());
 
 **Idan**: "The parser constructs a Money. Shipping constructs a Money. Both constructors are the one we just looked at."
 
-**Gil Benchmark**: "Both declarations have that text. Look at the paths."
+**Gil Benchmark**: "Same name, same constructor. Look at the paths."
 
 Cart's generated declaration imports Money from `@shop/money`, leading to `money/dist/index.d.ts`. The parser imports its adjacent source index.
 
@@ -136,7 +138,7 @@ The API compiles. The run throws `TypeError: Cannot read private member #cents f
 
 **Linoy**: "Why is there a money package in the API's output?"
 
-**Gil**: "It was there before your change. I rebuilt the old API: two emitted implementations, only one loaded. The type imports pulled money's source into the compile, even though those imports disappear from the JavaScript. Your parser is the first thing that loads that copy."
+**Gil**: "It was there before your change. I rebuilt the old API: two emitted implementations, only one loaded. Two imports that only need types pulled money's source into the compile, even though those imports disappear from the JavaScript. Your parser is the first thing that loads that copy."
 
 Gil follows cart's import to `packages/money/dist/index.js`.
 
@@ -281,7 +283,7 @@ Linoy starts an experimental branch.
 
 **Dima**: "You changed the imports as well?"
 
-**Linoy**: "Node needs actual .ts filenames, without the compiler's .js-to-.ts lookup. This noEmit check allows them; the release build won't emit them."
+**Linoy**: "Node needs actual .ts filenames, without the compiler's .js-to-.ts lookup. This noEmit check allows them. I'm not asking the release build to emit them."
 
 The source check passes. The already-emitted JavaScript API still imports `@shop/money` and `@shop/cart`; Node now loads their linked source. It prints `release-42 USD 15.00`.
 

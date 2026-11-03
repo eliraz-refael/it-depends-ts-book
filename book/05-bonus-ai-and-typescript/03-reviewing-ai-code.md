@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Daniel Compiler**: "I review an API-preserving patch against the public types it produces and the old callers that depend on them. Emit declarations before and after with the same compiler and settings, including the types their signatures refer to. Then compare the contracts, not just the spelling: different declarations can promise the same inputs and results. A caller edited in the patch cannot speak for the unedited callers elsewhere. Put it back and find why it needed changing. The API's owner decides whether to keep that change. Even when the contracts agree, runtime tests still have to check the values and effects."
+**Daniel Compiler**: "When a patch says it changes no public API, believe the declarations, not the summary. Emit them before and after and read the difference, following the types they refer to. An annotation is only one way to publish a promise. Inference publishes one too, whether or not the author thought to mention it. A confident summary doesn't get a vote in that comparison."
 
 ## The Debate
 
@@ -83,7 +83,7 @@ for (const row of cases) {
 console.log("3 statuses, 3 badges: passed");
 ```
 
-**Oded**: "Zero refunded, some refunded, all refunded. Both the status and the text the customer sees. `node check.ts` prints `3 statuses, 3 badges: passed` on the old commit. Same command, same files, same result on this one."
+**Oded**: "Zero refunded, some refunded, all refunded. Both the status and the text the customer sees. `node check.ts` prints `3 statuses, 3 badges: passed` on the old commit. I ran those unchanged files on this commit too. They passed."
 
 **Noam**: "Show me this one."
 
@@ -147,7 +147,7 @@ Noam reads the helper again. The comparisons are the same. The three labels are 
 
 **Oded**: "I'd like that in the minutes."
 
-"We're not in the meeting yet."
+**Noam**: "We're not in the meeting yet."
 
 ### "Put the old caller back"
 
@@ -210,7 +210,7 @@ He puts the submitted badge back. Then he emits declarations from the original c
 +export declare function orderStatus(order: Order): string;
 ```
 
-**Daniel**: "Only `status.d.ts` changed. I checked `order.d.ts` too. It's unchanged. An identical import line doesn't tell me whether `Order` still means the same thing. If an exported alias uses `typeof`, follow it to the value too. An unchanged alias line can acquire a different meaning."
+**Daniel**: "Only `status.d.ts` changed. I checked `order.d.ts` too. It's unchanged. An identical import line doesn't tell me whether `Order` still means the same thing. If an exported alias uses `typeof`, I follow it to the value too."
 
 **Oded** leans forward. "We didn't write `string` anywhere in that function."
 
@@ -240,9 +240,11 @@ export function mobileStatus(order: Order): "paid" | "partial" | "refunded" {
 
 With the original provider it compiles. With the submitted provider, the return gets **TS2322**: `Type 'string' is not assignable to type '"paid" | "partial" | "refunded"'.`
 
-**Eden**: "The app relies on those three states. We don't get to widen its return because this repo's badge found a fallback. Narrowing a parameter can break a caller elsewhere that still passes a `string`, too. A search here won't find it."
+**Eden**: "The app relies on those three states. We don't get to widen its return because this repo's badge found a fallback."
 
 **Oded**: "Fine. That is a caller I hadn't checked."
+
+**Eden**: "Parameters break the other way. Narrow one, and a caller elsewhere that still passes a `string` fails. A search here won't find it."
 
 Eden sets the copied adapter aside.
 
@@ -288,7 +290,9 @@ Oded runs `node check.ts`. It fails: `Expected refunded, got refund`.
 
 **Noam**: "It does. I haven't found a bug your tests missed. I've found a check the patch removed."
 
-He tries the equivalent typo in a scratch copy of the original: the final `return "refunded"` becomes `return "refund"`, with the original badge untouched. Compilation now fails twice. **TS2678** says `Type '"refunded"' is not comparable to type '"paid" | "partial" | "refund"'.` At the fallback, **TS2345** says `Argument of type '"refund"' is not assignable to parameter of type 'never'.`
+He tries the equivalent typo in a scratch copy of the original: the final `return "refunded"` becomes `return "refund"`, with the original badge untouched.
+
+**Noam**: "Compilation fails twice. TS2678 at the case:" `Type '"refunded"' is not comparable to type '"paid" | "partial" | "refund"'.` "And TS2345 at the fallback:" `Argument of type '"refund"' is not assignable to parameter of type 'never'.`
 
 **Daniel**: "The old badge made a new label require an answer here. The submitted fallback supplies an answer for every string: print it. That's a behavior choice. It arrived as a type-error repair."
 
@@ -338,7 +342,7 @@ The old badge compiles with the table. `node check.ts` passes. Daniel emits agai
 
 **Oded**: "You could say that about every inferred return in the shop."
 
-"I'm saying it about this one. I have a caller outside this patch that depends on it. If someone changes the implementation tomorrow, I want that implementation checked against the same three states."
+**Eden**: "I'm saying it about this one. I have a caller outside this patch that depends on it. If someone changes the implementation tomorrow, I want that implementation checked against the same three states."
 
 **Daniel**: "The two-word repair is sufficient for today's widening. An explicit return gives that decision a separate place to live. Checking the table against the same type also puts the typo error where the label is written."
 
@@ -397,13 +401,13 @@ He then uses the submitted patch and annotates its function `orderStatus(order: 
 
 ## The Verdict
 
-> A repair that changes the public contract needs an explicit contract decision. A refactor claiming to preserve that contract must still support its existing callers.
+> When a patch makes a type error disappear, find what the error was protecting before you accept the repair. A fix that changes the contract is a contract decision, not a type-error repair.
 
 **Eden**: "Keep the table, the explicit return and the checked labels. Keep the original badge. This refactor promised the existing status API; the mobile caller still gets it."
 
 **Noam**: "For changes to this shared API, attach the before-and-after declarations from the same compiler and configuration, including their referenced types. If a caller needs repairing, show the error that made you change it. We review that decision with the provider."
 
-**Oded**: "And keep the runtime tests. Swapping `paid` and `refunded` would satisfy that union perfectly."
+**Oded**: "And keep the runtime tests. Swapping `paid` and `refunded` would satisfy that union."
 
 **Daniel**: "And the declaration report would be identical."
 

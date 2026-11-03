@@ -32,18 +32,19 @@ export { t };
 
 ```typescript
 // src/probe.ts — temporary calls against the PR
+// Emit: tsc -p tsconfig.json --checkers 1 --noEmit false --rootDir src --outDir dist --removeComments true
 import { t } from "./i18n.js";
 console.log(t("shop.crat", { name: "A", count: "2" }));
 console.log(t("shop.cart", { name: "A" }));
 ```
 
-Gil emits with `tsc -p tsconfig.json --checkers 1 --noEmit false --rootDir src --outDir dist --removeComments true`, using the shared options below. On Node 22.23.4, `node dist/probe.js` prints `shop.crat`, then `Hello A, {count} items`.
+**Gil Benchmark**: "I emitted it with the shared options below. On Node 22.23.4, `node dist/probe.js` prints `shop.crat`, then `Hello A, {count} items`."
 
 **Oded**: "Yes. I removed those checks. I'm not arguing that misspelling cart is a feature. I'm asking whether we need to compute the parameters from every message while checking every caller."
 
 **Noam**: "That missing count was caught at the call before your edit. If this gets into the banner, somebody has to notice it there."
 
-**Gil Benchmark**: "Before you price either option, show me what you removed."
+**Gil**: "Before you price either option, show me what you removed."
 
 ### "It bought something"
 
@@ -73,7 +74,7 @@ function t(...args: Args): string;
 
 **Linoy**: "Then measure the larger catalogue. Don't remove the feature and tell me the feature was implemented badly."
 
-Both probe calls get TS2345. So does the banner's `t(pending[0], pending[1])`, which Oded expanded because `t(...pending)` gets TS2556 under his loose signature. The typo message ends by comparing `shop.crat` with `shop.hello`.
+Both probe calls get TS2345. So does `t(pending[0], pending[1])` in the banner we'll look at, which Oded expanded because `t(...pending)` gets TS2556 under his loose signature. The typo message ends by comparing `shop.crat` with `shop.hello`.
 
 **Oded**: "It would be nice if the error suggested cart."
 
@@ -96,9 +97,7 @@ export const ready = t("shop.ready");
 
 **Linoy**: "The banner chooses the whole call, then passes it on. Both branches work. Keep that, and keep ready without an empty object just to satisfy the helper."
 
-**Gil**: "I saved the emit from Oded's branch, with his expanded banner call. Now I'll emit this restored version and compare `dist/i18n.js`. Same options both times. The root package has `"type": "module"`."
-
-**Gil**: "Same 387 bytes."
+**Gil**: "I saved the emit from Oded's branch, with his expanded banner call. I emitted the restored version with the same options: `dist/i18n.js` is byte-identical, all 387 bytes. The root package has `"type": "module"`."
 
 **Oded**: "I did say type check."
 
@@ -129,6 +128,9 @@ export const ready = t("shop.ready");
 
 ```javascript
 // tools/workload.mjs
+// Build bench/case.ts from the catalogue as one-line const messages = … as const;,
+// the required helpers, the signature with declare, the calls, and export {};.
+// bench/tsconfig.json: {"extends":"../tsconfig.json","files":["case.ts"],"include":[]}
 export function workload() {
   const texts = ["Hello {name}, {count} items", "Hello {name}", "Ready"];
   const messages = {};
@@ -146,11 +148,9 @@ export function workload() {
 }
 ```
 
-`bench/case.ts`: the catalogue as one-line `const messages = … as const;`, required helpers, the signature with `declare`, calls, `export {};`. `bench/tsconfig.json`: `{"extends":"../tsconfig.json","files":["case.ts"],"include":[]}`.
+**Gil**: "I ran `tsc -p bench/tsconfig.json --checkers 1 --extendedDiagnostics` three times per version, rotating their order. The runs were serial, with no traces or profiles while timing. Here are the medians."
 
-**Gil**: "`tsc -p bench/tsconfig.json --checkers 1 --extendedDiagnostics`. Three serial runs, rotating order. No traces or profiles while timing. Medians below."
-
-Four alternatives, each with only its required helpers; the last uses Linoy's original Args:
+He compares four alternatives, each with only its required helpers. The last uses Linoy's original Args:
 
 ```typescript
 // Counterfactual signatures — alternatives, not overloads
@@ -218,7 +218,7 @@ function messageFor(hasItems: boolean): "shop.cart" | "shop.hello" {
 console.log(t(messageFor(true), { name: "A" }));
 ```
 
-The full project gets TS2556 at the unchanged banner's tuple spread. They give the probe a separate file list: `probe.json` extends the root config, with `files: ["src/i18n.ts", "src/probe.ts"]` and `include: []`. Checking and emitting with `-p probe.json` succeeds. Running `node dist/probe.js` prints `Hello A, {count} items`.
+The full project gets TS2556 at the unchanged banner's tuple spread. They give the probe a separate file list: `probe.json` extends the root config, with `files: ["src/i18n.ts", "src/probe.ts"]` and `include: []`. Checking with `-p probe.json` succeeds, as does emitting with the earlier emit options, including `--noEmit false`. Running `node dist/probe.js` prints `Hello A, {count} items`.
 
 **Noam**: "It lets my broken replacement through and rejects the caller I already had."
 
@@ -266,15 +266,15 @@ Noam's separate-key probe gets TS2345. The original pending-tuple banner compile
 
 **Linoy**: "I'll put my original signature back and try `tsc -p bench/tsconfig.json --checkers 1 --generateTrace trace`."
 
-Through the relation event's checker ID and `legend.json`, she finds Args: two thousand tuples. Expression events identify generated calls.
+Through a relation event's checker ID and `legend.json`, she finds Args: two thousand tuples. Expression events identify generated calls.
 
-**Linoy**: "There's Args. I suspect argument-to-union relations."
+**Linoy**: "My guess is we're spending the time relating arguments to that union."
 
 **Gil**: "About 0.2 seconds in the recorded check events, against about 1.6 for checking the file. Finding Args isn't finding the cost."
 
 **Linoy**: "Then CPU samples. `tsc -p bench/tsconfig.json --checkers 1 --pprofDir profile`. With a Go toolchain installed, `go tool pprof -top -cum profile/*-cpuprofile.pb.gz`."
 
-The cumulative profile puts a large share under [mapTypeEx](https://github.com/microsoft/typescript-go/blob/2bd066d87f5bafd315be9f40889d0a60b9e58e0b/internal/checker/checker.go#L25473-L25508). `-peek mapTypeEx` shows contextual typing above it, union construction below.
+The cumulative profile puts a large share of the CPU samples under [mapTypeEx](https://github.com/microsoft/typescript-go/blob/2bd066d87f5bafd315be9f40889d0a60b9e58e0b/internal/checker/checker.go#L25473-L25508). `-peek mapTypeEx` shows contextual typing above it, union construction below.
 
 **Daniel**: "It maps over union members and rebuilds the union if results change. That's 7.0.2's checker; don't build on the name."
 
@@ -310,10 +310,10 @@ Oded reruns the small banner: `Hello A, 2 items` when it has items, `Hello A` ot
 
 **Gil**: "Counters stay pinned to this compiler and configuration. Record times, but don't fail a build for missing these medians. The machine hasn't signed a service guarantee."
 
-**Noam**: "If we remove a check later, name the mistake and who catches it. If nobody does, we're accepting it. Don't call that equivalent."
+**Noam**: "And if we ever do drop a check, don't call it equivalent."
 
 **Oded** changes the title to “Check translation calls faster without loosening their arguments.”
 
 **Noam**: "Now I can tell what I'm approving."
 
-**Oded**: "Good. I'd hate to spend the saved time naming this PR."
+**Oded**: "Approve it before someone asks me to benchmark the title."

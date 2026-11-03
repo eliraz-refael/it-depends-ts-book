@@ -4,7 +4,7 @@
 
 **Prof. Eli Typeworth**: "Before asking for code, put the decisions it must respect in its signature and in examples of success and rejection. Existing signatures and tests count. Send them with the project configuration and the command that runs the compiler and tests. Agree which files may change. The configuration also checks the source files they import into the project, so a stricter setting can make the job bigger than you meant."
 
-"Run that command against the returned implementation. Compiling through `any`, an `as` assertion or a non-null `!` doesn't establish that the value was checked. Code without them can still do the wrong thing. If two implementations pass but disagree on behavior you need, decide which one you mean and put the difference in the examples before the next attempt. The checks enforce what you've expressed in them. Someone still has to own what you meant."
+"Run that command against the returned implementation. Compiling through `any`, an `as` assertion or a non-null `!` doesn't establish that the value was checked. Code without them can still do the wrong thing. The checks enforce what you've expressed in them. Someone still has to own what you meant."
 
 ## The Debate
 
@@ -60,7 +60,7 @@ Dima runs `./node_modules/.bin/tsc -p tsconfig.json`. It passes. `node src/probe
 
 ### "Which project?"
 
-Dima opens the files already in this small scratch project. He's running TypeScript 7.0.2 and Node 22.23.4, with the compiler and Node declarations installed locally. This is its `package.json`:
+Dima opens the files already in this small scratch project. This is its `package.json`:
 
 ```json
 {
@@ -92,7 +92,7 @@ And its `tsconfig.json`:
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "reset.d.ts"]
+  "include": ["src/**/*.ts", "test/**/*.ts"]
 }
 ```
 
@@ -100,7 +100,7 @@ And its `tsconfig.json`:
 
 **Idan**: "Give it these files too. And for this little project, I want the unchecked parse to stop at the return."
 
-She adds a [later overload](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#merging-interfaces) to the global `JSON` interface:
+She adds `reset.d.ts` to the config's `include` and writes a [later overload](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#merging-interfaces) to the global `JSON` interface:
 
 ```typescript
 // reset.d.ts
@@ -118,7 +118,7 @@ The same compiler command now reports **TS2322: Type 'unknown' is not assignable
 
 **Chen**: "Does that change every `JSON.parse` in the shop?"
 
-**Idan**: "Only in this program, including the source it imports, like the badge plugin's augmentation. Our later overload wins this call."
+**Idan**: "Only in this program, including the source it imports. Our later overload wins this call."
 
 **Chen**: "And if the answer just asserts Refund?"
 
@@ -181,7 +181,7 @@ test("rejects a negative amount", () => {
 
 **Dima**: "Me, apparently."
 
-**Chen**: "If it proposes both and the code passes, the answer agrees with itself. Very harmonious."
+**Chen**: "If it proposes both and the code passes, the answer agrees with itself."
 
 **Dima**: "Fine. But I'm not going to specify every possible string before asking for a parser. That's a parser written in English."
 
@@ -236,7 +236,7 @@ She replaces one line in the same implementation:
 const cents = value.cents;
 ```
 
-Dima runs `npm run check` again. Same contract, same two tests, same project settings. Both implementations pass.
+Dima runs `npm run check` again without changing the contract, tests or project settings. Both implementations pass.
 
 **Dima**: "So either one."
 
@@ -244,7 +244,9 @@ Dima runs `npm run check` again. Same contract, same two tests, same project set
 
 **Dima**: "I can afford two tests. I'm not maintaining two parsers. What haven't we decided?"
 
-He puts the assistant's `Number(value.cents)` line back. He wants to finish checking the actual answer before they choose.
+He puts the assistant's `Number(value.cents)` line back.
+
+**Dima**: "Let's finish checking the actual answer before we choose."
 
 ## The Turn
 
@@ -339,7 +341,7 @@ Dima runs `npm run check` with the returned, coercing implementation. It compile
 
 ## The Verdict
 
-> The owner decides what the implementation must satisfy. Revise that contract when the requirement changes, not merely because a returned implementation fails it.
+> When two implementations pass and disagree, the checks haven't decided the behavior. The owner decides, and adds the example that tells them apart.
 
 ### The next request
 

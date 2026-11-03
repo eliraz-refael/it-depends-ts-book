@@ -137,7 +137,7 @@ Noam enables `checkJs` and retries the failed default export.
 
 **Noam**: "TS2349 at `slug(title)`: `This expression is not callable.` No call signatures. And TS7006: `Parameter 'title' implicitly has an 'any' type.`"
 
-**Daniel**: "You omitted `strict`; TypeScript 7 defaults it to true. Checking this file now exposes its untyped parameter too."
+**Daniel**: "The config doesn't set `strict`; TypeScript 7 defaults it to true. Checking this file exposes its untyped parameter too."
 
 **Noam**: "There. Before deployment. I want this on for JavaScript too."
 
@@ -196,7 +196,7 @@ console.log(price(1250));
 
 **Eden**: "And the existing exceptions need a next step. Lookup's owner can confirm its IDs separately. Sum needs its callers examined before we write a contract for it. Neither belongs to the slugger."
 
-Eden lists owners for `lookup.js` and `sum.js` and adds `// @ts-nocheck` to each. Oded annotates `price` with `/** @param {number} cents */`.
+Eden adds `lookup.js` and `sum.js` to the exception list with their owners, and puts `// @ts-nocheck` in each. Oded annotates `price` with `/** @param {number} cents */`.
 
 **Eden**: "The sitemap is already on the exception list. The catalogue team left it opted out while they replace its footer callback. Their PR owns that work."
 
@@ -263,7 +263,7 @@ Chen runs the files emitted by that failed check, in the scratch build. The rout
 
 **Oded**: "Which is what I did the first time. I updated the test's call and left the real caller behind."
 
-**Noam**: "Now the route and both tests would agree. Nobody updated the sitemap, and its old opt-out wouldn't be a new change for me to review."
+**Noam**: "Now the route and both tests would agree. Nobody updated the sitemap, and its old opt-out wouldn't be a new change for me to review. I said the global check would catch this before deployment. It catches the files we haven't excused."
 
 **Eden**: "I've seen this fail at scale. The catalogue team isn't changing its call in this PR. Give it the function it still expects."
 
@@ -319,7 +319,7 @@ The unchanged `price-label.js` passes the global check and still prints `12.5`.
 
 > Preserve the calls a conversion claims to support. If those calls must change, migrate and verify their callers as part of the change.
 
-**Eden**: "Merge `export =`, both tests and the annotated route, with these checking changes. Include the backfill instead of copying it separately. I'll maintain the exception list with its owners; the catalogue team keeps the footer work."
+**Eden**: "Merge `export =`, both tests and the annotated route, with these checking changes. Add the backfill to the compiler's inputs instead of copying it separately. I'll maintain the exception list with its owners; the catalogue team keeps the footer work."
 
 **Noam**: "Strictness stays on. Money stays JavaScript with its parameter annotation until Oded's next PR."
 

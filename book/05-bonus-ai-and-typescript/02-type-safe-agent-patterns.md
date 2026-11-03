@@ -2,7 +2,7 @@
 
 ## The Principle
 
-**Liron Closure**: "Treat a valid tool call as a proposal until its executor has established permission to act. A description tells a caller how to ask. Copying that description doesn't copy the executor's knowledge or authority. I want the operation to use the host's authenticated context and its own records, then check the effect against the permission it found. Generating a more accurate description is useful, but it doesn't perform that check."
+**Liron Closure**: "Treat a valid tool call as a proposal until its executor has established permission to act. A description teaches the caller how to ask. It can make a request intelligible without making it permissible. The executor must decide whether to say yes before it changes anything."
 
 ## The Debate
 
@@ -81,7 +81,7 @@ The replay keeps both calls on hand: `ownCall`, `friendCall`, plus the structure
 
 **Guy**: "Both orders are eligible for partial refunds. That isn't the question on this ticket."
 
-The client sends the assistant this handwritten description:
+The client sends the assistant the handwritten description in `description.ts`:
 
 ```typescript
 // calls.ts
@@ -131,8 +131,8 @@ export function defineTool<S extends z.ZodType, R>(definition: {
 }) {
   return {
     name: definition.name, description: definition.description,
-    // For initial Refund, default output required: ["orderId","cents","currency"]
-    // For initial Refund, input required: ["orderId","cents"]
+    // Initial Refund, Zod's default (output) mode: required ["orderId","cents","currency"]
+    // Initial Refund, io: input: required ["orderId","cents"]
     parameters: z.toJSONSchema(definition.schema, { io: "input" }),
     invoke(raw: unknown): Result<R> {
       const parsed = definition.schema.safeParse(raw);
@@ -154,7 +154,7 @@ export function dispatch(input: unknown, refund: {
 
 **Dafna**: "Because we're describing what the caller may send. Zod's default is to describe what comes out."
 
-[Zod's guide](https://zod.dev/json-schema#io) identifies `ZodDefault` as having different input and output types; the two required lists above are generated from this `Refund` schema on 4.6.6.
+[Zod's guide](https://zod.dev/json-schema#io) lists `ZodDefault` among the types whose input and output differ.
 
 **Guy**: "So the outgoing description says currency can be missing."
 
@@ -177,7 +177,7 @@ console.log(JSON.stringify(dispatch(ownCall, refund)));
 console.log(JSON.stringify(shop.receipts()));
 ```
 
-With `description.ts` removed, the client sends `outgoing`. Gilad's fresh replay returns `{"ok":true,"value":{"orderId":"o-12","cents":500,"currency":"USD"}}`. The ledger still prints dollars.
+With `description.ts` removed, the client sends `outgoing`. Gilad's fresh replay returns `{"ok":true,"value":{"orderId":"o-12","cents":500,"currency":"USD"}}`. The ledger prints the same dollar entry.
 
 **Guy**: "Still dollars."
 
@@ -198,7 +198,9 @@ The same replay now returns `{"ok":false,"error":"invalid arguments"}` and print
 
 **Gilad**: "We've stopped recording the wrong currency by refusing the original request. Now give it the wrong currency explicitly."
 
-He replaces `ownCall` at the dispatch site with `{ name: "refund_order", arguments: '{"orderId":"o-12","cents":500,"currency":"USD"}' }` and starts fresh. The dollar receipt returns.
+He replaces `ownCall` at the dispatch site with `{ name: "refund_order", arguments: '{"orderId":"o-12","cents":500,"currency":"USD"}' }` and starts fresh.
+
+**Gilad**: "It records dollars again. All I had to do was ask for them."
 
 ## The Turn
 
