@@ -307,7 +307,7 @@ def validate(directory, manifest, mode="proof"):
         all_text = pdf.get_text()
         if not is_release:
             check('PROOF' in pdf.get_text(clip=pymupdf.Rect(0,680,504,720)), f'p{number}: missing proof footer')
-        check(re.findall(r'(?m)^\d+$', pdf.get_text(clip=pymupdf.Rect(0,680,504,720))) == [str(number)], f'p{number}: wrong folio')
+        check(re.findall(r'(?m)^\d+$', pdf.get_text(clip=pymupdf.Rect(0,680,504,720))) == ([] if is_release and number<=3 else [str(number)]), f'p{number}: wrong folio')
         check(bool(pdf.get_text(clip=pymupdf.Rect(0,42,504,678)).strip()), f'p{number}: unintended blank page')
         for font in pdf.get_fonts(full=True):
             check(font[2]=='Type3' or bool(document.extract_font(font[0])[3]), f'p{number}: font not embedded: {font[3]}')
@@ -421,7 +421,7 @@ def validate(directory, manifest, mode="proof"):
     for page in pages:
         for kind in page['front_parts']:
             header = document[page['page']-1].get_text(clip=pymupdf.Rect(0,0,504,42))
-            check(norm(front_headers[kind]) in norm(header), 'Wrong front-matter running head: '+kind)
+            check(not header.strip() if is_release and kind in ('title','copyright','dedication') else norm(front_headers[kind]) in norm(header), 'Wrong front-matter running head: '+kind)
             if not front_sequence or kind!=front_sequence[-1]:
                 front_sequence.append(kind)
     check(front_sequence==['title','copyright' if is_release else 'proof-info','dedication','acknowledgments','contents','symbol-key'], 'Front matter order changed')

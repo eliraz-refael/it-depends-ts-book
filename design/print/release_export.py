@@ -21,7 +21,7 @@ def front(data):
     assert data['public_repository_url'].removeprefix('https://') in COPYRIGHT
     assert 'Source and examples (release '+data['release_tag']+'):' in COPYRIGHT
     lines=''.join(f'<div class="copyright-line" data-copyright-line="{i}">{html.escape(line) if line else "&nbsp;"}</div>' for i,line in enumerate(COPYRIGHT))
-    return f'''<section class="front-page cover running-title" data-front-part="title" data-running="IT DEPENDS"><div class="eyebrow">{html.escape(data['author'])}</div><h1>{html.escape(data['title'])}</h1><h2>{html.escape(data['subtitle'])}</h2></section>
+    return f'''<section class="front-page cover running-title" data-front-part="title" data-running="IT DEPENDS"><div class="title-top-rule"></div><div class="release-author">{html.escape(data['author'])}</div><h1>{html.escape(data['title'])}</h1><h2>{html.escape(data['subtitle'])}</h2></section>
 <section class="front-page copyright running-title" data-front-part="copyright" data-running="Copyright">{lines}</section>'''
 
 def greyscale(document):

@@ -8,8 +8,8 @@ No manuscript, dependencies, renderer, type sizes or body layout were changed.
 
 `design/print/output/whole-book-release-c37c3ea/a/It-Depends-KDP-interior.pdf`
 
-- 438 pages, PDF 1.4, **2,172,892 bytes** (about 2.17 MB).
-- SHA-256: `3d0946556256b787223e1e7edce711ea6bb5c552a30c40f8766919e15a3a4528`.
+- 438 pages, PDF 1.4, **2,171,535 bytes** (about 2.17 MB).
+- SHA-256: `b34445da5a069e6a455df97328ab1a8fc9537ab2b15107c31d58a1ad2371e7b3`.
 - Every page is 7 × 10 inches; no bleed, crop marks or printer marks.
 - Black/greyscale only; all fonts embedded, including outlined numeral glyphs.
 - The final release count agrees with the selected cover's 438-page basis.
@@ -123,3 +123,51 @@ and real Info/XMP metadata policy. The README image is p13 rather than the
 brief's original p10; both are available. No other departures or new layout
 problems. Publishing still requires the normal KDP preview/physical-proof step;
 this work creates no tag and performs no upload.
+
+
+## Accepted release cosmetic polish
+
+The accepted 8be209a PDF is archived in
+`output/whole-book-release-c37c3ea/accepted-8be209a/`. Its commit was amended to
+b42e4f0 solely to correct author/committer attribution to the author's personal
+email; the accepted PDF was unchanged by that amend.
+
+Changes are release-only:
+
+1. Title page: no running head or folio. Eliraz Kedmi is now 22pt Plex under a
+   rule near the foot of the page. The title and subtitle retain their exact
+   original typography and positions. The top rule stays.
+2. Copyright and dedication: no running heads or folios; the body content and
+   positions are unchanged. Acknowledgments, contents and the symbol key retain
+   **both running heads and folios**, consistently. Page numbering still counts
+   the first three pages and remains continuous.
+3. Former link text and footnote URLs lose their underlines. Footnote callouts,
+   note text, destinations printed as URLs and all source content remain.
+
+Both clean renders pass every release validation and the pair comparison:
+438 pages, 2,171,535 bytes, PDF 1.4. The source-term map, real Info/XMP values,
+embedded fonts, greyscale, copyright, exact last line, notes, tables, keeps,
+fences and source checks remain green. Cleanup controls pass. No manuscript or
+proof CSS changes; the full suite and proof-mode result above remain the results
+of the immediately preceding release build, not a claim of rerunning them for
+this CSS-only polish.
+
+`check_release_polish.py` compares the final output against the archived accepted
+release. It asserts the exact title/subtitle spans, author placement, blank
+furniture regions, identical copyright/dedication bodies, identical pp4–8 rasters,
+and identical text and character positions on every page after p8. It derives
+allowed removal rectangles from the accepted PDF's actual underline vectors and
+raw link rectangles. Pixels outside those paths must match at 1.5× raster scale
+(with one pixel of antialias allowance). The removed vectors must be absent.
+
+PASS: all body raster differences are confined to removed underlines on
+**pp13, 67, 131, 248, 398, 405 and 437**. Every other page after p8 is pixel-identical.
+The first development comparison caught a 0.75pt title shift; its corrected
+render passes without weakening the comparison. Evidence:
+`a/cosmetic-comparison.json` and the independent pair's `comparison.json`.
+
+Visual review: p1 author hierarchy and spacing; p2 quiet copyright; p3 dedication
+without furniture; p13 README and note without underlines, callout retained.
+Requested images: `a/pages/page-001.png`, `page-002.png`, `page-003.png` and
+`page-013.png`. All are included in the complete page-image output. No remaining
+cosmetic departures. No push or upload.

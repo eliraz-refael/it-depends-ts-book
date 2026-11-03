@@ -356,6 +356,25 @@ and garbage-collects unreachable objects. Contents folios and note URLs stay
 printed and selectable. No PROOF mark or frozen commit is printed. Copyright
 text is asserted line by line against `copyright.txt` and publication metadata.
 
+Release furniture: pages 1–3 (title, copyright, dedication) have no running head
+or folio, but still count toward continuous numbering. Acknowledgments, contents
+and symbol-key pages keep both. The author is set at 22pt in Plex beneath a rule
+near the foot of the title page; title/subtitle positions are unchanged. Former
+link text and note URLs have no underlines; callouts remain.
+
+To compare cosmetic changes against an archived accepted release:
+
+```sh
+design/print/.venv/bin/python design/print/check_release_polish.py \
+  design/print/output/whole-book-release-c37c3ea/accepted-8be209a \
+  design/print/output/whole-book-release-c37c3ea/a
+```
+
+This asserts 438 pages, exact title/subtitle placement, unchanged copyright and
+dedication bodies, identical pp4–8 rasters, and unchanged text/geometry and rasters
+on pp9–438 except the exact former underline paths (one raster-pixel allowance
+for antialiasing). It verifies that those paths are absent in the new PDF.
+
 The settled publication-term rule is source-based: every occurrence of
 `placeholder`, `TBD` or `example.invalid` must match the frozen source's exact
 spelling, file and line, with equal PDF/source counts. Word rectangles must lie
