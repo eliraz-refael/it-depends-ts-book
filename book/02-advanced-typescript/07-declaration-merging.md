@@ -4,7 +4,7 @@
 
 **Gilad Stacktrace**: "If a declaration promises an operation, show me what supplies it when the program runs. I want to follow the entry that reaches the call, not just see a file where the operation exists. A declaration can accurately describe one running application and still promise too much to another."
 
-"When behavior depends on initialization, give someone responsibility for that path. If you can't guarantee it for every value covered by the type, represent the uncertainty and decide what the caller should do when the operation is missing. Neither a stronger declaration nor a friendlier error installs the behavior. Start with the entry we intend to ship and show me it doing the job."
+"When behavior depends on initialization, give someone responsibility for that path. Neither a stronger declaration nor a friendlier error installs the behavior. Start with the entry we intend to ship and show me it doing the job."
 
 ## The Debate
 
@@ -62,8 +62,6 @@ declare module "label-kit" {
 ### "Both pass the build"
 
 **Oded**: "The import makes this file a module. So `declare module` patches the package we imported. `Label` is a class, but the interface merges with its instance type. We still have one constructor."
-
-The [module augmentation rules](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation) resolve the name like an import.
 
 **Chen Override**: "Like the two widget packages merging `User`? Does a file see this member even if it doesn't import the patch?"
 

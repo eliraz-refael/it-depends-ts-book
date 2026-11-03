@@ -270,28 +270,28 @@ She's not a moralist. She doesn't lecture. She has, over time, become the engine
 
 ### Experts
 
-|   | Name                | Role               | In One Line                                           |
-|---|---------------------|--------------------|-------------------------------------------------------|
-|   | Prof. Eli Typeworth  | Language Theorist  | Wants the claim stated precisely enough to test       |
-|   | Daniel Compiler      | Compiler Internist | Opens the playground; asks which compiler you used    |
-|   | Gilad Stacktrace     | Systems Architect  | Doesn't care if it's elegant — does it survive 3 AM?  |
-|   | Liron Closure        | FP & Design Master | Has been saying the same thing since Clojure in 2009  |
-|   | Sahar Firstclass     | Simplicity Expert  | Checks the caller before adding the abstraction      |
+| Name                | Role               | In One Line                                           |
+|---------------------|--------------------|-------------------------------------------------------|
+| Prof. Eli Typeworth  | Language Theorist  | Wants the claim stated precisely enough to test       |
+| Daniel Compiler      | Compiler Internist | Opens the playground; asks which compiler you used    |
+| Gilad Stacktrace     | Systems Architect  | Doesn't care if it's elegant — does it survive 3 AM?  |
+| Liron Closure        | FP & Design Master | Has been saying the same thing since Clojure in 2009  |
+| Sahar Firstclass     | Simplicity Expert  | Checks the caller before adding the abstraction      |
 
 ### Professionals
 
-|   | Name              | Role                   | In One Line                                                 |
-|---|-------------------|------------------------|-------------------------------------------------------------|
-|   | Noam Kiperman     | Type Safety Absolutist | Your `any` is his on-call page                              |
-|   | Oded Shipley      | Velocity Advocate      | Has deployed to production on a Friday. Twice. This month.  |
-|   | Gil Benchmark     | Data-Driven Analyst    | Doesn't have opinions. Has datasets.                        |
-|   | Eden Legacy       | Migration Veteran      | Has migrated three million lines and lived to tell about it |
-|   | Linoy Nightly     | Cutting-Edge Advocate  | Brings a new feature, then tries it on your caller         |
-|   | Chen Override     | Socratic Skeptic       | If Chen can't break it, ship it                             |
-|   | Dafna Functor     | FP Purist              | Sees a `for` loop, mourns a `reduce`                        |
-|   | Guy Singleton     | OOP Advocate           | Considers his whiteboard class diagram a form of art        |
-|   | Dima Bridge       | Balanced Pragmatist    | Separates the questions, then makes the call               |
-|   | Idan Greenfield   | Parse-Don't-Validate   | Wants to see the value the parser actually produced       |
+| Name              | Role                   | In One Line                                                 |
+|-------------------|------------------------|-------------------------------------------------------------|
+| Noam Kiperman     | Type Safety Absolutist | Your `any` is his on-call page                              |
+| Oded Shipley      | Velocity Advocate      | Has deployed to production on a Friday. Twice. This month.  |
+| Gil Benchmark     | Data-Driven Analyst    | Doesn't have opinions. Has datasets.                        |
+| Eden Legacy       | Migration Veteran      | Has migrated three million lines and lived to tell about it |
+| Linoy Nightly     | Cutting-Edge Advocate  | Brings a new feature, then tries it on your caller         |
+| Chen Override     | Socratic Skeptic       | If Chen can't break it, ship it                             |
+| Dafna Functor     | FP Purist              | Sees a `for` loop, mourns a `reduce`                        |
+| Guy Singleton     | OOP Advocate           | Considers his whiteboard class diagram a form of art        |
+| Dima Bridge       | Balanced Pragmatist    | Separates the questions, then makes the call               |
+| Idan Greenfield   | Parse-Don't-Validate   | Wants to see the value the parser actually produced       |
 
 ---
 

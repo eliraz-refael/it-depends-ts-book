@@ -198,6 +198,8 @@ console.log(price(1250));
 
 Eden adds `lookup.js` and `sum.js` to the exception list with their owners, and puts `// @ts-nocheck` in each. Oded annotates `price` with `/** @param {number} cents */`.
 
+**Oded**: "The any budget again. An owner and a next step."
+
 **Eden**: "The sitemap is already on the exception list. The catalogue team left it opted out while they replace its footer callback. Their PR owns that work."
 
 **Noam**: "Those three stay opted out. Global `checkJs` stays on."
@@ -265,7 +267,7 @@ Chen runs the files emitted by that failed check, in the scratch build. The rout
 
 **Noam**: "Now the route and both tests would agree. Nobody updated the sitemap, and its old opt-out wouldn't be a new change for me to review. I said the global check would catch this before deployment. It catches the files we haven't excused."
 
-**Eden**: "I've seen this fail at scale. The catalogue team isn't changing its call in this PR. Give it the function it still expects."
+**Eden**: "I've seen this fail at scale. Every exception list I've inherited grew one temporary entry at a time, and nobody reviewed the old ones again. The catalogue team isn't changing its call in this PR. Give it the function it still expects."
 
 **Oded**: "I'd rather leave their footer work alone. Restore `export =`?"
 

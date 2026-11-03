@@ -455,7 +455,7 @@ safeRequests(raw); // Error: Type '(text: string) => boolean' is not assignable 
 
 **Noam**: "And `bad` stays rejected through the courier adapter and the repaired courier wrapper. We are not celebrating a green tracking page that accepts every parcel."
 
-## Additional Takes
+## Additional Take
 
 **Daniel Compiler**: "Overloads aren't the only thing a call can tell you that extraction can't. Try a generic function."
 
