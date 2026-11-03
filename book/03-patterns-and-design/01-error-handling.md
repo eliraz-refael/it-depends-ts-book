@@ -386,6 +386,6 @@ try {
 }
 ```
 
-Under the book's strict settings, an unannotated catch binding is [`unknown`](https://www.typescriptlang.org/tsconfig/useUnknownInCatchVariables.html). The outer catch and `tryHold` use `instanceof` to identify the library refusal. The transaction adapter uses identity to recognize its own signal. Other thrown values keep going to a handler that can deal with them.
+With strict checking, an unannotated catch binding is [`unknown`](https://www.typescriptlang.org/tsconfig/useUnknownInCatchVariables.html). The outer catch and `tryHold` use `instanceof` to identify the library refusal. The transaction adapter uses identity to recognize its own signal. Other thrown values keep going to a handler that can deal with them.
 
 **Liron**: "Suppose a queue retries a job whenever its handler rejects, and finishes it whenever the handler fulfills. If this job is supposed to report an occupied seat and stop, we need the transaction to roll back, then the job handler to record the refusal and finish. The store decides whether to commit. The queue decides whether to retry. They need to see different outcomes here."

@@ -193,8 +193,6 @@ config.database.host.toUpperCase();
 
 **Eden Legacy**: "On a three-million-line migration, we tried requiring complete types for every converted module. We got stuck on modules whose dependencies weren't typed yet. We had to let some of those calls through:"
 
-In these snapshots, `Promise<UserProfile>` describes the value the promise will resolve to. The type argument in `api.get<UserProfile>` tells the API client what type to report to its caller; it does not check the response body.
-
 ```typescript
 // Week 1: Rename .js to .ts, add any where needed
 export function fetchUserProfile(userId: any): any {
@@ -220,6 +218,8 @@ export function fetchUserProfile(userId: string): Promise<UserProfile> {
 ```
 
 "That let us type the callers without waiting for every dependency. The intermediate version still returns `any`. I'm not calling it finished."
+
+**Eli**: "`Promise<UserProfile>` describes the value the promise will resolve to. The type argument in `api.get<UserProfile>` tells the API client what type to report to its caller. It does not check the response body."
 
 **Noam**: "You're creating typed-looking code that isn't actually typed. It's worse than JavaScript because it gives false confidence. A developer sees `.ts` and assumes the compiler is checking things. It isn't."
 
@@ -250,16 +250,16 @@ export function fetchUserProfile(userId: string): Promise<any> {
 
 ### "The any-in-generics trap"
 
-**Linoy Nightly**: "Even a typed function can pass `any` straight through. This `T` stands for the array's element type. The return type keeps that same `T`. Look at the two calls:"
+**Linoy Nightly**: "Even a typed function can pass `any` straight through. This `T` stands for the array's element type. The return type keeps that `T` and includes `undefined` when there's no first element. Look at the two calls:"
 
 ```typescript
-function firstElement<T>(arr: T[]): T {
+function firstElement<T>(arr: T[]): T | undefined {
   return arr[0];
 }
 
 // With a proper type — inference works
 const num = firstElement([1, 2, 3]);
-//    ^? const num: number
+//    ^? const num: number | undefined
 
 // With any — inference short-circuits
 const anything: any[] = [1, 2, 3];
@@ -616,6 +616,8 @@ function processOrder(user: any, order: any) {
 
 The next version checks the purchase fields in `isPurchaseData`. Its return annotation, `data is PurchaseData`, tells the compiler to treat the original value as `PurchaseData` when the function returns `true`. The checks in its body supply the evidence for that claim. Look at the call inside `handleWebhook`: that is where `event.data` becomes usable by `processOrder`.
 
+**Dima**: "Keep the logger's user argument. Reject payloads missing that field. A purchase has to pass the user and order checks before we call the payment SDK."
+
 ```typescript
 // After: properly typed with unknown, type guards, and one documented any
 
@@ -666,10 +668,14 @@ function isPurchaseData(data: unknown): data is PurchaseData {
 }
 
 function handleWebhook(event: WebhookEvent) {
-  if (event.type === "purchase" && isPurchaseData(event.data)) {
+  if (typeof event.data !== "object" || event.data === null || !("user" in event.data)) {
+    throw new Error("Invalid webhook data");
+  }
+  if (event.type === "purchase") {
+    if (!isPurchaseData(event.data)) throw new Error("Invalid purchase data");
     processOrder(event.data.user, event.data.order);
   }
-  logEvent(event.type, event.data);
+  logEvent(event.type, event.data.user);
 }
 
 function processOrder(user: User, order: Order) {

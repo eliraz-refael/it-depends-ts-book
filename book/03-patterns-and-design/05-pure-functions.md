@@ -196,7 +196,11 @@ function makeSla() {
 const slaStatus = makeSla();
 ```
 
-**Eden**: "The old callers still pass a ticket. The dashboard can pass one instant for the whole list. Both paths use the same deadline cache, and both record after looking it up."
+**Eden**: "The direct callers still pass a ticket. The dashboard can pass one instant for the whole list. Both paths use the same deadline cache, and both record after looking it up."
+
+**Dafna**: "And `tickets.map(slaStatus)`?"
+
+**Eden**: "That would pass the index as `now`. Those calls need `tickets.map(ticket => slaStatus(ticket))`. I'll check callback references before switching."
 
 ```typescript
 function refresh(tickets: readonly Ticket[]): SlaStatus[] {
@@ -207,7 +211,7 @@ function refresh(tickets: readonly Ticket[]): SlaStatus[] {
 
 **Dafna**: "Keep `evaluate` available separately. Your exported function still reads the clock when I omit `now`, and still records when I supply it. I can't treat it as pure."
 
-**Eden**: "The digest still needs today's status when it passes a ticket. I'm keeping that call working. Use `evaluate` when you already have both numbers."
+**Eden**: "The digest still needs today's status when it passes a ticket. I'm keeping that direct call working. Use `evaluate` when you already have both numbers."
 
 **Oded**: "Same calls for three consumers. One clock read for the board. That's not the migration I was objecting to."
 

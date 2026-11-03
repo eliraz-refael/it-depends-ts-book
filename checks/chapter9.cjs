@@ -83,6 +83,8 @@ on("themeChanged", value => { const checked: "light" | "dark" = value; });
 example("wrong-theme-payload", 'publish("themeChanged", "blue"); publish("themeChanged", 16);', [2345, 2345]);
 example("wrong-callback", 'on("fontSizeChanged", (value: string) => {});', [2345]);
 example("wrong-setter-payload", 'setSetting("fontSize", false);', [2345]);
+const unionSetter = chapter.match(/`(setSetting<SettingKey>\("fontSize", false\))`/)[1] + ";";
+example("union-key-setter-accepts-wrong-field", unionSetter);
 example("wrong-constructed-suffix", 'function wrong<K extends SettingKey>(key: K, value: Settings[K]) { publish(`${key}Modified`, value); }', [2345]);
 example("wrong-generic-payload", 'function wrong<K extends SettingKey>(key: K, value: Settings[K]) { publish(`${key}Changed`, {}); }', [2345]);
 
@@ -214,10 +216,23 @@ assert.deepEqual(emitted, [
 for (const snapshot of snapshots) assert.deepEqual(snapshot, registrySaved);
 runtimeGroups++;
 
+// Isolated mutation: no preview subscriber and no contamination of the restored story.
+{
+  const probe = write("setter-probe.ts", imports + unionSetter + '\nexport {settings};');
+  const out = path.join(scratch, "union-setter-out");
+  const {diagnostics: found} = compile([...originalFiles, probe], {outDir: out}, scratch);
+  assert.equal(found.length, 0, describe(found));
+  fs.writeFileSync(path.join(out, "src/events.js"), 'exports.publish = () => {};');
+  const {settings} = require(path.join(out, "setter-probe.js"));
+  assert.equal(settings.fontSize, false, "The widened key permits the wrong value at runtime");
+  require(path.join(out, "src/writes.js")).setSetting("fontSize", 16);
+  assert.equal(settings.fontSize, 16, "Literal caller restores the numeric value");
+  runtimeGroups++;
+}
 console.log(JSON.stringify({
   typescript: version,
   chapterFences: blocks.length,
-  compilerCases: examples.length + 2,
+  compilerCases: examples.length + 3,
   runtimeScenarioGroups: runtimeGroups,
   reproducedSearches: recordedSearches.length,
   scratch,

@@ -388,7 +388,7 @@ src/restore.ts:7:  publish("fontSizeChanged", saved.fontSize);
 
 ## The Verdict
 
-The PR keeps the template-typed signatures and the generic setter. Ordinary controls update a property through `setSetting`, which constructs the event name. Restore continues to update the complete state before publishing, with literal names at its three emission sites. The preview still receives a number for `fontSizeChanged`.
+The PR keeps the template-typed signatures and the generic setter. Ordinary controls update a property through `setSetting`, which constructs the event name. Restore continues to update the complete state before publishing, with literal names at its three emission sites. For these literal calls, the preview still receives a number for `fontSizeChanged`.
 
 The registry stays in the review as an alternative. Linoy prefers using one wrapper throughout the feature. Oded accepts the extra step when tracing the shared setter, but wants the already enumerated restore emissions searchable by their full names. Neither the search result nor the signature tells Gilad which path ran in a particular session.
 
@@ -402,7 +402,7 @@ publish<SettingKey>("fontSizeChanged", false); // Compiles.
 
 **Linoy**: "Because `K` is all three keys now. The name can be any of the three events, and the value can be any of the three property types."
 
-**Daniel**: "You can also arrive there with independently widened variables. The literal calls we checked infer a specific key. This signature doesn't preserve every pairing through a union."
+**Daniel**: "You can also arrive there with independently widened variables. The setter has the same hole: `setSetting<SettingKey>("fontSize", false)` compiles and writes a boolean. The literal calls we checked infer a specific key. Neither signature preserves every pairing through a union."
 
 **Oded**: "And for a queue where the event is one value?"
 

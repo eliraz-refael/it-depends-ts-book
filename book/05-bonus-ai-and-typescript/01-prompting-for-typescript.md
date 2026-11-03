@@ -71,7 +71,7 @@ Dima opens the files already in this small scratch project. He's running TypeScr
   },
   "devDependencies": {
     "typescript": "7.0.2",
-    "@types/node": "26.5.1"
+    "@types/node": "22.20.5"
   }
 }
 ```
@@ -100,7 +100,7 @@ And its `tsconfig.json`:
 
 **Idan**: "Give it these files too. And for this little project, I want the unchecked parse to stop at the return."
 
-She adds one declaration:
+She adds a [later overload](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#merging-interfaces) to the global `JSON` interface:
 
 ```typescript
 // reset.d.ts
@@ -118,7 +118,7 @@ The same compiler command now reports **TS2322: Type 'unknown' is not assignable
 
 **Chen**: "Does that change every `JSON.parse` in the shop?"
 
-**Idan**: "Only in this program, including the source it imports, like Chapter 13's augmentation. Our [later overload](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#merging-interfaces) wins this call."
+**Idan**: "Only in this program, including the source it imports, like the badge plugin's augmentation. Our later overload wins this call."
 
 **Chen**: "And if the answer just asserts Refund?"
 

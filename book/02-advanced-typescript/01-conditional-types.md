@@ -74,7 +74,7 @@ declare function slugify<T extends string | string[]>(
 
 "Since 2.8."
 
-Oded sits back. "Nobody told me."
+Oded sits back. "Daniel showed us this in `Unwrap`. I was hoping it was his problem."
 
 **Linoy**: "Call it and hover."
 
@@ -124,10 +124,7 @@ declare const post: FrontMatter;
 
 const slugs = slugify(post.tags);
 // error TS2769: No overload matches this call.
-//   Overload 1 of 2, '(title: string): string', gave the following error.
-//     Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
-//       Type 'string[]' is not assignable to type 'string'.
-//   Overload 2 of 2, '(titles: string[]): string[]', gave the following error.
+//   The last overload gave the following error.
 //     Argument of type 'string | string[]' is not assignable to parameter of type 'string[]'.
 //       Type 'string' is not assignable to type 'string[]'.
 ```
@@ -431,7 +428,7 @@ type Wrapped = [any] extends [string] ? "ran" : "no"; // "ran"
 type TopCheck = any extends unknown ? "ran" : "no";  // "ran"
 ```
 
-"And `any` does not always produce both branches. Against `unknown`, as here, or `any` itself, it takes the true branch. Keep the actual condition attached to the example."
+"And `any` does not always produce both branches. Against `unknown`, as here, or `any` itself, it takes the true branch."
 
 **Chen** is not finished. "Two more things this machine does quietly. First:"
 
@@ -447,7 +444,7 @@ type Mistyped = Exclude<Channel, "smss">;
 // "email" | "sms" | "push" — a typo, and no error
 ```
 
-"Misspell a case in a `switch` and the exhaustiveness check from the enum argument screams at you. Misspell a member here and the filter matches nothing, hands back your union untouched, and the build goes green. Has anyone worked out what warns you?"
+"Misspell a case in a `switch` and the compiler rejects the case. The exhaustiveness check from the enum argument also flags the member you missed. Misspell a member here and the filter matches nothing, hands back your union untouched, and the build goes green. Has anyone worked out what warns you?"
 
 **Linoy**: "Nothing warns you. But you can make the gate do it — constrain the second parameter to the first:"
 

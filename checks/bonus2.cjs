@@ -34,8 +34,8 @@ assert(manuscript.includes('The old `refund` entry point is gone'));
 assert(manuscript.includes('`\"default\":\"USD\"`'));
 assert(manuscript.includes('The replay keeps both calls on hand.'));
 assert(manuscript.includes('TypeScript '+version));assert(manuscript.includes('Node '+process.versions.node));
-assert.equal(require('../node_modules/zod/package.json').version,'4.6.2');assert(manuscript.includes('4.6.2'));
-for(const flag of ['noEmit','allowImportingTsExtensions','strict ES2022/Node16','"type": "module"'])assert(manuscript.includes(flag));
+assert.equal(require('../node_modules/zod/package.json').version,'4.6.6');assert(manuscript.includes('4.6.6'));
+for(const flag of ['noEmit','allowImportingTsExtensions','`strict`','exactOptionalPropertyTypes','ES2022','Node16','"type": "module"'])assert(manuscript.includes(flag));
 const scratch=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'ts-book-bonus2-'))),story=path.join(scratch,'story');
 const results=[];let compilerCases=0,runtimeGroups=0,fileListQueries=0;
 function write(file,value){const p=path.join(story,file);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,typeof value==='string'?value:JSON.stringify(value,null,2)+'\n');}

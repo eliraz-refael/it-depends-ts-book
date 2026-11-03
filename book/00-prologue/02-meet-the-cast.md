@@ -30,7 +30,7 @@ Daniel tends to open a playground while someone is still explaining the problem.
 
 His humor is dry enough to start fires. When Oded once argued that a particular `as` assertion was "perfectly safe in practice," Daniel responded: "The Titanic was perfectly safe in practice. Until the iceberg."
 
-Reducing a problem is also where he can lose it. A missing project flag or declaration file can make his tidy reproduction answer a different question. Eden has learned to bring the repository configuration along with the snippet. And a compiling example rarely satisfies Noam until they've called the function.
+Reducing a problem is also where he can lose it. A missing project flag or declaration file can make his tidy reproduction answer a different question. Eden has learned to bring the repository configuration along with the snippet. And a compiling example rarely satisfies Noam until someone has called the function.
 
 *"The compiler disagrees."*
 
