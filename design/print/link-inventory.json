@@ -1,0 +1,9 @@
+[
+  {"source":"book/00-prologue/01-how-to-read.md","href":"../../README.md#checking-the-examples"},
+  {"source":"book/01-the-type-system/03-interface-vs-type.md","href":"https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/express-serve-static-core/index.d.ts"},
+  {"source":"book/02-advanced-typescript/01-conditional-types.md","href":"https://github.com/microsoft/TypeScript/issues/33912"},
+  {"source":"book/03-patterns-and-design/02-branded-types.md","href":"https://www.typescriptlang.org/docs/handbook/2/objects.html#readonly-properties"},
+  {"source":"book/04-the-real-world/04-performance-vs-safety.md","href":"https://github.com/microsoft/typescript-go/blob/2bd066d87f5bafd315be9f40889d0a60b9e58e0b/internal/checker/checker.go#L25473-L25508"},
+  {"source":"book/05-bonus-ai-and-typescript/01-prompting-for-typescript.md","href":"https://www.typescriptlang.org/docs/handbook/declaration-merging.html#merging-interfaces"},
+  {"source":"book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md","href":"https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html#isolated-declarations"}
+]

@@ -33,3 +33,13 @@ Wait explicitly for bundled fonts and pagination completion before PDF capture. 
 5. **Artifacts:** ignored output directory containing PDF, HTML, source/URL manifest, toolchain report, page images and contact sheets. Review every spread, then order a physical proof. A passing compiler suite is not print approval.
 
 Before submission, the author must supply copyright/license/imprint and public source metadata, and choose the printer, paper and binding. Confirm gutter and printer requirements against final pagination; then design the cover/spine. The README license is still TBD. Cover production, EPUB and publication/upload are separate work, not part of this plan-only change.
+
+## Settlement
+
+1. Merge `origin/codex/release-recheck` (**517e0fc**) into `codex/print-build` and build from that tree. The manuscript is frozen: the build makes no edits to `book/`.
+2. Derive the link inventory at build time and assert it against the current **six external links plus the README link**. A link inside dialogue is a build failure, not a warning.
+3. Step 1 is the pinned local Paged.js pagination trial with the listed cases. Report results with page images before any whole-book assembly. If footnotes fail, stop and report; do not switch renderer or fall back to endnotes.
+4. One release metadata file holds public repository URL and tag, license and imprint. Placeholder values allow a proof build and fail a release build. The author will supply real values. Printer, paper and binding are out of scope for this step.
+5. Add no npm or pip dependencies beyond those named in this plan; pin all dependencies. Keep generated output ignored and out of commits. Commit the trial locally without pushing.
+
+This settlement overrides the earlier link count, dialogue-warning policy, renderer-fallback proposal and printer scope.

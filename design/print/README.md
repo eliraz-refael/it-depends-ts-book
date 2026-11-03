@@ -91,3 +91,68 @@ Bundled under the SIL Open Font License, with each license in `fonts/`:
 The files were downloaded from those official repositories on September 24,
 2026. Keeping the exact font files here makes subsequent renders independent of
 changes to the upstream fonts.
+
+## Settled page-bottom footnote trial
+
+The Chapter 10 studies above remain unchanged. The separate step-1 trial reads
+and hashes the frozen `book/` tree, derives its seven-link inventory, then renders
+five **synthetic layout specimens**, not a whole-book proof. Its current result
+is **FAIL / stopped**; see
+[the trial review](../../docs/editorial/full-review/PRINT-TRIAL-REVIEW.md).
+Do not use the study's source appendix as a fallback.
+
+From the repository root, install only the pinned tools:
+
+```sh
+python3 -m venv design/print/.venv
+design/print/.venv/bin/pip install -r design/print/requirements.txt
+npm ci --prefix design/print --ignore-scripts
+```
+
+`trial-toolchain.json` pins the tested Node, Python, Chrome and Paged.js versions.
+Chrome is the existing local application; the trial does not download a browser.
+`package-lock.json` pins Paged.js's transitive dependencies. The Python tools
+retain their existing exact requirements. No new Python packages are needed.
+
+```sh
+# Source/inventory, dialogue, metadata and marker controls only:
+design/print/.venv/bin/python design/print/footnote_trial.py --validate-only
+
+# Fresh trial (currently exits 1 for the documented layout failures):
+design/print/.venv/bin/python design/print/footnote_trial.py
+
+# Inspect saved artifacts again without running Chrome/pagination:
+design/print/.venv/bin/python design/print/footnote_trial.py --inspect-existing
+
+# Must reject the committed placeholders before rendering:
+design/print/.venv/bin/python design/print/footnote_trial.py --mode release --validate-only
+```
+
+`release-metadata.json` is the only source of publication metadata. Proof mode
+permits its placeholders and prints the README's `example.invalid` destination;
+release mode rejects them. The fixtures always carry a proof footer. A passing
+release metadata gate would not turn these synthetic pages into a release.
+
+The inventory is parsed from Markdown inline tokens in the approved reading
+order and compared with `link-inventory.json`. Speaker-labelled paragraphs,
+quoted continuations, embedded quoted speech and blockquotes containing links
+fail before rendering. Code literals do not count as links. This deliberately
+conservative gate covers the book's dialogue syntax; it is not a classifier for
+arbitrary prose. Keep any future exceptions editorial, not a silent bypass.
+
+The local Chrome process uses a fresh temporary profile and file access for
+Paged.js's local stylesheet loading. HTTP(S) document requests are blocked and
+asserted absent. Font loading and the pagination promise must finish before PDF
+capture; there is no fixed sleep standing in for completion. Timeouts fail the
+run. Only the trial's browser/profile is cleaned up.
+
+All generated HTML, rendered DOM, layout metrics, PDFs, extracted text, PNGs,
+font/source hashes and `results.json` are under ignored
+`output/footnote-trial/`. Every page has a PNG; `all-pages.png` is the contact
+sheet. The verifier checks printed callout and note numbers as well as DOM
+references: matching IDs alone would miss the current failure. It also checks
+full selectable URL text, clickable destinations, note placement, retained code
+lines/table rows, repeated table headers, embedded fonts and 7 × 10 trim.
+
+The step-1 stop is intentional. No whole-book assembler, renderer replacement,
+endnote fallback, printer setup or manuscript rewrite is included.
