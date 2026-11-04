@@ -102,19 +102,34 @@ async function main() {
             h1:document.querySelectorAll('h1').length,buy:document.querySelectorAll('[data-buy]').length,
             gutters:document.querySelector('.book-body') ? (()=>{const e=document.querySelector('.book-body'),s=getComputedStyle(e),r=e.getBoundingClientRect();return [r.left+parseFloat(s.paddingLeft),innerWidth-r.right+parseFloat(s.paddingRight)];})():null,
             blocks:pre.map(e=>({outside:e.getBoundingClientRect().right>innerWidth+.5,overflow:getComputedStyle(e).overflowX})),
+            prose:document.querySelector('.book-body') ? (()=>{const e=document.querySelector('.book-body'),r=e.getBoundingClientRect(),s=getComputedStyle(e);return {width:r.width-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight),center:r.x+r.width/2};})():null,
+            wide:[...document.querySelectorAll('.book-body .code-block,.book-body .table-scroll,.symbol-key .symbol-group > table')].map(e=>{const r=e.getBoundingClientRect();return {width:r.width,center:r.x+r.width/2};}),
+            headerLinks:[...document.querySelectorAll('.header-inner nav > a:not([data-buy])')].map(e=>e.textContent),
+            fenceWidths:[...document.querySelectorAll('[data-fence]')].map(e=>({id:e.dataset.fence,client:e.parentElement.clientWidth,scroll:e.parentElement.scrollWidth})),
             code:[...document.querySelectorAll('[data-fence]')].map(e=>[e.dataset.fence,e.textContent]),
             storage:[localStorage.length,sessionStorage.length,document.cookie],
             key:[...document.querySelectorAll('[data-key-literal]')].map(e=>getComputedStyle(e).fontVariantLigatures)};
         })()`);
         assert.ok(measure.scroll<=width && measure.bodyScroll<=width,`${entry.route} @ ${width}: horizontal overflow ${measure.scroll}`);
         assert.equal(measure.h1,1);assert.equal(measure.buy,0);assert.deepEqual(measure.storage,[0,0,'']);
+        if(!process.env.WEB_MEASURE_ONLY) {
+          assert.deepEqual(measure.headerLinks,entry.route==='' ? ['Start reading'] : [],'Header reading link');
+          if(width===1280 && measure.prose) {
+            assert.equal(measure.prose.width,660,'Prose width');
+            assert.ok(measure.wide.every(x=>Math.abs(x.width-880)<1 && Math.abs(x.center-measure.prose.center)<1),'Wide examples centred at 880px: '+entry.route);
+          }
+        }
         if(width===360 && measure.gutters)assert.ok(measure.gutters.every(x=>x>=15.9),'Phone gutters');
         assert.ok(measure.blocks.every(x=>!x.outside),entry.route+' code outside page');
         assert.ok(measure.key.every(x=>x==='none'),'Typing column ligatures');
         for(const [id,text] of measure.code)assert.equal(text,manifest.fences[id].text,id);
-        results.push({route:entry.route,width,noOverflow:true,fences:measure.code.length});
+        results.push({route:entry.route,width,noOverflow:true,fences:measure.code.length,fenceWidths:measure.fenceWidths});
       }
       console.log(`PASS all 36 pages at ${width}px`);
+    }
+    if(process.env.WEB_MEASURE_ONLY) {
+      await fs.writeFile(process.env.WEB_MEASURE_ONLY,JSON.stringify({results},null,2)+'\n');
+      return;
     }
     const chapter1=manifest.routes.find(x=>x.route.startsWith('chapters/01-')).route;
     const ch27=manifest.routes.find(x=>x.route.startsWith('chapters/27-')).route;
@@ -122,7 +137,7 @@ async function main() {
     for(const width of [1280,390]) {
       for(const [name,route] of [['home',''],['chapter-01',chapter1],['cast','meet-the-cast/'],['chapter-27',ch27],['bonus-03-ending',b3]]) {
         await navigate(route,width);
-        if(name==='chapter-27')await evaluate(`document.querySelector('.code-block').scrollIntoView();window.scrollBy(0,-120)`);
+        if(name==='chapter-27' || (name==='chapter-01' && width===1280))await evaluate(`document.querySelector('.code-block').scrollIntoView();window.scrollBy(0,-120)`);
         if(name==='bonus-03-ending')await evaluate(`document.querySelector('article').lastElementChild.scrollIntoView({block:'end'});window.scrollBy(0,130)`);
         await shot(`${name}-${width}`,name==='home');
         if(name==='bonus-03-ending')assert.ok(await evaluate('parseFloat(document.querySelector(".reading-progress > div").style.width)>99'), 'Reading progress at article end');

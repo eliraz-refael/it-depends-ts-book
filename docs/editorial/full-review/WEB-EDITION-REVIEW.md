@@ -91,3 +91,33 @@ updates; the end-of-article progress state is asserted rather than inferred.
 Set the actual paperback URL once the listing exists, then approve deployment in
 a separate PR. Nothing here deploys. All requested inputs and checks are settled;
 there are no manuscript edits, cover-generator imports or new dependencies.
+
+## Review revision: wider examples and header
+
+Fences and tables expand to 880px on desktop, centered on the unchanged 660px
+prose column. The expansion is bounded by viewport gutters and starts at 760px;
+phone styles are untouched. Home's header now says Start reading; every other
+page omits that link.
+
+Measured all 490 source fences before rebuilding and after the change:
+
+| Viewport | Fences requiring horizontal scrolling before | After |
+| --- | ---: | ---: |
+| 1280px | 228 | 25 |
+| 390px | 460 | 460 |
+| 360px | 474 | 474 |
+
+Every phone fence's client width and scroll width match the baseline exactly.
+The remaining desktop overlong lines retain their local scrollbar, including
+Ch27's long catalogue literal; no source lines were wrapped or edited.
+Evidence: ignored output/width-before.json, browser-check.json and
+width-comparison.json.
+
+Full web check PASS: two byte-identical builds, all 108 responsive page checks,
+source/print preservation including the accepted PDF hash, native no-JS contents,
+keyboard interaction, and all existing static/browser assertions. New checks
+assert desktop example width/centering, prose width and header link placement.
+Reviewed the refreshed 1280px chapter-27 and chapter-01 screenshots: expanded
+code aligns symmetrically around prose and the header contains Contents only.
+Screenshots: design/web/output/screenshots/chapter-27-1280.png and
+chapter-01-1280.png. No manuscript or print changes; no departures.

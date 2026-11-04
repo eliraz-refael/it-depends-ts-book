@@ -53,6 +53,11 @@ matching pinned browser is required. Ports 8765 and 8766 must be free for the
 short-lived test servers. The preview command is separate and stays running
 until stopped.
 
+Prose stays at 660px. On viewports at least 760px wide, fences and tables
+expand symmetrically to at most 880px, with viewport gutters. Phone styles stay
+unchanged. The header offers Start reading on Home only; other pages retain
+the wordmark and Contents (plus the optional configured buy control).
+
 Checks cover:
 
 - All 34 source files represented on 33 source-backed pages; Home, symbol key and
@@ -74,6 +79,8 @@ Checks cover:
   and no TBD, example.invalid or PROOF in visible text.
 - No buy links in the default build; an isolated test edition uses an Amazon
   search URL to show the controls without inventing a book listing.
+- Header reading link on Home only; at 1280px, prose is 660px and examples
+  are 880px, centered on it. Per-fence client/scroll widths are recorded.
 - Every page at 1280, 390 and 360 pixels: no horizontal page overflow, phone
   gutters, source fence text in the real DOM, no cookies/storage or third-party
   requests. Six representative pages also exercise native contents with scripts

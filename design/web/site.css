@@ -10,3 +10,16 @@
 @media(max-width:850px){.steps{grid-template-columns:repeat(3,minmax(0,1fr))}.hero-mark{width:180px;height:180px}.hero pre{font-size:18px}.cast-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:580px){.wide,.header-inner,.book-body,.reading-nav,.symbol-pointer,.site-footer{padding-left:16px;padding-right:16px}.header-inner{gap:12px}.header-inner nav{gap:10px 16px}.hero-inner{flex-direction:column;align-items:flex-start;padding-top:40px;padding-bottom:40px;gap:28px}.hero-mark{width:100px;height:100px;align-self:flex-end}.hero-mark svg{width:40px;height:54px}.hero pre{font-size:16px}.hero-label{font-size:11px}.subtitle{font-size:25px}.hook{font-size:21px}.home-intro{padding-top:44px}.contents-grid,.contents-panel .contents-grid{grid-template-columns:1fr}.contents-panel{padding:22px 16px}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.cast-grid{grid-template-columns:1fr}.numeral{font-size:145px}.chapter-opener{padding-top:45px;padding-bottom:38px}.chapter-opener .eyebrow{font-size:11px;letter-spacing:.15em}.book-body h2{letter-spacing:.13em}.code-block pre{padding:16px;font-size:14px}.code-block figcaption{padding-left:16px}.next-card{font-size:24px;padding:24px}.table-scroll table{min-width:480px}.symbol-key table{font-size:13px}.symbol-key th,.symbol-key td{padding:10px 5px}.symbol-key [data-key-glyph]{font-size:15px}.symbol-key h1{font-size:34px}}
 @media(prefers-reduced-motion:no-preference){.reading-progress>div{transition:width .1s linear}}
+
+/* Wide examples stay centred on the 660px prose column. Phone rules are untouched. */
+@media (min-width:760px) {
+  .book-body .code-block,
+  .book-body .table-scroll,
+  .symbol-key .symbol-group > table {
+    --example-width:min(880px,calc(100vw - 48px));
+    width:var(--example-width);
+    max-width:none;
+    margin-left:calc((660px - var(--example-width)) / 2);
+    margin-right:calc((660px - var(--example-width)) / 2);
+  }
+}
