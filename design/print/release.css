@@ -1,0 +1,10 @@
+/* Release-only furniture. All manuscript typography remains in proof.css. */
+@page { @bottom-left { content:none; } }
+.copyright { padding-top:135pt; font:9.5pt/14pt Plex; }
+.copyright-line { height:14pt; white-space:pre; }
+
+/* Suppress furniture without changing the page box or any flow dimensions. */
+.pagedjs_page:is([data-page-number="1"],[data-page-number="2"],[data-page-number="3"]) :is(.pagedjs_margin-top-center,.pagedjs_margin-bottom-right) { visibility:hidden; }
+.title-top-rule { border-top:2pt solid #181818; height:23.25pt; }
+.release-author { position:absolute; left:0; right:0; bottom:65pt; border-top:.7pt solid #555; padding-top:16pt; font:22pt/29pt Plex; }
+a { text-decoration:none; }

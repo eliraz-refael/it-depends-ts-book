@@ -1,9 +1,14 @@
 {
   "title": "It Depends",
   "subtitle": "TypeScript Principles, Debated",
-  "manuscript_commit": "d03727a0947a8434ac36e3978533152dc93a2e0f",
-  "public_repository_url": "https://example.invalid/REPOSITORY",
-  "release_tag": "TBD",
-  "license": "TBD",
-  "imprint": "TBD"
+  "manuscript_commit": "c37c3eae94bd4787ba97f9c58e4aa92e2ea3b333",
+  "public_repository_url": "https://github.com/eliraz-refael/it-depends-ts-book",
+  "release_tag": "v1.0.0",
+  "license": "Text: CC BY-NC-SA 4.0; code: MIT.",
+  "imprint": "Independently published",
+  "author": "Eliraz Kedmi",
+  "edition": "First edition, 2026",
+  "isbn": "9798167618534",
+  "text_license": "Text licensed under CC BY-NC-SA 4.0.",
+  "code_license": "Code examples licensed under the MIT License."
 }
