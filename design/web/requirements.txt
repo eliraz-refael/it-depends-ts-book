@@ -1,0 +1,2 @@
+# Reuse the print toolchain exactly; no additional packages.
+-r ../print/requirements.txt

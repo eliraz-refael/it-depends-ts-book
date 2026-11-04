@@ -1,0 +1,138 @@
+[
+  {
+    "source": "book/00-prologue/00-dedication.md",
+    "route": "about/#dedication"
+  },
+  {
+    "source": "book/00-prologue/00a-acknowledgments.md",
+    "route": "about/#acknowledgments"
+  },
+  {
+    "source": "book/00-prologue/01-how-to-read.md",
+    "route": "how-to-read/"
+  },
+  {
+    "source": "book/00-prologue/02-meet-the-cast.md",
+    "route": "meet-the-cast/"
+  },
+  {
+    "source": "book/01-the-type-system/01-any-vs-unknown.md",
+    "route": "chapters/01-the-any-problem/"
+  },
+  {
+    "source": "book/01-the-type-system/02-type-assertions.md",
+    "route": "chapters/02-the-lies-we-tell-the-compiler/"
+  },
+  {
+    "source": "book/01-the-type-system/03-interface-vs-type.md",
+    "route": "chapters/03-the-two-kingdoms/"
+  },
+  {
+    "source": "book/01-the-type-system/04-enums-vs-unions.md",
+    "route": "chapters/04-the-feature-that-wasnt-just-a-type/"
+  },
+  {
+    "source": "book/01-the-type-system/05-narrowing-strategies.md",
+    "route": "chapters/05-the-guard-at-the-gate/"
+  },
+  {
+    "source": "book/01-the-type-system/06-generics-basics.md",
+    "route": "chapters/06-the-hole-in-the-function/"
+  },
+  {
+    "source": "book/02-advanced-typescript/01-conditional-types.md",
+    "route": "chapters/07-the-fork-in-the-type/"
+  },
+  {
+    "source": "book/02-advanced-typescript/02-mapped-types.md",
+    "route": "chapters/08-who-owns-the-fields/"
+  },
+  {
+    "source": "book/02-advanced-typescript/03-template-literal-types.md",
+    "route": "chapters/09-where-did-this-event-come-from/"
+  },
+  {
+    "source": "book/02-advanced-typescript/04-infer-keyword.md",
+    "route": "chapters/10-the-call-you-didnt-make/"
+  },
+  {
+    "source": "book/02-advanced-typescript/05-advanced-generics.md",
+    "route": "chapters/11-some-assembly-required/"
+  },
+  {
+    "source": "book/02-advanced-typescript/06-variance.md",
+    "route": "chapters/12-the-same-object-twice/"
+  },
+  {
+    "source": "book/02-advanced-typescript/07-declaration-merging.md",
+    "route": "chapters/13-who-loaded-it/"
+  },
+  {
+    "source": "book/03-patterns-and-design/01-error-handling.md",
+    "route": "chapters/14-two-seats-or-none/"
+  },
+  {
+    "source": "book/03-patterns-and-design/02-branded-types.md",
+    "route": "chapters/15-what-the-number-means/"
+  },
+  {
+    "source": "book/03-patterns-and-design/03-runtime-validation.md",
+    "route": "chapters/16-what-the-schema-does-with-the-rest/"
+  },
+  {
+    "source": "book/03-patterns-and-design/04-immutability.md",
+    "route": "chapters/17-the-price-you-were-given/"
+  },
+  {
+    "source": "book/03-patterns-and-design/05-pure-functions.md",
+    "route": "chapters/18-the-ticket-hadnt-changed/"
+  },
+  {
+    "source": "book/03-patterns-and-design/06-imperative-vs-declarative.md",
+    "route": "chapters/19-who-goes-next/"
+  },
+  {
+    "source": "book/03-patterns-and-design/07-currying-partial-application.md",
+    "route": "chapters/20-before-the-first-line/"
+  },
+  {
+    "source": "book/03-patterns-and-design/08-hof-patterns.md",
+    "route": "chapters/21-the-message-kept-going/"
+  },
+  {
+    "source": "book/03-patterns-and-design/09-config-to-function.md",
+    "route": "chapters/22-the-policys-alibi/"
+  },
+  {
+    "source": "book/03-patterns-and-design/10-monads-light.md",
+    "route": "chapters/23-still-waiting-for-no/"
+  },
+  {
+    "source": "book/04-the-real-world/01-migration-strategies.md",
+    "route": "chapters/24-both-tests-were-green/"
+  },
+  {
+    "source": "book/04-the-real-world/02-monorepo-type-sharing.md",
+    "route": "chapters/25-the-other-money/"
+  },
+  {
+    "source": "book/04-the-real-world/03-testing-typed-code.md",
+    "route": "chapters/26-it-cant-be-green/"
+  },
+  {
+    "source": "book/04-the-real-world/04-performance-vs-safety.md",
+    "route": "chapters/27-more-work-less-time/"
+  },
+  {
+    "source": "book/05-bonus-ai-and-typescript/01-prompting-for-typescript.md",
+    "route": "bonus/01-which-file-says-that/"
+  },
+  {
+    "source": "book/05-bonus-ai-and-typescript/02-type-safe-agent-patterns.md",
+    "route": "bonus/02-whose-refund-is-it/"
+  },
+  {
+    "source": "book/05-bonus-ai-and-typescript/03-reviewing-ai-code.md",
+    "route": "bonus/03-what-did-the-fix-fix/"
+  }
+]
