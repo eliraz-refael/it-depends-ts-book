@@ -1,0 +1,19 @@
+{
+  "title": "It Depends",
+  "subtitle": "TypeScript Principles, Debated",
+  "author": "Eliraz Kedmi",
+  "isbn": "9798167618534",
+  "edition": "First edition, 2026",
+  "imprint": "Independently published",
+  "hook": "Ask a senior developer any question about TypeScript, and you’ll get the same answer: ‘It depends.’ This book is about what it depends on.",
+  "team": "A team of developers. Thirty arguments. Working code that puts their opinions to the test. From any versus unknown to reviewing AI-generated code, follow the debate as a neat rule meets a stubborn caller, a failing test or a requirement nobody mentioned. Sometimes the team reaches a verdict. Sometimes they still disagree. Either way, you see what changed their minds—and what didn’t.",
+  "team_status": "Approved",
+  "checked": "Every example is checked against TypeScript 7.0.2",
+  "closing": "Strict mode on. Opinions included.",
+  "provenance": {
+    "source": "selected-navy back cover",
+    "approved_by": "author",
+    "approved_on": "2026-11-04",
+    "front_asset": "front.png"
+  }
+}
