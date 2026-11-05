@@ -35,7 +35,7 @@ def build(out,config):
     routes=json.loads((HERE/'routes.json').read_text())
     sources=[r['source'] for r in routes]
     assert sources==(ROOT/'docs/editorial/full-review/reading-order.txt').read_text().splitlines()
-    _,hashes=printbook.trial.inputs({'manuscript_commit':config['source_commit']})
+    _,hashes=printbook.trial.inputs({'manuscript_commit':'HEAD'})
     assert list(hashes)==sources
     manifest={'source_hashes':hashes,'base_url':base,'sources':{},'fences':{},'texts':{},'inline':{},'links':[],'quotes':[],'pages':{},'routes':routes,'buy':bool(buy)}
     documents=[];cast=[]

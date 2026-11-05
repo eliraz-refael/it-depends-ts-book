@@ -92,11 +92,12 @@ Checks cover:
   the enhanced drawer. The reading-progress bar reaches the last narrative line.
 - The final Bonus 3 narrative line is exact; navigation/footer are outside its
   article. One H1 per page, ordered source headings, skip link and focus styles.
-- Print/manuscript sources unchanged against `8bdd8f1`. With `WEB_PRINT_PDF`, the
-  PDF must retain SHA-256
-  `b34445da5a069e6a455df97328ab1a8fc9537ab2b15107c31d58a1ad2371e7b3`.
-  Without that artifact, the report explicitly says the PDF check was not supplied;
-  source preservation is still checked. Print is not rerendered for a byte hash.
+- The site is built from the committed manuscript: every `book/` file must match
+  `HEAD`, so uncommitted edits fail the build. With `WEB_PRINT_PDF`, the PDF must
+  retain SHA-256
+  `b34445da5a069e6a455df97328ab1a8fc9537ab2b15107c31d58a1ad2371e7b3`, the accepted
+  first-print interior. Without that artifact, the report says the PDF check was
+  not supplied. Print is not rerendered for a byte hash.
 
 Results: `output/check.json`, `browser-check.json`, `determinism.json` and
 `site.manifest.json`. Requested images live in `output/screenshots/`, named
