@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Run from the pinned Python environment: python design/web/check."""
-import json,shutil,subprocess,sys,time
+import argparse,json,os,shutil,subprocess,sys,time
 from pathlib import Path
 import build
 import check as checks
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--static-only',action='store_true',help='Run all build/static checks; explicitly skip the pinned local Chrome checks')
+args=parser.parse_args()
 HERE=Path(__file__).resolve().parent
 config=json.loads((HERE/'config.json').read_text())
 for name in ['site','repeat','buy-test']:
@@ -17,12 +20,22 @@ assert site.with_suffix('.manifest.json').read_bytes()==repeat.with_suffix('.man
 result=checks.check(site,config)
 assert not result['failures'],result['failures']
 (HERE/'output/determinism.json').write_text(json.dumps({'status':'PASS','files':len(files(site)),'sha256':files(site)},indent=2)+'\n')
+if args.static_only:
+ skipped=['108 responsive page checks (1280/390/360px), gutters and overflow',
+          'Desktop example widths/centering and header links in the browser',
+          'DOM fence text, typing-column ligatures and browser storage/network/errors',
+          'No-JS contents, pointer/keyboard interaction, Escape/focus and reading progress',
+          'Buy-enabled browser controls and all screenshots']
+ (HERE/'output/browser-check.json').write_text(json.dumps({'status':'SKIPPED','reason':'Static-only mode: CI does not provide the pinned macOS Chrome installation','skipped':skipped},indent=2)+'\n')
+ print('SKIPPED browser checks: '+ '; '.join(skipped))
+ print('PASS: all static checks and two byte-identical builds; browser checks SKIPPED')
+ sys.exit(0)
 servers=[]
 try:
- for port,name in [(8765,'site'),(8766,'buy-test')]:
+ for port,name in [(int(os.environ.get('WEB_PORT',8765)),'site'),(int(os.environ.get('WEB_BUY_PORT',8766)),'buy-test')]:
   servers.append(subprocess.Popen([sys.executable,str(HERE/'preview.py'),'--port',str(port),'--site',str(HERE/'output'/name)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL))
  time.sleep(.4)
- assert all(p.poll() is None for p in servers),'Preview server did not start (ports 8765/8766 must be free)'
+ assert all(p.poll() is None for p in servers),'Preview server did not start (WEB_PORT/WEB_BUY_PORT must be free; defaults 8765/8766)'
  subprocess.run(['node',str(HERE/'browser-check.cjs')],check=True)
 finally:
  for p in servers:p.terminate();p.wait()

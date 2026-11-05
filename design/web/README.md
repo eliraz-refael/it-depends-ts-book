@@ -2,8 +2,8 @@
 
 Plain static HTML/CSS built from the frozen `book/` tree. B, “Paperback on
 screen,” is the visual reference; the home page follows Main. The selected navy
-cover supplies the hero's visual language and the approved copy. No deployment
-workflow or repository settings are part of this work.
+cover supplies the hero's visual language and the approved copy. The Pages workflow publishes only the checked public site; repository settings
+remain a manual author step.
 
 ## Build and preview
 
@@ -50,7 +50,8 @@ two byte-identical public builds and inventories, then uses the print project's
 pinned local Chrome with built-in Node CDP APIs. No browser package or download is
 needed. Chrome's current path is the existing macOS print-toolchain path; a
 matching pinned browser is required. Ports 8765 and 8766 must be free for the
-short-lived test servers. The preview command is separate and stays running
+short-lived test servers (or set `WEB_PORT` and `WEB_BUY_PORT` to two free ports
+for both the servers and browser checks). The preview command is separate and stays running
 until stopped.
 
 Prose stays at 660px. On viewports at least 760px wide, fences and tables
@@ -122,12 +123,46 @@ experiment generators are not included. Cast names/roles and act titles come
 from the book, not the mockups' static arrays. Tan is decoration only; cream is
 used for text on navy. The five-part explanation allows open endings.
 
-## Deployment later
+## GitHub Pages deployment
 
-This PR does not publish anything. After the paperback is in the store, set its
-real URL, confirm the desired `base_url`, rerun checks, and review the generated
-buy state. A later deployment PR can publish **only `output/site/`** as a GitHub
-Pages artifact. Canonicals, sitemap and assets already support the project
-subpath. `robots.txt` is provided in that artifact; crawler rules on a GitHub
-project site ultimately depend on the origin-root robots file. No analytics,
-CDNs, external fonts, cookies, dark mode or framework are included.
+One manual setup step for the author: **Settings → Pages → Build and deployment
+→ Source: GitHub Actions**. Once this workflow is merged, a matching push to
+`main` deploys the checked site. You can also choose **Actions → Deploy web edition
+to Pages → Run workflow** on `main`; dispatches on other branches do not deploy.
+The site URL is https://eliraz-refael.github.io/it-depends-ts-book/.
+
+`.github/workflows/pages.yml` builds on Ubuntu 24.04, reads Python and Node pins
+from `design/print/trial-toolchain.json`, installs `design/web/requirements.txt`
+(which includes the pinned print requirements) and runs `npm ci`. All actions
+are pinned to full commit SHAs, with version comments. Full checkout history is
+needed for the frozen-source comparison. Only `design/web/output/site` is
+uploaded: reports, screenshots, manifests and the buy-test edition stay out.
+A single Pages concurrency group serializes deployments.
+
+CI runs `python design/web/check --static-only`: all static checks and two
+byte-identical builds must pass before the official configure/upload/deploy
+Pages actions run. The existing browser check requires the exact pinned macOS
+Chrome binary; the changing Ubuntu runner browser has not been validated as a
+replacement. CI explicitly logs these skipped checks and writes a SKIPPED
+`output/browser-check.json`:
+
+- 108 responsive page checks, gutters, overflow, desktop widths/centering and
+  header-link placement in the browser.
+- Real-DOM fence text, typing-column ligatures, browser storage, network requests
+  and JavaScript errors.
+- No-JS contents, pointer/keyboard activation, Escape/focus, reading progress,
+  buy-enabled browser controls and screenshots.
+
+The accepted print PDF hash check also remains local: its artifact is not in
+Git. Source/print preservation, exact source text and fences, links and assets,
+contrast, heading order, source navigation order, compiler controls and empty
+buy-control checks still run in CI. The default local command retains every
+browser check; `--static-only` is an explicit opt-out, never an automatic fallback.
+
+`paperback_url` remains empty, so the deployed site has no buy controls. When the
+Amazon listing exists, put its actual HTTPS URL in `design/web/config.json`'s
+`paperback_url`, rerun the local full web check and review the buy state, then
+merge that change to `main`. The workflow deploys it automatically. No manuscript
+edit is needed. Canonicals, sitemap and assets support the project subpath;
+crawler rules ultimately depend on the origin-root robots file. No analytics,
+CDNs, external fonts, cookies or framework are included.
