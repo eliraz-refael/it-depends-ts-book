@@ -7,6 +7,8 @@ const { pathToFileURL } = require('node:url');
 const assert = require('node:assert/strict');
 const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const pins = require('../print/trial-toolchain.json');
+const siteOrigin = `http://127.0.0.1:${process.env.WEB_PORT || 8765}`;
+const buyOrigin = `http://127.0.0.1:${process.env.WEB_BUY_PORT || 8766}`;
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function main() {
@@ -48,7 +50,7 @@ async function main() {
         const value = msg.params.args[0]?.value;
         if (typeof value === 'string' && value.startsWith('PROOF_PROGRESS')) console.log(value);
       }
-      if (msg.method === 'Network.requestWillBeSent' && /^https?:/.test(msg.params.request.url) && !/^http:\/\/127\.0\.0\.1:(8765|8766)\//.test(msg.params.request.url)) external.push(msg.params.request.url);
+      if (msg.method === 'Network.requestWillBeSent' && /^https?:/.test(msg.params.request.url) && ![siteOrigin,buyOrigin].includes(new URL(msg.params.request.url).origin)) external.push(msg.params.request.url);
       if (msg.method === 'Runtime.exceptionThrown') errors.push(msg.params.exceptionDetails);
     };
     function cdp(method, params = {}) {
@@ -65,7 +67,7 @@ async function main() {
       return result.result.value;
     }
     await cdp('Page.enable'); await cdp('Runtime.enable'); await cdp('Network.enable');
-    const base = `http://127.0.0.1:${process.env.WEB_PORT || 8765}`;
+    const base = siteOrigin;
     const config = JSON.parse(await fs.readFile(path.join(__dirname,'config.json'),'utf8'));
     const prefix = new URL(config.base_url).pathname;
     const site = path.join(__dirname,'output/site');
@@ -164,7 +166,7 @@ async function main() {
     }
     await cdp('Emulation.setScriptExecutionDisabled',{value:false});
     // Test-only server/site has a nonempty paperback URL; production remains empty.
-    await cdp('Page.navigate',{url:'http://127.0.0.1:8766'+prefix});
+    await cdp('Page.navigate',{url:buyOrigin+prefix});
     await delay(500);await evaluate('document.fonts.ready.then(()=>true)');
     assert.ok(await evaluate('document.querySelectorAll("[data-buy]").length===2'),'Test buy links missing');
     await cdp('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
