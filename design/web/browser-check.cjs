@@ -107,13 +107,16 @@ async function main() {
             prose:document.querySelector('.book-body') ? (()=>{const e=document.querySelector('.book-body'),r=e.getBoundingClientRect(),s=getComputedStyle(e);return {width:r.width-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight),center:r.x+r.width/2};})():null,
             wide:[...document.querySelectorAll('.book-body .code-block,.book-body .table-scroll,.symbol-key .symbol-group > table')].map(e=>{const r=e.getBoundingClientRect();return {width:r.width,center:r.x+r.width/2};}),
             headerLinks:[...document.querySelectorAll('.header-inner nav > a:not([data-buy])')].map(e=>e.textContent),
+            soon:[...document.querySelectorAll('[data-paperback-soon]')].map(e=>({text:e.textContent,plain:e.tagName==='SPAN' && !e.closest('a,button,[role=button],[role=link]') && e.tabIndex===-1,visible:e.getBoundingClientRect().height>0,cursor:getComputedStyle(e).cursor,decoration:getComputedStyle(e).textDecorationLine})),
             fenceWidths:[...document.querySelectorAll('[data-fence]')].map(e=>({id:e.dataset.fence,client:e.parentElement.clientWidth,scroll:e.parentElement.scrollWidth})),
             code:[...document.querySelectorAll('[data-fence]')].map(e=>[e.dataset.fence,e.textContent]),
             storage:[localStorage.length,sessionStorage.length,document.cookie],
             key:[...document.querySelectorAll('[data-key-literal]')].map(e=>getComputedStyle(e).fontVariantLigatures)};
         })()`);
         assert.ok(measure.scroll<=width && measure.bodyScroll<=width,`${entry.route} @ ${width}: horizontal overflow ${measure.scroll}`);
-        assert.equal(measure.h1,1);assert.equal(measure.buy,0);assert.deepEqual(measure.storage,[0,0,'']);
+        assert.equal(measure.h1,1);assert.equal(measure.buy,0);
+        assert.equal(measure.soon.length,entry.route==='' || /^(chapters|bonus)\//.test(entry.route) ? 1 : 0,'Coming-soon count');
+        assert.ok(measure.soon.every(x=>x.text==='Paperback coming soon' && x.plain && x.visible && x.cursor==='auto' && x.decoration==='none'),'Coming-soon plain visible text');assert.deepEqual(measure.storage,[0,0,'']);
         if(!process.env.WEB_MEASURE_ONLY) {
           assert.deepEqual(measure.headerLinks,entry.route==='' ? ['Start reading'] : [],'Header reading link');
           if(width===1280 && measure.prose) {
@@ -170,7 +173,11 @@ async function main() {
     await delay(500);await evaluate('document.fonts.ready.then(()=>true)');
     assert.ok(await evaluate('document.querySelectorAll("[data-buy]").length===2'),'Test buy links missing');
     await cdp('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+    assert.equal(await evaluate('document.querySelectorAll("[data-paperback-soon]").length'),0,'Buy replaces coming soon');
     await shot('home-buy-test-1280');
+    await cdp('Page.navigate',{url:buyOrigin+prefix+chapter1});
+    await delay(500);await evaluate('document.fonts.ready.then(()=>true)');
+    assert.ok(await evaluate('document.querySelectorAll("[data-buy]").length===2 && document.querySelectorAll(".paperback-invitation [data-buy]").length===1 && !document.querySelector("[data-paperback-soon]")'),'Chapter buy replaces coming soon');
     assert.deepEqual(external,[],'Third-party requests');assert.deepEqual(errors,[],'Browser errors');
     await fs.writeFile(path.join(__dirname,'output/browser-check.json'),JSON.stringify({status:'PASS',pages:36,widths:[1280,390,360],results,noJavaScriptPages:6,external,errors,screenshots:await fs.readdir(output)},null,2)+'\n');
   } finally {

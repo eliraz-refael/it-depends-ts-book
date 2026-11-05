@@ -32,8 +32,10 @@ reports and the buy-button test edition are siblings, not public assets.
 
 `config.json` controls the canonical base URL, repository URL, frozen source
 commit and `paperback_url`. Leave `paperback_url` empty until the real Amazon
-listing is ready: every buy control is omitted, including its surrounding
-invitation. Do not edit the manuscript to change web settings.
+listing is ready: quiet, non-link “Paperback coming soon” text appears beside
+Home’s Start reading button and below each chapter/bonus navigation card. The
+header omits the buy control in this state. Do not edit the manuscript to change
+web settings.
 
 ## Checks
 
@@ -78,7 +80,8 @@ Checks cover:
   the six external URLs remain unchanged. See `output/check.json` for the mapping.
 - Four source-owned occurrences of “placeholder,” no generated occurrences,
   and no TBD, example.invalid or PROOF in visible text.
-- No buy links in the default build; an isolated test edition uses an Amazon
+- Coming-soon text is present as a plain span in the prescribed Home and
+  chapter/bonus slots, with zero buy links in the default build; an isolated test edition uses an Amazon
   search URL to show the controls without inventing a book listing.
 - Header reading link on Home only; at 1280px, prose is 660px and examples
   are 880px, centered on it. Per-fence client/scroll widths are recorded.
@@ -159,10 +162,12 @@ contrast, heading order, source navigation order, compiler controls and empty
 buy-control checks still run in CI. The default local command retains every
 browser check; `--static-only` is an explicit opt-out, never an automatic fallback.
 
-`paperback_url` remains empty, so the deployed site has no buy controls. When the
+`paperback_url` remains empty, so the deployed site has no buy controls and
+shows “Paperback coming soon” in its Home and end-of-chapter invitations. When the
 Amazon listing exists, put its actual HTTPS URL in `design/web/config.json`'s
 `paperback_url`, rerun the local full web check and review the buy state, then
-merge that change to `main`. The workflow deploys it automatically. No manuscript
+merge that change to `main`. The real buy button replaces the coming-soon text everywhere, and the header
+buy button returns. The workflow deploys it automatically. No manuscript
 edit is needed. Canonicals, sitemap and assets support the project subpath;
 crawler rules ultimately depend on the origin-root robots file. No analytics,
 CDNs, external fonts, cookies or framework are included.

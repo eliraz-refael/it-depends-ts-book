@@ -32,7 +32,16 @@ def check(site,config):
  texts={};fences={};inline={};links=[];terms=Counter();terms_re=re.compile('placeholder|TBD|example\\.invalid|PROOF')
  for file,d in docs.items():
   assert_(len([n for n in d.nodes if n['tag']=='h1'])==1,file+': H1')
-  assert_(not d.selected('data-buy') if not config['paperback_url'] else True,file+': buy button')
+  route=m['pages'][file]['route']
+  invitation=route=='' or route.startswith(('chapters/','bonus/'))
+  soon=d.selected('data-paperback-soon');buy=d.selected('data-buy')
+  assert_(len(soon)==(int(invitation) if not config['paperback_url'] else 0),file+': coming-soon count')
+  for n in soon:
+   assert_(n['tag']=='span' and n['text']=='Paperback coming soon' and set(n['attrs'])=={'class','data-paperback-soon'} and n['attrs']['class']=='paperback-soon',file+': coming-soon is plain text')
+   assert_(('actions' if route=='' else 'paperback-invitation') in n['ancestors'],file+': coming-soon placement')
+  assert_(len(buy)==(1+int(invitation) if config['paperback_url'] else 0),file+': buy link count')
+  for n in buy:
+   assert_(n['tag']=='a' and n['attrs'].get('href')==config['paperback_url'],file+': buy URL')
   ids=[n['attrs']['id'] for n in d.selected('id')];assert_(len(ids)==len(set(ids)),file+': duplicate anchors')
   for attr,dest in [('data-source-text',texts),('data-fence',fences),('data-inline',inline)]:
    for n in d.selected(attr):
