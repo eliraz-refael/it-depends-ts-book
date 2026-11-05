@@ -23,3 +23,7 @@
     margin-right:calc((660px - var(--example-width)) / 2);
   }
 }
+
+.paperback-soon{font-size:15px;font-weight:400;color:var(--muted);cursor:auto;text-decoration:none}
+.actions{align-items:center}
+.paperback-invitation{max-width:708px;margin:-36px auto 0;padding:0 24px 48px;text-align:center}

@@ -19,6 +19,8 @@ assert files(site)==files(repeat),'Two clean builds differ'
 assert site.with_suffix('.manifest.json').read_bytes()==repeat.with_suffix('.manifest.json').read_bytes(),'Build inventories differ'
 result=checks.check(site,config)
 assert not result['failures'],result['failures']
+buy_result=checks.check(HERE/'output/buy-test',{**config,'paperback_url':'https://www.amazon.com/s?k=It+Depends+Eliraz+Kedmi'})
+assert not buy_result['failures'],buy_result['failures']
 (HERE/'output/determinism.json').write_text(json.dumps({'status':'PASS','files':len(files(site)),'sha256':files(site)},indent=2)+'\n')
 if args.static_only:
  skipped=['108 responsive page checks (1280/390/360px), gutters and overflow',
