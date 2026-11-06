@@ -127,6 +127,7 @@ def check(site,config):
  listed=[x.text for x in sitemap.findall('{*}url/{*}loc')]
  assert_(listed==[p['canonical'] for p in m['pages'].values() if p['route']!='404.html'],'Sitemap page inventory')
  assert_('Sitemap: '+config['base_url']+'sitemap.xml' in (site/'robots.txt').read_text(),'Robots sitemap')
+ assert_((site/'google0016ea1bbf4c2d4a.html').read_text()==(HERE/'google0016ea1bbf4c2d4a.html').read_text(),'Search Console verification file')
  for target in re.findall(r'url\(([^)]+)\)',css):assert_((site/'assets'/target.strip('"\'')).is_file(),'CSS asset: '+target)
  for name in ['IBMPlexSans-OFL.txt','JetBrainsMono-OFL.txt','Oxanium-OFL.txt']:assert_((site/'assets/fonts'/name).is_file(),'Font licence '+name)
  for file,d in docs.items():
