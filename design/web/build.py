@@ -151,6 +151,7 @@ def build(out,config):
     shutil.copytree(ROOT/'design/print/fonts',assets/'fonts')
     shutil.copyfile(ROOT/'design/cover/front.png',assets/'cover.png')
     write(out/'sitemap.xml','<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join(f'<url><loc>{E(p["canonical"])}</loc></url>' for p in manifest['pages'].values() if p['route']!='404.html')+'</urlset>')
+    shutil.copyfile(HERE/'google0016ea1bbf4c2d4a.html',out/'google0016ea1bbf4c2d4a.html')
     write(out/'robots.txt','User-agent: *\nAllow: /\nSitemap: '+urljoin(base,'sitemap.xml')+'\n')
     manifest['assets']={str(p.relative_to(out)):digest(p) for p in assets.rglob('*') if p.is_file()}
     write(out.with_suffix('.manifest.json'),json.dumps(manifest,indent=2,ensure_ascii=False)+'\n')
