@@ -1,10 +1,20 @@
 /* Release-only furniture. All manuscript typography remains in proof.css. */
 @page { @bottom-left { content:none; } }
+@page :left {
+  @bottom-left { content:counter(page); font:10pt Oxanium; }
+  @bottom-right { content:none; }
+}
 .copyright { padding-top:135pt; font:9.5pt/14pt Plex; }
 .copyright-line { height:14pt; white-space:pre; }
 
 /* Suppress furniture without changing the page box or any flow dimensions. */
-.pagedjs_page:is([data-page-number="1"],[data-page-number="2"],[data-page-number="3"]) :is(.pagedjs_margin-top-center,.pagedjs_margin-bottom-right) { visibility:hidden; }
+.pagedjs_page:is([data-page-number="1"],[data-page-number="2"],[data-page-number="3"]) :is(.pagedjs_margin-top-center,.pagedjs_margin-bottom-left,.pagedjs_margin-bottom-right) { visibility:hidden; }
 .title-top-rule { border-top:2pt solid #181818; height:23.25pt; }
 .release-author { position:absolute; left:0; right:0; bottom:65pt; border-top:.7pt solid #555; padding-top:16pt; font:22pt/29pt Plex; }
 a { text-decoration:none; }
+
+/* Center the dedication on the paper, compensating for mirrored margins.
+   The paragraph keeps its original italic font, size and line height. */
+.dedication { padding-top:0; }
+.dedication p { position:absolute; top:311.04pt; left:calc(50% - 5.04pt); width:100%; margin:0; transform:translate(-50%, -50%); text-align:center; }
+.pagedjs_left_page .dedication p { left:calc(50% + 5.04pt); }

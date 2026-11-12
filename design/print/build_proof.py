@@ -20,6 +20,7 @@ import footnote_trial as trial
 import prose_quotes
 import symbol_key
 import release_export
+import check_release_polish
 
 HERE, ROOT = trial.HERE, trial.ROOT
 MD = trial.MD
@@ -291,6 +292,10 @@ def validate(directory, manifest, mode="proof"):
     document = pymupdf.open(directory / 'raw.pdf')
     colour_audit = release_export.greyscale(document) if is_release else None
     failures, observations = [], []
+    if is_release:
+        furniture = check_release_polish.geometry(document)
+        failures.extend(furniture['failures'])
+        write_json(directory/'furniture-validation.json', furniture)
     def check(ok, message):
         if not ok:
             failures.append(message)

@@ -95,8 +95,8 @@ Checks cover:
 - The site is built from the committed manuscript: every `book/` file must match
   `HEAD`, so uncommitted edits fail the build. With `WEB_PRINT_PDF`, the PDF must
   retain SHA-256
-  `b34445da5a069e6a455df97328ab1a8fc9537ab2b15107c31d58a1ad2371e7b3`, the accepted
-  first-print interior. Without that artifact, the report says the PDF check was
+  `5643b928391164ce4933c230a12e2718f8862cface039865bf2bfed776373811`, the corrected
+  printed-proof interior. Without that artifact, the report says the PDF check was
   not supplied. Print is not rerendered for a byte hash.
 
 Results: `output/check.json`, `browser-check.json`, `determinism.json` and
