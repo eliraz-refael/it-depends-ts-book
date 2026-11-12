@@ -2,14 +2,15 @@
 
 Frozen source: `c37c3eae94bd4787ba97f9c58e4aa92e2ea3b333`. The 34-file
 `book/` tree is unchanged; it is byte-identical to the accepted d03727a manuscript.
-No manuscript, dependencies, renderer, type sizes or body layout were changed.
+No manuscript, dependencies, renderer or type sizes were changed. The printed-proof
+repairs move only verso folios and the p3 dedication; all other body layout is unchanged.
 
-## Deliverable
+## Deliverable (printed-proof fixes, November 12, 2026)
 
 `design/print/output/whole-book-release-c37c3ea/a/It-Depends-KDP-interior.pdf`
 
-- 438 pages, PDF 1.4, **2,171,535 bytes** (about 2.17 MB).
-- SHA-256: `b34445da5a069e6a455df97328ab1a8fc9537ab2b15107c31d58a1ad2371e7b3`.
+- 438 pages, PDF 1.4, **2,170,244 bytes** (about 2.17 MB).
+- SHA-256: `5643b928391164ce4933c230a12e2718f8862cface039865bf2bfed776373811`.
 - Every page is 7 × 10 inches; no bleed, crop marks or printer marks.
 - Black/greyscale only; all fonts embedded, including outlined numeral glyphs.
 - The final release count agrees with the selected cover's 438-page basis.
@@ -152,8 +153,9 @@ proof CSS changes; the full suite and proof-mode result above remain the results
 of the immediately preceding release build, not a claim of rerunning them for
 this CSS-only polish.
 
-`check_release_polish.py` compares the final output against the archived accepted
-release. It asserts the exact title/subtitle spans, author placement, blank
+At that earlier polish, `check_release_polish.py` compared the output against the
+archived pre-polish release. The following is the historical result; the current
+checker instead guards the two printed-proof repairs described below. It asserts the exact title/subtitle spans, author placement, blank
 furniture regions, identical copyright/dedication bodies, identical pp4–8 rasters,
 and identical text and character positions on every page after p8. It derives
 allowed removal rectangles from the accepted PDF's actual underline vectors and
@@ -171,3 +173,40 @@ without furniture; p13 README and note without underlines, callout retained.
 Requested images: `a/pages/page-001.png`, `page-002.png`, `page-003.png` and
 `page-013.png`. All are included in the complete page-image output. No remaining
 cosmetic departures. No push or upload.
+
+
+## Printed-proof fixes (November 12, 2026)
+
+Verso folios move to the outer bottom-left edge; rectos keep their exact original
+bottom-right placement. Pages 1–3 retain no furniture. The p3 dedication keeps
+its original italic Plex typography and is centered on the paper. Measured
+text-box center: **(251.983154, 359.878830)pt**, within 1pt of (252,360).
+Page 10's folio starts at **48.949219pt**; p11's right edge remains
+**455.029755pt**. The baseline remains **697.5pt** on both.
+
+The accepted baseline for this repair is SHA-256
+`b34445da5a069e6a455df97328ab1a8fc9537ab2b15107c31d58a1ad2371e7b3`. The current
+`check_release_polish.py` checks every character, style and position and every
+144dpi page raster. Only the exact old/new verso folio glyph boxes and p3
+text glyph boxes are exempted, with a one-pixel antialiasing allowance. All
+other geometry and pixels match. The current comparison report replaces the
+historical underline-comparison artifact in this worktree's output directory.
+
+The source remains `c37c3ea`; no `book/` change calls for a new manuscript pin.
+The web build still reads HEAD and its optional PDF hash now names this repaired
+artifact. The isolated render uses Chrome for Testing at the original
+156.0.8078.80 version and Python 3.14.8, with the existing dependency pins.
+
+Requested images: `a/pages/page-003.png`, `page-010.png`, `page-011.png`,
+`page-436.png`, `page-437.png`; the full-size spread is `a/spread-010-011.png`.
+The deliverable remains 438 pages, so the cover spine needs no change.
+
+Validation: PASS for clean root and print `npm ci`, all 25 `npm run check`
+scripts, both full release renders, their text/geometry/raster comparison, the
+accepted-interior comparison, release sanitation and furniture regression
+controls, and `design/web/check --static-only` with the new PDF hash. Exactly
+219 pages differ from the accepted artifact: p3 and the 218 versos p4–438.
+The other 219 pages are pixel-identical; no unexpected text geometry or raster
+differences remain. Pages 1–3 have no folios and every later page has exactly one.
+The web browser checks were not requested and remain explicitly skipped by
+static-only mode. No source, lockfile or release-metadata edits; no push/upload.

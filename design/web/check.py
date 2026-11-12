@@ -135,7 +135,7 @@ def check(site,config):
   assert_(any(n['attrs'].get('property')=='og:image' and n['attrs'].get('content')==config['base_url']+'assets/cover.png' for n in d.nodes),file+': OG image')
  artifact=os.environ.get('WEB_PRINT_PDF');print_pdf={'status':'not supplied; print source still checked'}
  if artifact:
-  actual=build.digest(Path(artifact));expected='b34445da5a069e6a455df97328ab1a8fc9537ab2b15107c31d58a1ad2371e7b3'
+  actual=build.digest(Path(artifact));expected='5643b928391164ce4933c230a12e2718f8862cface039865bf2bfed776373811'
   assert_(actual==expected,'Accepted print PDF changed');print_pdf={'status':'PASS' if actual==expected else 'FAIL','sha256':actual}
  result={'status':'FAIL' if fail else 'PASS','failures':fail,'pages':len(docs),'source_files':len(m['source_hashes']),'texts':len(texts),'fences':len(fences),'inline_code':len(inline),'quote_blocks':len(m['quotes']),'links':m['links'],'publication_terms':dict(terms),'contrast':contrast,'print_pdf':print_pdf}
  (HERE/'output/check.json').write_text(json.dumps(result,indent=2)+'\n');return result

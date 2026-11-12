@@ -318,8 +318,9 @@ source parsing and rendering.
 ## Release export
 
 The release mode uses the same frozen manuscript, renderer, typography and
-pagination as proof mode. It changes only the title-page furniture, copyright
-page, README note destination and PDF publication properties. No `book/` edits
+pagination as proof mode. It changes the title-page furniture, copyright page,
+README note destination, outer folio placement, dedication centering and PDF
+publication properties. No `book/` edits
 are made. Metadata is approved for KDP paperback, black ink on white paper,
 7 × 10 inches, no bleed. Continuous folios and next-page starts are retained.
 
@@ -362,18 +363,45 @@ and symbol-key pages keep both. The author is set at 22pt in Plex beneath a rule
 near the foot of the title page; title/subtitle positions are unchanged. Former
 link text and note URLs have no underlines; callouts remain.
 
+Visible folios are on the outer text edge: bottom-left on even pages (x≈48.96pt)
+and bottom-right on odd pages (right edge x≈455.04pt), in the same 10pt Oxanium
+with baseline y=697.5pt. Pages 1–3 suppress both bottom boxes. The p3 dedication
+keeps its italic Plex type and size, centered on the 504×720pt paper; its measured
+text-box center must lie within 1pt of (252,360), not the mirrored text area.
+These are release-only CSS changes. `build_proof.py` checks every page and writes
+`furniture-validation.json`. Run the regression controls against the final PDF:
+
+```sh
+design/print/.venv/bin/python design/print/check_release.py \
+  --pdf design/print/output/whole-book-release-c37c3ea/a/It-Depends-KDP-interior.pdf
+```
+
+The manuscript is unchanged, so `release-metadata.json`'s `manuscript_commit`
+remains `c37c3eae94bd4787ba97f9c58e4aa92e2ea3b333`. The web build continues to read
+`HEAD`; only its optional accepted-interior artifact hash changes.
+
+If the system browser has updated, set `PRINT_CHROME` to an isolated Chrome for
+Testing executable at the exact version in `trial-toolchain.json`. The renderer
+accepts that product label but still requires the exact version; it never skips
+the pin. Python and dependency versions must also match the pinned toolchain.
+
 To compare cosmetic changes against an archived accepted release:
 
 ```sh
 design/print/.venv/bin/python design/print/check_release_polish.py \
-  design/print/output/whole-book-release-c37c3ea/accepted-8be209a \
+  /absolute/path/to/accepted-b34445da-directory \
   design/print/output/whole-book-release-c37c3ea/a
 ```
 
-This asserts 438 pages, exact title/subtitle placement, unchanged copyright and
-dedication bodies, identical pp4–8 rasters, and unchanged text/geometry and rasters
-on pp9–438 except the exact former underline paths (one raster-pixel allowance
-for antialiasing). It verifies that those paths are absent in the new PDF.
+This asserts 438 pages, unchanged title and copyright, unchanged
+dedication text and typography, and unchanged character geometry and 144dpi page
+rasters outside the two permitted repairs: verso folio glyph boxes and the old
+and new dedication glyph boxes on p3. Only one raster pixel of antialiasing
+allowance surrounds those boxes. Every recto after p3 is identical, as are pp1–2;
+all other content on every verso is identical. The baseline is SHA-256
+`b34445da5a069e6a455df97328ab1a8fc9537ab2b15107c31d58a1ad2371e7b3`, the accepted
+first-print interior. The earlier underline/title polish is historical evidence
+in RELEASE-EXPORT.md; this comparator now guards the two printed-proof fixes.
 
 The settled publication-term rule is source-based: every occurrence of
 `placeholder`, `TBD` or `example.invalid` must match the frozen source's exact

@@ -1,5 +1,5 @@
 """Adversarial controls for release PDF sanitation and publication metadata."""
-import tempfile
+import argparse, tempfile
 from pathlib import Path
 import pymupdf
 import release_export as release
@@ -36,4 +36,27 @@ def main():
         (root/'source.md').write_text('Different source.\n')
         assert release.publication_terms(source,manifest,pages,root)['failures'],'Source count mismatch escaped'
     print('PASS: red paint, outline, link, annotation, form, JavaScript and false metadata controls; clean PDF preserves text and real Info/XMP')
-if __name__=='__main__':main()
+def furniture_controls(pdf):
+    from check_release_polish import geometry, folios
+    original=Path(pdf).read_bytes()
+    good=pymupdf.open(stream=original,filetype='pdf')
+    assert not release.errors(good),release.errors(good)
+    assert not geometry(good)['failures'],geometry(good)['failures']
+    for number in (1,2,3):
+        doc=pymupdf.open(stream=original,filetype='pdf');doc[number-1].insert_text((49,697.5),str(number))
+        assert f'p{number}: front-matter footer must be empty' in geometry(doc)['failures']
+        doc.close()
+    duplicate=pymupdf.open(stream=original,filetype='pdf');duplicate[9].insert_text((430,697.5),'10')
+    assert 'p10: missing, extra or wrong folio' in geometry(duplicate)['failures']
+    wrong=pymupdf.open(stream=original,filetype='pdf')
+    page=wrong[9];page.add_redact_annot(folios(page)[0]['bbox']);page.apply_redactions();page.insert_text((430,697.5),'10')
+    assert 'p10: folio is not at the outer text edge' in geometry(wrong)['failures']
+    offcenter=pymupdf.open(stream=original,filetype='pdf');page=offcenter[2]
+    page.add_redact_annot(page.rect);page.apply_redactions();page.insert_text((59,291),'For Dafna, Refael, Noa, and Shiri.')
+    assert 'Dedication text box is not centered on the paper within 1pt' in geometry(offcenter)['failures']
+    print('PASS: all 438 pages, outer folios and centered dedication; forbidden front-matter folios, duplicate folio, wrong-side folio and off-center dedication controls')
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--pdf',type=Path);args=parser.parse_args()
+    main()
+    if args.pdf:furniture_controls(args.pdf)

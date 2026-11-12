@@ -5,13 +5,14 @@ const path = require('node:path');
 const os = require('node:os');
 const { pathToFileURL } = require('node:url');
 const assert = require('node:assert/strict');
-const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const chrome = process.env.PRINT_CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const pins = require('./trial-toolchain.json');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function main() {
   assert.equal(process.version, pins.node, 'Node pin');
-  assert.equal(execFileSync(chrome, ['--version'], { encoding: 'utf8' }).trim(), pins.chrome, 'Chrome pin');
+  const chromeVersion = execFileSync(chrome, ['--version'], { encoding: 'utf8' }).trim();
+  assert.equal(chromeVersion.replace(' for Testing', ''), pins.chrome, 'Chrome pin');
   const spec = JSON.parse(await fs.readFile(process.argv[2], 'utf8'));
   const profile = await fs.mkdtemp(path.join(os.tmpdir(), 'book-footnotes-'));
   const browser = spawn(chrome, ['--headless', '--remote-debugging-port=0', '--allow-file-access-from-files',
