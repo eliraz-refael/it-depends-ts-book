@@ -30,11 +30,11 @@ edit, archive/remove only `design/web/output/site/`, or pass
 are ignored. The public site is **only** `output/site/`; manifests, screenshots,
 reports and the buy-button test edition are siblings, not public assets.
 
-`config.json` controls the canonical base URL, repository URL, frozen source
-commit and `paperback_url`. Leave `paperback_url` empty until the real Amazon
-listing is ready: quiet, non-link “Paperback coming soon” text appears beside
-Home’s Start reading button and below each chapter/bonus navigation card. The
-header omits the buy control in this state. Do not edit the manuscript to change
+`config.json` controls the canonical base URL, repository URL and
+`paperback_url`. `paperback_url` holds the live Amazon listing, so the header,
+Home's Start reading row and each chapter/bonus navigation card show the buy
+link. Emptying it restores the quiet, non-link “Paperback coming soon” text in
+those slots and removes the header control. Do not edit the manuscript to change
 web settings.
 
 ## Checks
@@ -80,9 +80,11 @@ Checks cover:
   the six external URLs remain unchanged. See `output/check.json` for the mapping.
 - Four source-owned occurrences of “placeholder,” no generated occurrences,
   and no TBD, example.invalid or PROOF in visible text.
-- Coming-soon text is present as a plain span in the prescribed Home and
-  chapter/bonus slots, with zero buy links in the default build; an isolated test edition uses an Amazon
-  search URL to show the controls without inventing a book listing.
+- With `paperback_url` set, every page has the header buy link and Home and
+  each chapter/bonus page add one in the prescribed slot, all pointing at that
+  URL, with no coming-soon text. With it empty, coming-soon text is a plain span
+  in those slots and there are zero buy links. An isolated test edition always
+  exercises the buy controls with an Amazon search URL.
 - Header reading link on Home only; at 1280px, prose is 660px and examples
   are 880px, centered on it. Per-fence client/scroll widths are recorded.
 - Every page at 1280, 390 and 360 pixels: no horizontal page overflow, phone
